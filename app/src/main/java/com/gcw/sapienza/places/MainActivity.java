@@ -1,18 +1,48 @@
 package com.gcw.sapienza.places;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import com.parse.*;
+import android.view.View;
+import android.widget.Button;
+
+
 
 public class MainActivity extends ActionBarActivity {
-    //
+    private static final String TAG = "MainActivity";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        //button listener for showing the list
+        Button btn_list = (Button)this.findViewById(R.id.button_list);
+        btn_list.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //open the list of flags
+                Intent show_list_intent = new Intent(MainActivity.this, FlagsListActivity.class);
+                MainActivity.this.startActivity(show_list_intent);
+            }
+        });
+
+        //button listener for showing the map
+        Button btn_map = (Button)this.findViewById(R.id.button_map);
+        //TODO implement the map :)
+        btn_map.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.e(TAG, "NOT IMPLEMENTED");
+            }
+        });
+
+
     }
 
 
