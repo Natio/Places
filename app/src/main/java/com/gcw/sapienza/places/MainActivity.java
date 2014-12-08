@@ -12,10 +12,6 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Parse.initialize(this, "BWtqN9x6uyr935MKAROcWkc6mzv8KLQMMVnFGHps", "Gr1g8Z2kfv3AOZqToZ30hyMyNzH24vj4yudNoKfb");
-
-
-
         setContentView(R.layout.activity_main);
     }
 
