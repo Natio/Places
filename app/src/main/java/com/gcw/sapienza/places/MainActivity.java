@@ -4,13 +4,18 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-
+import com.parse.*;
 
 public class MainActivity extends ActionBarActivity {
     //
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Parse.initialize(this, "BWtqN9x6uyr935MKAROcWkc6mzv8KLQMMVnFGHps", "Gr1g8Z2kfv3AOZqToZ30hyMyNzH24vj4yudNoKfb");
+
+
+
         setContentView(R.layout.activity_main);
     }
 
