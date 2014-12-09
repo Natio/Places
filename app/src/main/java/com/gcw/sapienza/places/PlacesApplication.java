@@ -3,11 +3,10 @@ package com.gcw.sapienza.places;
 import android.app.Application;
 import android.util.Log;
 
+import com.cgw.sapienza.places.model.Flag;
 import com.parse.Parse;
+import com.parse.ParseObject;
 
-/**
- * Created by paolo on 08/12/14.
- */
 
 public class PlacesApplication extends Application{
     //just the tag for logging
@@ -25,7 +24,9 @@ public class PlacesApplication extends Application{
         super.onCreate();
 
         // initialize Parse.com
+        ParseObject.registerSubclass(Flag.class);
         Parse.initialize(this, PARSE_COM_APP_KEY , PARSE_COM_CLIENT_KEY);
+
         Log.d(TAG, "Hi");
     }
 }
