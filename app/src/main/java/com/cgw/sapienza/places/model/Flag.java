@@ -3,7 +3,9 @@ package com.cgw.sapienza.places.model;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
 
-
+/**
+ * Class that encapsulate the Post table on Parse.com
+ */
 @ParseClassName("Posts")
 public class Flag extends ParseObject{
 
