@@ -3,7 +3,6 @@ package com.gcw.sapienza.places;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,11 +33,12 @@ public class MainActivity extends ActionBarActivity {
 
         //button listener for showing the map
         Button btn_map = (Button)this.findViewById(R.id.button_map);
-        //TODO implement the map :)
         btn_map.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.e(TAG, "NOT IMPLEMENTED");
+                //open the list of flags
+                Intent show_map_intent = new Intent(MainActivity.this, FlagsMapActivity.class);
+                MainActivity.this.startActivity(show_map_intent);
             }
         });
 

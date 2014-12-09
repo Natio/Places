@@ -43,8 +43,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".FlagsListActivity">
         </activity>
+
+        <activity android:name=".FlagsMapActivity">
+        </activity>
+
     </application>
 
 </manifest>
