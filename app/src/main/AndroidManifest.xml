@@ -3,8 +3,18 @@
     package="com.gcw.sapienza.places" >
 
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />      <!--required for google maps api and parse -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />      <!--required for  google maps api and parse -->
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>     <!--required for  google maps api-->
+    <!-- The following two permissions are not required to use
+         Google Maps Android API v2, but are recommended. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>    <!-- google maps api-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>   <!-- google maps api-->
+
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true"/>   <!-- google maps api-->
 
     <application
         android:allowBackup="true"
@@ -13,10 +23,16 @@
         android:theme="@style/AppTheme"
         android:name="com.gcw.sapienza.places.PlacesApplication">
 
-        <!-- Required for google maps api -->
+        <!-- **** REQUIRED FOR GOOGLE MAPS API **** -->
+
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-        <!-- end required  -->
+        <!-- API KEY-->
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyA4sqWely5RiqZDTBZMwxM9n9YFDkxtEEs"/>
+
+        <!-- **** END REQUIRED ****  -->
 
         <activity
             android:name=".MainActivity"
