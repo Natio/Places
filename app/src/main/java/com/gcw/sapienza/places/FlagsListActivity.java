@@ -34,6 +34,8 @@ public class FlagsListActivity extends Activity {
         //Create the query and execute it in background
         //TODO add location filtering
         ParseQuery<Flag> q = ParseQuery.getQuery(Flag.class);
+        ParseGeoPoint p = new ParseGeoPoint(41.8883656,12.5066291);
+        q.whereWithinKilometers("location",p, 1);
         q.findInBackground(new FindCallback<Flag>() {
             public void done(List<Flag> flags, ParseException e) {
                 if (e == null) {

@@ -1,6 +1,7 @@
 package com.cgw.sapienza.places.model;
 
 import com.parse.ParseClassName;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 
 /**
@@ -17,6 +18,10 @@ public class Flag extends ParseObject{
     public String getText(){
 
         return (String)this.get("text");
+    }
+
+    public ParseGeoPoint getLocation(){
+        return (ParseGeoPoint)this.get("location");
     }
 
 
