@@ -28,4 +28,16 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Share"
+        android:id="@+id/button_share"
+        android:layout_marginTop="83dp"
+        android:layout_below="@+id/button_map"
+        android:layout_alignRight="@+id/button_map"
+        android:layout_alignEnd="@+id/button_map"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>
