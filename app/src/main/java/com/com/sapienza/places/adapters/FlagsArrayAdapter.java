@@ -46,13 +46,15 @@ public class FlagsArrayAdapter extends ArrayAdapter<Flag> {
 
         textView.setText(current_post.getText());
         ParseUser post_owner = (ParseUser)current_post.get("user");
-        post_owner.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject object, ParseException e) {
-                subtitleTextView.setText((String)object.get("username"));
-            }
-        });
-
+        if (post_owner != null){
+            post_owner.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
+                @Override
+                public void done(ParseObject object, ParseException e) {
+                    subtitleTextView.setText((String)object.get("username"));
+                }
+            });
+        }
+  
         return row;
     }
 }
