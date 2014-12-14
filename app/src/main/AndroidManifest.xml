@@ -3,7 +3,7 @@
     package="com.gcw.sapienza.places" >
 
 
-    <uses-permission android:name="android.permission.INTERNET" />      <!--required for google maps api and parse -->
+    <uses-permission android:name="android.permission.INTERNET" />      <!--required for google maps api and parse and RemoteSettings-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />      <!--required for  google maps api and parse -->
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>     <!--required for  google maps api-->
