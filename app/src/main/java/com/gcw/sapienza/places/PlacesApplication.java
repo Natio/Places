@@ -8,8 +8,11 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.cgw.sapienza.places.model.Flag;
+import com.parse.LogInCallback;
 import com.parse.Parse;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
+import com.parse.ParseException;
 
 
 public class PlacesApplication extends Application{
@@ -23,7 +26,7 @@ public class PlacesApplication extends Application{
     private static final String PARSE_COM_CLIENT_KEY = "Gr1g8Z2kfv3AOZqToZ30hyMyNzH24vj4yudNoKfb";
 
     //Shared location manager
-    //fixme find a better way to handle gps
+    //fixme find a better way to handle GPS
     private LocationManager locationManager;
 
     //current location
@@ -40,6 +43,24 @@ public class PlacesApplication extends Application{
         // initialize Parse.com
         ParseObject.registerSubclass(Flag.class);
         Parse.initialize(this, PARSE_COM_APP_KEY , PARSE_COM_CLIENT_KEY);
+
+
+        //todo when we will have login/signup screen we can remove this. It is just for simulating a logged in user
+        if(ParseUser.getCurrentUser() != null){
+            Log.d(TAG, "Already logged in as: " + ParseUser.getCurrentUser().getUsername());
+        }
+        else{
+            ParseUser.logInInBackground("test_user", "test_pwd", new LogInCallback() {
+                @Override
+                public void done(ParseUser user, ParseException e) {
+                    if (user != null) {
+                        Log.d(TAG, "Logged in as: " + ParseUser.getCurrentUser().getUsername());
+                    } else {
+                        Log.d(TAG, "Login failed: " + e.getMessage());
+                    }
+                }
+            });
+        }
 
         Log.d(TAG, "Hi");
 
