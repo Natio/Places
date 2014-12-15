@@ -24,6 +24,30 @@ import java.io.InputStreamReader;
 
 /**
  * Class for configuring parameters of the app from a remote configuration file
+ *
+ *
+ *
+ * TUTORIAL
+ *
+ *  This class has a single instance that can be retrieved using:
+
+        RemoteSettings.getInstance();
+
+ *   To synchronize with the file on the server call this method when the app launches
+ *
+ *
+        RemoteSettings.getInstance().synchWithFileAtURL("http://someURL", callbacks);
+
+ *   It will download a JSON file containing the configurations. If it cannot retrieve the JSON file from the specified URL it will use a
+ *   previously saved configuration file located in the internal storage.
+ *
+ *  To retrieve a value from the settings use the following method:
+
+    RemoteSettings.getInstance().getValue(key, defaultVal);
+ *
+ *  defaultVal must be of the same type of the expected value, otherwise a ClassCastException is raised
+ *
+ *
  */
 public class RemoteSettings {
     private static final String TAG = "RemoteSettings";
