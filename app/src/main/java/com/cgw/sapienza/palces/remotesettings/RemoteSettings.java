@@ -168,7 +168,7 @@ public class RemoteSettings {
      * @param <T> type of the value
      * @return returns the settings value if present, otherwise will return defaultValue
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked","unused"})
     public <T> T getValue(String key, T defaultValue){
         if(this.storage.has(key)){
             try{
