@@ -42,6 +42,15 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
+        Button btn_share = (Button)this.findViewById(R.id.button_share);
+        btn_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent show_share = new Intent(MainActivity.this, ShareActivity.class);
+                MainActivity.this.startActivity(show_share);
+            }
+        });
+
 
     }
 

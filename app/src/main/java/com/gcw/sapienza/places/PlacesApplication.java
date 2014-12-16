@@ -26,5 +26,7 @@ public class PlacesApplication extends Application{
         // initialize Parse.com
         ParseObject.registerSubclass(Flag.class);
         Parse.initialize(this, PARSE_COM_APP_KEY , PARSE_COM_CLIENT_KEY);
+
+        Log.d(TAG, "Hi");
     }
 }

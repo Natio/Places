@@ -3,14 +3,14 @@
     package="com.gcw.sapienza.places" >
 
 
-    <uses-permission android:name="android.permission.INTERNET" />      <!--required for google maps api and parse -->
+    <uses-permission android:name="android.permission.INTERNET" />      <!--required for google maps api and parse and RemoteSettings-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />      <!--required for  google maps api and parse -->
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>     <!--required for  google maps api-->
     <!-- The following two permissions are not required to use
          Google Maps Android API v2, but are recommended. -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>    <!-- google maps api-->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>   <!-- google maps api-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>   <!-- google maps api and it is our main feature-->
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -53,6 +53,9 @@
         </activity>
 
         <activity android:name=".FlagsMapActivity">
+        </activity>
+
+        <activity android:name=".ShareActivity">
         </activity>
 
     </application>
