@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.parse.ui.ParseLoginBuilder;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -50,7 +51,8 @@ public class MainActivity extends ActionBarActivity {
                 MainActivity.this.startActivity(show_share);
             }
         });
-
+        ParseLoginBuilder builder = new ParseLoginBuilder(MainActivity.this);
+        startActivityForResult(builder.build(), 0);
 
     }
 
