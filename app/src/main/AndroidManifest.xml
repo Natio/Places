@@ -58,6 +58,9 @@
         <activity android:name=".ShareActivity">
         </activity>
 
+        <!-- service for monitoring user position -->
+        <service android:name=".LocationService" />
+
     </application>
 
 </manifest>

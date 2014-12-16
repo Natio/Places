@@ -1,5 +1,6 @@
 package com.gcw.sapienza.places;
 
+import android.app.IntentService;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -17,6 +18,9 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent locInt = new Intent(this, LocationService.class);
+        startService(locInt);
 
         setContentView(R.layout.activity_main);
 
