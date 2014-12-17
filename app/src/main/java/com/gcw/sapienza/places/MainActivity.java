@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +21,8 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
 
         Intent locInt = new Intent(this, LocationService.class);
+        Log.d("Main Activity", "Starting Location Service");
+        stopService(locInt);
         startService(locInt);
 
         setContentView(R.layout.activity_main);

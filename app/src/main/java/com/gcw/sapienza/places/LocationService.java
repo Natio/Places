@@ -15,6 +15,10 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import com.parse.*;
+
+import java.util.List;
+
 public class LocationService extends IntentService implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -25,6 +29,7 @@ public class LocationService extends IntentService implements
     private static final long ONE_MIN = 1000 * 60;
     private static final long REFRESH_TIME = ONE_MIN * 5;
     private static final float MINIMUM_ACCURACY = 50.0f;
+    private static final float SMALLEST_DISPLACEMENT = 100.0f;
 
     private LocationRequest locationRequest;
     private GoogleApiClient googleApiClient;
@@ -43,16 +48,33 @@ public class LocationService extends IntentService implements
 
     private LocationRequest mLocationRequest;
 
+    static private List<ParseObject> parseObjects;
+
 
     @Override
     public void onConnected(Bundle connectionHint) {
         Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
         if (currentLocation != null && currentLocation.getTime() > REFRESH_TIME) {
-            location = currentLocation;
-            Log.d("FUSED LOCATION PROVIDER", "Connected to Google Api!");
+            this.location = currentLocation;
+            queryParsewithLocation(currentLocation);
         } else {
             fusedLocationProviderApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         }
+    }
+
+    public void queryParsewithLocation(Location location){
+        ParseGeoPoint gp = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Posts");
+        query.whereNear("location", gp);
+        query.setLimit(10);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> parseObjects, ParseException e) {
+                LocationService.parseObjects = parseObjects;
+                Log.d("FUSED LOCATION PROVIDER", "Found " + parseObjects.size() + " pins nearby");
+            }
+        });
+        Log.d("FUSED LOCATION PROVIDER", "Connected to Google Api");
     }
 
 
@@ -68,7 +90,18 @@ public class LocationService extends IntentService implements
 
     @Override
     public void onLocationChanged(Location location) {
-        mLocationView.setText("Location received: " + location.toString());
+        Log.d("FUSED LOCATION PROVIDER", "Location changed");
+        //if the existing location is empty or
+        //the current location accuracy is greater than existing accuracy
+        //then store the current location
+        if (null == this.location || location.getAccuracy() < this.location.getAccuracy()) {
+            this.location = location;
+            queryParsewithLocation(location);
+            //if the accuracy is not better, remove all location updates for this listener
+            if (this.location.getAccuracy() < MINIMUM_ACCURACY) {
+                fusedLocationProviderApi.removeLocationUpdates(googleApiClient, this);
+            }
+        }
     }
 
     @Override
@@ -87,5 +120,11 @@ public class LocationService extends IntentService implements
         if (googleApiClient != null) {
             googleApiClient.connect();
         }
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        googleApiClient.disconnect();
     }
 }
