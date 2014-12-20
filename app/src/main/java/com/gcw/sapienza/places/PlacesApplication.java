@@ -52,7 +52,6 @@ public class PlacesApplication extends Application{
         //initialize the location manager
 //        this.initLocationManager();
         startLocationService();
-
         // initialize Parse.com
         ParseObject.registerSubclass(Flag.class);
         Parse.initialize(this, PARSE_COM_APP_KEY , PARSE_COM_CLIENT_KEY);
@@ -92,10 +91,10 @@ public class PlacesApplication extends Application{
 
     }
 
-    private void startLocationService(){
+    private void startLocationService() {
         Intent locInt = new Intent(this, LocationService.class);
         Log.d("Places Application", "Starting Location Service");
-        stopService(locInt);
+//        stopService(locInt);
         startService(locInt);
     }
 

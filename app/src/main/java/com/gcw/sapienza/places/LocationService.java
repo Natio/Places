@@ -40,18 +40,11 @@ public class LocationService extends IntentService implements
         super("LocationService");
     }
 
-    private final String TAG = "MyAwesomeApp";
-
-    private TextView mLocationView;
-
-    private GoogleApiClient mGoogleApiClient;
-
-    private LocationRequest mLocationRequest;
-
     static private List<ParseObject> parseObjects;
 
     @Override
     public void onConnected(Bundle connectionHint) {
+        Log.d("Location Service", "Connecting to Google Api");
         Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
         if (currentLocation != null) {
             this.location = currentLocation;
@@ -100,6 +93,7 @@ public class LocationService extends IntentService implements
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        Log.d("Location Service" , "Handling intent");
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(INTERVAL);
@@ -119,7 +113,6 @@ public class LocationService extends IntentService implements
     @Override
     public void onDestroy(){
         super.onDestroy();
-        fusedLocationProviderApi.removeLocationUpdates(googleApiClient, this);
         googleApiClient.disconnect();
     }
 }
