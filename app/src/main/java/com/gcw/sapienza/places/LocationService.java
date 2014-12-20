@@ -50,11 +50,10 @@ public class LocationService extends IntentService implements
 
     static private List<ParseObject> parseObjects;
 
-
     @Override
     public void onConnected(Bundle connectionHint) {
         Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
-        if (currentLocation != null && currentLocation.getTime() > REFRESH_TIME) {
+        if (currentLocation != null) {
             this.location = currentLocation;
             queryParsewithLocation(currentLocation);
         } else {
@@ -71,36 +70,31 @@ public class LocationService extends IntentService implements
             @Override
             public void done(List<ParseObject> parseObjects, ParseException e) {
                 LocationService.parseObjects = parseObjects;
-                Log.d("FUSED LOCATION PROVIDER", "Found " + parseObjects.size() + " pins nearby");
+                Log.d("Location Service", "Found " + parseObjects.size() + " pins nearby");
             }
         });
-        Log.d("FUSED LOCATION PROVIDER", "Connected to Google Api");
+        Log.d("Location Service", "Connected to Google Api");
     }
 
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.i(TAG, "GoogleApiClient connection has been suspend");
+        Log.i("Location Service", "GoogleApiClient connection has been suspend");
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.i(TAG, "GoogleApiClient connection has failed");
+        Log.i("Location Service", "GoogleApiClient connection has failed");
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d("FUSED LOCATION PROVIDER", "Location changed");
-        //if the existing location is empty or
-        //the current location accuracy is greater than existing accuracy
-        //then store the current location
-        if (null == this.location || location.getAccuracy() < this.location.getAccuracy()) {
+        Log.d("Location Service", "Location changed");
+        long elapsed_time = location.getTime() -
+                (this.location == null ? 0l : this.location.getTime());
+        if (elapsed_time > REFRESH_TIME) {
             this.location = location;
             queryParsewithLocation(location);
-            //if the accuracy is not better, remove all location updates for this listener
-            if (this.location.getAccuracy() < MINIMUM_ACCURACY) {
-                fusedLocationProviderApi.removeLocationUpdates(googleApiClient, this);
-            }
         }
     }
 
@@ -125,6 +119,7 @@ public class LocationService extends IntentService implements
     @Override
     public void onDestroy(){
         super.onDestroy();
+        fusedLocationProviderApi.removeLocationUpdates(googleApiClient, this);
         googleApiClient.disconnect();
     }
 }

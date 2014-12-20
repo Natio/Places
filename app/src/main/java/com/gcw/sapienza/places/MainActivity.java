@@ -20,11 +20,6 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent locInt = new Intent(this, LocationService.class);
-        Log.d("Main Activity", "Starting Location Service");
-        stopService(locInt);
-        startService(locInt);
-
         setContentView(R.layout.activity_main);
 
         //button listener for showing the list

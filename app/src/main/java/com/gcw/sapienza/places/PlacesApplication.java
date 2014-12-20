@@ -2,6 +2,7 @@ package com.gcw.sapienza.places;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -49,7 +50,8 @@ public class PlacesApplication extends Application{
         super.onCreate();
         PlacesApplication.PLACES_CONTEXT = this.getApplicationContext();
         //initialize the location manager
-        this.initLocationManager();
+//        this.initLocationManager();
+        startLocationService();
 
         // initialize Parse.com
         ParseObject.registerSubclass(Flag.class);
@@ -90,8 +92,12 @@ public class PlacesApplication extends Application{
 
     }
 
-
-
+    private void startLocationService(){
+        Intent locInt = new Intent(this, LocationService.class);
+        Log.d("Places Application", "Starting Location Service");
+        stopService(locInt);
+        startService(locInt);
+    }
 
     private void initLocationManager(){
         this.locationManager = (LocationManager) this.getSystemService(PlacesApplication.LOCATION_SERVICE);
