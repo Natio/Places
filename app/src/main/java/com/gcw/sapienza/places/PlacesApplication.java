@@ -51,6 +51,7 @@ public class PlacesApplication extends Application{
         PlacesApplication.PLACES_CONTEXT = this.getApplicationContext();
         //initialize the location manager
 //        this.initLocationManager();
+        //fixme location service not connecting to google api properly
         startLocationService();
         // initialize Parse.com
         ParseObject.registerSubclass(Flag.class);

@@ -58,8 +58,18 @@
         <activity android:name=".ShareActivity">
         </activity>
 
+        <activity
+            android:name="com.parse.ui.ParseLoginActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop">
+            <meta-data
+                android:name="com.parse.ui.ParseLoginActivity.PARSE_LOGIN_ENABLED"
+                android:value="true"/>
+        </activity>
+
         <!-- service for monitoring user position -->
         <service android:name=".LocationService" />
+
 
     </application>
 
