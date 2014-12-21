@@ -67,27 +67,6 @@ public class PlacesApplication extends Application{
                 Log.d(TAG, "RemoteSettings configuration error: "+error);
             }
         });
-
-
-        //todo when we will have login/signup screen we can remove this. It is just for simulating a logged in user
-        if(ParseUser.getCurrentUser() != null){
-            Log.d(TAG, "Already logged in as: " + ParseUser.getCurrentUser().getUsername());
-        }
-        else{
-            ParseUser.logInInBackground("test_user", "test_pwd", new LogInCallback() {
-                @Override
-                public void done(ParseUser user, ParseException e) {
-                    if (user != null) {
-                        Log.d(TAG, "Logged in as: " + ParseUser.getCurrentUser().getUsername());
-                    } else {
-                        Log.d(TAG, "Login failed: " + e.getMessage());
-                    }
-                }
-            });
-        }
-
-        Log.d(TAG, "Hi");
-
     }
 
 

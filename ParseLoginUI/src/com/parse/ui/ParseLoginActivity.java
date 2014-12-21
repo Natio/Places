@@ -36,6 +36,7 @@ import android.view.Window;
 
 import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseUser;
 
 /**
  * Encapsulates the Parse login flow. The user can log in by username/password,
@@ -98,6 +99,15 @@ public class ParseLoginActivity extends FragmentActivity implements
     if (savedInstanceState == null) {
       getSupportFragmentManager().beginTransaction().add(fragmentContainer,
           ParseLoginFragment.newInstance(configOptions)).commit();
+    }
+
+    // Check if there is a currently logged in user
+    // and they are linked to a Facebook account.
+    ParseUser currentUser = ParseUser.getCurrentUser();
+    if ((currentUser != null) && ParseFacebookUtils.isLinked(currentUser)) {
+        // Go to the user info activity
+        setResult(RESULT_OK);
+        finish();
     }
   }
 
