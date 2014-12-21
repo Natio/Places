@@ -23,6 +23,8 @@
         android:theme="@style/AppTheme"
         android:name="com.gcw.sapienza.places.PlacesApplication">
 
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/app_id"/>
+
         <!-- **** REQUIRED FOR GOOGLE MAPS API **** -->
 
         <meta-data android:name="com.google.android.gms.version"
@@ -30,7 +32,7 @@
         <!-- API KEY-->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyCs5UkCaZDiKLA3CpkUcxmH_wcFW56NoGA"/>
+            android:value="AIzaSyAcM1V7C4fyCG0rGqcrpLmq_GnVswzWOrg"/>
 
         <!-- **** END REQUIRED ****  -->
 
@@ -58,6 +60,9 @@
         <activity android:name=".ShareActivity">
         </activity>
 
+        <activity android:name=".Settings">
+        </activity>
+
         <activity
             android:name="com.parse.ui.ParseLoginActivity"
             android:label="@string/app_name"
@@ -67,9 +72,12 @@
                 android:value="true"/>
         </activity>
 
+        <activity android:name="com.facebook.LoginActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:label="@string/app_name" />
+
         <!-- service for monitoring user position -->
         <service android:name=".LocationService" />
-
 
     </application>
 

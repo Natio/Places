@@ -3,5 +3,9 @@
 
     <string name="app_name">Places</string>
     <string name="action_settings">Settings</string>
+    <string name="app_id">883622278337228</string>
+    <string name="mosaic">Home</string>
+    <string name="map">Map</string>
+    <string name="share">Place a flag</string>
 
 </resources>

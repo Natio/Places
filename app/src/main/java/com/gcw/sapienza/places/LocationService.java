@@ -106,6 +106,7 @@ public class LocationService extends IntentService implements
                 .build();
 
         if (googleApiClient != null) {
+            Log.d("Location Service", "Google Api Client built");
             googleApiClient.connect();
         }
     }

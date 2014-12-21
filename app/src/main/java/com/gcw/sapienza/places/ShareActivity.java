@@ -8,10 +8,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.cgw.sapienza.places.model.Flag;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.SaveCallback;
+
+import com.cgw.sapienza.places.model.Flag;
 
 /**
  * Created by paolo on 12/12/14.
@@ -47,6 +48,7 @@ public class ShareActivity extends Activity {
         Flag f = new Flag();
         ParseGeoPoint p = new ParseGeoPoint(current_location.getLatitude(), current_location.getLongitude());
         f.put("location",p);
+        f.put("fbId", MainActivity.fbId);
         f.put("text",this.textView.getText().toString());
         f.saveInBackground(new SaveCallback() {
             @Override

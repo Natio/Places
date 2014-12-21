@@ -31,4 +31,5 @@ dependencies {
     //android-async-http, needed by RemoteSettings
     compile 'com.loopj.android:android-async-http:1.4.5'
     compile project(':ParseLoginUI')
+    compile 'com.facebook.android:facebook-android-sdk:3.21.1'
 }
