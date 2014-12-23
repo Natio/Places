@@ -1,10 +1,15 @@
 package com.gcw.sapienza.places;
 
 import android.app.IntentService;
+import android.app.Service;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.location.Location;
 import android.app.Activity;
+import android.os.Binder;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -19,10 +24,12 @@ import com.parse.*;
 
 import java.util.List;
 
-public class LocationService extends IntentService implements
+public class LocationService extends Service implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
+
+    private final IBinder mBinder = new LocalBinder();
 
     private static final long INTERVAL = 1000 * 30;
     private static final long FASTEST_INTERVAL = 1000 * 5;
@@ -36,11 +43,9 @@ public class LocationService extends IntentService implements
     private Location location;
     private FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
 
-    public LocationService(){
-        super("LocationService");
-    }
+    private ILocationUpdater listener;
 
-    static private List<ParseObject> parseObjects;
+    private List<ParseObject> parseObjects;
 
     @Override
     public void onConnected(Bundle connectionHint) {
@@ -49,21 +54,41 @@ public class LocationService extends IntentService implements
         if (currentLocation != null) {
             this.location = currentLocation;
             queryParsewithLocation(currentLocation);
+            updateApplication();
         } else {
             fusedLocationProviderApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+        }
+    }
+
+    public Location getLocation(){
+        return this.location;
+    }
+
+    public void setListener(ILocationUpdater app) {
+        this.listener = app;
+    }
+
+    public class LocalBinder extends Binder {
+        LocationService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return LocationService.this;
         }
     }
 
     public void queryParsewithLocation(Location location){
         ParseGeoPoint gp = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Posts");
-        query.whereNear("location", gp);
+        query.whereWithinKilometers("location", gp, 0.5f);
         query.setLimit(10);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> parseObjects, ParseException e) {
-                LocationService.parseObjects = parseObjects;
+                LocationService.this.parseObjects = parseObjects;
                 Log.d("Location Service", "Found " + parseObjects.size() + " pins nearby");
+                Log.d("Location Service", "=====PINS=====");
+                for(int i = 0; i < parseObjects.size(); i++){
+                    Log.d("Location Service", (String) parseObjects.get(i).get("text"));
+                }
             }
         });
         Log.d("Location Service", "Connected to Google Api");
@@ -88,12 +113,20 @@ public class LocationService extends IntentService implements
         if (elapsed_time > REFRESH_TIME) {
             this.location = location;
             queryParsewithLocation(location);
+            updateApplication();
+        }
+    }
+
+    private void updateApplication(){
+        if(listener != null) {
+            listener.setLocation(location);
+            listener.setPinsNearby(parseObjects);
         }
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
-        Log.d("Location Service" , "Handling intent");
+    public void onCreate() {
+        super.onCreate();
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(INTERVAL);
@@ -113,7 +146,13 @@ public class LocationService extends IntentService implements
 
     @Override
     public void onDestroy(){
+        Log.d("Location Service", "Being Destroyed");
         super.onDestroy();
         googleApiClient.disconnect();
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return mBinder;
     }
 }
