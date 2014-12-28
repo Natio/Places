@@ -126,8 +126,8 @@ public class MainActivity extends ActionBarActivity {
         final Session session = ParseFacebookUtils.getSession();
 
         Request request = Request.newMeRequest(session,
-                new Request.GraphUserCallback() {
-
+                new Request.GraphUserCallback()
+                {
                     @Override
                     public void onCompleted(GraphUser user, Response response) {
                         if (user != null) {
