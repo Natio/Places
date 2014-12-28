@@ -20,7 +20,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    //compile fileTree(dir: 'libs', include: ['*.jar'])
     //Parse.com support files
     compile files('libs/bolts.jar')
     //compile fileTree(dir: 'libs', include: 'Parse-*.jar')
@@ -28,5 +28,8 @@ dependencies {
     //compile 'com.parse.bolts:bolts-android:1.1.2'
     //Google maps
     compile 'com.google.android.gms:play-services:6.5.+'
-    compile 'com.loopj.android:android-async-http:1.4.6'
+    //android-async-http, needed by RemoteSettings
+    compile 'com.loopj.android:android-async-http:1.4.5'
+    compile project(':ParseLoginUI')
+    compile 'com.facebook.android:facebook-android-sdk:3.21.1'
 }

@@ -20,6 +20,11 @@ public class Flag extends ParseObject{
         return (String)this.get("text");
     }
 
+    public String getFbId()
+    {
+        return (String)this.get("fbId");
+    }
+
     public ParseGeoPoint getLocation(){
         return (ParseGeoPoint)this.get("location");
     }

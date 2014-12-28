@@ -2,6 +2,7 @@ package com.com.sapienza.places.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,8 @@ import java.util.List;
  */
 public class FlagsArrayAdapter extends ArrayAdapter<Flag> {
 
+    public static final String TAG = "FlagsArrayAdapter";
+
     public FlagsArrayAdapter(Context context, int layoutResourceId, List<Flag> data){
         super(context, layoutResourceId, data);
     }
@@ -40,6 +43,8 @@ public class FlagsArrayAdapter extends ArrayAdapter<Flag> {
         //obtain current post
         Flag current_post =  this.getItem(position);
 
+        // Log.v(TAG, "FLAG[" + position + "]: " + current_post.getText() + "  -  fbId: " + current_post.getFbId());
+
         //obtain post's subviews and configure them
         TextView textView = (TextView)row.findViewById(R.id.flag_list_item_first_line);
         final TextView subtitleTextView = (TextView)row.findViewById(R.id.flag_list_item_subtitle);
@@ -53,6 +58,10 @@ public class FlagsArrayAdapter extends ArrayAdapter<Flag> {
                     subtitleTextView.setText((String)object.get("username"));
                 }
             });
+        }
+        else if(current_post.getFbId() != "")
+        {
+            subtitleTextView.setText(current_post.getFbId());
         }
   
         return row;

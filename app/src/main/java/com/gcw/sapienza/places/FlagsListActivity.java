@@ -15,10 +15,6 @@ import com.parse.*;
 import java.util.List;
 
 
-
-
-
-
 /**
  * Activity to show the list of flags
  */
