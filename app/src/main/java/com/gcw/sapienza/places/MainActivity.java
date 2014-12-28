@@ -2,6 +2,8 @@ package com.gcw.sapienza.places;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.facebook.Request;
 import com.facebook.Response;
@@ -133,5 +136,37 @@ public class MainActivity extends ActionBarActivity {
                     }
                 });
         request.executeAsync();
+    }
+
+    protected Location getLocation()
+    {
+        Location location;
+        LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
+
+        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        if (isGPSEnabled || isNetworkEnabled)
+        {
+            if (isNetworkEnabled)
+            {
+                if (locationManager != null)
+                {
+                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                    return location;
+                }
+            }
+            if (isGPSEnabled)
+            {
+                if (locationManager != null)
+                {
+                    location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    return location;
+                }
+            }
+        }
+        else Toast.makeText(getApplicationContext(), "Please enable GPS data", Toast.LENGTH_LONG).show();
+
+        return null;
     }
 }

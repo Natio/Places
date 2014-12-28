@@ -44,13 +44,14 @@ public class ShareFragment extends Fragment{
     }
 
     private void share(){
+        Location current_location = ((MainActivity)getActivity()).getLocation();
 
-        PlacesApplication app = (PlacesApplication)this.getActivity().getApplication();
-        Location current_location = app.getCurrentLocation();
-        if(current_location == null){
+        if(current_location == null)
+        {
             Log.d(TAG, "No GPS data");
             return;
         }
+
         Flag f = new Flag();
         ParseGeoPoint p = new ParseGeoPoint(current_location.getLatitude(), current_location.getLongitude());
         f.put("location",p);

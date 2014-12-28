@@ -1,5 +1,6 @@
 package com.gcw.sapienza.places;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -24,24 +25,31 @@ public class MosaicFragment extends Fragment{
 
     private static View view;
 
+    protected static final int MAP_RADIUS = 1;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         //Create the query and execute it in background
-        //TODO add location filtering
         ParseQuery<Flag> q = ParseQuery.getQuery(Flag.class);
-        ParseGeoPoint p = new ParseGeoPoint(41.8883656,12.5066291);
-        q.whereWithinKilometers("location",p, 1);
-        q.findInBackground(new FindCallback<Flag>() {
-            public void done(List<Flag> flags, ParseException e) {
-                if (e == null) {
-                    //if flags are retrieved configure the ListView
-                    MosaicFragment.this.configureListViewWithFlags(flags);
-                } else {
-                    Log.d("score", "Error: " + e.getMessage());
+
+        Location location = ((MainActivity)getActivity()).getLocation();
+
+        if(location!=null)
+        {
+            ParseGeoPoint p = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+            q.whereWithinKilometers("location", p, MAP_RADIUS);
+            q.findInBackground(new FindCallback<Flag>() {
+                public void done(List<Flag> flags, ParseException e) {
+                    if (e == null) {
+                        //if flags are retrieved configure the ListView
+                        MosaicFragment.this.configureListViewWithFlags(flags);
+                    } else {
+                        Log.d(TAG, "Error: " + e.getMessage());
+                    }
                 }
-            }
-        });
+            });
+        }
 
         view = inflater.inflate(R.layout.flags_list_layout, container, false);
 

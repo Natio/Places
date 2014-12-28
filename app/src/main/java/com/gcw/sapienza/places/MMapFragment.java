@@ -1,5 +1,6 @@
 package com.gcw.sapienza.places;
 
+import android.location.Location;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.cgw.sapienza.places.model.Flag;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -27,6 +29,11 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
     private static final String TAG = "MMapFragment";
     private SupportMapFragment mapFragment;
     private static View view;
+
+    protected Location location;
+
+    protected static final int MAP_RADIUS = 1;
+    protected static final int MAP_ZOOM = 18;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,28 +63,33 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(final GoogleMap googleMap) {
 
         ParseQuery<Flag> q = ParseQuery.getQuery(Flag.class);
-        ParseGeoPoint p = new ParseGeoPoint(41.8883656,12.5066291);
-        q.whereWithinKilometers("location",p, 1);
 
-        q.findInBackground(new FindCallback<Flag>() {
-            public void done(List<Flag> flags, ParseException e) {
-                if (e == null)
-                {
-                    for (Flag f : flags)
-                    {
-                        ParseGeoPoint location = f.getLocation();
-                        String text = f.getText();
+        location = ((MainActivity)getActivity()).getLocation();
+        LatLng lat_lng = new LatLng(location.getLatitude(), location.getLongitude());
 
-                        googleMap.addMarker(new MarkerOptions()
-                                .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                                .title(text));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lat_lng, MAP_ZOOM));
+
+        if(location!=null)
+        {
+            ParseGeoPoint p = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+            q.whereWithinKilometers("location", p, MAP_RADIUS);
+
+            q.findInBackground(new FindCallback<Flag>() {
+                public void done(List<Flag> flags, ParseException e) {
+                    if (e == null) {
+                        for (Flag f : flags) {
+                            ParseGeoPoint location = f.getLocation();
+                            String text = f.getText();
+
+                            googleMap.addMarker(new MarkerOptions()
+                                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                                    .title(text));
+                        }
+                    } else {
+                        Log.d(TAG, "Error: " + e.getMessage());
                     }
                 }
-                else
-                {
-                    Log.d(TAG, "Error: " + e.getMessage());
-                }
-            }
-        });
+            });
+        }
     }
 }
