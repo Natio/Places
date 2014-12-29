@@ -14,7 +14,6 @@ import com.cgw.sapienza.places.model.Flag;
 import com.facebook.HttpMethod;
 import com.facebook.Request;
 import com.facebook.Response;
-import com.facebook.android.Util;
 import com.facebook.model.GraphObject;
 import com.gcw.sapienza.places.R;
 import com.parse.GetCallback;
