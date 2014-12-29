@@ -23,8 +23,8 @@
       to match your app's package name + ".permission.C2D_MESSAGE".
     -->
     <permission android:protectionLevel="signature"
-        android:name="gcw.sapienza.places.permission.C2D_MESSAGE" />
-    <uses-permission android:name="gcw.sapienza.places.permission.C2D_MESSAGE" />
+        android:name="com.gcw.sapienza.places.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.gcw.sapienza.places.permission.C2D_MESSAGE" />
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -110,7 +110,7 @@
                 <!--
                   IMPORTANT: Change "com.parse.tutorials.pushnotifications" to match your app's package name.
                 -->
-                <category android:name="gcw.sapienza.places" />
+                <category android:name="com.gcw.sapienza.places" />
             </intent-filter>
         </receiver>
         <receiver android:name="com.parse.ParsePushBroadcastReceiver" android:exported="false">
