@@ -21,6 +21,9 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.ParseException;
 import com.gcw.sapienza.places.LocationService.LocalBinder;
+//Parse push notifications
+import com.parse.ParsePush;
+import com.parse.SaveCallback;
 
 import java.util.List;
 
@@ -67,7 +70,8 @@ public class PlacesApplication extends Application{
         // initialize Parse.com
         ParseObject.registerSubclass(Flag.class);
         Parse.initialize(this, PARSE_COM_APP_KEY , PARSE_COM_CLIENT_KEY);
-
+        //Parse push notifications
+        subscribeToParseBroadcast();
         //Syncs settings with the server
         RemoteSettings.getInstance().synchWithFileAtURL("https://dl.dropboxusercontent.com/u/2181964/remote_config.json", new RemoteSettingsCallBacks() {
             @Override
@@ -78,6 +82,19 @@ public class PlacesApplication extends Application{
             @Override
             public void onError(String error) {
                 Log.d(TAG, "RemoteSettings configuration error: "+error);
+            }
+        });
+    }
+
+    private void subscribeToParseBroadcast() {
+        ParsePush.subscribeInBackground("", new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Log.d("com.parse.push", "successfully subscribed to the broadcast channel.");
+                } else {
+                    Log.e("com.parse.push", "failed to subscribe for push", e);
+                }
             }
         });
     }
