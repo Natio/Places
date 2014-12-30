@@ -86,6 +86,10 @@ public class MainActivity extends ActionBarActivity {
         {
             logout();
         }
+        else if(id == R.id.action_refresh)
+        {
+            refresh();
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -103,6 +107,12 @@ public class MainActivity extends ActionBarActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+    }
+
+    protected void refresh()
+    {
+        ((MosaicFragment)fragments[1]).updateFlags();
+        ((MMapFragment)fragments[2]).updateMarkersOnMap();
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {

@@ -29,7 +29,15 @@ public class MosaicFragment extends Fragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        updateFlags();
 
+        view = inflater.inflate(R.layout.flags_list_layout, container, false);
+
+        return view;
+    }
+
+    protected void updateFlags()
+    {
         //Create the query and execute it in background
         ParseQuery<Flag> q = ParseQuery.getQuery(Flag.class);
 
@@ -50,10 +58,6 @@ public class MosaicFragment extends Fragment{
                 }
             });
         }
-
-        view = inflater.inflate(R.layout.flags_list_layout, container, false);
-
-        return view;
     }
 
     /**

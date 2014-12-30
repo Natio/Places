@@ -35,6 +35,8 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
     protected static final int MAP_RADIUS = 1;
     protected static final int MAP_ZOOM = 18;
 
+    protected GoogleMap gMap;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -61,35 +63,40 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(final GoogleMap googleMap) {
-
-        ParseQuery<Flag> q = ParseQuery.getQuery(Flag.class);
-
         location = ((MainActivity)getActivity()).getLocation();
         LatLng lat_lng = new LatLng(location.getLatitude(), location.getLongitude());
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lat_lng, MAP_ZOOM));
 
-        if(location!=null)
-        {
-            ParseGeoPoint p = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-            q.whereWithinKilometers("location", p, MAP_RADIUS);
+        gMap = googleMap;
 
-            q.findInBackground(new FindCallback<Flag>() {
-                public void done(List<Flag> flags, ParseException e) {
-                    if (e == null) {
-                        for (Flag f : flags) {
-                            ParseGeoPoint location = f.getLocation();
-                            String text = f.getText();
+        if(location!=null) updateMarkersOnMap();
+    }
 
-                            googleMap.addMarker(new MarkerOptions()
-                                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                                    .title(text));
-                        }
-                    } else {
-                        Log.d(TAG, "Error: " + e.getMessage());
+    protected void updateMarkersOnMap()
+    {
+        ParseQuery<Flag> q = ParseQuery.getQuery(Flag.class);
+
+        gMap.clear();
+
+        ParseGeoPoint p = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+        q.whereWithinKilometers("location", p, MAP_RADIUS);
+
+        q.findInBackground(new FindCallback<Flag>() {
+            public void done(List<Flag> flags, ParseException e) {
+                if (e == null) {
+                    for (Flag f : flags) {
+                        ParseGeoPoint location = f.getLocation();
+                        String text = f.getText();
+
+                        gMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                                .title(text));
                     }
+                } else {
+                    Log.d(TAG, "Error: " + e.getMessage());
                 }
-            });
-        }
+            }
+        });
     }
 }

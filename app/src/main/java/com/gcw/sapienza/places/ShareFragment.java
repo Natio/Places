@@ -66,6 +66,7 @@ public class ShareFragment extends Fragment{
                 else
                 {
                     resetShareFragment();
+                    ((MainActivity)getActivity()).refresh();
                 }
             }
         });
