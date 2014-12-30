@@ -67,6 +67,7 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
         LatLng lat_lng = new LatLng(location.getLatitude(), location.getLongitude());
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lat_lng, MAP_ZOOM));
+        googleMap.getUiSettings().setScrollGesturesEnabled(false);
 
         gMap = googleMap;
 

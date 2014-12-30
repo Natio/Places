@@ -148,9 +148,8 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    private void makeMeRequest() {
-
-        ParseFacebookUtils.initialize(getString(R.string.app_id));
+    private void makeMeRequest()
+    {
         final Session session = ParseFacebookUtils.getSession();
 
         Request request = Request.newMeRequest(session,

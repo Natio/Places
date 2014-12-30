@@ -18,6 +18,7 @@ import com.gcw.sapienza.places.remotesettings.RemoteSettingsCallBacks;
 import com.gcw.sapienza.places.services.ILocationUpdater;
 import com.gcw.sapienza.places.services.LocationService;
 import com.parse.Parse;
+import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParseException;
 import com.gcw.sapienza.places.services.LocationService.LocalBinder;
@@ -63,15 +64,21 @@ public class PlacesApplication extends Application{
     public void onCreate() {
         super.onCreate();
         PlacesApplication.PLACES_CONTEXT = this.getApplicationContext();
+
         //initialize the location manager
 //        this.initLocationManager();
+
         //fixme location service not connecting to google api properly
         startLocationService();
+
         // initialize Parse.com
         ParseObject.registerSubclass(Flag.class);
         Parse.initialize(this, PARSE_COM_APP_KEY , PARSE_COM_CLIENT_KEY);
+        ParseFacebookUtils.initialize(getString(R.string.app_id));
+
         //Parse push notifications
         subscribeToParseBroadcast();
+
         //Syncs settings with the server
         RemoteSettings.getInstance().synchWithFileAtURL("https://dl.dropboxusercontent.com/u/2181964/remote_config.json", new RemoteSettingsCallBacks() {
             @Override
