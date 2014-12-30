@@ -24,4 +24,4 @@
         android:layout_alignRight="@+id/flag_list_item_first_line"
         android:layout_alignEnd="@+id/flag_list_item_first_line" />
 
-</RelativeLayout> 
+</RelativeLayout>

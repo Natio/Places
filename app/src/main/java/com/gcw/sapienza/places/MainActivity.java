@@ -20,6 +20,7 @@ import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.model.GraphUser;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseUser;
 import com.parse.ui.ParseLoginBuilder;
 
 import java.util.Arrays;
@@ -81,8 +82,27 @@ public class MainActivity extends ActionBarActivity {
             startActivity(new Intent(this, Settings.class));
             return true;
         }
+        else if(id == R.id.action_logout)
+        {
+            logout();
+        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void logout() {
+        // Log the user out
+        ParseUser.logOut();
+
+        // Go to the login view
+        startLoginActivity();
+    }
+
+    private void startLoginActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
