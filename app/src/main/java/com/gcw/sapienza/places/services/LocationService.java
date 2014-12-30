@@ -1,17 +1,12 @@
-package com.gcw.sapienza.places;
+package com.gcw.sapienza.places.services;
 
-import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.location.Location;
-import android.app.Activity;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -69,7 +64,7 @@ public class LocationService extends Service implements
     }
 
     public class LocalBinder extends Binder {
-        LocationService getService() {
+        public LocationService getService() {
             // Return this instance of LocalService so clients can call public methods
             return LocationService.this;
         }

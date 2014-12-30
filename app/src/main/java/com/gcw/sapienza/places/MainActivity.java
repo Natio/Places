@@ -1,6 +1,5 @@
 package com.gcw.sapienza.places;
 
-import android.app.IntentService;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
@@ -10,7 +9,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -79,7 +77,7 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            startActivity(new Intent(this, Settings.class));
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
         else if(id == R.id.action_logout)

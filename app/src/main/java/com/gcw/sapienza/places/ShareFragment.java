@@ -9,10 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.cgw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.model.Flag;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.SaveCallback;
@@ -44,10 +44,11 @@ public class ShareFragment extends Fragment{
     }
 
     private void share(){
-        Location current_location = ((MainActivity)getActivity()).getLocation();
+        Location current_location = ((com.gcw.sapienza.places.MainActivity)getActivity()).getLocation();
 
         if(current_location == null)
         {
+            Toast.makeText(getActivity().getApplicationContext(), "Please enable GPS/Netwok service", Toast.LENGTH_LONG).show();
             Log.d(TAG, "No GPS data");
             return;
         }
@@ -55,7 +56,7 @@ public class ShareFragment extends Fragment{
         Flag f = new Flag();
         ParseGeoPoint p = new ParseGeoPoint(current_location.getLatitude(), current_location.getLongitude());
         f.put("location",p);
-        f.put("fbId", MainActivity.fbId);
+        f.put("fbId", com.gcw.sapienza.places.MainActivity.fbId);
         f.put("text",this.textView.getText().toString());
         f.saveInBackground(new SaveCallback() {
             @Override
@@ -66,7 +67,7 @@ public class ShareFragment extends Fragment{
                 else
                 {
                     resetShareFragment();
-                    ((MainActivity)getActivity()).refresh();
+                    ((com.gcw.sapienza.places.MainActivity)getActivity()).refresh();
                 }
             }
         });

@@ -1,4 +1,4 @@
-package com.gcw.sapienza.places;
+package com.gcw.sapienza.places.legacy;
 
 import android.app.Activity;
 import android.location.Location;
@@ -8,11 +8,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.gcw.sapienza.places.MainActivity;
+import com.gcw.sapienza.places.PlacesApplication;
+import com.gcw.sapienza.places.R;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.SaveCallback;
 
-import com.cgw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.model.Flag;
 
 /**
  * Created by paolo on 12/12/14.

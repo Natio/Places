@@ -1,10 +1,9 @@
-package com.cgw.sapienza.palces.remotesettings;
-
+package com.gcw.sapienza.places.remotesettings;
 
 /**
  * Interface for handling RemoteSettings configuration callbacks
  */
-public interface RemoteSettingsCallBacks{
+public interface RemoteSettingsCallBacks {
     /**
      * fired when the configuration is read from an URL
      */

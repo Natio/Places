@@ -1,12 +1,13 @@
-package com.gcw.sapienza.places;
+package com.gcw.sapienza.places.legacy;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListView;
 
-import com.cgw.sapienza.places.model.Flag;
-import com.com.sapienza.places.adapters.FlagsArrayAdapter;
+import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.adapters.FlagsArrayAdapter;
 import com.parse.FindCallback;
 import com.parse.ParseQuery;
 

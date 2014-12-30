@@ -12,15 +12,15 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.cgw.sapienza.palces.remotesettings.RemoteSettings;
-import com.cgw.sapienza.palces.remotesettings.RemoteSettingsCallBacks;
-import com.cgw.sapienza.places.model.Flag;
-import com.parse.LogInCallback;
+import com.gcw.sapienza.places.remotesettings.RemoteSettings;
+import com.gcw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.remotesettings.RemoteSettingsCallBacks;
+import com.gcw.sapienza.places.services.ILocationUpdater;
+import com.gcw.sapienza.places.services.LocationService;
 import com.parse.Parse;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 import com.parse.ParseException;
-import com.gcw.sapienza.places.LocationService.LocalBinder;
+import com.gcw.sapienza.places.services.LocationService.LocalBinder;
 //Parse push notifications
 import com.parse.ParsePush;
 import com.parse.SaveCallback;

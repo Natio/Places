@@ -1,4 +1,4 @@
-package com.com.sapienza.places.adapters;
+package com.gcw.sapienza.places.adapters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.cgw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.model.Flag;
 import com.facebook.HttpMethod;
 import com.facebook.Request;
 import com.facebook.Response;

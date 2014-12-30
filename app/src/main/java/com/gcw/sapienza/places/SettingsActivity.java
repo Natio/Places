@@ -10,7 +10,7 @@ import com.parse.ParseUser;
 /**
  * Created by Simone on 12/19/2014.
  */
-public class Settings extends Activity {
+public class SettingsActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

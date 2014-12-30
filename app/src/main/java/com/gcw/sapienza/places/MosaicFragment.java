@@ -9,8 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.cgw.sapienza.places.model.Flag;
-import com.com.sapienza.places.adapters.FlagsArrayAdapter;
+import com.gcw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.adapters.FlagsArrayAdapter;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;

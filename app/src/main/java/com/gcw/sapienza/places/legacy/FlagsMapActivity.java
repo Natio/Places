@@ -1,10 +1,11 @@
-package com.gcw.sapienza.places;
+package com.gcw.sapienza.places.legacy;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.cgw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.model.Flag;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;

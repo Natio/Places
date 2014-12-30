@@ -1,4 +1,4 @@
-package com.cgw.sapienza.palces.remotesettings;
+package com.gcw.sapienza.places.remotesettings;
 
 import android.content.Context;
 import android.util.Log;
@@ -183,6 +183,4 @@ public class RemoteSettings {
         }
         return defaultValue;
     }
-
-
 }

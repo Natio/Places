@@ -1,9 +1,11 @@
-package com.gcw.sapienza.places;
+package com.gcw.sapienza.places.legacy;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+
+import com.gcw.sapienza.places.MainActivity;
+import com.gcw.sapienza.places.R;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -11,7 +13,7 @@ import java.util.TimerTask;
 /**
  * Created by Simone on 12/12/2014.
  */
-public class SplashScreen extends FragmentActivity
+public class SplashScreenActivity extends FragmentActivity
 {
     public static final int TIMEOUT = 1000;
     public static final String TAG = "SplashScreen";
@@ -33,7 +35,7 @@ public class SplashScreen extends FragmentActivity
 
     private void goToMainScreen()
     {
-        startActivity(new Intent(SplashScreen.this, MainActivity.class));
+        startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
         finish();
     }
 }
