@@ -95,7 +95,7 @@ public class FlagsArrayAdapter extends ArrayAdapter<Flag> {
 
             req.executeAsync();
 
-            if(fb_name == null) subtitleTextView.setText(current_post.getFbId());
+            // if(fb_name == null) subtitleTextView.setText(current_post.getFbId());
         }
   
         return row;
