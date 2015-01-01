@@ -1,9 +1,12 @@
 package com.gcw.sapienza.places;
 
+import android.app.ActivityManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -19,10 +22,13 @@ import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.model.GraphUser;
+import com.gcw.sapienza.places.services.LocationService;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 import com.parse.ui.ParseLoginBuilder;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 
 
@@ -42,6 +48,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
         setContentView(R.layout.activity_main);
 
+        logRun();
+
         ParseLoginBuilder builder = new ParseLoginBuilder(MainActivity.this);
 
         builder.setParseLoginEnabled(true);
@@ -59,6 +67,18 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         mViewPager.setOnPageChangeListener(this);
         mViewPager.setCurrentItem(1);
         makeMeRequest(); // retrieve user's Facebook ID
+    }
+
+    private void logRun() {
+        try {
+
+            File file = new File(Environment.getExternalStorageDirectory() + "/Places", String.valueOf(System.currentTimeMillis()));
+            Log.d("Main Activity", Environment.getExternalStorageDirectory() + "/Places");
+            Runtime.getRuntime().exec("logcat -d -v time -f " + file.getAbsolutePath());
+        }
+        catch (IOException e){
+            Log.w("Main Activity", "Something went wrong while starting the log: " + e.toString());
+        }
     }
 
     protected void onSaveInstanceState(Bundle outState) {
@@ -122,6 +142,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     @Override
     public void onPageSelected(int i) {
+        Log.d("Main Activity", "Page selected, is Location Service running? " + isMyServiceRunning(LocationService.class));
         Fragment sel = fragments[i];
         if(sel instanceof MMapFragment){
             Log.d("Main Activity", "Page selected. Updating markers...");
@@ -131,6 +152,16 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
             Log.d("Main Activity", "Page selected. Updating flags...");
             ((MosaicFragment)sel).updateFlags();
         }
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

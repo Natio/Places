@@ -17,6 +17,7 @@ import android.view.View;
 
 import com.gcw.sapienza.places.MMapFragment;
 import com.gcw.sapienza.places.MainActivity;
+import com.gcw.sapienza.places.Notifications;
 import com.gcw.sapienza.places.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -131,8 +132,8 @@ public class LocationService extends Service implements
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.app_logo)
-                        .setContentTitle("My Notification Title")
-                        .setContentText("Something interesting happened");
+                        .setContentTitle(Notifications.notifications[(int)(Math.random()*Notifications.notifications.length)])
+                        .setContentText(this.parseObjects.size() + "time capsules around!");
         int NOTIFICATION_ID = 12345;
 
         Intent targetIntent = new Intent(this, MainActivity.class);
