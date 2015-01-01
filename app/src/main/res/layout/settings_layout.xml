@@ -42,9 +42,16 @@
             android:summary="Enable to see flags placed by your friends"
             android:key="flFilter"
             />
-        <!-- <RadioButtonPreference>
-
-        </RadioButtonPreference> -->
+        <CheckBoxPreference
+            android:title="Storytellers In The Dark"
+            android:summary="Enable to see flags placed by strangers"
+            android:key="strangersFilter"
+            />
+        <CheckBoxPreference
+            android:title="Archaeologist"
+            android:summary="Enable to give higher relevance to older flags"
+            android:key="timeFilter"
+            />
 
     </PreferenceCategory>
 

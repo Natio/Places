@@ -34,7 +34,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     Fragment[] fragments = {new ShareFragment(), new MosaicFragment(), new MMapFragment()};
     ViewPager mViewPager;
 
-    public static String fbId;
+    public static String fbId = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
