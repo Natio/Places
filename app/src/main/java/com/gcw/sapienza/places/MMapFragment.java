@@ -17,8 +17,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.util.List;
@@ -30,12 +32,19 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
     private SupportMapFragment mapFragment;
     private static View view;
 
-    protected Location location;
+    protected static Location location;
 
     protected static final int MAP_RADIUS = 1;
     protected static final int MAP_ZOOM = 18;
 
-    protected GoogleMap gMap;
+    protected static GoogleMap gMap;
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        Log.d("MMapFragment", "Visibility changed");
+        updateMarkersOnMap();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -63,7 +72,8 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(final GoogleMap googleMap) {
-        location = ((MainActivity)getActivity()).getLocation();
+//        location = ((MainActivity)getActivity()).getLocation();
+        location = PlacesApplication.getLocation();
         LatLng lat_lng = new LatLng(location.getLatitude(), location.getLongitude());
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lat_lng, MAP_ZOOM));
@@ -74,30 +84,54 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
         if(location!=null) updateMarkersOnMap();
     }
 
-    protected void updateMarkersOnMap()
+    public static void updateMarkersOnMap()
     {
-        ParseQuery<Flag> q = ParseQuery.getQuery(Flag.class);
+        List<ParseObject> pins= PlacesApplication.getPins();
+        if(pins != null && gMap != null) {
+            gMap.clear();
 
-        gMap.clear();
+            location = PlacesApplication.getLocation();
+            LatLng lat_lng = new LatLng(location.getLatitude(), location.getLongitude());
+            gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lat_lng, MAP_ZOOM));
 
-        ParseGeoPoint p = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-        q.whereWithinKilometers("location", p, MAP_RADIUS);
+            for (ParseObject p : pins) {
+                Flag f = (Flag) p;
+                ParseGeoPoint location = f.getLocation();
+                String text = f.getText();
 
-        q.findInBackground(new FindCallback<Flag>() {
-            public void done(List<Flag> flags, ParseException e) {
-                if (e == null) {
-                    for (Flag f : flags) {
-                        ParseGeoPoint location = f.getLocation();
-                        String text = f.getText();
-
-                        gMap.addMarker(new MarkerOptions()
-                                .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                                .title(text));
-                    }
-                } else {
-                    Log.d(TAG, "Error: " + e.getMessage());
-                }
+                gMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                        .title(text));
             }
-        });
+        }else {
+            if (pins != null) {
+                Log.w("MMapFragment", "No pins!");
+            }else{
+                Log.w("MMapFragment", "Google Map is null!");
+            }
+        }
+//        ParseQuery<Flag> q = ParseQuery.getQuery(Flag.class);
+//
+//        gMap.clear();
+//
+//        ParseGeoPoint p = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+//        q.whereWithinKilometers("location", p, MAP_RADIUS);
+//
+//        q.findInBackground(new FindCallback<Flag>() {
+//            public void done(List<Flag> flags, ParseException e) {
+//                if (e == null) {
+//                    for (Flag f : flags) {
+//                        ParseGeoPoint location = f.getLocation();
+//                        String text = f.getText();
+//
+//                        gMap.addMarker(new MarkerOptions()
+//                                .position(new LatLng(location.getLatitude(), location.getLongitude()))
+//                                .title(text));
+//                    }
+//                } else {
+//                    Log.d(TAG, "Error: " + e.getMessage());
+//                }
+//            }
+//        });
     }
 }

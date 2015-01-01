@@ -41,7 +41,9 @@ public class MosaicFragment extends Fragment{
         //Create the query and execute it in background
         ParseQuery<Flag> q = ParseQuery.getQuery(Flag.class);
 
-        Location location = ((MainActivity)getActivity()).getLocation();
+        Location location = null;
+        if((MainActivity)getActivity() != null)
+            location = ((MainActivity)getActivity()).getLocation();
 
         if(location!=null)
         {
@@ -68,9 +70,12 @@ public class MosaicFragment extends Fragment{
         Log.d(TAG, flags.toString());
 
         //retrieve the listview
-        ListView listView = (ListView)this.getView().findViewById(R.id.flags_list_view);
-        //configure the adapter
-        FlagsArrayAdapter adapter = new FlagsArrayAdapter(this.getActivity(), R.layout.flags_list_item, flags);
-        listView.setAdapter(adapter);
+        ListView listView = null;
+        if(this.getView() != null) {
+            listView = (ListView) this.getView().findViewById(R.id.flags_list_view);
+            //configure the adapter
+            FlagsArrayAdapter adapter = new FlagsArrayAdapter(this.getActivity(), R.layout.flags_list_item, flags);
+            listView.setAdapter(adapter);
+        }
     }
 }

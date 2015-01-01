@@ -47,13 +47,20 @@ public class PlacesApplication extends Application{
     private LocationManager locationManager;
 
     //current location
-    private Location currentLocation = null;
-    private List<ParseObject> pinsNearby;
+    private static Location currentLocation = null;
+    private static List<ParseObject> pinsNearby;
 
 
     public LocationService mService;
     boolean mBound = false;
 
+    public static Location getLocation(){
+        return currentLocation;
+    }
+
+    public static List<ParseObject> getPins(){
+        return pinsNearby;
+    }
 
     public static Context getPlacesAppContext(){
         return PlacesApplication.PLACES_CONTEXT;
@@ -166,11 +173,10 @@ public class PlacesApplication extends Application{
         return this.currentLocation;
     }
     private ILocationUpdater listener = new ILocationUpdater() {
-        public void setLocation(Location l){
-            PlacesApplication.this.currentLocation = l;
-        }
+        public void setLocation(Location l){ PlacesApplication.currentLocation = l; }
         public void setPinsNearby(List<ParseObject> l){
-            PlacesApplication.this.pinsNearby = l;
+            PlacesApplication.pinsNearby = l;
         }
     };
+
 }

@@ -1,5 +1,6 @@
 package com.gcw.sapienza.places;
 
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
@@ -9,6 +10,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -24,7 +26,7 @@ import com.parse.ui.ParseLoginBuilder;
 import java.util.Arrays;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements ViewPager.OnPageChangeListener {
 
     private static final String TAG = "MainActivity";
 
@@ -54,8 +56,8 @@ public class MainActivity extends ActionBarActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), this);
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setOnPageChangeListener(this);
         mViewPager.setCurrentItem(1);
-
         makeMeRequest(); // retrieve user's Facebook ID
     }
 
@@ -111,6 +113,29 @@ public class MainActivity extends ActionBarActivity {
     {
         ((MosaicFragment)fragments[1]).updateFlags();
         ((MMapFragment)fragments[2]).updateMarkersOnMap();
+    }
+
+    @Override
+    public void onPageScrolled(int i, float v, int i2) {
+
+    }
+
+    @Override
+    public void onPageSelected(int i) {
+        Fragment sel = fragments[i];
+        if(sel instanceof MMapFragment){
+            Log.d("Main Activity", "Page selected. Updating markers...");
+            ((MMapFragment)sel).updateMarkersOnMap();
+        }
+        else if(sel instanceof MosaicFragment){
+            Log.d("Main Activity", "Page selected. Updating flags...");
+            ((MosaicFragment)sel).updateFlags();
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int i) {
+
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {

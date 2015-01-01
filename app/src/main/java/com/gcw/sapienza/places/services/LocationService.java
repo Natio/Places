@@ -1,13 +1,23 @@
 package com.gcw.sapienza.places.services;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.*;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 
+import com.gcw.sapienza.places.MMapFragment;
+import com.gcw.sapienza.places.MainActivity;
+import com.gcw.sapienza.places.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderApi;
@@ -84,6 +94,8 @@ public class LocationService extends Service implements
                 for(int i = 0; i < parseObjects.size(); i++){
                     Log.d("Location Service", (String) parseObjects.get(i).get("text"));
                 }
+                updateApplication();
+                MMapFragment.updateMarkersOnMap();
             }
         });
         Log.d("Location Service", "Connected to Google Api");
@@ -108,8 +120,26 @@ public class LocationService extends Service implements
         if (elapsed_time > REFRESH_TIME) {
             this.location = location;
             queryParsewithLocation(location);
+            if(this.parseObjects.size() > 0) {
+                notifyUser();
+            }
             updateApplication();
         }
+    }
+
+    private void notifyUser() {
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.app_logo)
+                        .setContentTitle("My Notification Title")
+                        .setContentText("Something interesting happened");
+        int NOTIFICATION_ID = 12345;
+
+        Intent targetIntent = new Intent(this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+        NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        nManager.notify(NOTIFICATION_ID, builder.build());
     }
 
     private void updateApplication(){
