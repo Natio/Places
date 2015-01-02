@@ -78,6 +78,9 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
 
         gMap = googleMap;
 
+        //show continuously my location on map
+        gMap.setMyLocationEnabled(true);
+
         if(location!=null) updateMarkersOnMap();
     }
 
@@ -107,10 +110,10 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
             }
 
             // add pin for your current location
-            gMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                    .title("You are here!")
-                    .alpha(1)).showInfoWindow();
+//            gMap.addMarker(new MarkerOptions()
+//                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
+//                    .title("You are here!")
+//                    .alpha(1)).showInfoWindow();
         }
     }
 

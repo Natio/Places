@@ -3,18 +3,13 @@ package com.gcw.sapienza.places;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.util.Log;
-import android.view.View;
-import android.widget.SeekBar;
-
-import com.gcw.sapienza.places.utils.Utils;
 
 /**
  * Created by Simone on 12/30/2014.
  */
 public class SettingsFragment extends PreferenceFragment {
 
-    private final String TAG = "SettingsFragment";
+    private static final String TAG = "SettingsFragment";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,5 +30,4 @@ public class SettingsFragment extends PreferenceFragment {
         time_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
         seek_bar.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
     }
-
 }

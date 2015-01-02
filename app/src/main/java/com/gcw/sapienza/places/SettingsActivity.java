@@ -16,12 +16,11 @@ import com.gcw.sapienza.places.utils.Utils;
 public class SettingsActivity extends Activity
         implements Preference.OnPreferenceChangeListener{
 
-    private final String TAG = "SettingsActivity";
+    private static final String TAG = "SettingsActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
     }
@@ -51,7 +50,7 @@ public class SettingsActivity extends Activity
             //TODO moving the bar actually updates the app radius
             SharedPreferences preferences = PreferenceManager
                     .getDefaultSharedPreferences(this);
-            Log.d(TAG, String.valueOf(preferences.getInt("seekBar", 3)));
+            Log.d(TAG, "SeekBar stored value: " + String.valueOf(preferences.getInt("seekBar", 3)));
             preference.setDefaultValue(newValue);
             int value = (int)newValue;
             Utils.MAP_RADIUS = value / 10f;
