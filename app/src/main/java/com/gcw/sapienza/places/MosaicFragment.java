@@ -28,8 +28,6 @@ public class MosaicFragment extends Fragment{
 
     private static View view;
 
-    protected static final int MAP_RADIUS = 1;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         updateFlags();
@@ -44,12 +42,12 @@ public class MosaicFragment extends Fragment{
         //Create the query and execute it in background
         ParseQuery<Flag> q = ParseQuery.getQuery(Flag.class);
 
-        Location location = Utils.getLocation(getActivity().getApplicationContext());
+        Location location = PlacesApplication.getLocation();
 
         if(location!=null)
         {
             ParseGeoPoint p = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-            q.whereWithinKilometers("location", p, MAP_RADIUS);
+            q.whereWithinKilometers("location", p, Utils.MAP_RADIUS);
             q.findInBackground(new FindCallback<Flag>() {
                 public void done(List<Flag> flags, ParseException e) {
                     if (e == null) {
@@ -70,7 +68,7 @@ public class MosaicFragment extends Fragment{
     private void configureListViewWithFlags(final List<Flag> flags){
         Log.d(TAG, flags.toString());
 
-        //retrieve the listview
+        //retrieve the listviews
         ListView listView = (ListView)this.getView().findViewById(R.id.flags_list_view);
         //configure the adapter
         FlagsArrayAdapter adapter = new FlagsArrayAdapter(this.getActivity(), R.layout.flags_list_item, flags);

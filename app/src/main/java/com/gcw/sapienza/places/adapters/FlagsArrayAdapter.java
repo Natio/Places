@@ -3,7 +3,6 @@ package com.gcw.sapienza.places.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +12,6 @@ import android.widget.TextView;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.utils.Utils;
-import com.parse.GetCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseUser;
 
 import java.util.List;
 

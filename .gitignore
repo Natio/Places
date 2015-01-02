@@ -17,6 +17,9 @@ gen/
 build/
 .idea/
 
+#IntelliJ IDEA Module files
+*/*.iml
+
 # Local configuration file (sdk path, etc)
 local.properties
 

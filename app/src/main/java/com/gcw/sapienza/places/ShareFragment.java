@@ -58,8 +58,9 @@ public class ShareFragment extends Fragment{
         return view;
     }
 
-    private void share(){
-        Location current_location = Utils.getLocation(getActivity().getApplicationContext());
+    private void share()
+    {
+        Location current_location = PlacesApplication.getLocation();
 
         if(current_location == null)
         {

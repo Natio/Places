@@ -38,6 +38,7 @@ public class Utils
     public static HashMap<String, String> userProfilePicMap = new HashMap<>();
 
     public static final int UPDATE_DELAY = 200;
+    public static final float MAP_RADIUS = 0.5f;
 
     public static void clearUserData()
     {
@@ -147,6 +148,7 @@ public class Utils
         req.executeAsync();
     }
 
+    @Deprecated // Daniele says its 'getLocation' is much better than mine, that's why it's deprecated.
     public static Location getLocation(Context context)
     {
         Location location;

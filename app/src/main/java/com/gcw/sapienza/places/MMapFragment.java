@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.gcw.sapienza.places.model.Flag;
-import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -18,10 +17,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.parse.FindCallback;
-import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseQuery;
+import com.parse.ParseObject;
 
 import java.util.List;
 
@@ -32,12 +29,18 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
     private SupportMapFragment mapFragment;
     private static View view;
 
-    protected Location location;
+    protected static Location location;
 
-    protected static final float MAP_RADIUS = 0.5f;
     protected static final int MAP_ZOOM = 22;
 
-    protected GoogleMap gMap;
+    protected static GoogleMap gMap;
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        Log.d(TAG, "Visibility changed");
+        updateMarkersOnMap();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -64,8 +67,10 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
-    public void onMapReady(final GoogleMap googleMap) {
-        location = Utils.getLocation(getActivity().getApplicationContext());
+    public void onMapReady(final GoogleMap googleMap)
+    {
+        location = PlacesApplication.getLocation();
+
         LatLng lat_lng = new LatLng(location.getLatitude(), location.getLongitude());
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lat_lng, MAP_ZOOM));
@@ -76,41 +81,40 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
         if(location!=null) updateMarkersOnMap();
     }
 
-    protected void updateMarkersOnMap()
+    public static void updateMarkersOnMap()
     {
-        ParseQuery<Flag> q = ParseQuery.getQuery(Flag.class);
+        List<ParseObject> pins= PlacesApplication.getPins();
 
-        gMap.clear();
+        if(pins != null && gMap != null)
+        {
+            gMap.clear();
 
-        ParseGeoPoint p = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-        q.whereWithinKilometers("location", p, MAP_RADIUS);
+            location = PlacesApplication.getLocation();
+            LatLng lat_lng = new LatLng(location.getLatitude(), location.getLongitude());
+            gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lat_lng, MAP_ZOOM));
 
-        q.findInBackground(new FindCallback<Flag>() {
-            public void done(List<Flag> flags, ParseException e) {
-                if (e == null) {
-                    for (Flag f : flags) {
-                        ParseGeoPoint location = f.getLocation();
-                        String text = f.getText();
+            for (ParseObject p : pins)
+            {
+                Flag f = (Flag) p;
+                ParseGeoPoint location = f.getLocation();
+                String text = f.getText();
 
-                        gMap.addMarker(new MarkerOptions()
+                gMap.addMarker(new MarkerOptions()
                                 .position(new LatLng(location.getLatitude(), location.getLongitude()))
                                 .title(text)
                                 .icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
                                 .alpha(0.8f));
-                    }
-                } else {
-                    Log.d(TAG, "Error: " + e.getMessage());
-                }
             }
-        });
 
-        gMap.addMarker(new MarkerOptions()
-                .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                .title("You are here!")
-                .alpha(1)).showInfoWindow();
+            // add pin for your current location
+            gMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                    .title("You are here!")
+                    .alpha(1)).showInfoWindow();
+        }
     }
 
-    protected float getCategoryColor(String category)
+    protected static float getCategoryColor(String category)
     {
         if(category==null || category.equals("Misc") || category.equals("")) return BitmapDescriptorFactory.HUE_CYAN;
         if(category.equals("Entertainment")) return BitmapDescriptorFactory.HUE_AZURE;
@@ -118,6 +122,6 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
         else if(category.equals("History")) return BitmapDescriptorFactory.HUE_GREEN;
         else if(category.equals("Culture")) return BitmapDescriptorFactory.HUE_MAGENTA;
         else if(category.equals("Landscapes")) return BitmapDescriptorFactory.HUE_VIOLET;
-        else return BitmapDescriptorFactory.HUE_YELLOW; // 'state of mind' category
+        else return BitmapDescriptorFactory.HUE_YELLOW; // State Of Mind' category
     }
 }

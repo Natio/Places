@@ -1,28 +1,34 @@
 package com.gcw.sapienza.places;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.gcw.sapienza.places.utils.Utils;
-import com.parse.ParseFacebookUtils;
+import com.gcw.sapienza.places.services.LocationService;
 import com.parse.ParseUser;
 import com.parse.ui.ParseLoginBuilder;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.io.File;
 import java.util.Arrays;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements ViewPager.OnPageChangeListener {
 
     private static final String TAG = "MainActivity";
+
+    private static boolean isForeground = false;
 
     SectionsPagerAdapter mSectionsPagerAdapter;
     Fragment[] fragments = {new ShareFragment(), new MosaicFragment(), new MMapFragment()};
@@ -33,6 +39,8 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        logRun();
 
         ParseLoginBuilder builder = new ParseLoginBuilder(MainActivity.this);
 
@@ -48,9 +56,22 @@ public class MainActivity extends ActionBarActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), this);
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setOnPageChangeListener(this);
         mViewPager.setCurrentItem(1);
 
         Utils.makeMeRequest(); // retrieve user's Facebook ID
+    }
+
+    private void logRun() {
+        try {
+
+            File file = new File(Environment.getExternalStorageDirectory() + "/Places", String.valueOf(System.currentTimeMillis()));
+            Log.d(TAG, "Logs directory: " + Environment.getExternalStorageDirectory() + "/Places");
+            Runtime.getRuntime().exec("logcat -d -v time -f " + file.getAbsolutePath());
+        }
+        catch (IOException e){
+            Log.w(TAG, "Something went wrong while starting the log: " + e.toString());
+        }
     }
 
     protected void onSaveInstanceState(Bundle outState) {
@@ -106,6 +127,40 @@ public class MainActivity extends ActionBarActivity {
         ((MMapFragment)fragments[2]).updateMarkersOnMap();
     }
 
+    @Override
+    public void onPageScrolled(int i, float v, int i2) {
+
+    }
+
+    @Override
+    public void onPageSelected(int i) {
+        Log.d(TAG, "Page selected, is Location Service running? " + isMyServiceRunning(LocationService.class));
+        Fragment sel = fragments[i];
+        if(sel instanceof MMapFragment){
+            Log.d(TAG, "Page selected. Updating markers...");
+            ((MMapFragment)sel).updateMarkersOnMap();
+        }
+        else if(sel instanceof MosaicFragment){
+            Log.d(TAG, "Page selected. Updating flags...");
+            ((MosaicFragment)sel).updateFlags();
+        }
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int i) {
+
+    }
+
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
         MainActivity mainActivity;
 
@@ -139,5 +194,23 @@ public class MainActivity extends ActionBarActivity {
             }
             return mainActivity.fragments[i];
         }
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        isForeground = true;
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        isForeground = false;
+    }
+
+    public static boolean isForeground(){
+        return isForeground;
     }
 }
