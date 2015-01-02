@@ -124,7 +124,7 @@ public class LocationService extends Service implements
 
     @Override
     public void onLocationChanged(Location location) {
-        if(notificationLocation != null && location.distanceTo(this.notificationLocation) > WITHIN_DISTANCE_KM){
+        if(notificationLocation != null && (location.distanceTo(this.notificationLocation) / 1000) > WITHIN_DISTANCE_KM){
             NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             nManager.cancel(NOTIFICATION_ID);
         }
@@ -156,7 +156,8 @@ public class LocationService extends Service implements
                         .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle(Notifications.notifications[(int) (Math.random() * Notifications.notifications.length)])
                         .setContentText(this.parseObjects.size() + " time capsules around!")
-                        .setSound(soundUri);
+                        .setSound(soundUri)
+                        .setLights(0xff00ff00, 1000, 3000);
 
         Intent targetIntent = new Intent(this, MainActivity.class);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
