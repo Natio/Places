@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.gcw.sapienza.places.MainActivity;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.SaveCallback;
@@ -51,7 +52,7 @@ public class ShareActivity extends Activity {
         Flag f = new Flag();
         ParseGeoPoint p = new ParseGeoPoint(current_location.getLatitude(), current_location.getLongitude());
         f.put("location",p);
-        f.put("fbId", MainActivity.fbId);
+        f.put("fbId", Utils.fbId);
         f.put("text",this.textView.getText().toString());
         f.saveInBackground(new SaveCallback() {
             @Override

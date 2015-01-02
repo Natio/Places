@@ -21,6 +21,7 @@ import com.gcw.sapienza.places.MMapFragment;
 import com.gcw.sapienza.places.MainActivity;
 import com.gcw.sapienza.places.Notifications;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderApi;
@@ -45,10 +46,6 @@ public class LocationService extends Service implements
     private static final long FASTEST_INTERVAL = 1000 * 5;
     private static final long ONE_MIN = 1000 * 60;
     private static final long REFRESH_TIME = ONE_MIN * 1; //TODO high frequency, useful for debugging purposes
-    private static final float MINIMUM_ACCURACY = 50.0f;
-    private static final float SMALLEST_DISPLACEMENT = 100.0f;
-
-    private static final float WITHIN_DISTANCE_KM = 0.5f;
     private static final int MAX_PINS = 10;
 
     private static final int NOTIFICATION_ID = 12345;
@@ -94,18 +91,14 @@ public class LocationService extends Service implements
     public void queryParsewithLocation(Location location){
         ParseGeoPoint gp = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Posts");
-        query.whereWithinKilometers("location", gp, WITHIN_DISTANCE_KM);
+        query.whereWithinKilometers("location", gp, Utils.MAP_RADIUS);
         query.setLimit(MAX_PINS); //TODO want this to be user-specific?
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> parseObjects, ParseException e) {
                 LocationService.this.parseObjects = parseObjects;
                 Log.d(TAG, "Found " + parseObjects.size() +
-                        " pins within " + WITHIN_DISTANCE_KM + " km");
-//                Log.d(TAG, "=====PINS=====");
-//                for(int i = 0; i < parseObjects.size(); i++){
-//                    Log.d(TAG, (String) parseObjects.get(i).get("text"));
-//                }
+                        " pins within " + Utils.MAP_RADIUS + " km");
                 updateApplication();
                 MMapFragment.updateMarkersOnMap();
             }
@@ -125,7 +118,7 @@ public class LocationService extends Service implements
 
     @Override
     public void onLocationChanged(Location location) {
-        if(notificationLocation != null && (location.distanceTo(this.notificationLocation) / 1000) > WITHIN_DISTANCE_KM){
+        if(notificationLocation != null && (location.distanceTo(this.notificationLocation) / 1000) > Utils.MAP_RADIUS){
             NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             nManager.cancel(NOTIFICATION_ID);
         }
@@ -135,7 +128,7 @@ public class LocationService extends Service implements
         Log.d(TAG, "Elapsed time: " + elapsed_time);
         float distance = location.distanceTo(this.location) / 1000;
         Log.d(TAG, "Distance from last known location: " + distance);
-        if (elapsed_time > REFRESH_TIME && distance > WITHIN_DISTANCE_KM / 2) { //TODO comment second condition for debugging ease
+        if (elapsed_time > REFRESH_TIME && distance > Utils.MAP_RADIUS / 2) { //TODO comment second condition for debugging ease
             this.location = location;
             queryParsewithLocation(location);
             if(this.parseObjects.size() > 0 && !MainActivity.isForeground()) {
