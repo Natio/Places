@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,9 +21,8 @@ import java.net.URL;
  */
 public class FlagActivity extends Activity {
 
-    private static String text;
-    private static String id;
-    private static String url;
+    private String text;
+    private String id;
 
     private static final String TAG = "FlagActivity";
 
@@ -39,10 +39,21 @@ public class FlagActivity extends Activity {
         setContentView(R.layout.flag_layout);
 
         ((EditText)findViewById(R.id.text)).setText(text);
-        ((TextView)findViewById(R.id.author)).setText("by " + Utils.userIdMap.get(id));
+        if(!Utils.userIdMap.containsKey(id))
+        {
+            final Handler handler = new Handler();
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (!Utils.userIdMap.containsKey(id)) handler.postDelayed(this, Utils.UPDATE_DELAY);
+                    else ((TextView)findViewById(R.id.author)).setText("by " + Utils.userIdMap.get(id));
+                }
+            });
+        }
+        else ((TextView)findViewById(R.id.author)).setText("by " + Utils.userIdMap.get(id));
 
-        if(!Utils.userProfilePicMap.containsKey(id)) {
-
+        if(!Utils.userProfilePicMap.containsKey(id))
+        {
             try
             {
                 Utils.fetchFbProfilePic(id);
@@ -55,11 +66,7 @@ public class FlagActivity extends Activity {
                 @Override
                 public void run() {
                     if (!Utils.userProfilePicMap.containsKey(id)) handler.postDelayed(this, Utils.UPDATE_DELAY);
-                    else
-                    {
-                        url = Utils.userProfilePicMap.get(id);
-                        streamProfilePic();
-                    }
+                    else streamProfilePic();
                 }
             });
         }
@@ -75,7 +82,7 @@ public class FlagActivity extends Activity {
             {
                 try
                 {
-                    final Bitmap bitmap = BitmapFactory.decodeStream(new URL(url).openConnection().getInputStream());
+                    final Bitmap bitmap = BitmapFactory.decodeStream(new URL(Utils.userProfilePicMap.get(id)).openConnection().getInputStream());
 
                     runOnUiThread(new Runnable() {
                         @Override
