@@ -6,18 +6,29 @@
     android:paddingRight="@dimen/com_parse_ui_horizontal_margin"
     android:paddingBottom="@dimen/com_parse_ui_vertical_margin"
     android:gravity="center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/azure">
 
     <include
         layout="@layout/com_parse_ui_parse_login_app_logo"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0.5" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Places"
+        android:textSize="90dp"
+        android:textColor="@color/white"
+        android:layout_marginTop="20dp"
+        android:id="@+id/textView"
+        android:layout_weight="0.5"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.5"
+        android:layout_weight="0.3"
         android:gravity="center"
         android:orientation="vertical">
 

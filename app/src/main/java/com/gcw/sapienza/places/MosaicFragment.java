@@ -65,30 +65,32 @@ public class MosaicFragment extends Fragment{
      * Configures the listview for showing the flags passed as arguments
      * @param flags List of flags
      */
-    private void configureListViewWithFlags(final List<Flag> flags){
-        Log.d(TAG, flags.toString());
-
-        //retrieve the listviews
-        ListView listView = (ListView)this.getView().findViewById(R.id.flags_list_view);
-        //configure the adapter
-        FlagsArrayAdapter adapter = new FlagsArrayAdapter(this.getActivity(), R.layout.flags_list_item, flags);
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+    private void configureListViewWithFlags(final List<Flag> flags)
+    {
+        if(this.getView() != null)
         {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            //retrieve the listviews
+            ListView listView = (ListView)this.getView().findViewById(R.id.flags_list_view);
+            //configure the adapter
+            FlagsArrayAdapter adapter = new FlagsArrayAdapter(this.getActivity(), R.layout.flags_list_item, flags);
+            listView.setAdapter(adapter);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
             {
-                Intent intent = new Intent(getActivity().getApplicationContext(), FlagActivity.class);
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                {
+                    Intent intent = new Intent(getActivity().getApplicationContext(), FlagActivity.class);
 
-                Bundle bundle = new Bundle();
+                    Bundle bundle = new Bundle();
 
-                bundle.putString("text", ((Flag) parent.getItemAtPosition(position)).getText());
-                bundle.putString("id", ((Flag) parent.getItemAtPosition(position)).getFbId());
+                    bundle.putString("text", ((Flag) parent.getItemAtPosition(position)).getText());
+                    bundle.putString("id", ((Flag) parent.getItemAtPosition(position)).getFbId());
 
-                intent.putExtras(bundle);
+                    intent.putExtras(bundle);
 
-                startActivity(intent);
-            }
-        });
+                    startActivity(intent);
+                }
+            });
+        }
     }
 }
