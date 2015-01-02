@@ -26,7 +26,7 @@ import com.parse.SaveCallback;
 
 public class ShareFragment extends Fragment{
 
-    private static final String TAG = "ShareActivity";
+    private static final String TAG = "ShareFragment";
 
     private TextView textView;
 
@@ -71,11 +71,20 @@ public class ShareFragment extends Fragment{
 
         Flag f = new Flag();
         ParseGeoPoint p = new ParseGeoPoint(current_location.getLatitude(), current_location.getLongitude());
+
+        if(Utils.fbId.equals(""))
+        {
+            Toast.makeText(getActivity().getApplicationContext(),
+                    "Couldn't retrieve your Facebook credentials,\nplease check your internet connection.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        f.put("fbId", Utils.fbId);
         f.put("category", spinner.getSelectedItem().toString());
         f.put("location",p);
-        if(!Utils.fbId.equals("")) f.put("fbId", Utils.fbId);
-        else f.put("user", ParseUser.getCurrentUser().getUsername());
         f.put("text",this.textView.getText().toString());
+
         f.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
