@@ -70,13 +70,15 @@ public class MosaicFragment extends Fragment{
         if(this.getView() != null)
         {
             //retrieve the listviews
-            ListView listView = (ListView) this.getView().findViewById(R.id.flags_list_view);
+            ListView listView = (ListView)this.getView().findViewById(R.id.flags_list_view);
             //configure the adapter
             FlagsArrayAdapter adapter = new FlagsArrayAdapter(this.getActivity(), R.layout.flags_list_item, flags);
             listView.setAdapter(adapter);
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+            {
                 @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                {
                     Intent intent = new Intent(getActivity().getApplicationContext(), FlagActivity.class);
 
                     Bundle bundle = new Bundle();

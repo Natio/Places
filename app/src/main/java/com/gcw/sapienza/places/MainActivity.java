@@ -49,7 +49,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         builder.setFacebookLoginEnabled(true);
         builder.setFacebookLoginPermissions(Arrays.asList("public_profile", "user_friends"/*, "user_relationships", "user_birthday", "user_location"*/));
 
-        builder.setAppLogo(R.drawable.app_logo);
+        // builder.setAppLogo(R.drawable.app_logo);
 
         startActivityForResult(builder.build(), 0);
 
