@@ -7,6 +7,8 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -35,14 +37,18 @@ public class LocationService extends Service implements
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
+    private static final String TAG = "LocationService";
+
     private final IBinder mBinder = new LocalBinder();
 
     private static final long INTERVAL = 1000 * 30;
     private static final long FASTEST_INTERVAL = 1000 * 5;
     private static final long ONE_MIN = 1000 * 60;
-    private static final long REFRESH_TIME = ONE_MIN * 5;
+    private static final long REFRESH_TIME = ONE_MIN * 1; //TODO high frequency, useful for debugging purposes
     private static final float MINIMUM_ACCURACY = 50.0f;
     private static final float SMALLEST_DISPLACEMENT = 100.0f;
+
+    private static final float WITHIN_DISTANCE_KM = 0.5f;
 
     private LocationRequest locationRequest;
     private GoogleApiClient googleApiClient;
@@ -55,15 +61,14 @@ public class LocationService extends Service implements
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        Log.d("Location Service", "Connecting to Google Api");
+        Log.d("TAG", "Connected to Google Api");
         Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
         if (currentLocation != null) {
             this.location = currentLocation;
             queryParsewithLocation(currentLocation);
             updateApplication();
-        } else {
-            fusedLocationProviderApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         }
+        fusedLocationProviderApi.requestLocationUpdates(googleApiClient, locationRequest, this);
     }
 
     public Location getLocation(){
@@ -84,44 +89,48 @@ public class LocationService extends Service implements
     public void queryParsewithLocation(Location location){
         ParseGeoPoint gp = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Posts");
-        query.whereWithinKilometers("location", gp, 0.5f);
+        query.whereWithinKilometers("location", gp, WITHIN_DISTANCE_KM);
         query.setLimit(10);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> parseObjects, ParseException e) {
                 LocationService.this.parseObjects = parseObjects;
-                Log.d("Location Service", "Found " + parseObjects.size() + " pins nearby");
-                Log.d("Location Service", "=====PINS=====");
-                for(int i = 0; i < parseObjects.size(); i++){
-                    Log.d("Location Service", (String) parseObjects.get(i).get("text"));
-                }
+                Log.d("TAG", "Found " + parseObjects.size() +
+                        " pins within " + WITHIN_DISTANCE_KM + " km");
+//                Log.d("TAG", "=====PINS=====");
+//                for(int i = 0; i < parseObjects.size(); i++){
+//                    Log.d("TAG", (String) parseObjects.get(i).get("text"));
+//                }
                 updateApplication();
                 MMapFragment.updateMarkersOnMap();
             }
         });
-        Log.d("Location Service", "Connected to Google Api");
     }
 
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.i("Location Service", "GoogleApiClient connection has been suspend");
+        Log.i("TAG", "GoogleApiClient connection has been suspend");
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.i("Location Service", "GoogleApiClient connection has failed");
+        Log.i("TAG", "GoogleApiClient connection has failed");
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d("Location Service", "Location changed");
+        Log.d("TAG", "Location changed");
         long elapsed_time = location.getTime() -
                 (this.location == null ? 0l : this.location.getTime());
-        if (elapsed_time > REFRESH_TIME) {
+        Log.d("TAG", "Elapsed time: " + elapsed_time);
+        float distance = location.distanceTo(this.location);
+        if (elapsed_time > REFRESH_TIME /*&& distance > WITHIN_DISTANCE_KM / 2*/) { //TODO comment second condition for debugging ease
             this.location = location;
             queryParsewithLocation(location);
-            if(this.parseObjects.size() > 0) {
+            if(this.parseObjects.size() > 0 && !MainActivity.isForeground()) {
+                Log.d("TAG", "Notifying user..." +
+                        this.parseObjects.size() + " pins found");
                 notifyUser();
             }
             updateApplication();
@@ -129,11 +138,15 @@ public class LocationService extends Service implements
     }
 
     private void notifyUser() {
+        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.app_logo)
-                        .setContentTitle(Notifications.notifications[(int)(Math.random()*Notifications.notifications.length)])
-                        .setContentText(this.parseObjects.size() + "time capsules around!");
+                        .setAutoCancel(true)
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle(Notifications.notifications[(int) (Math.random() * Notifications.notifications.length)])
+                        .setContentText(this.parseObjects.size() + " time capsules around!")
+                        .setSound(soundUri);
         int NOTIFICATION_ID = 12345;
 
         Intent targetIntent = new Intent(this, MainActivity.class);
@@ -165,14 +178,14 @@ public class LocationService extends Service implements
                 .build();
 
         if (googleApiClient != null) {
-            Log.d("Location Service", "Google Api Client built");
+            Log.d("TAG", "Google Api Client built");
             googleApiClient.connect();
         }
     }
 
     @Override
     public void onDestroy(){
-        Log.d("Location Service", "Being Destroyed");
+        Log.d("TAG", "Being Destroyed");
         super.onDestroy();
         googleApiClient.disconnect();
     }

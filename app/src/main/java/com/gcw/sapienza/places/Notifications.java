@@ -7,6 +7,6 @@ public class Notifications {
     public static String [] notifications = new String []
 
     {
-        "Places found something interesting around...","Look at this!", "Take a moment to check this out ;)"
+        "Something interesting nearby...", "Look at this!", "Check this out ;)"
     };
 }

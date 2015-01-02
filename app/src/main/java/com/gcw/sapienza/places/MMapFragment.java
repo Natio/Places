@@ -42,7 +42,7 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        Log.d("MMapFragment", "Visibility changed");
+        Log.d(TAG, "Visibility changed");
         updateMarkersOnMap();
     }
 
@@ -105,9 +105,9 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
             }
         }else {
             if (pins != null) {
-                Log.w("MMapFragment", "No pins!");
+                Log.w(TAG, "No pins!");
             }else{
-                Log.w("MMapFragment", "Google Map is null!");
+                Log.w(TAG, "Google Map is null!");
             }
         }
 //        ParseQuery<Flag> q = ParseQuery.getQuery(Flag.class);

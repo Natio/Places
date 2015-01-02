@@ -36,6 +36,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     private static final String TAG = "MainActivity";
 
+    private static boolean isForeground = false;
+
     SectionsPagerAdapter mSectionsPagerAdapter;
     Fragment[] fragments = {new ShareFragment(), new MosaicFragment(), new MMapFragment()};
     ViewPager mViewPager;
@@ -73,11 +75,11 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         try {
 
             File file = new File(Environment.getExternalStorageDirectory() + "/Places", String.valueOf(System.currentTimeMillis()));
-            Log.d("Main Activity", Environment.getExternalStorageDirectory() + "/Places");
+            Log.d(TAG, "Logs directory: " + Environment.getExternalStorageDirectory() + "/Places");
             Runtime.getRuntime().exec("logcat -d -v time -f " + file.getAbsolutePath());
         }
         catch (IOException e){
-            Log.w("Main Activity", "Something went wrong while starting the log: " + e.toString());
+            Log.w(TAG, "Something went wrong while starting the log: " + e.toString());
         }
     }
 
@@ -142,14 +144,14 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     @Override
     public void onPageSelected(int i) {
-        Log.d("Main Activity", "Page selected, is Location Service running? " + isMyServiceRunning(LocationService.class));
+        Log.d(TAG, "Page selected, is Location Service running? " + isMyServiceRunning(LocationService.class));
         Fragment sel = fragments[i];
         if(sel instanceof MMapFragment){
-            Log.d("Main Activity", "Page selected. Updating markers...");
+            Log.d(TAG, "Page selected. Updating markers...");
             ((MMapFragment)sel).updateMarkersOnMap();
         }
         else if(sel instanceof MosaicFragment){
-            Log.d("Main Activity", "Page selected. Updating flags...");
+            Log.d(TAG, "Page selected. Updating flags...");
             ((MosaicFragment)sel).updateFlags();
         }
     }
@@ -251,5 +253,24 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         else Toast.makeText(getApplicationContext(), "Please enable GPS data", Toast.LENGTH_LONG).show();
 
         return null;
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        isForeground = true;
+    }
+
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        isForeground = false;
+    }
+
+    public static boolean isForeground(){
+        return isForeground;
     }
 }
