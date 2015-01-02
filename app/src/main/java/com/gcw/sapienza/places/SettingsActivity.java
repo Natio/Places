@@ -1,17 +1,27 @@
 package com.gcw.sapienza.places;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.widget.SeekBar;
+
+import com.gcw.sapienza.places.utils.Utils;
 
 /**
  * Created by Simone on 12/19/2014.
  */
-public class SettingsActivity extends Activity implements Preference.OnPreferenceChangeListener {
+public class SettingsActivity extends Activity
+        implements Preference.OnPreferenceChangeListener{
+
+    private final String TAG = "SettingsActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
         getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
     }
@@ -35,7 +45,20 @@ public class SettingsActivity extends Activity implements Preference.OnPreferenc
         {
 
         }
+        else if(preference.getTitle().equals("How far will you see?"))
+        {
+            //TODO make these settings work...visually it seems more broken than it actually is:
+            //TODO moving the bar actually updates the app radius
+            SharedPreferences preferences = PreferenceManager
+                    .getDefaultSharedPreferences(this);
+            Log.d(TAG, String.valueOf(preferences.getInt("seekBar", 3)));
+            preference.setDefaultValue(newValue);
+            int value = (int)newValue;
+            Utils.MAP_RADIUS = value / 10f;
+            Log.d("Settings Activity", "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
 
+        }
         return false;
     }
+
 }

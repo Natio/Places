@@ -38,7 +38,7 @@ public class Utils
     public static HashMap<String, String> userProfilePicMap = new HashMap<>();
 
     public static final int UPDATE_DELAY = 200;
-    public static final float MAP_RADIUS = 0.5f;
+    public static float MAP_RADIUS = 0.5f;
 
     public static void clearUserData()
     {

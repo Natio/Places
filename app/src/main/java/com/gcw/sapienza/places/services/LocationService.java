@@ -46,6 +46,7 @@ public class LocationService extends Service implements
     private static final long FASTEST_INTERVAL = 1000 * 5;
     private static final long ONE_MIN = 1000 * 60;
     private static final long REFRESH_TIME = ONE_MIN * 1; //TODO high frequency, useful for debugging purposes
+    private static final int MAX_PINS = 10;
 
     private static final int NOTIFICATION_ID = 12345;
 
@@ -91,17 +92,13 @@ public class LocationService extends Service implements
         ParseGeoPoint gp = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Posts");
         query.whereWithinKilometers("location", gp, Utils.MAP_RADIUS);
-        query.setLimit(10);
+        query.setLimit(MAX_PINS); //TODO want this to be user-specific?
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> parseObjects, ParseException e) {
                 LocationService.this.parseObjects = parseObjects;
                 Log.d(TAG, "Found " + parseObjects.size() +
                         " pins within " + Utils.MAP_RADIUS + " km");
-//                Log.d(TAG, "=====PINS=====");
-//                for(int i = 0; i < parseObjects.size(); i++){
-//                    Log.d(TAG, (String) parseObjects.get(i).get("text"));
-//                }
                 updateApplication();
                 MMapFragment.updateMarkersOnMap();
             }
