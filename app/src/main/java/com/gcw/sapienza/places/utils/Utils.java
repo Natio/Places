@@ -1,0 +1,206 @@
+package com.gcw.sapienza.places.utils;
+
+import android.content.Context;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.facebook.HttpMethod;
+import com.facebook.Request;
+import com.facebook.Response;
+import com.facebook.Session;
+import com.facebook.model.GraphObject;
+import com.facebook.model.GraphUser;
+import com.parse.ParseFacebookUtils;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * Created by mic_head on 02/01/15.
+ */
+public class Utils
+{
+    private static final String TAG = "Utils";
+
+    public static String fbId = "";
+    public static ArrayList<String> friends = new ArrayList<String>();
+    public static HashMap<String, String> userIdMap = new HashMap<>();
+    public static HashMap<String, String> userProfilePicMap = new HashMap<>();
+
+    public static final int UPDATE_DELAY = 200;
+
+    public static void clearUserData()
+    {
+        fbId = "";
+        friends.clear();
+        userIdMap.clear();
+        userProfilePicMap.clear();
+    }
+
+    public static void fetchFbUsername(final String id)
+    {
+        Bundle bundle = new Bundle();
+        bundle.putString("fields", "name");
+
+        Request req = new Request(ParseFacebookUtils.getSession(), id, bundle, HttpMethod.GET,
+                new Request.Callback()
+                {
+                    @Override
+                    public void onCompleted(Response response) {
+                        try
+                        {
+                            GraphObject go = response.getGraphObject();
+
+                            JSONObject obj = go.getInnerJSONObject();
+                            userIdMap.put(id, obj.getString("name"));
+                        }
+                        catch(JSONException e)
+                        {
+                            Log.v(TAG, "Couldn't resolve facebook user's name.  Error: " + e.toString());
+                            e.printStackTrace();
+                        };
+                    }
+                });
+
+        req.executeAsync();
+    }
+
+    public static void fetchFbProfilePic(final String id) throws MalformedURLException, IOException
+    {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("redirect", false);
+        bundle.putString("height", "200");
+        bundle.putString("type", "normal");
+        bundle.putString("width", "200");
+
+        Request req = new Request(ParseFacebookUtils.getSession(), "/"+id+"/picture", bundle, HttpMethod.GET,
+                new Request.Callback()
+                {
+                    @Override
+                    public void onCompleted(Response response) {
+                        try
+                        {
+                            GraphObject go = response.getGraphObject();
+
+                            JSONObject obj = go.getInnerJSONObject();
+                            final String url = obj.getJSONObject("data").getString("url");
+
+                            userProfilePicMap.put(id, url);
+                        }
+                        catch(JSONException e)
+                        {
+                            Log.v(TAG, "Couldn't retrieve facebook user data.  Error: " + e.toString());
+                            e.printStackTrace();
+                        };
+                    }
+                }
+        );
+
+        req.executeAsync();
+    }
+
+    public static void fetchFbFriends() throws MalformedURLException, IOException
+    {
+        friends.clear();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("fields", "id");
+
+        final Session session = ParseFacebookUtils.getSession();
+
+        Request req = new Request(session, "me/friends", bundle, HttpMethod.GET,
+            new Request.Callback()
+            {
+                @Override
+                public void onCompleted(Response response)
+                {
+                    try
+                    {
+                        GraphObject go = response.getGraphObject();
+                        JSONObject obj = go.getInnerJSONObject();
+
+                        Log.v(TAG, "FB friends: " + obj.toString());
+
+                        JSONArray array = obj.getJSONArray("data");
+
+                        for(int i = 0; i < array.length(); i++) friends.add(((JSONObject)array.get(i)).getString("id"));
+                    }
+                    catch(JSONException e)
+                    {
+                        Log.v(TAG, "Couldn't retrieve user's friends.  Error: " + e.toString());
+                        e.printStackTrace();
+                    };
+                }
+            }
+        );
+
+        req.executeAsync();
+    }
+
+    public static Location getLocation(Context context)
+    {
+        Location location;
+        LocationManager locationManager = (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
+
+        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        if (isGPSEnabled || isNetworkEnabled)
+        {
+            if (isNetworkEnabled)
+            {
+                if (locationManager != null)
+                {
+                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                    return location;
+                }
+            }
+            if (isGPSEnabled)
+            {
+                if (locationManager != null)
+                {
+                    location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    return location;
+                }
+            }
+        }
+        else Toast.makeText(context, "Please enable GPS data", Toast.LENGTH_LONG).show();
+
+        return null;
+    }
+
+    public static void makeMeRequest()
+    {
+        final Session session = ParseFacebookUtils.getSession();
+
+        if(session == null) return;
+
+        Request request = Request.newMeRequest(session,
+                new Request.GraphUserCallback()
+                {
+                    @Override
+                    public void onCompleted(GraphUser user, Response response) {
+                        if (user != null) {
+                            Utils.fbId = user.getId();
+                            try
+                            {
+                                Utils.fetchFbFriends();
+                            }
+                            catch(MalformedURLException mue){ mue.printStackTrace(); }
+                            catch(IOException ioe){ ioe.printStackTrace(); }
+                        }
+                    }
+                });
+        request.executeAsync();
+    }
+}

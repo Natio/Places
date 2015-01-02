@@ -1,8 +1,6 @@
 package com.gcw.sapienza.places;
 
 import android.content.Intent;
-import android.location.Location;
-import android.location.LocationManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -11,16 +9,14 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-import com.facebook.Request;
-import com.facebook.Response;
-import com.facebook.Session;
-import com.facebook.model.GraphUser;
+import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 import com.parse.ui.ParseLoginBuilder;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Arrays;
 
 
@@ -32,8 +28,6 @@ public class MainActivity extends ActionBarActivity {
     Fragment[] fragments = {new ShareFragment(), new MosaicFragment(), new MMapFragment()};
     ViewPager mViewPager;
 
-    public static String fbId = "";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,10 +36,10 @@ public class MainActivity extends ActionBarActivity {
 
         ParseLoginBuilder builder = new ParseLoginBuilder(MainActivity.this);
 
-        builder.setParseLoginEnabled(true);
+        builder.setParseLoginEnabled(false);
 
         builder.setFacebookLoginEnabled(true);
-        builder.setFacebookLoginPermissions(Arrays.asList("public_profile"/*, "user_friends", "user_relationships", "user_birthday", "user_location"*/));
+        builder.setFacebookLoginPermissions(Arrays.asList("public_profile", "user_friends"/*, "user_relationships", "user_birthday", "user_location"*/));
 
         builder.setAppLogo(R.drawable.app_logo);
 
@@ -56,15 +50,12 @@ public class MainActivity extends ActionBarActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setCurrentItem(1);
 
-        makeMeRequest(); // retrieve user's Facebook ID
+        Utils.makeMeRequest(); // retrieve user's Facebook ID
     }
 
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
     }
-
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -95,6 +86,8 @@ public class MainActivity extends ActionBarActivity {
     private void logout() {
         // Log the user out
         ParseUser.logOut();
+
+        Utils.clearUserData();
 
         // Go to the login view
         startLoginActivity();
@@ -146,54 +139,5 @@ public class MainActivity extends ActionBarActivity {
             }
             return mainActivity.fragments[i];
         }
-    }
-
-    private void makeMeRequest()
-    {
-        final Session session = ParseFacebookUtils.getSession();
-
-        Request request = Request.newMeRequest(session,
-                new Request.GraphUserCallback()
-                {
-                    @Override
-                    public void onCompleted(GraphUser user, Response response) {
-                        if (user != null) {
-                            fbId = user.getId();
-                        }
-                    }
-                });
-        request.executeAsync();
-    }
-
-    protected Location getLocation()
-    {
-        Location location;
-        LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
-
-        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-        if (isGPSEnabled || isNetworkEnabled)
-        {
-            if (isNetworkEnabled)
-            {
-                if (locationManager != null)
-                {
-                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                    return location;
-                }
-            }
-            if (isGPSEnabled)
-            {
-                if (locationManager != null)
-                {
-                    location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    return location;
-                }
-            }
-        }
-        else Toast.makeText(getApplicationContext(), "Please enable GPS data", Toast.LENGTH_LONG).show();
-
-        return null;
     }
 }

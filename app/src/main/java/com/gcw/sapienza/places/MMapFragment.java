@@ -10,10 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.gcw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.FindCallback;
@@ -32,8 +34,8 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
 
     protected Location location;
 
-    protected static final int MAP_RADIUS = 1;
-    protected static final int MAP_ZOOM = 18;
+    protected static final float MAP_RADIUS = 0.5f;
+    protected static final int MAP_ZOOM = 22;
 
     protected GoogleMap gMap;
 
@@ -63,7 +65,7 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(final GoogleMap googleMap) {
-        location = ((MainActivity)getActivity()).getLocation();
+        location = Utils.getLocation(getActivity().getApplicationContext());
         LatLng lat_lng = new LatLng(location.getLatitude(), location.getLongitude());
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lat_lng, MAP_ZOOM));
@@ -92,12 +94,30 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
 
                         gMap.addMarker(new MarkerOptions()
                                 .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                                .title(text));
+                                .title(text)
+                                .icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
+                                .alpha(0.8f));
                     }
                 } else {
                     Log.d(TAG, "Error: " + e.getMessage());
                 }
             }
         });
+
+        gMap.addMarker(new MarkerOptions()
+                .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                .title("You are here!")
+                .alpha(1)).showInfoWindow();
+    }
+
+    protected float getCategoryColor(String category)
+    {
+        if(category==null || category.equals("Misc") || category.equals("")) return BitmapDescriptorFactory.HUE_CYAN;
+        if(category.equals("Entertainment")) return BitmapDescriptorFactory.HUE_AZURE;
+        else if(category.equals("Food")) return BitmapDescriptorFactory.HUE_BLUE;
+        else if(category.equals("History")) return BitmapDescriptorFactory.HUE_GREEN;
+        else if(category.equals("Culture")) return BitmapDescriptorFactory.HUE_MAGENTA;
+        else if(category.equals("Landscapes")) return BitmapDescriptorFactory.HUE_VIOLET;
+        else return BitmapDescriptorFactory.HUE_YELLOW; // 'state of mind' category
     }
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="categories">
+        <item>Misc</item>
+        <item>Entertainment</item>
+        <item>Food</item>
+        <item>History</item>
+        <item>Culture</item>
+        <item>Landscapes</item>
+        <item>State Of Mind</item>
+    </string-array>
+
+</resources>

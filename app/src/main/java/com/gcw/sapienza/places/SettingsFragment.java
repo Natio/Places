@@ -1,14 +1,8 @@
 package com.gcw.sapienza.places;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.view.View;
-
-import com.parse.ParseUser;
-
-import java.util.prefs.PreferenceChangeListener;
 
 /**
  * Created by Simone on 12/30/2014.
