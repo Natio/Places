@@ -26,7 +26,7 @@ import com.parse.SaveCallback;
 
 public class ShareFragment extends Fragment{
 
-    private static final String TAG = "ShareActivity";
+    private static final String TAG = "ShareFragment";
 
     private TextView textView;
 
