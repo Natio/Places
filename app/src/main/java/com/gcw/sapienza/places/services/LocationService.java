@@ -50,6 +50,8 @@ public class LocationService extends Service implements
 
     private static final float WITHIN_DISTANCE_KM = 0.5f;
 
+    private static final int NOTIFICATION_ID = 12345;
+
     private LocationRequest locationRequest;
     private GoogleApiClient googleApiClient;
     private Location location;
@@ -59,9 +61,11 @@ public class LocationService extends Service implements
 
     private List<ParseObject> parseObjects;
 
+    private Location notificationLocation;
+
     @Override
     public void onConnected(Bundle connectionHint) {
-        Log.d("TAG", "Connected to Google Api");
+        Log.d(TAG, "Connected to Google Api");
         Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
         if (currentLocation != null) {
             this.location = currentLocation;
@@ -95,11 +99,11 @@ public class LocationService extends Service implements
             @Override
             public void done(List<ParseObject> parseObjects, ParseException e) {
                 LocationService.this.parseObjects = parseObjects;
-                Log.d("TAG", "Found " + parseObjects.size() +
+                Log.d(TAG, "Found " + parseObjects.size() +
                         " pins within " + WITHIN_DISTANCE_KM + " km");
-//                Log.d("TAG", "=====PINS=====");
+//                Log.d(TAG, "=====PINS=====");
 //                for(int i = 0; i < parseObjects.size(); i++){
-//                    Log.d("TAG", (String) parseObjects.get(i).get("text"));
+//                    Log.d(TAG, (String) parseObjects.get(i).get("text"));
 //                }
                 updateApplication();
                 MMapFragment.updateMarkersOnMap();
@@ -110,28 +114,34 @@ public class LocationService extends Service implements
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.i("TAG", "GoogleApiClient connection has been suspend");
+        Log.i(TAG, "GoogleApiClient connection has been suspend");
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.i("TAG", "GoogleApiClient connection has failed");
+        Log.i(TAG, "GoogleApiClient connection has failed");
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d("TAG", "Location changed");
+        if(notificationLocation != null && location.distanceTo(this.notificationLocation) > WITHIN_DISTANCE_KM){
+            NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            nManager.cancel(NOTIFICATION_ID);
+        }
+        Log.d(TAG, "Location changed");
         long elapsed_time = location.getTime() -
                 (this.location == null ? 0l : this.location.getTime());
-        Log.d("TAG", "Elapsed time: " + elapsed_time);
-        float distance = location.distanceTo(this.location);
-        if (elapsed_time > REFRESH_TIME /*&& distance > WITHIN_DISTANCE_KM / 2*/) { //TODO comment second condition for debugging ease
+        Log.d(TAG, "Elapsed time: " + elapsed_time);
+        float distance = location.distanceTo(this.location) / 1000;
+        Log.d(TAG, "Distance from last known location: " + distance);
+        if (elapsed_time > REFRESH_TIME && distance > WITHIN_DISTANCE_KM / 2) { //TODO comment second condition for debugging ease
             this.location = location;
             queryParsewithLocation(location);
             if(this.parseObjects.size() > 0 && !MainActivity.isForeground()) {
-                Log.d("TAG", "Notifying user..." +
+                Log.d(TAG, "Notifying user..." +
                         this.parseObjects.size() + " pins found");
                 notifyUser();
+                this.notificationLocation = this.location;
             }
             updateApplication();
         }
@@ -147,7 +157,6 @@ public class LocationService extends Service implements
                         .setContentTitle(Notifications.notifications[(int) (Math.random() * Notifications.notifications.length)])
                         .setContentText(this.parseObjects.size() + " time capsules around!")
                         .setSound(soundUri);
-        int NOTIFICATION_ID = 12345;
 
         Intent targetIntent = new Intent(this, MainActivity.class);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -178,14 +187,14 @@ public class LocationService extends Service implements
                 .build();
 
         if (googleApiClient != null) {
-            Log.d("TAG", "Google Api Client built");
+            Log.d(TAG, "Google Api Client built");
             googleApiClient.connect();
         }
     }
 
     @Override
     public void onDestroy(){
-        Log.d("TAG", "Being Destroyed");
+        Log.d(TAG, "Being Destroyed");
         super.onDestroy();
         googleApiClient.disconnect();
     }
