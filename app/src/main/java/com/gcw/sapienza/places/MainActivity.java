@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.SeekBar;
 
 import com.gcw.sapienza.places.utils.Utils;
 import com.gcw.sapienza.places.services.LocationService;
