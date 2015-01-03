@@ -11,21 +11,21 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="What's on your mind?"
         android:textSize="20sp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="20dp"
         android:id="@+id/textView2"
         android:layout_gravity="center_horizontal"
-        android:paddingBottom="60dp" />
+        android:layout_weight="0.1" />
 
     <EditText
         android:layout_marginTop="10dp"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.5"
+        android:layout_weight="0.45"
         android:textSize="25sp"
         android:id="@+id/share_text_field"
         android:cursorVisible="false"
         android:inputType="textImeMultiLine"
-        android:paddingBottom="50dp" />
+        android:paddingBottom="20dp" />
 
     <!-- <TableRow
         android:layout_height="wrap_content"
@@ -50,7 +50,8 @@
             android:gravity="center_horizontal"
             android:textAlignment="gravity"
             android:clipToPadding="false"
-            android:paddingBottom="30dp" />
+            android:paddingBottom="30dp"
+            android:layout_weight="0.25"/>
 
     <Button
         style="?android:attr/borderlessButtonStyle"
@@ -61,7 +62,8 @@
         android:text="Place"
         android:textSize="60sp"
         android:textColor="@color/white"
-        android:id="@+id/share_button" />
+        android:id="@+id/share_button"
+        android:layout_weight="0.25" />
 
     <!-- </TableRow> -->
 

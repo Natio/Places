@@ -51,6 +51,7 @@ public class MosaicFragment extends Fragment{
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
+                if(position == 0) return; //this is for the header
                 Intent intent = new Intent(getActivity().getApplicationContext(), FlagActivity.class);
 
                 Date date = ((Flag) parent.getItemAtPosition(position)).getDate();
