@@ -17,11 +17,9 @@ import android.widget.Toast;
 
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.utils.Utils;
-import com.parse.Parse;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.HashMap;
@@ -74,13 +72,11 @@ public class ShareFragment extends Fragment{
         {
             Toast.makeText(getActivity().getApplicationContext(), "Please enable GPS/Network service", Toast.LENGTH_LONG).show();
             Log.d(TAG, "No GPS data");
-<<<<<<< HEAD
-            Map<String, String> dimensions = new HashMap<String, String>();
+
+            Map<String, String> dimensions = new HashMap<>();
             dimensions.put("reason", "Share with No GPS");
             ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
-=======
             resetShareFragment();
->>>>>>> f30188b11d9b3dca5cf7302a02bda8570fc0984f
             return;
         }
 
@@ -92,13 +88,10 @@ public class ShareFragment extends Fragment{
             Toast.makeText(getActivity().getApplicationContext(),
                     "Couldn't retrieve your Facebook credentials,\nplease check your internet connection.",
                     Toast.LENGTH_LONG).show();
-<<<<<<< HEAD
-            Map<String, String> dimensions = new HashMap<String, String>();
+            Map<String, String> dimensions = new HashMap<>();
             dimensions.put("reason", "Share with No Facebook");
             ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
-=======
             resetShareFragment();
->>>>>>> f30188b11d9b3dca5cf7302a02bda8570fc0984f
             return;
         }
         final String category = spinner.getSelectedItem().toString();
@@ -113,7 +106,7 @@ public class ShareFragment extends Fragment{
                 if(e != null){
                     resetShareFragment();
                     Log.d(TAG, e.getMessage());
-                    Map<String, String> dimensions = new HashMap<String, String>();
+                    Map<String, String> dimensions = new HashMap<>();
                     dimensions.put("reason", e.getMessage());
                     ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
                 }
@@ -121,7 +114,7 @@ public class ShareFragment extends Fragment{
                 {
                     resetShareFragment();
                     ((com.gcw.sapienza.places.MainActivity)getActivity()).refresh();
-                    Map<String, String> dimensions = new HashMap<String, String>();
+                    Map<String, String> dimensions = new HashMap<>();
                     dimensions.put("category", category);
                     ParseAnalytics.trackEventInBackground("sharing_succeded", dimensions);
                 }

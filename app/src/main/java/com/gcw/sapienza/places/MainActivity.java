@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.SeekBar;
 
 import com.gcw.sapienza.places.utils.Utils;
 import com.gcw.sapienza.places.services.LocationService;
@@ -229,9 +228,9 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         isForeground = false;
 
 
-        long time_diff = (new Date().getTime() - this.startTime)/1000;
+        long time_diff = ((new Date().getTime() - this.startTime)/1000)/60;
         Map<String, String> dimensions = new HashMap<String, String>();
-        dimensions.put("time", ""+time_diff);
+        dimensions.put("time_minutes", ""+time_diff);
         ParseAnalytics.trackEventInBackground("session_time", dimensions);
         Log.d(TAG,"pause");
     }

@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.SeekBar;
 
 import com.gcw.sapienza.places.utils.Utils;
 
