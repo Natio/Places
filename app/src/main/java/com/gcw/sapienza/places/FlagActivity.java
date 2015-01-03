@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,6 +22,7 @@ public class FlagActivity extends Activity {
 
     private String text;
     private String id;
+    private String date;
 
     private static final String TAG = "FlagActivity";
 
@@ -35,28 +35,32 @@ public class FlagActivity extends Activity {
 
         text = bundle.getString("text");
         id = bundle.getString("id");
+        date = bundle.getString("date");
 
         setContentView(R.layout.flag_layout);
 
         ((EditText)findViewById(R.id.text)).setText(text);
+
         if(!Utils.userIdMap.containsKey(id))
         {
+            Utils.fetchFbUsername(id);
+
             final Handler handler = new Handler();
             handler.post(new Runnable() {
                 @Override
                 public void run() {
                     if (!Utils.userIdMap.containsKey(id)) handler.postDelayed(this, Utils.UPDATE_DELAY);
-                    else ((TextView)findViewById(R.id.author)).setText("by " + Utils.userIdMap.get(id));
+                    else ((TextView)findViewById(R.id.author)).setText(Utils.userIdMap.get(id) + ", " + date);
                 }
             });
         }
-        else ((TextView)findViewById(R.id.author)).setText("by " + Utils.userIdMap.get(id));
+        else ((TextView)findViewById(R.id.author)).setText(Utils.userIdMap.get(id) + ", " + date);
 
-        if(!Utils.userProfilePicMap.containsKey(id))
+        if(!Utils.userProfilePicMapLarge.containsKey(id))
         {
             try
             {
-                Utils.fetchFbProfilePic(id);
+                Utils.fetchFbProfilePic(id, Utils.LARGE_PIC_SIZE);
             }
             catch(MalformedURLException mue){ mue.printStackTrace(); }
             catch (IOException ioe){ ioe.printStackTrace(); }
@@ -65,7 +69,7 @@ public class FlagActivity extends Activity {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (!Utils.userProfilePicMap.containsKey(id)) handler.postDelayed(this, Utils.UPDATE_DELAY);
+                    if (!Utils.userProfilePicMapLarge.containsKey(id)) handler.postDelayed(this, Utils.UPDATE_DELAY);
                     else streamProfilePic();
                 }
             });
@@ -82,7 +86,7 @@ public class FlagActivity extends Activity {
             {
                 try
                 {
-                    final Bitmap bitmap = BitmapFactory.decodeStream(new URL(Utils.userProfilePicMap.get(id)).openConnection().getInputStream());
+                    final Bitmap bitmap = BitmapFactory.decodeStream(new URL(Utils.userProfilePicMapLarge.get(id)).openConnection().getInputStream());
 
                     runOnUiThread(new Runnable() {
                         @Override

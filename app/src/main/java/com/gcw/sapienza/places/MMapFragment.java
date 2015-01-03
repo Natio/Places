@@ -1,6 +1,7 @@
 package com.gcw.sapienza.places;
 
 import android.location.Location;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,8 +9,10 @@ import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.gcw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -71,14 +74,40 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
     {
         location = PlacesApplication.getLocation();
 
+        if(location!=null)
+        {
+            initMap(googleMap);
+
+            updateMarkersOnMap();
+        }
+        else
+        {
+            final Handler handler = new Handler();
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    location = PlacesApplication.getLocation();
+
+                    if (location == null) handler.postDelayed(this, Utils.UPDATE_DELAY);
+                    else
+                    {
+                        initMap(googleMap);
+
+                        ((MainActivity)getActivity()).refresh();
+                    }
+                }
+            });
+        }
+    }
+
+    protected void initMap(final GoogleMap googleMap)
+    {
         LatLng lat_lng = new LatLng(location.getLatitude(), location.getLongitude());
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lat_lng, MAP_ZOOM));
         googleMap.getUiSettings().setScrollGesturesEnabled(false);
 
         gMap = googleMap;
-
-        if(location!=null) updateMarkersOnMap();
     }
 
     public static void updateMarkersOnMap()

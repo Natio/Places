@@ -5,6 +5,8 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import java.util.Date;
+
 /**
  * Class that encapsulate the Post table on Parse.com
  */
@@ -28,4 +30,6 @@ public class Flag extends ParseObject{
     public ParseGeoPoint getLocation(){
         return (ParseGeoPoint)this.get("location");
     }
+
+    public Date getDate() { return (Date)this.getCreatedAt(); }
 }

@@ -19,6 +19,9 @@ import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 
@@ -72,7 +75,12 @@ public class MosaicFragment extends Fragment{
             //retrieve the listviews
             ListView listView = (ListView)this.getView().findViewById(R.id.flags_list_view);
             //configure the adapter
-            FlagsArrayAdapter adapter = new FlagsArrayAdapter(this.getActivity(), R.layout.flags_list_item, flags);
+            FlagsArrayAdapter adapter = new FlagsArrayAdapter(this.getActivity(), R.layout.flags_list_item, flags, getActivity());
+
+            // View header = (View)getLayoutInflater(null).inflate(R.layout.header_flags_list, null);
+            // listView.removeHeaderView(header);
+            // listView.addHeaderView(header);
+
             listView.setAdapter(adapter);
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
             {
@@ -81,10 +89,15 @@ public class MosaicFragment extends Fragment{
                 {
                     Intent intent = new Intent(getActivity().getApplicationContext(), FlagActivity.class);
 
+                    Date date = ((Flag) parent.getItemAtPosition(position)).getDate();
+                    DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+                    String sDate = df.format(date);
+
                     Bundle bundle = new Bundle();
 
                     bundle.putString("text", ((Flag) parent.getItemAtPosition(position)).getText());
                     bundle.putString("id", ((Flag) parent.getItemAtPosition(position)).getFbId());
+                    bundle.putString("date", sDate);
 
                     intent.putExtras(bundle);
 

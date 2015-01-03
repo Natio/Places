@@ -35,17 +35,22 @@ public class Utils
     public static String fbId = "";
     public static ArrayList<String> friends = new ArrayList<String>();
     public static HashMap<String, String> userIdMap = new HashMap<>();
-    public static HashMap<String, String> userProfilePicMap = new HashMap<>();
+    public static HashMap<String, String> userProfilePicMapSmall = new HashMap<>();
+    public static HashMap<String, String> userProfilePicMapLarge = new HashMap<>();
 
     public static final int UPDATE_DELAY = 200;
     public static float MAP_RADIUS = 0.5f;
+
+    public static final String LARGE_PIC_SIZE = "200";
+    public static final String SMALL_PIC_SIZE = "120";
 
     public static void clearUserData()
     {
         fbId = "";
         friends.clear();
         userIdMap.clear();
-        userProfilePicMap.clear();
+        userProfilePicMapSmall.clear();
+        userProfilePicMapLarge.clear();
     }
 
     public static void fetchFbUsername(final String id)
@@ -76,13 +81,13 @@ public class Utils
         req.executeAsync();
     }
 
-    public static void fetchFbProfilePic(final String id) throws MalformedURLException, IOException
+    public static void fetchFbProfilePic(final String id, final String size) throws MalformedURLException, IOException
     {
         Bundle bundle = new Bundle();
         bundle.putBoolean("redirect", false);
-        bundle.putString("height", "200");
+        bundle.putString("height", size);
         bundle.putString("type", "normal");
-        bundle.putString("width", "200");
+        bundle.putString("width", size);
 
         Request req = new Request(ParseFacebookUtils.getSession(), "/"+id+"/picture", bundle, HttpMethod.GET,
                 new Request.Callback()
@@ -96,7 +101,8 @@ public class Utils
                             JSONObject obj = go.getInnerJSONObject();
                             final String url = obj.getJSONObject("data").getString("url");
 
-                            userProfilePicMap.put(id, url);
+                            if(size.equals(SMALL_PIC_SIZE)) userProfilePicMapSmall.put(id, url);
+                            else userProfilePicMapLarge.put(id, url);
                         }
                         catch(JSONException e)
                         {

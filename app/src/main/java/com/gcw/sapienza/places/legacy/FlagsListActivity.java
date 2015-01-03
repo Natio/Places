@@ -55,7 +55,7 @@ public class FlagsListActivity extends Activity {
         //retrieve the listview
         ListView listView = (ListView)this.findViewById(R.id.flags_list_view);
         //configure the adapter
-        FlagsArrayAdapter adapter = new FlagsArrayAdapter(this, R.layout.flags_list_item, flags);
+        FlagsArrayAdapter adapter = new FlagsArrayAdapter(this, R.layout.flags_list_item, flags, this);
         listView.setAdapter(adapter);
     }
 

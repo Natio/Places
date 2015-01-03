@@ -16,6 +16,7 @@ import android.view.MenuItem;
 
 import com.gcw.sapienza.places.utils.Utils;
 import com.gcw.sapienza.places.services.LocationService;
+import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 import com.parse.ui.ParseLoginBuilder;
 
@@ -42,16 +43,19 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
         logRun();
 
-        ParseLoginBuilder builder = new ParseLoginBuilder(MainActivity.this);
+        if(ParseFacebookUtils.getSession() == null || ParseFacebookUtils.getSession().isClosed())
+        {
+            ParseLoginBuilder builder = new ParseLoginBuilder(MainActivity.this);
 
-        builder.setParseLoginEnabled(false);
+            builder.setParseLoginEnabled(false);
 
-        builder.setFacebookLoginEnabled(true);
-        builder.setFacebookLoginPermissions(Arrays.asList("public_profile", "user_friends"/*, "user_relationships", "user_birthday", "user_location"*/));
+            builder.setFacebookLoginEnabled(true);
+            builder.setFacebookLoginPermissions(Arrays.asList("public_profile", "user_friends"/*, "user_relationships", "user_birthday", "user_location"*/));
 
-        // builder.setAppLogo(R.drawable.app_logo);
+            // builder.setAppLogo(R.drawable.app_logo);
 
-        startActivityForResult(builder.build(), 0);
+            startActivityForResult(builder.build(), 0);
+        }
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), this);
         mViewPager = (ViewPager) findViewById(R.id.pager);
