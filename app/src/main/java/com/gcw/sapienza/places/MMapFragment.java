@@ -154,6 +154,6 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
         else if(category.equals("History")) return BitmapDescriptorFactory.HUE_GREEN;
         else if(category.equals("Culture")) return BitmapDescriptorFactory.HUE_MAGENTA;
         else if(category.equals("Landscapes")) return BitmapDescriptorFactory.HUE_VIOLET;
-        else return BitmapDescriptorFactory.HUE_YELLOW; // State Of Mind' category
+        else return BitmapDescriptorFactory.HUE_YELLOW; // 'State Of Mind' category
     }
 }

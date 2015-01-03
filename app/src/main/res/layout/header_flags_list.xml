@@ -5,14 +5,13 @@
     android:layout_height="fill_parent">
 
     <TextView
+        android:id="@+id/header"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:gravity="center_horizontal|center_vertical"
-        android:textStyle="bold"
-        android:textColor="@color/white"
-        android:textSize="22dp"
-        android:background="@color/azure"
-        android:padding="10dp"
-        android:text="Flags nearby" />
+        android:textColor="@color/azure"
+        android:textSize="20dp"
+        android:background="@color/white"
+        android:padding="10dp" />
 
 </LinearLayout>

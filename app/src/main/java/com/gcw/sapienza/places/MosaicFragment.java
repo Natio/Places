@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.adapters.FlagsArrayAdapter;
@@ -30,12 +31,43 @@ public class MosaicFragment extends Fragment{
     private static final String TAG = "MosaicFragment";
 
     private static View view;
+    private static ListView listView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         updateFlags();
 
         view = inflater.inflate(R.layout.flags_list_layout, container, false);
+
+        //retrieve the listviews
+        listView = (ListView)view.findViewById(R.id.flags_list_view);
+
+        View header = inflater.inflate(R.layout.header_flags_list, null);
+        ((TextView)header.findViewById(R.id.header)).setText("within a range of " + Utils.MAP_RADIUS + " kms");
+        listView.addHeaderView(header);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                Intent intent = new Intent(getActivity().getApplicationContext(), FlagActivity.class);
+
+                Date date = ((Flag) parent.getItemAtPosition(position)).getDate();
+                DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+                String sDate = df.format(date);
+
+                Bundle bundle = new Bundle();
+
+                bundle.putString("text", ((Flag) parent.getItemAtPosition(position)).getText());
+                bundle.putString("id", ((Flag) parent.getItemAtPosition(position)).getFbId());
+                bundle.putString("date", sDate);
+
+                intent.putExtras(bundle);
+
+                startActivity(intent);
+            }
+        });
 
         return view;
     }
@@ -72,38 +104,9 @@ public class MosaicFragment extends Fragment{
     {
         if(this.getView() != null)
         {
-            //retrieve the listviews
-            ListView listView = (ListView)this.getView().findViewById(R.id.flags_list_view);
-            //configure the adapter
             FlagsArrayAdapter adapter = new FlagsArrayAdapter(this.getActivity(), R.layout.flags_list_item, flags, getActivity());
 
-            // View header = (View)getLayoutInflater(null).inflate(R.layout.header_flags_list, null);
-            // listView.removeHeaderView(header);
-            // listView.addHeaderView(header);
-
             listView.setAdapter(adapter);
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-            {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-                {
-                    Intent intent = new Intent(getActivity().getApplicationContext(), FlagActivity.class);
-
-                    Date date = ((Flag) parent.getItemAtPosition(position)).getDate();
-                    DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-                    String sDate = df.format(date);
-
-                    Bundle bundle = new Bundle();
-
-                    bundle.putString("text", ((Flag) parent.getItemAtPosition(position)).getText());
-                    bundle.putString("id", ((Flag) parent.getItemAtPosition(position)).getFbId());
-                    bundle.putString("date", sDate);
-
-                    intent.putExtras(bundle);
-
-                    startActivity(intent);
-                }
-            });
         }
     }
 }
