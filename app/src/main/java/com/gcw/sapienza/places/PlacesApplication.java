@@ -18,6 +18,7 @@ import com.gcw.sapienza.places.remotesettings.RemoteSettingsCallBacks;
 import com.gcw.sapienza.places.services.ILocationUpdater;
 import com.gcw.sapienza.places.services.LocationService;
 import com.parse.Parse;
+import com.parse.ParseAnalytics;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParseException;
