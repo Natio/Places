@@ -7,9 +7,8 @@
     <ImageView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="#000000"
-        android:scaleType="fitCenter"
-        android:src="@drawable/splash" />
+        android:background="#ff12470d"
+        android:scaleType="fitCenter" />
 
     <ProgressBar
         style="?android:attr/progressBarStyleLarge"
@@ -19,6 +18,15 @@
         android:paddingBottom="40dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:src="@drawable/title_places"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <!--
     <TextView
