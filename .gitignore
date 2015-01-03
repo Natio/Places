@@ -13,10 +13,12 @@ bin/
 gen/
 
 # Gradle files
-.idea/
 .gradle/
 build/
 .idea/
+
+#IntelliJ IDEA Module files
+*/*.iml
 
 # Local configuration file (sdk path, etc)
 local.properties

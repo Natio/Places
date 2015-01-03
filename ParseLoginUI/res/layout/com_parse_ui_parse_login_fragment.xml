@@ -6,18 +6,26 @@
     android:paddingRight="@dimen/com_parse_ui_horizontal_margin"
     android:paddingBottom="@dimen/com_parse_ui_vertical_margin"
     android:gravity="center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#ff084403">
+
+    <!-- added screenorientation to avoid rotation in login-->
 
     <include
         layout="@layout/com_parse_ui_parse_login_app_logo"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
+
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0.5" />
+        android:id="@+id/imageView"
+        android:src="@drawable/title_places" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.5"
+        android:layout_weight="0.09"
         android:gravity="center"
         android:orientation="vertical">
 

@@ -12,6 +12,20 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>    <!-- google maps api-->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>   <!-- google maps api and it is our main feature-->
 
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <!--
+      IMPORTANT: Change "com.parse.tutorials.pushnotifications.permission.C2D_MESSAGE" in the lines below
+      to match your app's package name + ".permission.C2D_MESSAGE".
+    -->
+    <permission android:protectionLevel="signature"
+        android:name="com.gcw.sapienza.places.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.gcw.sapienza.places.permission.C2D_MESSAGE" />
+
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true"/>   <!-- google maps api-->
@@ -36,36 +50,44 @@
 
         <!-- **** END REQUIRED ****  -->
 
-        <!-- SplashScreen is the first activity to be started -->
+        <!-- SplashScreen is the first activity to be started
         <activity
-            android:name=".SplashScreen">
-            android:label="SplashScreen"
+            android:name=".SplashScreen"
+            android:label="SplashScreen" >
+        </activity> -->
+
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"> <!-- soft keyboard 'done' button, force vertical orientation -->
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name" >
+        <activity android:name=".legacy.FlagsListActivity">
         </activity>
 
-        <activity android:name=".FlagsListActivity">
+        <activity android:name=".legacy.FlagsMapActivity">
         </activity>
 
-        <activity android:name=".FlagsMapActivity">
+        <activity android:name=".legacy.ShareActivity">
         </activity>
 
-        <activity android:name=".ShareActivity">
+        <activity android:name=".SettingsActivity">
         </activity>
 
-        <activity android:name=".Settings">
+        <activity android:name=".FlagActivity">
         </activity>
 
         <activity
             android:name="com.parse.ui.ParseLoginActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:launchMode="singleTop">
             <meta-data
                 android:name="com.parse.ui.ParseLoginActivity.PARSE_LOGIN_ENABLED"
@@ -77,7 +99,35 @@
             android:label="@string/app_name" />
 
         <!-- service for monitoring user position -->
-        <service android:name=".LocationService" />
+        <service android:name=".services.LocationService" />
+
+        <!-- push service -->
+        <service android:name="com.parse.PushService" />
+        <receiver android:name="com.parse.ParseBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.parse.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
+                <!--
+                  IMPORTANT: Change "com.parse.tutorials.pushnotifications" to match your app's package name.
+                -->
+                <category android:name="com.gcw.sapienza.places" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.parse.ParsePushBroadcastReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="com.parse.push.intent.RECEIVE" />
+                <action android:name="com.parse.push.intent.DELETE" />
+                <action android:name="com.parse.push.intent.OPEN" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

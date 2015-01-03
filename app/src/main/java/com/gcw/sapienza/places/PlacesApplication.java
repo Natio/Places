@@ -12,15 +12,19 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.cgw.sapienza.palces.remotesettings.RemoteSettings;
-import com.cgw.sapienza.palces.remotesettings.RemoteSettingsCallBacks;
-import com.cgw.sapienza.places.model.Flag;
-import com.parse.LogInCallback;
+import com.gcw.sapienza.places.remotesettings.RemoteSettings;
+import com.gcw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.remotesettings.RemoteSettingsCallBacks;
+import com.gcw.sapienza.places.services.ILocationUpdater;
+import com.gcw.sapienza.places.services.LocationService;
 import com.parse.Parse;
+import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 import com.parse.ParseException;
-import com.gcw.sapienza.places.LocationService.LocalBinder;
+import com.gcw.sapienza.places.services.LocationService.LocalBinder;
+//Parse push notifications
+import com.parse.ParsePush;
+import com.parse.SaveCallback;
 
 import java.util.List;
 
@@ -43,13 +47,20 @@ public class PlacesApplication extends Application{
     private LocationManager locationManager;
 
     //current location
-    private Location currentLocation = null;
-    private List<ParseObject> pinsNearby;
+    private static Location currentLocation = null;
+    private static List<ParseObject> pinsNearby;
 
 
     public LocationService mService;
     boolean mBound = false;
 
+    public static Location getLocation(){
+        return currentLocation;
+    }
+
+    public static List<ParseObject> getPins(){
+        return pinsNearby;
+    }
 
     public static Context getPlacesAppContext(){
         return PlacesApplication.PLACES_CONTEXT;
@@ -60,13 +71,20 @@ public class PlacesApplication extends Application{
     public void onCreate() {
         super.onCreate();
         PlacesApplication.PLACES_CONTEXT = this.getApplicationContext();
+
         //initialize the location manager
 //        this.initLocationManager();
+
         //fixme location service not connecting to google api properly
         startLocationService();
+
         // initialize Parse.com
         ParseObject.registerSubclass(Flag.class);
         Parse.initialize(this, PARSE_COM_APP_KEY , PARSE_COM_CLIENT_KEY);
+        ParseFacebookUtils.initialize(getString(R.string.app_id));
+
+        //Parse push notifications
+        subscribeToParseBroadcast();
 
         //Syncs settings with the server
         RemoteSettings.getInstance().synchWithFileAtURL("https://dl.dropboxusercontent.com/u/2181964/remote_config.json", new RemoteSettingsCallBacks() {
@@ -78,6 +96,19 @@ public class PlacesApplication extends Application{
             @Override
             public void onError(String error) {
                 Log.d(TAG, "RemoteSettings configuration error: "+error);
+            }
+        });
+    }
+
+    private void subscribeToParseBroadcast() {
+        ParsePush.subscribeInBackground("", new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Log.d("com.parse.push", "successfully subscribed to the broadcast channel.");
+                } else {
+                    Log.e("com.parse.push", "failed to subscribe for push", e);
+                }
             }
         });
     }
@@ -142,11 +173,10 @@ public class PlacesApplication extends Application{
         return this.currentLocation;
     }
     private ILocationUpdater listener = new ILocationUpdater() {
-        public void setLocation(Location l){
-            PlacesApplication.this.currentLocation = l;
-        }
+        public void setLocation(Location l){ PlacesApplication.currentLocation = l; }
         public void setPinsNearby(List<ParseObject> l){
-            PlacesApplication.this.pinsNearby = l;
+            PlacesApplication.pinsNearby = l;
         }
     };
+
 }
