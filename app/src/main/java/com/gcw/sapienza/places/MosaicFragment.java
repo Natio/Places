@@ -20,6 +20,8 @@ import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 
+import org.w3c.dom.Text;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -33,6 +35,8 @@ public class MosaicFragment extends Fragment{
     private static View view;
     private static ListView listView;
 
+    private static TextView textHeader;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         updateFlags();
@@ -43,7 +47,8 @@ public class MosaicFragment extends Fragment{
         listView = (ListView)view.findViewById(R.id.flags_list_view);
 
         View header = inflater.inflate(R.layout.header_flags_list, null);
-        ((TextView)header.findViewById(R.id.header)).setText("within a range of " + Utils.MAP_RADIUS + " kms");
+        textHeader = (TextView)header.findViewById(R.id.header);
+        textHeader.setText("within " + Utils.MAP_RADIUS + " kms");
         listView.addHeaderView(header);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -51,6 +56,11 @@ public class MosaicFragment extends Fragment{
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
+                if(position == 0) {
+                    startActivity(new Intent(getActivity().getApplicationContext(), SettingsActivity.class));
+                    return;
+                }
+
                 Intent intent = new Intent(getActivity().getApplicationContext(), FlagActivity.class);
 
                 Date date = ((Flag) parent.getItemAtPosition(position)).getDate();
@@ -70,6 +80,10 @@ public class MosaicFragment extends Fragment{
         });
 
         return view;
+    }
+
+    public static void updateHeaderText(){
+        textHeader.setText("within " + Utils.MAP_RADIUS + " kms");
     }
 
     protected void updateFlags()

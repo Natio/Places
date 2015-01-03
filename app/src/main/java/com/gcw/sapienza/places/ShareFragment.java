@@ -38,6 +38,8 @@ public class ShareFragment extends Fragment{
 
     private Spinner spinner;
 
+    private Button shareButton;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -46,10 +48,12 @@ public class ShareFragment extends Fragment{
         textView = (TextView)view.findViewById(R.id.share_text_field);
         textView.setGravity(Gravity.CENTER);
 
-        ((Button)view.findViewById(R.id.share_button)).setOnClickListener(new View.OnClickListener() {
+        shareButton = ((Button)view.findViewById(R.id.share_button));
+        shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ShareFragment.this.share();
+                v.setClickable(false);
             }
         });
 
@@ -70,9 +74,13 @@ public class ShareFragment extends Fragment{
         {
             Toast.makeText(getActivity().getApplicationContext(), "Please enable GPS/Network service", Toast.LENGTH_LONG).show();
             Log.d(TAG, "No GPS data");
+<<<<<<< HEAD
             Map<String, String> dimensions = new HashMap<String, String>();
             dimensions.put("reason", "Share with No GPS");
             ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
+=======
+            resetShareFragment();
+>>>>>>> f30188b11d9b3dca5cf7302a02bda8570fc0984f
             return;
         }
 
@@ -84,9 +92,13 @@ public class ShareFragment extends Fragment{
             Toast.makeText(getActivity().getApplicationContext(),
                     "Couldn't retrieve your Facebook credentials,\nplease check your internet connection.",
                     Toast.LENGTH_LONG).show();
+<<<<<<< HEAD
             Map<String, String> dimensions = new HashMap<String, String>();
             dimensions.put("reason", "Share with No Facebook");
             ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
+=======
+            resetShareFragment();
+>>>>>>> f30188b11d9b3dca5cf7302a02bda8570fc0984f
             return;
         }
         final String category = spinner.getSelectedItem().toString();
@@ -99,6 +111,7 @@ public class ShareFragment extends Fragment{
             @Override
             public void done(ParseException e) {
                 if(e != null){
+                    resetShareFragment();
                     Log.d(TAG, e.getMessage());
                     Map<String, String> dimensions = new HashMap<String, String>();
                     dimensions.put("reason", e.getMessage());
@@ -123,6 +136,7 @@ public class ShareFragment extends Fragment{
         hideKeyboard();
 
         Toast.makeText(getActivity().getApplicationContext(), "Flag has been placed!", Toast.LENGTH_LONG).show();
+        shareButton.setClickable(true);
     }
 
     public void hideKeyboard()
