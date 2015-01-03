@@ -54,6 +54,7 @@ public class SettingsActivity extends Activity
             preference.setDefaultValue(newValue);
             int value = (int)newValue;
             Utils.MAP_RADIUS = value / 10f;
+            MosaicFragment.updateHeaderText();
             Log.d("Settings Activity", "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
 
         }
