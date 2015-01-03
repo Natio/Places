@@ -7,7 +7,6 @@
     android:paddingBottom="@dimen/com_parse_ui_vertical_margin"
     android:gravity="center"
     android:orientation="vertical"
-    android:screenOrientation="portrait"
     android:background="#ff084403">
 
     <!-- added screenorientation to avoid rotation in login-->
