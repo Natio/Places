@@ -55,7 +55,7 @@ Toast radiusToast;
 
             showToast("Radius set to " + value * 100 + " meters.");
 
-            Log.d("Settings Activity", "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
+            Log.d(TAG, "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
         }
         else if(preference.getKey().equals("maxFetch"))
         {
@@ -66,7 +66,7 @@ Toast radiusToast;
 
             showToast("Max number of visible flags: " + value + ".");
 
-            Log.d("Settings Activity", "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
+            Log.d(TAG, "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
         }
 
         PlacesApplication.mService.queryParsewithLocation(PlacesApplication.getLocation());
