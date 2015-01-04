@@ -46,7 +46,7 @@ Toast radiusToast;
         {
             Utils.ARCHAEOLOGIST_ENABLED = (boolean)newValue;
         }
-        else if(preference.getTitle().equals("Sight area"))
+        else if(preference.getTitle().equals("Range of action"))
         {
             int value = (int)newValue + 1;
 
@@ -57,7 +57,7 @@ Toast radiusToast;
 
             Log.d("Settings Activity", "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
         }
-        else if(preference.getTitle().equals("Max number of visible flags"))
+        else if(preference.getTitle().equals("Max number of visible pins"))
         {
             int value = Utils.stepValues[(int)newValue];
 

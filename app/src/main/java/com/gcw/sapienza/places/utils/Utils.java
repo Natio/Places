@@ -58,6 +58,8 @@ public class Utils
 
     public static final int PIC_CAPTURE_REQUEST_CODE = 91;
 
+    public static String[] categories;
+
     public static Activity mainActivity;
 
     public static void clearUserData()

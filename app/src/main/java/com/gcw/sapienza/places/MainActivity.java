@@ -3,6 +3,7 @@ package com.gcw.sapienza.places;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
@@ -78,6 +79,9 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         Utils.mainActivity = this;
         Utils.makeMeRequest(); // retrieve user's Facebook ID
         Utils.updatePreferences(getBaseContext());
+
+        Resources res = getResources();
+        Utils.categories = res.getStringArray(R.array.categories);
     }
 
     private void logRun() {
