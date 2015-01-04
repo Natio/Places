@@ -26,6 +26,7 @@ import com.parse.ParseException;
 import com.gcw.sapienza.places.services.LocationService.LocalBinder;
 //Parse push notifications
 import com.parse.ParsePush;
+import com.parse.PushService;
 import com.parse.SaveCallback;
 
 import java.io.IOException;
@@ -88,6 +89,9 @@ public class PlacesApplication extends Application{
         ParseObject.registerSubclass(Flag.class);
         Parse.initialize(this, PARSE_COM_APP_KEY , PARSE_COM_CLIENT_KEY);
         ParseFacebookUtils.initialize(getString(R.string.app_id));
+
+//        PushService.setDefaultPushCallback(this, MainActivity.class);
+
 
         //Parse push notifications
         subscribeToParseBroadcast();

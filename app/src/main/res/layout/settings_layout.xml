@@ -53,14 +53,14 @@
             android:key="timeFilter"
             />
         <SeekBarPreference
-            android:title="How far will you see?"
+            android:title="Sight area"
             android:max="4"
             android:defaultValue="1"
             android:progress="1"
             android:key="seekBar"
             />
         <SeekBarPreference
-            android:title="The more, the better"
+            android:title="Max number of visible flags"
             android:max="4"
             android:defaultValue="1"
             android:progress="1"

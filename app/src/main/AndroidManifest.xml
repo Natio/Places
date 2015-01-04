@@ -126,7 +126,7 @@
                 <category android:name="com.gcw.sapienza.places" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.parse.ParsePushBroadcastReceiver" android:exported="false">
+        <receiver android:name="com.gcw.sapienza.places.Receiver" android:exported="false">
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
                 <action android:name="com.parse.push.intent.DELETE" />

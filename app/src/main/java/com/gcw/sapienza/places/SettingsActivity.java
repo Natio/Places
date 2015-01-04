@@ -46,7 +46,7 @@ Toast radiusToast;
         {
             Utils.ARCHAEOLOGIST_ENABLED = (boolean)newValue;
         }
-        else if(preference.getTitle().equals("How far will you see?"))
+        else if(preference.getTitle().equals("Sight area"))
         {
             int value = (int)newValue + 1;
 
@@ -57,14 +57,14 @@ Toast radiusToast;
 
             Log.d("Settings Activity", "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
         }
-        else if(preference.getTitle().equals("The more, the better"))
+        else if(preference.getTitle().equals("Max number of visible flags"))
         {
             int value = Utils.stepValues[(int)newValue];
 
             Utils.MAX_PINS = value;
             MosaicFragment.updateHeaderText();
 
-            showToast("Max pins allowed set to " + value + ".");
+            showToast("Max number of visible flags: " + value + ".");
 
             Log.d("Settings Activity", "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
         }
