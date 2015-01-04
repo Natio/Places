@@ -1,12 +1,9 @@
 package com.gcw.sapienza.places;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.gcw.sapienza.places.utils.Utils;

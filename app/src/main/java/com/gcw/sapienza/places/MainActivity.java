@@ -3,29 +3,30 @@ package com.gcw.sapienza.places;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.SeekBar;
 
-import com.gcw.sapienza.places.utils.Utils;
 import com.gcw.sapienza.places.services.LocationService;
+import com.gcw.sapienza.places.utils.Utils;
+import com.parse.ParseAnalytics;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 import com.parse.ui.ParseLoginBuilder;
 
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MainActivity extends ActionBarActivity implements ViewPager.OnPageChangeListener {
@@ -33,6 +34,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     private static final String TAG = "MainActivity";
 
     private static boolean isForeground = false;
+
+    private long startTime = -1;///used to track session timing (statistics)
 
     SectionsPagerAdapter mSectionsPagerAdapter;
     Fragment[] fragments = {new ShareFragment(), new MosaicFragment(), new MMapFragment()};
@@ -42,6 +45,9 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        this.startTime = new Date().getTime();
+
+        ParseAnalytics.trackAppOpenedInBackground(this.getIntent());
         setContentView(R.layout.activity_main);
 
         logRun();
@@ -96,15 +102,18 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
+            ParseAnalytics.trackEventInBackground("open_settings");
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
         else if(id == R.id.action_logout)
         {
+            ParseAnalytics.trackEventInBackground("logout");
             logout();
         }
         else if(id == R.id.action_refresh)
         {
+            ParseAnalytics.trackEventInBackground("refresh");
             refresh();
         }
 
@@ -207,7 +216,9 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     public void onResume()
     {
         super.onResume();
+        this.startTime = new Date().getTime();
         isForeground = true;
+        Log.d(TAG,"resume");
     }
 
     @Override
@@ -215,6 +226,13 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     {
         super.onPause();
         isForeground = false;
+
+
+        long time_diff = ((new Date().getTime() - this.startTime)/1000)/60;
+        Map<String, String> dimensions = new HashMap<String, String>();
+        dimensions.put("time_minutes", ""+time_diff);
+        ParseAnalytics.trackEventInBackground("session_time", dimensions);
+        Log.d(TAG,"pause");
     }
 
     public static boolean isForeground(){

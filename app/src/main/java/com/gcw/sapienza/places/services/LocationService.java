@@ -1,6 +1,5 @@
 package com.gcw.sapienza.places.services;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -14,8 +13,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.*;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
 
 import com.gcw.sapienza.places.MMapFragment;
 import com.gcw.sapienza.places.MainActivity;
