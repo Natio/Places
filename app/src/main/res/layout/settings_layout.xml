@@ -33,34 +33,34 @@
         android:title="Filters">
 
         <CheckBoxPreference
-            android:title="Lone Wolf"
-            android:summary="See flags placed by yourself"
+            android:title="Show my flags"
+            android:summary="Your flags are shown in the list"
             android:key="meFilter"
             />
         <CheckBoxPreference
-            android:title="With Friends Surrounded"
-            android:summary="See flags placed by your friends"
+            android:title="Show my friends' flags"
+            android:summary="Your friends' flags are visible"
             android:key="flFilter"
             />
         <CheckBoxPreference
             android:title="Storytellers In The Dark"
-            android:summary="See flags placed by strangers"
+            android:summary="Coming soon"
             android:key="strangersFilter"
             />
         <CheckBoxPreference
             android:title="Archaeologist"
-            android:summary="Give higher relevance to older flags"
+            android:summary="Coming soon"
             android:key="timeFilter"
             />
         <SeekBarPreference
-            android:title="How far will you see?"
+            android:title="Range of action"
             android:max="4"
             android:defaultValue="1"
             android:progress="1"
             android:key="seekBar"
             />
         <SeekBarPreference
-            android:title="The more, the better"
+            android:title="Max number of visible pin"
             android:max="4"
             android:defaultValue="1"
             android:progress="1"
