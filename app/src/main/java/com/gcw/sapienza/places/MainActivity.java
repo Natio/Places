@@ -3,7 +3,9 @@ package com.gcw.sapienza.places;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -13,6 +15,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.gcw.sapienza.places.utils.Utils;
 import com.gcw.sapienza.places.services.LocationService;
@@ -37,9 +40,9 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     private long startTime = -1;///used to track session timing (statistics)
 
-    SectionsPagerAdapter mSectionsPagerAdapter;
-    Fragment[] fragments = {new ShareFragment(), new MosaicFragment(), new MMapFragment()};
-    ViewPager mViewPager;
+    protected static SectionsPagerAdapter mSectionsPagerAdapter;
+    protected static Fragment[] fragments = {new ShareFragment(), new MosaicFragment(), new MMapFragment()};
+    protected static ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +75,9 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         mViewPager.setOnPageChangeListener(this);
         mViewPager.setCurrentItem(1);
 
+        Utils.mainActivity = this;
         Utils.makeMeRequest(); // retrieve user's Facebook ID
+        Utils.updatePreferences(getBaseContext());
     }
 
     private void logRun() {
@@ -139,8 +144,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     protected void refresh()
     {
-        ((MosaicFragment)fragments[1]).updateFlags();
-        ((MMapFragment)fragments[2]).updateMarkersOnMap();
+        PlacesApplication.mService.queryParsewithLocation(PlacesApplication.getLocation());
     }
 
     @Override
@@ -151,14 +155,24 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     @Override
     public void onPageSelected(int i) {
         Log.d(TAG, "Page selected, is Location Service running? " + isMyServiceRunning(LocationService.class));
+
+        // I commented it out because I consider it an overkill -- Simone
+        /*
         Fragment sel = fragments[i];
         if(sel instanceof MMapFragment){
             Log.d(TAG, "Page selected. Updating markers...");
-            ((MMapFragment)sel).updateMarkersOnMap();
+            MMapFragment.updateMarkersOnMap();
         }
         else if(sel instanceof MosaicFragment){
             Log.d(TAG, "Page selected. Updating flags...");
-            ((MosaicFragment)sel).updateFlags();
+            MosaicFragment.configureListViewWithFlags();
+        }
+        */
+
+        Fragment sel = fragments[i];
+        if(sel instanceof ShareFragment)
+        {
+            ((ShareFragment)sel).resetMedia();
         }
     }
 
@@ -237,5 +251,38 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     public static boolean isForeground(){
         return isForeground;
+    }
+
+    public void takePic(View v)
+    {
+        ((ShareFragment)fragments[0]).isPicTaken = true;
+
+        startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE), Utils.PIC_CAPTURE_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode)
+        {
+            case Utils.PIC_CAPTURE_REQUEST_CODE:
+                switch(resultCode)
+                {
+                    case RESULT_OK:
+                        if(data.getData() == null)
+                        {
+                            ((ShareFragment) fragments[0]).pic = (Bitmap)data.getExtras().get("data");
+                        }else try
+                        {
+                            ((ShareFragment) fragments[0]).pic = MediaStore.Images.Media.getBitmap(this.getContentResolver(), data.getData());
+                        }
+                        catch (IOException ioe)
+                        {
+                            ioe.printStackTrace();
+                        }
+                }
+        }
     }
 }

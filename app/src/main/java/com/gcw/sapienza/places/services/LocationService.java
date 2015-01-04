@@ -16,8 +16,10 @@ import android.util.Log;
 
 import com.gcw.sapienza.places.MMapFragment;
 import com.gcw.sapienza.places.MainActivity;
+import com.gcw.sapienza.places.MosaicFragment;
 import com.gcw.sapienza.places.Notifications;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -54,7 +56,7 @@ public class LocationService extends Service implements
 
     private ILocationUpdater listener;
 
-    private List<ParseObject> parseObjects;
+    private List<Flag> parseObjects;
 
     private Location notificationLocation;
 
@@ -85,18 +87,22 @@ public class LocationService extends Service implements
         }
     }
 
-    public void queryParsewithLocation(Location location){
+    public void queryParsewithLocation(Location location)
+    {
         ParseGeoPoint gp = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Posts");
+        ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
         query.whereWithinKilometers("location", gp, Utils.MAP_RADIUS);
+        if(!Utils.LONE_WOLF_ENABLED) query.whereNotEqualTo("fbId", Utils.fbId);
         query.setLimit(MAX_PINS); //TODO want this to be user-specific?
-        query.findInBackground(new FindCallback<ParseObject>() {
+        query.findInBackground(new FindCallback<Flag>() {
             @Override
-            public void done(List<ParseObject> parseObjects, ParseException e) {
+            public void done(List<Flag> parseObjects, ParseException e) {
                 LocationService.this.parseObjects = parseObjects;
                 Log.d(TAG, "Found " + parseObjects.size() +
                         " pins within " + Utils.MAP_RADIUS + " km");
                 updateApplication();
+
+                MosaicFragment.configureListViewWithFlags();
                 MMapFragment.updateMarkersOnMap();
             }
         });

@@ -2,6 +2,7 @@ package com.gcw.sapienza.places.services;
 
 import android.location.Location;
 
+import com.gcw.sapienza.places.model.Flag;
 import com.parse.ParseObject;
 
 import java.util.List;
@@ -13,6 +14,6 @@ public interface ILocationUpdater {
 
     public void setLocation(Location l);
 
-    public void setPinsNearby(List<ParseObject> l);
+    public void setPinsNearby(List<Flag> l);
 
 }

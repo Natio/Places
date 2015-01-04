@@ -101,9 +101,6 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
 
     protected void initMap(final GoogleMap googleMap)
     {
-        LatLng lat_lng = new LatLng(location.getLatitude(), location.getLongitude());
-
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lat_lng, MAP_ZOOM));
         googleMap.getUiSettings().setScrollGesturesEnabled(false);
 
         gMap = googleMap;
@@ -114,7 +111,7 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
 
     public static void updateMarkersOnMap()
     {
-        List<ParseObject> pins= PlacesApplication.getPins();
+        List<Flag> pins= PlacesApplication.getPins();
 
         if(pins != null && gMap != null)
         {
@@ -122,7 +119,7 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
 
             location = PlacesApplication.getLocation();
             LatLng lat_lng = new LatLng(location.getLatitude(), location.getLongitude());
-            gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lat_lng, MAP_ZOOM));
+            gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lat_lng, MAP_ZOOM));
 
             for (ParseObject p : pins)
             {
@@ -136,12 +133,6 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
                                 .icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
                                 .alpha(0.8f));
             }
-
-            // add pin for your current location
-//            gMap.addMarker(new MarkerOptions()
-//                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
-//                    .title("You are here!")
-//                    .alpha(1)).showInfoWindow();
         }
     }
 

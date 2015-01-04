@@ -1,5 +1,6 @@
 package com.gcw.sapienza.places;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -37,9 +38,8 @@ public class MosaicFragment extends Fragment{
     private static TextView textHeader;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        updateFlags();
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
         view = inflater.inflate(R.layout.flags_list_layout, container, false);
 
         //retrieve the listviews
@@ -71,6 +71,7 @@ public class MosaicFragment extends Fragment{
                 bundle.putString("text", ((Flag) parent.getItemAtPosition(position)).getText());
                 bundle.putString("id", ((Flag) parent.getItemAtPosition(position)).getFbId());
                 bundle.putString("date", sDate);
+                bundle.putByteArray("pic", ((Flag) parent.getItemAtPosition(position)).getPic());
 
                 intent.putExtras(bundle);
 
@@ -81,43 +82,21 @@ public class MosaicFragment extends Fragment{
         return view;
     }
 
-    public static void updateHeaderText(){
+    public static void updateHeaderText()
+    {
         textHeader.setText("within " + Utils.MAP_RADIUS + " kms");
     }
 
-    protected void updateFlags()
+    public static void configureListViewWithFlags()
     {
-        //Create the query and execute it in background
-        ParseQuery<Flag> q = ParseQuery.getQuery(Flag.class);
-
-        Location location = PlacesApplication.getLocation();
-
-        if(location!=null)
+        if(view != null)
         {
-            ParseGeoPoint p = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-            q.whereWithinKilometers("location", p, Utils.MAP_RADIUS);
-            q.findInBackground(new FindCallback<Flag>() {
-                public void done(List<Flag> flags, ParseException e) {
-                    if (e == null) {
-                        //if flags are retrieved configure the ListView
-                        MosaicFragment.this.configureListViewWithFlags(flags);
-                    } else {
-                        Log.d(TAG, "Error: " + e.getMessage());
-                    }
-                }
-            });
-        }
-    }
-
-    /**
-     * Configures the listview for showing the flags passed as arguments
-     * @param flags List of flags
-     */
-    private void configureListViewWithFlags(final List<Flag> flags)
-    {
-        if(this.getView() != null)
-        {
-            FlagsArrayAdapter adapter = new FlagsArrayAdapter(this.getActivity(), R.layout.flags_list_item, flags, getActivity());
+            FlagsArrayAdapter adapter =
+                    new FlagsArrayAdapter
+                                    (Utils.mainActivity,
+                                    R.layout.flags_list_item,
+                                    PlacesApplication.getPins(),
+                                    Utils.mainActivity);
 
             listView.setAdapter(adapter);
         }

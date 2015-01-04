@@ -1,7 +1,10 @@
 package com.gcw.sapienza.places;
 
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
@@ -22,6 +25,7 @@ import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.SaveCallback;
 
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +41,14 @@ public class ShareFragment extends Fragment{
     private Spinner spinner;
 
     private Button shareButton;
+
+    protected Bitmap pic;
+    protected MediaStore.Video video;
+    protected MediaStore.Audio audio;
+
+    protected boolean isPicTaken = false;
+    protected boolean isVideoTaken = false;
+    protected boolean isSoundCaptured = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -80,7 +92,7 @@ public class ShareFragment extends Fragment{
             return;
         }
 
-        Flag f = new Flag();
+        final Flag f = new Flag();
         ParseGeoPoint p = new ParseGeoPoint(current_location.getLatitude(), current_location.getLongitude());
 
         if(Utils.fbId.equals(""))
@@ -100,26 +112,64 @@ public class ShareFragment extends Fragment{
         f.put("location",p);
         f.put("text",this.textView.getText().toString());
 
-        f.saveInBackground(new SaveCallback() {
+        new Thread(new Runnable()
+        {
             @Override
-            public void done(ParseException e) {
-                if(e != null){
-                    resetShareFragment();
-                    Log.d(TAG, e.getMessage());
-                    Map<String, String> dimensions = new HashMap<>();
-                    dimensions.put("reason", e.getMessage());
-                    ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
-                }
-                else
+            public void run() {
+
+                if (isPicTaken)
                 {
-                    resetShareFragment();
-                    ((com.gcw.sapienza.places.MainActivity)getActivity()).refresh();
-                    Map<String, String> dimensions = new HashMap<>();
-                    dimensions.put("category", category);
-                    ParseAnalytics.trackEventInBackground("sharing_succeded", dimensions);
+                    if (pic == null)
+                    {
+                        Toast.makeText(getActivity(), "Error encountered while retrieving picture\nFlag won't be stored",
+                                Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    else
+                    {
+                        Log.v(TAG, "Successfully retrieved pic.");
+
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        pic.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                        byte[] byteArray = stream.toByteArray();
+                        f.put("pic", byteArray);
+                    }
                 }
+
+                f.saveInBackground(new SaveCallback()
+                {
+                    @Override
+                    public void done(ParseException e)
+                    {
+                        if (e != null) {
+                            Log.d(TAG, e.getMessage());
+                            Map<String, String> dimensions = new HashMap<>();
+                            dimensions.put("reason", e.getMessage());
+                            ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
+                        } else {
+                            ((com.gcw.sapienza.places.MainActivity) getActivity()).refresh();
+                            Map<String, String> dimensions = new HashMap<>();
+                            dimensions.put("category", category);
+                            ParseAnalytics.trackEventInBackground("sharing_succeded", dimensions);
+                        }
+
+                        resetShareFragment();
+                        resetMedia();
+                    }
+                });
             }
-        });
+        }).start();
+    }
+
+    protected void resetMedia()
+    {
+        isPicTaken = false;
+        isVideoTaken = false;
+        isSoundCaptured = false;
+
+        pic = null;
+        video = null;
+        audio = null;
     }
 
     public void resetShareFragment()

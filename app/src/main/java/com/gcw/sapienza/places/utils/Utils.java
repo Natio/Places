@@ -1,9 +1,12 @@
 package com.gcw.sapienza.places.utils;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -13,6 +16,7 @@ import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.model.GraphObject;
 import com.facebook.model.GraphUser;
+import com.gcw.sapienza.places.MainActivity;
 import com.parse.ParseFacebookUtils;
 
 import org.json.JSONArray;
@@ -43,6 +47,15 @@ public class Utils
 
     public static final String LARGE_PIC_SIZE = "200";
     public static final String SMALL_PIC_SIZE = "120";
+
+    public static boolean LONE_WOLF_ENABLED = true;
+    public static boolean WITH_FRIENDS_SURROUNDED_ENABLED = true;
+    public static boolean STORYTELLERS_IN_THE_DARK_ENABLED = true;
+    public static boolean ARCHAEOLOGIST_ENABLED = true;
+
+    public static final int PIC_CAPTURE_REQUEST_CODE = 91;
+
+    public static Activity mainActivity;
 
     public static void clearUserData()
     {
@@ -210,5 +223,16 @@ public class Utils
                     }
                 });
         request.executeAsync();
+    }
+
+    public static void updatePreferences(Context context)
+    {
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(context);
+
+        Utils.LONE_WOLF_ENABLED = preferences.getBoolean("meFilter", true);
+        Utils.WITH_FRIENDS_SURROUNDED_ENABLED = preferences.getBoolean("flFilter", true);
+        Utils.STORYTELLERS_IN_THE_DARK_ENABLED = preferences.getBoolean("strangersFilter", true);
+        Utils.ARCHAEOLOGIST_ENABLED = preferences.getBoolean("timeFilter", true);
     }
 }

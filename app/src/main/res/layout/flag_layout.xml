@@ -17,9 +17,10 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:id="@+id/author"
-        android:layout_alignParentBottom="true"
+        android:layout_marginTop="15dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="125dp" />
+        android:layout_marginBottom="15dp"
+        android:layout_above="@+id/profile_pic" />
 
     <ImageView
         android:layout_width="wrap_content"
@@ -41,6 +42,14 @@
         android:gravity="center"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="110dp"
+        android:layout_marginTop="70dp"
         android:textSize="25sp" />
+
+    <ImageView
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:id="@+id/pic"
+        android:layout_below="@+id/text"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>

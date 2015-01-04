@@ -35,7 +35,7 @@
         <CheckBoxPreference
             android:title="Lone Wolf"
             android:summary="See flags placed by yourself"
-            android:key="loneWolfFilter"
+            android:key="meFilter"
             />
         <CheckBoxPreference
             android:title="With Friends Surrounded"

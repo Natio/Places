@@ -18,7 +18,7 @@ public class SettingsFragment extends PreferenceFragment {
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.layout.settings_layout);
 
-        Preference loneWolf_filter = (Preference) findPreference("loneWolfFilter");
+        Preference loneWolf_filter = (Preference) findPreference("meFilter");
         Preference fl_filter = (Preference) findPreference("flFilter");
         Preference strangers_filter = (Preference) findPreference("strangersFilter");
         Preference time_filter = (Preference) findPreference("timeFilter");

@@ -26,6 +26,11 @@
         android:name="com.gcw.sapienza.places.permission.C2D_MESSAGE" />
     <uses-permission android:name="com.gcw.sapienza.places.permission.C2D_MESSAGE" />
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true"/>   <!-- google maps api-->

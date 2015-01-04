@@ -31,4 +31,6 @@ public class Flag extends ParseObject{
     }
 
     public Date getDate() { return (Date)this.getCreatedAt(); }
+
+    public byte[] getPic() { return (byte[])this.get("pic"); }
 }

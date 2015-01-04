@@ -23,6 +23,7 @@ public class FlagActivity extends Activity {
     private String text;
     private String id;
     private String date;
+    private byte[] pic;
 
     private static final String TAG = "FlagActivity";
 
@@ -31,13 +32,27 @@ public class FlagActivity extends Activity {
     {
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.flag_layout);
+
         Bundle bundle = getIntent().getExtras();
 
         text = bundle.getString("text");
         id = bundle.getString("id");
         date = bundle.getString("date");
 
-        setContentView(R.layout.flag_layout);
+        ImageView iw = ((ImageView)findViewById(R.id.pic));
+
+        if(bundle.getByteArray("pic") != null)
+        {
+            pic = new byte[bundle.getByteArray("pic").length];
+            System.arraycopy(bundle.getByteArray("pic"), 0, pic, 0, pic.length);
+            iw.setImageBitmap(BitmapFactory.decodeByteArray(pic, 0, pic.length));
+        }
+        else
+        {
+            iw.setMaxHeight(0);
+            iw.setMaxWidth(0);
+        }
 
         ((EditText)findViewById(R.id.text)).setText(text);
 
