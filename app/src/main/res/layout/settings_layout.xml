@@ -44,12 +44,12 @@
             />
         <CheckBoxPreference
             android:title="Storytellers In The Dark"
-            android:summary="Coming soon"
+            android:summary="Flags from strangers are visible"
             android:key="strangersFilter"
             />
         <CheckBoxPreference
             android:title="Archaeologist"
-            android:summary="Coming soon"
+            android:summary="Give higher relevance to older flags"
             android:key="timeFilter"
             />
         <SeekBarPreference
@@ -60,7 +60,7 @@
             android:key="seekBar"
             />
         <SeekBarPreference
-            android:title="Max number of visible pins"
+            android:title="Max number of visible flags"
             android:max="4"
             android:defaultValue="1"
             android:progress="1"
