@@ -5,6 +5,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -26,7 +28,9 @@ import com.gcw.sapienza.places.services.LocationService.LocalBinder;
 import com.parse.ParsePush;
 import com.parse.SaveCallback;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 
 public class PlacesApplication extends Application{
@@ -53,6 +57,8 @@ public class PlacesApplication extends Application{
 
     public static LocationService mService;
     boolean mBound = false;
+
+    private static String locality;
 
     public static Location getLocation(){
         return currentLocation;
@@ -173,10 +179,26 @@ public class PlacesApplication extends Application{
         return this.currentLocation;
     }
     private ILocationUpdater listener = new ILocationUpdater() {
-        public void setLocation(Location l){ PlacesApplication.currentLocation = l; }
+        public void setLocation(Location l){
+            PlacesApplication.currentLocation = l;
+            updateWeatherInfo();
+        }
         public void setPinsNearby(List<Flag> l){
             PlacesApplication.pinsNearby = l;
         }
     };
+
+    private void updateWeatherInfo() {
+        Geocoder gcd = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> addresses = gcd.getFromLocation(currentLocation.getLatitude(), currentLocation.getLongitude(), 1);
+            if (addresses.size() > 0) {
+                Log.d(TAG, "Locality: " + addresses.get(0).getLocality());
+                locality = addresses.get(0).getLocality();
+            }
+        }catch (IOException e){
+            Log.e(TAG, "No locality found! Error: " + e.toString());
+        }
+    }
 
 }

@@ -3,7 +3,6 @@ package com.gcw.sapienza.places;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -14,10 +13,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.adapters.FlagsArrayAdapter;
+import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.utils.Utils;
-
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

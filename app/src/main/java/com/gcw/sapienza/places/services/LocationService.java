@@ -11,7 +11,7 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.*;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.gcw.sapienza.places.MMapFragment;
@@ -27,8 +27,10 @@ import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-
-import com.parse.*;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseQuery;
 
 import java.util.List;
 
@@ -169,6 +171,8 @@ public class LocationService extends Service implements
             listener.setPinsNearby(parseObjects);
         }
     }
+
+
 
     @Override
     public void onCreate() {
