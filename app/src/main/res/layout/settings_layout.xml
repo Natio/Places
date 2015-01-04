@@ -53,10 +53,9 @@
             android:key="timeFilter"
             />
         <SeekBarPreference
-            android:id="@+id/seekbar"
             android:title="How far will you see?"
             android:max="5"
-            android:defaultValue="2"
+            android:progress="2"
             android:key="seekBar"
             />
 

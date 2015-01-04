@@ -7,6 +7,7 @@ import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import com.gcw.sapienza.places.utils.Utils;
 
@@ -17,6 +18,8 @@ public class SettingsActivity extends Activity
         implements Preference.OnPreferenceChangeListener{
 
     private static final String TAG = "SettingsActivity";
+
+    Toast radiusToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,19 +49,29 @@ public class SettingsActivity extends Activity
         }
         else if(preference.getTitle().equals("How far will you see?"))
         {
-            //TODO make these settings work...visually it seems more broken than it actually is:
-            //TODO moving the bar actually updates the app radius
-            SharedPreferences preferences = PreferenceManager
-                    .getDefaultSharedPreferences(this);
-            Log.d(TAG, "SeekBar stored value: " + String.valueOf(preferences.getInt("seekBar", 3)));
-            preference.setDefaultValue(newValue);
+            if((int)newValue == 0) {
+                if(radiusToast != null)
+                    radiusToast.cancel();
+                radiusToast = Toast.makeText(getBaseContext(), (String) "Radius can't be shorter than 100 meters!",
+                        Toast.LENGTH_SHORT);
+                radiusToast.show();
+                return false;
+            }
             int value = (int)newValue;
+
             Utils.MAP_RADIUS = value / 10f;
             MosaicFragment.updateHeaderText();
+
+            if(radiusToast != null)
+                radiusToast.cancel();
+            radiusToast = Toast.makeText(getBaseContext(), (String) "Radius set to " + value * 100 + " meters.",
+                    Toast.LENGTH_SHORT);
+            radiusToast.show();
+
             Log.d("Settings Activity", "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
 
         }
-        return false;
+        return true;
     }
 
 }

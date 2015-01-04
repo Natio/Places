@@ -1,8 +1,10 @@
 package com.gcw.sapienza.places;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,7 +41,6 @@ public class MosaicFragment extends Fragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        updateFlags();
 
         view = inflater.inflate(R.layout.flags_list_layout, container, false);
 
@@ -48,7 +49,7 @@ public class MosaicFragment extends Fragment{
 
         View header = inflater.inflate(R.layout.header_flags_list, null);
         textHeader = (TextView)header.findViewById(R.id.header);
-        textHeader.setText("within " + Utils.MAP_RADIUS + " kms");
+        textHeader.setText("within " + (int)(Utils.MAP_RADIUS * 1000) + " meters");
         listView.addHeaderView(header);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -79,11 +80,22 @@ public class MosaicFragment extends Fragment{
             }
         });
 
+        fetchDefaultRadius();
+        updateFlags();
+
         return view;
     }
 
+    private void fetchDefaultRadius() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        int range = prefs.getInt("seekBar", 2);
+        Utils.MAP_RADIUS = range / 10f;
+        Log.d(TAG, "Updated map radius to " + Utils.MAP_RADIUS);
+        MosaicFragment.updateHeaderText();
+    }
+
     public static void updateHeaderText(){
-        textHeader.setText("within " + Utils.MAP_RADIUS + " kms");
+        textHeader.setText("within " + (int)(Utils.MAP_RADIUS * 1000) + " meters");
     }
 
     protected void updateFlags()
