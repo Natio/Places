@@ -60,7 +60,7 @@
             android:key="seekBar"
             />
         <SeekBarPreference
-            android:title="Max number of visible pins"
+            android:title="Max number of visible flags"
             android:max="4"
             android:defaultValue="1"
             android:progress="1"
