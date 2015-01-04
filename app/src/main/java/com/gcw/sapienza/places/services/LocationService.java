@@ -96,6 +96,10 @@ public class LocationService extends Service implements
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
         query.whereWithinKilometers("location", gp, Utils.MAP_RADIUS);
 
+        Log.v(TAG, "Lone Wolf enabled: " + Utils.LONE_WOLF_ENABLED);
+        Log.v(TAG, "With Friends Surrounded enabled: " + Utils.WITH_FRIENDS_SURROUNDED_ENABLED);
+        Log.v(TAG, "Storytellers In The Dark enabled: " + Utils.STORYTELLERS_IN_THE_DARK_ENABLED);
+
         if(!Utils.LONE_WOLF_ENABLED) query.whereNotEqualTo("fbId", Utils.fbId);
         if(!Utils.WITH_FRIENDS_SURROUNDED_ENABLED) query.whereNotContainedIn("fbId", Utils.friends); // this is rather expensive
         if(!Utils.STORYTELLERS_IN_THE_DARK_ENABLED)
