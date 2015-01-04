@@ -23,11 +23,14 @@ public class SettingsFragment extends PreferenceFragment {
         Preference strangers_filter = (Preference) findPreference("strangersFilter");
         Preference time_filter = (Preference) findPreference("timeFilter");
         Preference seek_bar = (Preference) findPreference("seekBar");
+        Preference max_fetch = (Preference) findPreference("maxFetch");
 
         loneWolf_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
         fl_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
         strangers_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
         time_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
         seek_bar.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
+        max_fetch.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
+
     }
 }

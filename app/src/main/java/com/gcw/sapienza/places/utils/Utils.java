@@ -44,6 +44,9 @@ public class Utils
 
     public static final int UPDATE_DELAY = 200;
     public static float MAP_RADIUS = 0.5f;
+    public static int MAX_PINS = 10;
+
+    public static int[] stepValues = {1, 5, 10, 15, 20};
 
     public static final String LARGE_PIC_SIZE = "200";
     public static final String SMALL_PIC_SIZE = "120";

@@ -47,7 +47,6 @@ public class LocationService extends Service implements
     private static final long FASTEST_INTERVAL = 1000 * 5;
     private static final long ONE_MIN = 1000 * 60;
     private static final long REFRESH_TIME = ONE_MIN * 1; //TODO high frequency, useful for debugging purposes
-    private static final int MAX_PINS = 10;
 
     private static final int NOTIFICATION_ID = 12345;
 
@@ -95,7 +94,7 @@ public class LocationService extends Service implements
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
         query.whereWithinKilometers("location", gp, Utils.MAP_RADIUS);
         if(!Utils.LONE_WOLF_ENABLED) query.whereNotEqualTo("fbId", Utils.fbId);
-        query.setLimit(MAX_PINS); //TODO want this to be user-specific?
+        query.setLimit(Utils.MAX_PINS); //TODO want this to be user-specific?
         query.findInBackground(new FindCallback<Flag>() {
             @Override
             public void done(List<Flag> parseObjects, ParseException e) {

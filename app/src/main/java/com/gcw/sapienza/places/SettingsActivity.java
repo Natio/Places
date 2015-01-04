@@ -16,7 +16,7 @@ public class SettingsActivity extends Activity
 
     private static final String TAG = "SettingsActivity";
 
-    Toast radiusToast;
+Toast radiusToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +53,18 @@ public class SettingsActivity extends Activity
             Utils.MAP_RADIUS = value / 10f;
             MosaicFragment.updateHeaderText();
 
-            showToast(value);
+            showToast("Radius set to " + value * 100 + " meters.");
+
+            Log.d("Settings Activity", "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
+        }
+        else if(preference.getTitle().equals("The more, the better"))
+        {
+            int value = Utils.stepValues[(int)newValue];
+
+            Utils.MAX_PINS = value;
+            MosaicFragment.updateHeaderText();
+
+            showToast("Max pins allowed set to " + value + ".");
 
             Log.d("Settings Activity", "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
         }
@@ -63,10 +74,10 @@ public class SettingsActivity extends Activity
         return true;
     }
 
-    private void showToast(int value) {
+    private void showToast(String text) {
         if(radiusToast != null)
             radiusToast.cancel();
-        radiusToast = Toast.makeText(getBaseContext(), "Radius set to " + value * 100 + " meters.",
+        radiusToast = Toast.makeText(getBaseContext(), text,
                 Toast.LENGTH_SHORT);
         radiusToast.show();
     }
