@@ -1,11 +1,10 @@
 package com.gcw.sapienza.places;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.gcw.sapienza.places.utils.Utils;
 
@@ -17,6 +16,8 @@ public class SettingsActivity extends Activity
 
     private static final String TAG = "SettingsActivity";
 
+    Toast radiusToast;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,9 +28,6 @@ public class SettingsActivity extends Activity
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue)
     {
-        SharedPreferences preferences = PreferenceManager
-                .getDefaultSharedPreferences(this);
-
         preference.setDefaultValue(newValue);
 
         if(preference.getTitle().equals("Lone Wolf"))
@@ -50,18 +48,27 @@ public class SettingsActivity extends Activity
         }
         else if(preference.getTitle().equals("How far will you see?"))
         {
-            //TODO make these settings work...visually it seems more broken than it actually is:
-            //TODO moving the bar actually updates the app radius
-            Log.d(TAG, "SeekBar stored value: " + String.valueOf(preferences.getInt("seekBar", 3)));
-            int value = (int)newValue;
+            int value = (int)newValue + 1;
+
             Utils.MAP_RADIUS = value / 10f;
             MosaicFragment.updateHeaderText();
+
+            showToast(value);
+
             Log.d("Settings Activity", "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
         }
 
         PlacesApplication.mService.queryParsewithLocation(PlacesApplication.getLocation());
 
         return true;
+    }
+
+    private void showToast(int value) {
+        if(radiusToast != null)
+            radiusToast.cancel();
+        radiusToast = Toast.makeText(getBaseContext(), "Radius set to " + value * 100 + " meters.",
+                Toast.LENGTH_SHORT);
+        radiusToast.show();
     }
 
 }
