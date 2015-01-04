@@ -3,7 +3,6 @@ package com.gcw.sapienza.places;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -14,10 +13,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.adapters.FlagsArrayAdapter;
+import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.utils.Utils;
-
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -77,7 +75,7 @@ public class MosaicFragment extends Fragment{
             }
         });
 
-        fetchDefaultRadius();
+        loadDefaultSettings();
 
         if(PlacesApplication.getLocation() != null && adapter == null)
             PlacesApplication.mService.queryParsewithLocation(PlacesApplication.getLocation());
@@ -85,11 +83,14 @@ public class MosaicFragment extends Fragment{
         return view;
     }
 
-    private void fetchDefaultRadius() {
+    private void loadDefaultSettings() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         int range = prefs.getInt("seekBar", 1) + 1;
         Utils.MAP_RADIUS = range / 10f;
         Log.d(TAG, "Updated map radius to " + Utils.MAP_RADIUS);
+        int step = Utils.stepValues[prefs.getInt("maxFetch", 1)];
+        Utils.MAX_PINS = step;
+        Log.d(TAG, "Updated max pins to " + Utils.MAX_PINS);
         MosaicFragment.updateHeaderText();
     }
 

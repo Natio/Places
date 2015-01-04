@@ -11,7 +11,7 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.*;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -28,8 +28,10 @@ import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-
-import com.parse.*;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +49,6 @@ public class LocationService extends Service implements
     private static final long FASTEST_INTERVAL = 1000 * 5;
     private static final long ONE_MIN = 1000 * 60;
     private static final long REFRESH_TIME = ONE_MIN * 1; //TODO high frequency, useful for debugging purposes
-    private static final int MAX_PINS = 10;
 
     private static final int NOTIFICATION_ID = 12345;
 
@@ -119,7 +120,8 @@ public class LocationService extends Service implements
             }
         }
 
-        query.setLimit(MAX_PINS); //TODO want this to be user-specific?
+        query.setLimit(Utils.MAX_PINS);
+
         query.findInBackground(new FindCallback<Flag>() {
             @Override
             public void done(List<Flag> parseObjects, ParseException e) {
@@ -195,6 +197,8 @@ public class LocationService extends Service implements
             listener.setPinsNearby(parseObjects);
         }
     }
+
+
 
     @Override
     public void onCreate() {
