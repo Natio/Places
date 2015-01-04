@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.*;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.gcw.sapienza.places.MMapFragment;
 import com.gcw.sapienza.places.MainActivity;
@@ -30,6 +31,7 @@ import com.google.android.gms.location.LocationServices;
 
 import com.parse.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LocationService extends Service implements
@@ -92,7 +94,31 @@ public class LocationService extends Service implements
         ParseGeoPoint gp = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
         query.whereWithinKilometers("location", gp, Utils.MAP_RADIUS);
+
         if(!Utils.LONE_WOLF_ENABLED) query.whereNotEqualTo("fbId", Utils.fbId);
+        if(!Utils.WITH_FRIENDS_SURROUNDED_ENABLED) query.whereNotContainedIn("fbId", Utils.friends); // this is rather expensive
+        if(!Utils.STORYTELLERS_IN_THE_DARK_ENABLED)
+        {
+            if(Utils.LONE_WOLF_ENABLED && Utils.WITH_FRIENDS_SURROUNDED_ENABLED)
+            {
+                ArrayList<String> meAndMyFriends = new ArrayList<String>();
+                meAndMyFriends.add(Utils.fbId);
+                meAndMyFriends.addAll(Utils.friends);
+                query.whereContainedIn("fbId", meAndMyFriends);
+            }
+            else if(Utils.LONE_WOLF_ENABLED) query.whereEqualTo("fbId", Utils.fbId);
+            else if(Utils.WITH_FRIENDS_SURROUNDED_ENABLED) query.whereEqualTo("fbId", Utils.friends);
+            else
+            {
+                Toast.makeText(getApplicationContext(), "You won't be able to see any flags with these settings", Toast.LENGTH_LONG).show();
+
+                parseObjects.clear();
+                updateApplication();
+
+                return;
+            }
+        }
+
         query.setLimit(MAX_PINS); //TODO want this to be user-specific?
         query.findInBackground(new FindCallback<Flag>() {
             @Override

@@ -46,57 +46,32 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="0.1"
-        android:layout_marginTop="30dp" >
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center_horizontal">
+
+        <TableRow>
+
+            <Button
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:text="Attach picture"
+                android:onClick="takePic"
+                android:textSize="14sp"
+                android:layout_marginBottom="20dp"
+                android:gravity="center_horizontal" />
+
+        </TableRow>
 
         <TableRow>
 
             <Spinner
-                android:layout_width="130dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/spinner"
                 android:layout_centerHorizontal="true"
                 android:gravity="center_horizontal"
-                android:textAlignment="gravity"
-                android:clipToPadding="false"
-                android:paddingBottom="30dp"
-                android:layout_marginRight="10dp" />
-
-            <TableLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp" >
-
-                <TableRow>
-                    <Button
-                        style="?android:attr/borderlessButtonStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="30dp"
-                        android:text="Take a picture"
-                        android:onClick="takePic"
-                        android:textSize="14sp"
-                        android:layout_marginBottom="8dp" />
-                </TableRow>
-
-                <TableRow>
-                    <Button
-                        style="?android:attr/borderlessButtonStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="30dp"
-                        android:text="Take a video"
-                        android:textSize="14sp"
-                        android:layout_marginBottom="8dp"/>
-                </TableRow>
-
-                <TableRow>
-                    <Button
-                        style="?android:attr/borderlessButtonStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="30dp"
-                        android:text="Capture a sound"
-                        android:textSize="14sp" />
-                </TableRow>
-
-            </TableLayout>
+                android:textAlignment="gravity" />
 
         </TableRow>
 

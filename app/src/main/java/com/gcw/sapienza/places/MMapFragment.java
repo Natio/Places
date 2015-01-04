@@ -1,5 +1,6 @@
 package com.gcw.sapienza.places;
 
+import android.content.res.Resources;
 import android.location.Location;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -138,12 +139,11 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
 
     protected static float getCategoryColor(String category)
     {
-        if(category==null || category.equals("Misc") || category.equals("")) return BitmapDescriptorFactory.HUE_CYAN;
-        if(category.equals("Entertainment")) return BitmapDescriptorFactory.HUE_AZURE;
-        else if(category.equals("Food")) return BitmapDescriptorFactory.HUE_BLUE;
-        else if(category.equals("History")) return BitmapDescriptorFactory.HUE_GREEN;
-        else if(category.equals("Culture")) return BitmapDescriptorFactory.HUE_MAGENTA;
-        else if(category.equals("Landscapes")) return BitmapDescriptorFactory.HUE_VIOLET;
-        else return BitmapDescriptorFactory.HUE_YELLOW; // 'State Of Mind' category
+        if (Utils.categories == null || category == null || category.equals(Utils.categories[0]) || category.equals(""))
+            return BitmapDescriptorFactory.HUE_CYAN;
+        if (category.equals(Utils.categories[1])) return BitmapDescriptorFactory.HUE_AZURE;
+        else if (category.equals(Utils.categories[2])) return BitmapDescriptorFactory.HUE_BLUE;
+        else if (category.equals(Utils.categories[3])) return BitmapDescriptorFactory.HUE_GREEN;
+        else return BitmapDescriptorFactory.HUE_YELLOW; // 'Food' category
     }
 }
