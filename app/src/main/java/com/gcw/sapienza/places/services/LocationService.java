@@ -124,6 +124,9 @@ public class LocationService extends Service implements
             }
         }
 
+        if(Utils.ARCHAEOLOGIST_ENABLED) query.orderByAscending("createdAt");
+        else query.orderByDescending("createdAt");
+
         query.setLimit(Utils.MAX_PINS);
 
         query.findInBackground(new FindCallback<Flag>() {
