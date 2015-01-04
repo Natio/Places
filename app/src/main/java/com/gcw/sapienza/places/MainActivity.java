@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -33,7 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class MainActivity extends ActionBarActivity implements ViewPager.OnPageChangeListener {
+public class MainActivity extends ActionBarActivity implements ViewPager.OnPageChangeListener, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "MainActivity";
 
@@ -44,6 +45,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     protected static SectionsPagerAdapter mSectionsPagerAdapter;
     protected static Fragment[] fragments = {new ShareFragment(), new MosaicFragment(), new MMapFragment()};
     protected static ViewPager mViewPager;
+    protected static SwipeRefreshLayout srl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -193,6 +195,14 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     @Override
     public void onPageScrollStateChanged(int i) {
 
+    }
+
+    @Override
+    public void onRefresh()
+    {
+        refresh();
+
+        srl.setRefreshing(false);
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {

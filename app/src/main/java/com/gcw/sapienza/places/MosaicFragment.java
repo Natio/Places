@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +41,9 @@ public class MosaicFragment extends Fragment{
 
         //retrieve the listviews
         listView = (ListView)view.findViewById(R.id.flags_list_view);
+
+        ((MainActivity)getActivity()).srl = (SwipeRefreshLayout)view.findViewById(R.id.swipe_refresh);
+        ((MainActivity)getActivity()).srl.setOnRefreshListener((MainActivity)getActivity());
 
         View header = inflater.inflate(R.layout.header_flags_list, null);
         textHeader = (TextView)header.findViewById(R.id.header);

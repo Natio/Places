@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+
+<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.gcw.sapienza.places.MainActivity"
+    android:id="@+id/swipe_refresh" >
 
     <ListView
         android:layout_width="fill_parent"
@@ -10,4 +15,5 @@
         android:choiceMode="singleChoice"
         android:scrollbars="none" />
 
-</LinearLayout>
+
+</android.support.v4.widget.SwipeRefreshLayout>
