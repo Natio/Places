@@ -87,7 +87,7 @@ public class MosaicFragment extends Fragment{
 
     private void fetchDefaultRadius() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        int range = prefs.getInt("seekBar", 2);
+        int range = prefs.getInt("seekBar", 1) + 1;
         Utils.MAP_RADIUS = range / 10f;
         Log.d(TAG, "Updated map radius to " + Utils.MAP_RADIUS);
         MosaicFragment.updateHeaderText();

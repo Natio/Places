@@ -46,29 +46,25 @@ public class SettingsActivity extends Activity
         }
         else if(preference.getTitle().equals("How far will you see?"))
         {
-            if((int)newValue == 0) {
-                if(radiusToast != null)
-                    radiusToast.cancel();
-                radiusToast = Toast.makeText(getBaseContext(), (String) "Radius can't be shorter than 100 meters!",
-                        Toast.LENGTH_SHORT);
-                radiusToast.show();
-                return false;
-            }
-            int value = (int)newValue;
+            int value = (int)newValue + 1;
 
             Utils.MAP_RADIUS = value / 10f;
             MosaicFragment.updateHeaderText();
 
-            if(radiusToast != null)
-                radiusToast.cancel();
-            radiusToast = Toast.makeText(getBaseContext(), (String) "Radius set to " + value * 100 + " meters.",
-                    Toast.LENGTH_SHORT);
-            radiusToast.show();
+            showToast(value);
 
             Log.d("Settings Activity", "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
 
         }
         return true;
+    }
+
+    private void showToast(int value) {
+        if(radiusToast != null)
+            radiusToast.cancel();
+        radiusToast = Toast.makeText(getBaseContext(), "Radius set to " + value * 100 + " meters.",
+                Toast.LENGTH_SHORT);
+        radiusToast.show();
     }
 
 }
