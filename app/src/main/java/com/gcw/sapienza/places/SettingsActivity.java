@@ -30,23 +30,23 @@ Toast radiusToast;
     {
         preference.setDefaultValue(newValue);
 
-        if(preference.getTitle().equals("Lone Wolf"))
+        if(preference.getKey().equals("meFilter"))
         {
             Utils.LONE_WOLF_ENABLED = (boolean)newValue;
         }
-        else if(preference.getTitle().equals("With Friends Surrounded"))
+        else if(preference.getKey().equals("flFilter"))
         {
             Utils.WITH_FRIENDS_SURROUNDED_ENABLED = (boolean)newValue;
         }
-        else if(preference.getTitle().equals("Storytellers In The Dark"))
+        else if(preference.getKey().equals("strangersFilter"))
         {
             Utils.STORYTELLERS_IN_THE_DARK_ENABLED = (boolean)newValue;
         }
-        else if(preference.getTitle().equals("Archaeologist"))
+        else if(preference.getKey().equals("timeFilter"))
         {
             Utils.ARCHAEOLOGIST_ENABLED = (boolean)newValue;
         }
-        else if(preference.getTitle().equals("Range of action"))
+        else if(preference.getKey().equals("seekBar"))
         {
             int value = (int)newValue + 1;
 
@@ -57,7 +57,7 @@ Toast radiusToast;
 
             Log.d("Settings Activity", "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
         }
-        else if(preference.getTitle().equals("Max number of visible pins"))
+        else if(preference.getKey().equals("maxFetch"))
         {
             int value = Utils.stepValues[(int)newValue];
 
