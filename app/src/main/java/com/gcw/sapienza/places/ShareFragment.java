@@ -111,6 +111,9 @@ public class ShareFragment extends Fragment{
         f.put("category", category);
         f.put("location",p);
         f.put("text",this.textView.getText().toString());
+        Log.d(TAG, "Application temperature: " + PlacesApplication.temperature);
+        f.put("temp", PlacesApplication.temperature);
+
 
         new Thread(new Runnable()
         {

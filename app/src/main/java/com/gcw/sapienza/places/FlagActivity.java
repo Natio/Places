@@ -24,6 +24,7 @@ public class FlagActivity extends Activity {
     private String id;
     private String date;
     private byte[] pic;
+    private Integer temp;
 
     private static final String TAG = "FlagActivity";
 
@@ -39,6 +40,7 @@ public class FlagActivity extends Activity {
         text = bundle.getString("text");
         id = bundle.getString("id");
         date = bundle.getString("date");
+        temp = bundle.getInt("temp");
 
         ImageView iw = ((ImageView)findViewById(R.id.pic));
 
@@ -56,6 +58,8 @@ public class FlagActivity extends Activity {
 
         ((EditText)findViewById(R.id.text)).setText(text);
 
+        final String tempString = temp == Integer.MAX_VALUE ? "" : ", " + temp + "°C";
+
         if(!Utils.userIdMap.containsKey(id))
         {
             Utils.fetchFbUsername(id);
@@ -65,11 +69,11 @@ public class FlagActivity extends Activity {
                 @Override
                 public void run() {
                     if (!Utils.userIdMap.containsKey(id)) handler.postDelayed(this, Utils.UPDATE_DELAY);
-                    else ((TextView)findViewById(R.id.author)).setText(Utils.userIdMap.get(id) + ", " + date);
+                    else ((TextView)findViewById(R.id.author)).setText(Utils.userIdMap.get(id) + ", " + date + tempString);
                 }
             });
         }
-        else ((TextView)findViewById(R.id.author)).setText(Utils.userIdMap.get(id) + ", " + date);
+        else  ((TextView)findViewById(R.id.author)).setText(Utils.userIdMap.get(id) + ", " + date + tempString);
 
         if(!Utils.userProfilePicMapLarge.containsKey(id))
         {

@@ -61,6 +61,8 @@ public class PlacesApplication extends Application{
 
     private static String locality;
 
+    public static int temperature;
+
     public static Location getLocation(){
         return currentLocation;
     }
@@ -199,6 +201,9 @@ public class PlacesApplication extends Application{
             if (addresses.size() > 0) {
                 Log.d(TAG, "Locality: " + addresses.get(0).getLocality());
                 locality = addresses.get(0).getLocality();
+                String cc = addresses.get(0).getCountryCode();
+                JSONWeatherTask task = new JSONWeatherTask();
+                task.execute(new String[]{locality + "," + cc});
             }
         }catch (IOException e){
             Log.e(TAG, "No locality found! Error: " + e.toString());

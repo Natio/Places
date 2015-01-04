@@ -68,6 +68,7 @@ public class MosaicFragment extends Fragment{
                 bundle.putString("id", ((Flag) parent.getItemAtPosition(position)).getFbId());
                 bundle.putString("date", sDate);
                 bundle.putByteArray("pic", ((Flag) parent.getItemAtPosition(position)).getPic());
+                bundle.putInt("temp", ((Flag) parent.getItemAtPosition(position)).getTemp());
 
                 intent.putExtras(bundle);
 
