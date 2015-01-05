@@ -80,7 +80,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
         Utils.mainActivity = this;
         Utils.makeMeRequest(); // retrieve user's Facebook ID
-        Utils.updatePreferences(getBaseContext());
+//        Utils.updatePreferences(getBaseContext());
 
         Resources res = getResources();
         Utils.categories = res.getStringArray(R.array.categories);

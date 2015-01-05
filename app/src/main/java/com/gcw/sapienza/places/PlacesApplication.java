@@ -61,7 +61,7 @@ public class PlacesApplication extends Application{
 
     private static String locality;
 
-    public static int temperature;
+    public static String weather = "";
 
     public static Location getLocation(){
         return currentLocation;

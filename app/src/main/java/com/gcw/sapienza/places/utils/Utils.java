@@ -238,6 +238,6 @@ public class Utils
         Utils.LONE_WOLF_ENABLED = preferences.getBoolean("meFilter", true);
         Utils.WITH_FRIENDS_SURROUNDED_ENABLED = preferences.getBoolean("flFilter", true);
         Utils.STORYTELLERS_IN_THE_DARK_ENABLED = preferences.getBoolean("strangersFilter", true);
-        Utils.ARCHAEOLOGIST_ENABLED = preferences.getBoolean("timeFilter", true);
+        Utils.ARCHAEOLOGIST_ENABLED = preferences.getBoolean("timeFilter", false);
     }
 }

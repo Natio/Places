@@ -32,7 +32,7 @@ public class Flag extends ParseObject{
 
     public Date getDate() { return (Date)this.getCreatedAt(); }
 
-    public int getTemp() { return (int)this.get("temp"); }
-
     public byte[] getPic() { return (byte[])this.get("pic"); }
+
+    public String getWeather() { return (String)this.get("weather");  }
 }

@@ -24,7 +24,7 @@ public class FlagActivity extends Activity {
     private String id;
     private String date;
     private byte[] pic;
-    private Integer temp;
+    private String weather;
 
     private static final String TAG = "FlagActivity";
 
@@ -40,7 +40,7 @@ public class FlagActivity extends Activity {
         text = bundle.getString("text");
         id = bundle.getString("id");
         date = bundle.getString("date");
-        temp = bundle.getInt("temp");
+        weather = bundle.getString("weather");
 
         ImageView iw = ((ImageView)findViewById(R.id.pic));
 
@@ -58,7 +58,7 @@ public class FlagActivity extends Activity {
 
         ((EditText)findViewById(R.id.text)).setText(text);
 
-        final String tempString = temp == Integer.MAX_VALUE ? "" : ", " + temp + "°C";
+        final String weatherString = weather == "" ? "" : ", " + weather;
 
         if(!Utils.userIdMap.containsKey(id))
         {
@@ -69,11 +69,11 @@ public class FlagActivity extends Activity {
                 @Override
                 public void run() {
                     if (!Utils.userIdMap.containsKey(id)) handler.postDelayed(this, Utils.UPDATE_DELAY);
-                    else ((TextView)findViewById(R.id.author)).setText(Utils.userIdMap.get(id) + ", " + date + tempString);
+                    else ((TextView)findViewById(R.id.author)).setText(Utils.userIdMap.get(id) + ", " + date + weatherString);
                 }
             });
         }
-        else  ((TextView)findViewById(R.id.author)).setText(Utils.userIdMap.get(id) + ", " + date + tempString);
+        else  ((TextView)findViewById(R.id.author)).setText(Utils.userIdMap.get(id) + ", " + date + weatherString);
 
         if(!Utils.userProfilePicMapLarge.containsKey(id))
         {
