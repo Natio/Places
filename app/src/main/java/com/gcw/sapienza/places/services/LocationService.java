@@ -67,6 +67,7 @@ public class LocationService extends Service implements
 
     @Override
     public void onConnected(Bundle connectionHint) {
+        Utils.updatePreferences(getBaseContext());
         Log.d(TAG, "Connected to Google Api");
         Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
         if (currentLocation != null) {
@@ -153,6 +154,9 @@ public class LocationService extends Service implements
         query.findInBackground(new FindCallback<Flag>() {
             @Override
             public void done(List<Flag> parseObjects, ParseException e) {
+                if(parseObjects == null){
+                    parseObjects = new ArrayList<Flag>();
+                }
                 LocationService.this.parseObjects = parseObjects;
                 Log.d(TAG, "Found " + parseObjects.size() +
                         " pins within " + Utils.MAP_RADIUS + " km");

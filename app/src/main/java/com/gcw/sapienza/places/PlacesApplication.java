@@ -60,7 +60,7 @@ public class PlacesApplication extends Application{
 
     private static String locality;
 
-    public static int temperature;
+    public static String weather = "";
 
     //made synchronized for thread safety and added fake location if running on emulator
     public static synchronized Location getLocation(){
