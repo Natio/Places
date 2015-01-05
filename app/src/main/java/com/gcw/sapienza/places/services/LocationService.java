@@ -64,7 +64,7 @@ public class LocationService extends Service implements
 
     private ILocationUpdater listener;
 
-    private List<Flag> parseObjects;
+    public List<Flag> parseObjects;
 
     private Location notificationLocation;
 

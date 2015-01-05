@@ -104,11 +104,6 @@ public class MosaicFragment extends Fragment{
         return view;
     }
 
-
-
-
-
-
     private void loadDefaultSettings() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         int range = prefs.getInt("seekBar", 1) + 1;
@@ -132,7 +127,7 @@ public class MosaicFragment extends Fragment{
                     new FlagsArrayAdapter
                                     (Utils.mainActivity,
                                     R.layout.flags_list_item,
-                                    PlacesApplication.getPins(),
+                                    PlacesApplication.mService.parseObjects,
                                     Utils.mainActivity);
 
             listView.setAdapter(adapter);
