@@ -192,10 +192,10 @@ public class LocationService extends Service implements
                         " pins within " + Utils.MAP_RADIUS + " km");
                 updateApplication();
 
-                if(Utils.mainActivity == null) Log.v(TAG, "MainActivity is null");
-                else if(Utils.mainActivity.getMosaicFragment() == null) Log.v(TAG, "MosaicFragment is null");
+                if(MainActivity.getMainActivity() == null) Log.v(TAG, "MainActivity is null");
+                else if(MainActivity.getMainActivity().getMosaicFragment() == null) Log.v(TAG, "MosaicFragment is null");
 
-                Utils.mainActivity.getMosaicFragment().configureListViewWithFlags();
+                MainActivity.getMainActivity().getMosaicFragment().configureListViewWithFlags();
                 MMapFragment.updateMarkersOnMap();
             }
         });
