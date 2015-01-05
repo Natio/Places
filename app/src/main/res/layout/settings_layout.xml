@@ -52,6 +52,7 @@
             />
         <CheckBoxPreference
             android:title="Archaeologist"
+            android:defaultValue="false"
             android:summary="Give higher relevance to older flags"
             android:key="timeFilter"
             />
