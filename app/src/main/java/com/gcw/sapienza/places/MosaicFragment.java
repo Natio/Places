@@ -2,6 +2,7 @@ package com.gcw.sapienza.places;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -83,6 +84,7 @@ public class MosaicFragment extends Fragment{
 
         loadDefaultSettings();
 
+
         if(PlacesApplication.getLocation() != null && adapter == null)
         {
             if(PlacesApplication.mService != null) PlacesApplication.mService.queryParsewithLocation(PlacesApplication.getLocation());
@@ -101,6 +103,11 @@ public class MosaicFragment extends Fragment{
 
         return view;
     }
+
+
+
+
+
 
     private void loadDefaultSettings() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
