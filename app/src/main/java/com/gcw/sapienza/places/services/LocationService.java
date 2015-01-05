@@ -5,12 +5,14 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -37,6 +39,7 @@ import com.parse.ParseQuery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Handler;
 
 public class LocationService extends Service implements
         GoogleApiClient.ConnectionCallbacks,
@@ -66,8 +69,8 @@ public class LocationService extends Service implements
     private Location notificationLocation;
 
     @Override
-    public void onConnected(Bundle connectionHint) {
-        Utils.updatePreferences(getBaseContext());
+    public void onConnected(Bundle connectionHint)
+    {
         Log.d(TAG, "Connected to Google Api");
         Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
         if (currentLocation != null) {
@@ -118,35 +121,59 @@ public class LocationService extends Service implements
 
         query.whereWithinKilometers("location", gp, radius);
 
-        Log.v(TAG, "Lone Wolf enabled: " + Utils.LONE_WOLF_ENABLED);
-        Log.v(TAG, "With Friends Surrounded enabled: " + Utils.WITH_FRIENDS_SURROUNDED_ENABLED);
-        Log.v(TAG, "Storytellers In The Dark enabled: " + Utils.STORYTELLERS_IN_THE_DARK_ENABLED);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
-        if(!Utils.LONE_WOLF_ENABLED) query.whereNotEqualTo("fbId", Utils.fbId);
-        if(!Utils.WITH_FRIENDS_SURROUNDED_ENABLED) query.whereNotContainedIn("fbId", Utils.friends); // this is rather expensive
-        if(!Utils.STORYTELLERS_IN_THE_DARK_ENABLED)
+        boolean lone_wolf = preferences.getBoolean("meFilter", true);
+        boolean with_friends_surrounded = preferences.getBoolean("flFilter", true);
+        boolean storytellers_in_the_dark = preferences.getBoolean("strangersFilter", true);
+        boolean archaeologist = preferences.getBoolean("timeFilter", false);
+
+        Log.v(TAG, "Lone Wolf enabled: " + lone_wolf);
+        Log.v(TAG, "With Friends Surrounded enabled: " + with_friends_surrounded);
+        Log.v(TAG, "Storytellers In The Dark enabled: " + storytellers_in_the_dark);
+        Log.v(TAG, "Archaeologist enabled: " + archaeologist);
+
+        if(Utils.fbId.equals(""))
         {
-            if(Utils.LONE_WOLF_ENABLED && Utils.WITH_FRIENDS_SURROUNDED_ENABLED)
+            final android.os.Handler handler = new android.os.Handler();
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (Utils.fbId.equals("")) handler.postDelayed(this, Utils.UPDATE_DELAY);
+                    else queryParsewithLocation(getLocation());
+                }
+            });
+
+            return;
+        }
+
+        if(!lone_wolf) query.whereNotEqualTo("fbId", Utils.fbId);
+        if(!with_friends_surrounded) query.whereNotContainedIn("fbId", Utils.friends); // this is rather expensive
+        if(!storytellers_in_the_dark)
+        {
+            if(lone_wolf && with_friends_surrounded)
             {
                 ArrayList<String> meAndMyFriends = new ArrayList<>();
                 meAndMyFriends.add(Utils.fbId);
                 meAndMyFriends.addAll(Utils.friends);
                 query.whereContainedIn("fbId", meAndMyFriends);
             }
-            else if(Utils.LONE_WOLF_ENABLED) query.whereEqualTo("fbId", Utils.fbId);
-            else if(Utils.WITH_FRIENDS_SURROUNDED_ENABLED) query.whereEqualTo("fbId", Utils.friends);
+            else if(lone_wolf) query.whereEqualTo("fbId", Utils.fbId);
+            else if(with_friends_surrounded) query.whereEqualTo("fbId", Utils.friends);
             else
             {
                 Toast.makeText(getApplicationContext(), "You won't be able to see any flags with these settings", Toast.LENGTH_LONG).show();
 
-                parseObjects.clear();
+                if(parseObjects == null) parseObjects = new ArrayList<Flag>();
+                else parseObjects.clear();
+
                 updateApplication();
 
                 return;
             }
         }
 
-        if(Utils.ARCHAEOLOGIST_ENABLED) query.orderByAscending("createdAt");
+        if(archaeologist) query.orderByAscending("createdAt");
         else query.orderByDescending("createdAt");
 
         query.setLimit(Utils.MAX_PINS);
