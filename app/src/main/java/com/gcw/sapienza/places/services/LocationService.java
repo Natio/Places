@@ -19,6 +19,7 @@ import com.gcw.sapienza.places.MMapFragment;
 import com.gcw.sapienza.places.MainActivity;
 import com.gcw.sapienza.places.MosaicFragment;
 import com.gcw.sapienza.places.Notifications;
+import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.utils.Utils;
@@ -35,6 +36,7 @@ import com.parse.ParseQuery;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class LocationService extends Service implements
         GoogleApiClient.ConnectionCallbacks,
@@ -92,15 +94,28 @@ public class LocationService extends Service implements
 
     public void queryParsewithLocation(Location location)
     {
+        //creates a fake location for testing if it is running on simulator
+        if(PlacesApplication.isRunningOnEmulator){
+            location = PlacesApplication.getLocation();
+        }
+
         //this is for avoiding a crash if location is null
         //the crash happens if there is no GPS data and the action range is changed
         if(location == null){
             return;
         }
 
+
         ParseGeoPoint gp = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
-        query.whereWithinKilometers("location", gp, Utils.MAP_RADIUS);
+
+        float radius = Utils.MAP_RADIUS;
+
+        if(PlacesApplication.isRunningOnEmulator){
+            radius = 10.0f;
+        }
+
+        query.whereWithinKilometers("location", gp, radius);
 
         Log.v(TAG, "Lone Wolf enabled: " + Utils.LONE_WOLF_ENABLED);
         Log.v(TAG, "With Friends Surrounded enabled: " + Utils.WITH_FRIENDS_SURROUNDED_ENABLED);
@@ -157,7 +172,7 @@ public class LocationService extends Service implements
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.i(TAG, "GoogleApiClient connection has failed");
+        Log.i(TAG, "GoogleApiClient connection has failed "+ connectionResult.toString());
     }
 
     @Override
@@ -244,4 +259,34 @@ public class LocationService extends Service implements
     public IBinder onBind(Intent intent) {
         return mBinder;
     }
+
+    //courtesy of http://gis.stackexchange.com/questions/25877/how-to-generate-random-locations-nearby-my-location
+    public static Location getRandomLocation(Location center, int radius) {
+        double x0 = center.getLongitude();
+        double y0 = center.getLatitude();
+        Random random = new Random();
+
+        // Convert radius from meters to degrees
+        double radiusInDegrees = radius / 111000f;
+
+        double u = random.nextDouble();
+        double v = random.nextDouble();
+        double w = radiusInDegrees * Math.sqrt(u);
+        double t = 2 * Math.PI * v;
+        double x = w * Math.cos(t);
+        double y = w * Math.sin(t);
+
+        // Adjust the x-coordinate for the shrinking of the east-west distances
+        double new_x = x / Math.cos(y0);
+
+        double foundLongitude = new_x + x0;
+        double foundLatitude = y + y0;
+
+        Location random_loc = new Location("fake_location_in_rome");
+        random_loc.setLatitude(foundLatitude);
+        random_loc.setLongitude(foundLongitude);
+        return random_loc;
+    }
+
+
 }

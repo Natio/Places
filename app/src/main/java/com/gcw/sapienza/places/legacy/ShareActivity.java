@@ -1,25 +1,15 @@
 package com.gcw.sapienza.places.legacy;
 
 import android.app.Activity;
-import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
-import com.gcw.sapienza.places.utils.Utils;
-import com.parse.ParseException;
-import com.parse.ParseGeoPoint;
-import com.parse.SaveCallback;
 
-import com.gcw.sapienza.places.model.Flag;
 
-/**
- * Created by paolo on 12/12/14.
- */
+
 public class ShareActivity extends Activity {
     private static final String TAG = "ShareActivity";
 
@@ -41,7 +31,7 @@ public class ShareActivity extends Activity {
     }
 
     private void share(){
-
+/*
         PlacesApplication app = (PlacesApplication)this.getApplication();
         Location current_location = app.getCurrentLocation();
         if(current_location == null){
@@ -64,5 +54,6 @@ public class ShareActivity extends Activity {
                 }
             }
         });
+        */
     }
 }
