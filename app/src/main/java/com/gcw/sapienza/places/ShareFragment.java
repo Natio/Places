@@ -69,8 +69,6 @@ public class ShareFragment extends Fragment{
             }
         });
 
-        this.picButton = (Button)this.view.findViewById(R.id.pic_button);
-
         this.spinner = (Spinner) view.findViewById(R.id.spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.categories, R.layout.custom_spinner);
@@ -78,6 +76,22 @@ public class ShareFragment extends Fragment{
         this.spinner.setAdapter(adapter);
 
         return this.view;
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+
+        Log.v(TAG, "onDestroy called.");
+    }
+
+    @Override
+    public void onDestroyView()
+    {
+        super.onDestroyView();
+
+        Log.v(TAG, "onDestroyView called.");
     }
 
     private void share()
@@ -183,6 +197,13 @@ public class ShareFragment extends Fragment{
         }).start();
     }
 
+    protected void setPicButtonAsPicTaken()
+    {
+        this.view = getView();
+        this.picButton = (Button)this.view.findViewById(R.id.pic_button);
+        this.picButton.setText("Picture taken ✓");
+    }
+
     protected void resetMedia()
     {
         this.isPicTaken = false;
@@ -212,8 +233,6 @@ public class ShareFragment extends Fragment{
             inputMethodManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
         }
     }
-
-
 
     //=========================================
     // Getters & Setters
