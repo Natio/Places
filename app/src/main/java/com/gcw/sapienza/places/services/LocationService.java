@@ -92,6 +92,12 @@ public class LocationService extends Service implements
 
     public void queryParsewithLocation(Location location)
     {
+        //this is for avoiding a crash if location is null
+        //the crash happens if there is no GPS data and the action range is changed
+        if(location == null){
+            return;
+        }
+
         ParseGeoPoint gp = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
         query.whereWithinKilometers("location", gp, Utils.MAP_RADIUS);
@@ -106,7 +112,7 @@ public class LocationService extends Service implements
         {
             if(Utils.LONE_WOLF_ENABLED && Utils.WITH_FRIENDS_SURROUNDED_ENABLED)
             {
-                ArrayList<String> meAndMyFriends = new ArrayList<String>();
+                ArrayList<String> meAndMyFriends = new ArrayList<>();
                 meAndMyFriends.add(Utils.fbId);
                 meAndMyFriends.addAll(Utils.friends);
                 query.whereContainedIn("fbId", meAndMyFriends);
