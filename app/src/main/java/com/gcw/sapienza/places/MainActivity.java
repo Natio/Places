@@ -53,6 +53,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         this.srl = srl;
     }
 
+    private static MainActivity SINGLETON_INSTANCE = null;
+
     public ShareFragment getShareFragment(){
         return (ShareFragment)this.fragments[0];
     }
@@ -65,9 +67,17 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         return (MMapFragment)this.fragments[2];
     }
 
+    public static MainActivity getMainActivity(){
+        if(MainActivity.SINGLETON_INSTANCE == null){
+            throw new RuntimeException("MainActivity is not ready yet");
+        }
+        return MainActivity.SINGLETON_INSTANCE;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MainActivity.SINGLETON_INSTANCE = this;
         Utils.mainActivity = this;
         this.startTime = new Date().getTime();
 
