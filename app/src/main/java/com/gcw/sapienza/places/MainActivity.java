@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.Utils;
@@ -285,6 +286,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                 switch(resultCode)
                 {
                     case RESULT_OK:
+                        ((ShareFragment)fragments[0]).picButton.setText("Picture taken ✓");
+
                         if(data.getData() == null)
                         {
                             ((ShareFragment) fragments[0]).pic = (Bitmap)data.getExtras().get("data");
