@@ -2,7 +2,9 @@ package com.gcw.sapienza.places;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -82,11 +84,30 @@ public class MosaicFragment extends Fragment{
 
         loadDefaultSettings();
 
+
         if(PlacesApplication.getLocation() != null && adapter == null)
-            PlacesApplication.mService.queryParsewithLocation(PlacesApplication.getLocation());
+        {
+            if(PlacesApplication.mService != null) PlacesApplication.mService.queryParsewithLocation(PlacesApplication.getLocation());
+            else
+            {
+                final Handler handler = new Handler();
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(PlacesApplication.mService == null) handler.postDelayed(this, Utils.UPDATE_DELAY);
+                        else PlacesApplication.mService.queryParsewithLocation(PlacesApplication.getLocation());
+                    }
+                });
+            }
+        }
 
         return view;
     }
+
+
+
+
+
 
     private void loadDefaultSettings() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());

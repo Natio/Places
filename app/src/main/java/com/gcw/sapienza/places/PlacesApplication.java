@@ -8,9 +8,7 @@ import android.content.ServiceConnection;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -26,7 +24,6 @@ import com.parse.ParseException;
 import com.gcw.sapienza.places.services.LocationService.LocalBinder;
 //Parse push notifications
 import com.parse.ParsePush;
-import com.parse.PushService;
 import com.parse.SaveCallback;
 
 import java.io.IOException;
@@ -47,12 +44,14 @@ public class PlacesApplication extends Application{
     //Parse.com client key
     private static final String PARSE_COM_CLIENT_KEY = "Gr1g8Z2kfv3AOZqToZ30hyMyNzH24vj4yudNoKfb";
 
-    //Shared location manager
-    //fixme find a better way to handle GPS
-    private LocationManager locationManager;
-
     //current location
     private static Location currentLocation = null;
+
+    //TODO i do not now if this gives a false positive on a real device. if it does just assign false
+    public static final boolean isRunningOnEmulator = Build.BRAND.toLowerCase().startsWith("generic");
+
+
+
     private static List<Flag> pinsNearby;
 
 
@@ -63,7 +62,15 @@ public class PlacesApplication extends Application{
 
     public static String weather = "";
 
-    public static Location getLocation(){
+    //made synchronized for thread safety and added fake location if running on emulator
+    public static synchronized Location getLocation(){
+        if (PlacesApplication.isRunningOnEmulator && currentLocation == null) {
+
+            Location loc = new Location("rome_center");
+            loc.setLatitude(41.900193);
+            loc.setLongitude(12.472916);
+            currentLocation = LocationService.getRandomLocation(loc, 1000);
+        }
         return currentLocation;
     }
 
@@ -79,10 +86,10 @@ public class PlacesApplication extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
+
         PlacesApplication.PLACES_CONTEXT = this.getApplicationContext();
 
         //initialize the location manager
-//        this.initLocationManager();
 
         //fixme location service not connecting to google api properly
         startLocationService();
@@ -142,6 +149,7 @@ public class PlacesApplication extends Application{
             LocalBinder binder = (LocalBinder) service;
             mService = binder.getService();
             mService.setListener(listener);
+            Log.d(TAG, "*******************************"+mService+"");
             mBound = true;
         }
 
@@ -152,38 +160,6 @@ public class PlacesApplication extends Application{
         }
     };
 
-    private void initLocationManager(){
-        this.locationManager = (LocationManager) this.getSystemService(PlacesApplication.LOCATION_SERVICE);
-
-        LocationListener locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                PlacesApplication.this.currentLocation = location;
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        };
-
-        this.locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-
-    }
-
-    public Location getCurrentLocation(){
-        return this.currentLocation;
-    }
     private ILocationUpdater listener = new ILocationUpdater() {
         public void setLocation(Location l){
             PlacesApplication.currentLocation = l;
@@ -197,7 +173,10 @@ public class PlacesApplication extends Application{
     private void updateWeatherInfo() {
         Geocoder gcd = new Geocoder(this, Locale.getDefault());
         try {
-            List<Address> addresses = gcd.getFromLocation(currentLocation.getLatitude(), currentLocation.getLongitude(), 1);
+
+            Location current = PlacesApplication.getLocation();
+
+            List<Address> addresses = gcd.getFromLocation(current.getLatitude(), current.getLongitude(), 1);
             if (addresses.size() > 0) {
                 Log.d(TAG, "Locality: " + addresses.get(0).getLocality());
                 locality = addresses.get(0).getLocality();
