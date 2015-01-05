@@ -1,8 +1,10 @@
 package com.gcw.sapienza.places;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -28,26 +30,21 @@ Toast radiusToast;
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue)
     {
-        preference.setDefaultValue(newValue);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        SharedPreferences.Editor editor = preferences.edit();
 
-        if(preference.getKey().equals("meFilter"))
+        if(preference.getKey().equals("meFilter") ||
+                preference.getKey().equals("flFilter") ||
+                preference.getKey().equals("strangersFilter") ||
+                preference.getKey().equals("timeFilter"))
         {
-            Utils.LONE_WOLF_ENABLED = (boolean)newValue;
-        }
-        else if(preference.getKey().equals("flFilter"))
-        {
-            Utils.WITH_FRIENDS_SURROUNDED_ENABLED = (boolean)newValue;
-        }
-        else if(preference.getKey().equals("strangersFilter"))
-        {
-            Utils.STORYTELLERS_IN_THE_DARK_ENABLED = (boolean)newValue;
-        }
-        else if(preference.getKey().equals("timeFilter"))
-        {
-            Utils.ARCHAEOLOGIST_ENABLED = (boolean)newValue;
+            editor.putBoolean(preference.getKey(), (boolean)newValue);
+            editor.commit();
         }
         else if(preference.getKey().equals("seekBar"))
         {
+            preference.setDefaultValue(newValue);
+
             int value = (int)newValue + 1;
 
             Utils.MAP_RADIUS = value / 10f;
@@ -59,6 +56,8 @@ Toast radiusToast;
         }
         else if(preference.getKey().equals("maxFetch"))
         {
+            preference.setDefaultValue(newValue);
+
             int value = Utils.stepValues[(int)newValue];
 
             Utils.MAX_PINS = value;
