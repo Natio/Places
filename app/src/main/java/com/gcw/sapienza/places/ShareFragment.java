@@ -34,21 +34,20 @@ public class ShareFragment extends Fragment{
 
     private static final String TAG = "ShareFragment";
 
-    private TextView textView;
-
     private static View view;
 
-    private Spinner spinner;
+    private static Spinner spinner;
+    private static TextView textView;
+    private static Button shareButton;
+    protected static Button picButton;
 
-    private Button shareButton;
+    protected static Bitmap pic;
+    protected static MediaStore.Video video;
+    protected static MediaStore.Audio audio;
 
-    protected Bitmap pic;
-    protected MediaStore.Video video;
-    protected MediaStore.Audio audio;
-
-    protected boolean isPicTaken = false;
-    protected boolean isVideoTaken = false;
-    protected boolean isSoundCaptured = false;
+    protected static boolean isPicTaken = false;
+    protected static boolean isVideoTaken = false;
+    protected static boolean isSoundCaptured = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,7 +57,7 @@ public class ShareFragment extends Fragment{
         textView = (TextView)view.findViewById(R.id.share_text_field);
         textView.setGravity(Gravity.CENTER);
 
-        shareButton = ((Button)view.findViewById(R.id.share_button));
+        shareButton = (Button)view.findViewById(R.id.share_button);
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,6 +65,8 @@ public class ShareFragment extends Fragment{
                 v.setClickable(false);
             }
         });
+
+        picButton = (Button)view.findViewById(R.id.pic_button);
 
         spinner = (Spinner) view.findViewById(R.id.spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
@@ -177,6 +178,7 @@ public class ShareFragment extends Fragment{
     public void resetShareFragment()
     {
         this.textView.setText("");
+        picButton.setText("Take a picture");
 
         hideKeyboard();
 

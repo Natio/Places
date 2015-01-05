@@ -47,7 +47,7 @@ public class PlacesApplication extends Application{
     //current location
     private static Location currentLocation = null;
 
-    //TODO i do not now if this gives a false positive on a real device. if it does just assign false
+    //TODO i do not know if this gives a false positive on a real device. if it does just assign false
     public static final boolean isRunningOnEmulator = Build.BRAND.toLowerCase().startsWith("generic");
 
 
