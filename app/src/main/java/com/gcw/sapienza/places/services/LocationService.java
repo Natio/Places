@@ -177,6 +177,9 @@ public class LocationService extends Service implements
         else query.orderByDescending("createdAt");
 
         query.setLimit(Utils.MAX_PINS);
+        if(PlacesApplication.isRunningOnEmulator){
+            query.setLimit(50);
+        }
 
         query.findInBackground(new FindCallback<Flag>() {
             @Override
