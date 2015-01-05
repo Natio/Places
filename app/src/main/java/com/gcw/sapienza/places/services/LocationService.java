@@ -191,6 +191,7 @@ public class LocationService extends Service implements
         Log.d(TAG, "Elapsed time: " + elapsed_time);
         float distance = location.distanceTo(this.location) / 1000;
         Log.d(TAG, "Distance from last known location: " + distance);
+//        if (elapsed_time > 20000) { //for quick debugging
         if (elapsed_time > REFRESH_TIME && distance > Utils.MAP_RADIUS / 2) { //TODO comment second condition for debugging ease
             this.location = location;
             queryParsewithLocation(location);

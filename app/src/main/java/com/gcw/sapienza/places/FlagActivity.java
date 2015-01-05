@@ -58,7 +58,7 @@ public class FlagActivity extends Activity {
 
         ((EditText)findViewById(R.id.text)).setText(text);
 
-        final String weatherString = weather == "" ? "" : ", " + weather;
+        final String weatherString = (weather == null || weather.equals("")) ? "" : ", " + weather;
 
         if(!Utils.userIdMap.containsKey(id))
         {
