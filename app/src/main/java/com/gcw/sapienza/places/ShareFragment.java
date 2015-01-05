@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gcw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
@@ -79,7 +80,11 @@ public class ShareFragment extends Fragment{
 
     private void share()
     {
-        Location current_location = PlacesApplication.getLocation();
+        Location current_location =  PlacesApplication.getLocation();
+        if(PlacesApplication.isRunningOnEmulator){
+            current_location = LocationService.getRandomLocation(current_location, 100);
+            Log.d(TAG, "Generata Posizione casuale per simulatore: "+current_location);
+        }
 
         if(current_location == null)
         {
