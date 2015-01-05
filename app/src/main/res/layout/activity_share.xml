@@ -57,9 +57,10 @@
                 android:layout_height="30dp"
                 android:text="Attach picture"
                 android:onClick="takePic"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:layout_marginBottom="20dp"
-                android:gravity="center_horizontal" />
+                android:gravity="center_horizontal"
+                android:id="@+id/pic_button" />
 
         </TableRow>
 
