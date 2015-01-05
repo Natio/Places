@@ -4,6 +4,6 @@
     <color name="red">#ffff0000</color>
     <color name="black">#ff000000</color>
     <color name="white">#ffffffff</color>
-    <color name="gray">#ff888888</color>
+    <color name="grey">#ff888888</color>
     <color name="green">#ff084403</color>
 </resources>
