@@ -143,8 +143,6 @@ public class LocationService extends Service implements
                     else queryParsewithLocation(getLocation());
                 }
             });
-
-            return;
         }
 
         if(!lone_wolf) query.whereNotEqualTo("fbId", Utils.fbId);
