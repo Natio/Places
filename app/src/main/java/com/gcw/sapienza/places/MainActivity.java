@@ -59,19 +59,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
         logRun();
 
-        if(ParseFacebookUtils.getSession() == null || ParseFacebookUtils.getSession().isClosed())
-        {
-            ParseLoginBuilder builder = new ParseLoginBuilder(MainActivity.this);
-
-            builder.setParseLoginEnabled(false);
-
-            builder.setFacebookLoginEnabled(true);
-            builder.setFacebookLoginPermissions(Arrays.asList("public_profile", "user_friends"/*, "user_relationships", "user_birthday", "user_location"*/));
-
-            // builder.setAppLogo(R.drawable.app_logo);
-
-            startActivityForResult(builder.build(), 0);
-        }
+        startLoginActivity();
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), this);
         mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -141,11 +129,21 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         startLoginActivity();
     }
 
-    private void startLoginActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+    private void startLoginActivity()
+    {
+        if(ParseFacebookUtils.getSession() == null || ParseFacebookUtils.getSession().isClosed())
+        {
+            ParseLoginBuilder builder = new ParseLoginBuilder(MainActivity.this);
+
+            builder.setParseLoginEnabled(false);
+
+            builder.setFacebookLoginEnabled(true);
+            builder.setFacebookLoginPermissions(Arrays.asList("public_profile", "user_friends"/*, "user_relationships", "user_birthday", "user_location"*/));
+
+            // builder.setAppLogo(R.drawable.app_logo);
+
+            startActivityForResult(builder.build(), 0);
+        }
     }
 
     protected void refresh()
