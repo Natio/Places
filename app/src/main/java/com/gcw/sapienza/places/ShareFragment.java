@@ -34,7 +34,7 @@ public class ShareFragment extends Fragment{
 
     private static final String TAG = "ShareFragment";
 
-    private  View view;
+    private  View mView;
 
     private Spinner spinner;
     private TextView textView;
@@ -55,12 +55,12 @@ public class ShareFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        this.view = inflater.inflate(R.layout.activity_share, container, false);
+        this.mView = inflater.inflate(R.layout.activity_share, container, false);
 
-        this.textView = (TextView)view.findViewById(R.id.share_text_field);
+        this.textView = (TextView)mView.findViewById(R.id.share_text_field);
         this.textView.setGravity(Gravity.CENTER);
 
-        this.shareButton = (Button)this.view.findViewById(R.id.share_button);
+        this.shareButton = (Button)this.mView.findViewById(R.id.share_button);
         this.shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,13 +69,13 @@ public class ShareFragment extends Fragment{
             }
         });
 
-        this.spinner = (Spinner) view.findViewById(R.id.spinner);
+        this.spinner = (Spinner)this.mView.findViewById(R.id.spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.categories, R.layout.custom_spinner);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.spinner.setAdapter(adapter);
 
-        return this.view;
+        return this.mView;
     }
 
     @Override
@@ -199,8 +199,8 @@ public class ShareFragment extends Fragment{
 
     protected void setPicButtonAsPicTaken()
     {
-        this.view = getView();
-        this.picButton = (Button)this.view.findViewById(R.id.pic_button);
+        // this.mView = getView();
+        this.picButton = (Button)this.mView.findViewById(R.id.pic_button);
         this.picButton.setText("Picture taken ✓");
     }
 

@@ -57,9 +57,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         return (ShareFragment)this.fragments[0];
     }
 
-    public MosaicFragment getMosaicFragment(){
-        return (MosaicFragment)this.fragments[1];
-    }
+    public MosaicFragment getMosaicFragment(){ return (MosaicFragment)this.fragments[1]; }
 
     public MMapFragment getMapFragment(){
         return (MMapFragment)this.fragments[2];
