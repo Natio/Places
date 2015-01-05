@@ -48,7 +48,7 @@ public class LocationService extends Service implements
     private static final long INTERVAL = 1000 * 30;
     private static final long FASTEST_INTERVAL = 1000 * 5;
     private static final long ONE_MIN = 1000 * 60;
-    private static final long REFRESH_TIME = ONE_MIN * 1; //TODO high frequency, useful for debugging purposes
+    private static final long REFRESH_TIME = ONE_MIN * 5; //TODO adjusted for alpha release, increase frequency when debugging
 
     private static final int NOTIFICATION_ID = 12345;
 
