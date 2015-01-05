@@ -256,11 +256,12 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         super.onPause();
         isForeground = false;
 
-
+        /*
         long time_diff = ((new Date().getTime() - this.startTime)/1000)/60;
         Map<String, String> dimensions = new HashMap<String, String>();
         dimensions.put("time_minutes", ""+time_diff);
         ParseAnalytics.trackEventInBackground("session_time", dimensions);
+        */
         Log.d(TAG,"pause");
     }
 
