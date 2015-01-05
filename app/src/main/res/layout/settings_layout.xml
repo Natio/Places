@@ -35,24 +35,20 @@
         <CheckBoxPreference
             android:title="Show my flags"
             android:defaultValue="true"
-            android:summary="Your flags are shown in the list"
             android:key="meFilter"
             />
         <CheckBoxPreference
             android:title="Show my friends' flags"
             android:defaultValue="true"
-            android:summary="Your friends' flags are visible"
             android:key="flFilter"
             />
         <CheckBoxPreference
-            android:title="Storytellers In The Dark"
+            android:title="Show flags from people you don't know"
             android:defaultValue="true"
-            android:summary="Flags from strangers are visible"
             android:key="strangersFilter"
             />
         <CheckBoxPreference
-            android:title="Archaeologist"
-            android:summary="Give higher relevance to older flags"
+            android:title="Give higher relevance to older flags"
             android:key="timeFilter"
             />
         <SeekBarPreference

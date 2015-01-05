@@ -19,6 +19,7 @@ public class JSONWeatherTask extends AsyncTask<String, String, String> {
     protected String doInBackground(String... params) {
         String data = ( (new WeatherHttpClient()).getWeatherData(params[0]));
         try {
+            Log.d("Weather", data);
             JSONObject info = new JSONObject(data);
             JSONObject mainObj = info.getJSONObject("main");
 
@@ -40,7 +41,6 @@ public class JSONWeatherTask extends AsyncTask<String, String, String> {
             PlacesApplication.weather = "";
             e.printStackTrace();
         }
-        Log.d("Weather", data);
         return data;
     }
 }
