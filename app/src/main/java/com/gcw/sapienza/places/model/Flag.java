@@ -32,7 +32,17 @@ public class Flag extends ParseObject{
 
     public Date getDate() { return (Date)this.getCreatedAt(); }
 
-    public int getTemp() { return (int)this.get("temp"); }
+    /**
+     *
+     * @return Integer.MAX_VALUE if there is no temperature
+     */
+    public int getTemp() {
+        Integer temp =(Integer) this.get("temp");
+        if(temp == null){
+            return Integer.MAX_VALUE;
+        }
+        return temp;
+    }
 
     public byte[] getPic() { return (byte[])this.get("pic"); }
 }
