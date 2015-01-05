@@ -3,7 +3,6 @@ package com.gcw.sapienza.places;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -35,31 +34,34 @@ public class ShareFragment extends Fragment{
 
     private static final String TAG = "ShareFragment";
 
-    private static View view;
+    private  View view;
 
-    private static Spinner spinner;
-    private static TextView textView;
-    private static Button shareButton;
-    protected static Button picButton;
+    private Spinner spinner;
+    private TextView textView;
+    private Button shareButton;
+    private Button picButton;
 
-    protected static Bitmap pic;
-    protected static MediaStore.Video video;
-    protected static MediaStore.Audio audio;
+    private Bitmap pic;
+    private MediaStore.Video video;
+    private MediaStore.Audio audio;
 
-    protected static boolean isPicTaken = false;
-    protected static boolean isVideoTaken = false;
-    protected static boolean isSoundCaptured = false;
+    private boolean isPicTaken = false;
+    private boolean isVideoTaken = false;
+    private boolean isSoundCaptured = false;
+
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        view = inflater.inflate(R.layout.activity_share, container, false);
+        this.view = inflater.inflate(R.layout.activity_share, container, false);
 
-        textView = (TextView)view.findViewById(R.id.share_text_field);
-        textView.setGravity(Gravity.CENTER);
+        this.textView = (TextView)view.findViewById(R.id.share_text_field);
+        this.textView.setGravity(Gravity.CENTER);
 
-        shareButton = (Button)view.findViewById(R.id.share_button);
-        shareButton.setOnClickListener(new View.OnClickListener() {
+        this.shareButton = (Button)this.view.findViewById(R.id.share_button);
+        this.shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ShareFragment.this.share();
@@ -67,15 +69,15 @@ public class ShareFragment extends Fragment{
             }
         });
 
-        picButton = (Button)view.findViewById(R.id.pic_button);
+        this.picButton = (Button)this.view.findViewById(R.id.pic_button);
 
-        spinner = (Spinner) view.findViewById(R.id.spinner);
+        this.spinner = (Spinner) view.findViewById(R.id.spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.categories, R.layout.custom_spinner);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
+        this.spinner.setAdapter(adapter);
 
-        return view;
+        return this.view;
     }
 
     private void share()
@@ -84,6 +86,18 @@ public class ShareFragment extends Fragment{
         if(PlacesApplication.isRunningOnEmulator){
             current_location = LocationService.getRandomLocation(current_location, 100);
             Log.d(TAG, "Generata Posizione casuale per simulatore: "+current_location);
+        }
+
+        //if there is no content
+        //TODO remember to fix this when adding videos
+        if(this.textView.getText().toString().length() == 0 && !isPicTaken){
+            Toast.makeText(getActivity().getApplicationContext(), "Please Insert text or take a picture", Toast.LENGTH_LONG).show();
+            Map<String, String> dimensions = new HashMap<>();
+            dimensions.put("reason", "Share without any content");
+            ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
+
+            resetShareFragment();
+            return;
         }
 
         if(current_location == null)
@@ -117,7 +131,7 @@ public class ShareFragment extends Fragment{
         f.put("category", category);
         f.put("location",p);
         f.put("text",this.textView.getText().toString());
-        f.put("weather", PlacesApplication.weather);
+        f.put("weather", PlacesApplication.getWeather());
 
 
         new Thread(new Runnable()
@@ -125,7 +139,7 @@ public class ShareFragment extends Fragment{
             @Override
             public void run() {
 
-                if (isPicTaken)
+                if (ShareFragment.this.isPicTaken)
                 {
                     if (pic == null)
                     {
@@ -171,24 +185,24 @@ public class ShareFragment extends Fragment{
 
     protected void resetMedia()
     {
-        isPicTaken = false;
-        isVideoTaken = false;
-        isSoundCaptured = false;
+        this.isPicTaken = false;
+        this.isVideoTaken = false;
+        this.isSoundCaptured = false;
 
-        pic = null;
-        video = null;
-        audio = null;
+        this.pic = null;
+        this.video = null;
+        this.audio = null;
     }
 
     public void resetShareFragment()
     {
         this.textView.setText("");
-        picButton.setText("Take a picture");
+        this.picButton.setText("Take a picture");
 
         hideKeyboard();
 
         Toast.makeText(getActivity().getApplicationContext(), "Flag has been placed!", Toast.LENGTH_LONG).show();
-        shareButton.setClickable(true);
+        this.shareButton.setClickable(true);
     }
 
     public void hideKeyboard()
@@ -198,4 +212,63 @@ public class ShareFragment extends Fragment{
             inputMethodManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
         }
     }
+
+
+
+    //=========================================
+    // Getters & Setters
+    //=========================================
+
+    public Button getPicButton() {
+        return picButton;
+    }
+
+    public Bitmap getPic() {
+        return pic;
+    }
+
+    public void setPic(Bitmap pic) {
+        this.pic = pic;
+    }
+
+    public MediaStore.Video getVideo() {
+        return video;
+    }
+
+    public void setVideo(MediaStore.Video video) {
+        this.video = video;
+    }
+
+    public MediaStore.Audio getAudio() {
+        return audio;
+    }
+
+    public void setAudio(MediaStore.Audio audio) {
+        this.audio = audio;
+    }
+
+    public boolean isPicTaken() {
+        return isPicTaken;
+    }
+
+    public void setPicTaken(boolean isPicTaken) {
+        this.isPicTaken = isPicTaken;
+    }
+
+    public boolean isVideoTaken() {
+        return isVideoTaken;
+    }
+
+    public void setVideoTaken(boolean isVideoTaken) {
+        this.isVideoTaken = isVideoTaken;
+    }
+
+    public boolean isSoundCaptured() {
+        return isSoundCaptured;
+    }
+
+    public void setSoundCaptured(boolean isSoundCaptured) {
+        this.isSoundCaptured = isSoundCaptured;
+    }
+
 }

@@ -2,7 +2,6 @@ package com.gcw.sapienza.places;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -29,12 +28,12 @@ public class MosaicFragment extends Fragment{
 
     private static final String TAG = "MosaicFragment";
 
-    private static View view;
-    private static ListView listView;
+    private View view;
+    private ListView listView;
 
-    private static TextView textHeader;
+    private TextView textHeader;
 
-    private static FlagsArrayAdapter adapter;
+    private FlagsArrayAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -44,8 +43,9 @@ public class MosaicFragment extends Fragment{
         //retrieve the listviews
         listView = (ListView)view.findViewById(R.id.flags_list_view);
 
-        ((MainActivity)getActivity()).srl = (SwipeRefreshLayout)view.findViewById(R.id.swipe_refresh);
-        ((MainActivity)getActivity()).srl.setOnRefreshListener((MainActivity)getActivity());
+        SwipeRefreshLayout srl = (SwipeRefreshLayout)view.findViewById(R.id.swipe_refresh);
+        ((MainActivity)getActivity()).setSwipeRefreshLayout(srl);
+        srl.setOnRefreshListener((MainActivity)getActivity());
 
         View header = inflater.inflate(R.layout.header_flags_list, null);
         textHeader = (TextView)header.findViewById(R.id.header);
@@ -112,14 +112,14 @@ public class MosaicFragment extends Fragment{
         int step = Utils.stepValues[prefs.getInt("maxFetch", 1)];
         Utils.MAX_PINS = step;
         Log.d(TAG, "Updated max pins to " + Utils.MAX_PINS);
-        MosaicFragment.updateHeaderText();
+        updateHeaderText();
     }
 
-    public static void updateHeaderText(){
+    public void updateHeaderText(){
         textHeader.setText("within " + (int)(Utils.MAP_RADIUS * 1000) + " meters");
     }
 
-    public static void configureListViewWithFlags()
+    public void configureListViewWithFlags()
     {
         if(listView != null)
         {

@@ -18,7 +18,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.Utils;
@@ -31,8 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+
 
 
 public class MainActivity extends ActionBarActivity implements ViewPager.OnPageChangeListener, SwipeRefreshLayout.OnRefreshListener {
@@ -43,15 +41,34 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     private long startTime = -1;///used to track session timing (statistics)
 
-    protected static SectionsPagerAdapter mSectionsPagerAdapter;
-    protected static Fragment[] fragments = {new ShareFragment(), new MosaicFragment(), new MMapFragment()};
-    protected static ViewPager mViewPager;
-    protected static SwipeRefreshLayout srl;
+    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private Fragment[] fragments = {new ShareFragment(), new MosaicFragment(), new MMapFragment()};
+    private ViewPager mViewPager;
+    private SwipeRefreshLayout srl;
+
+    public SwipeRefreshLayout getSwipeRefreshLayout(){
+        return this.srl;
+    }
+    public void setSwipeRefreshLayout(SwipeRefreshLayout srl){
+        this.srl = srl;
+    }
+
+    public ShareFragment getShareFragment(){
+        return (ShareFragment)this.fragments[0];
+    }
+
+    public MosaicFragment getMosaicFragment(){
+        return (MosaicFragment)this.fragments[1];
+    }
+
+    public MMapFragment getMapFragment(){
+        return (MMapFragment)this.fragments[2];
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Utils.mainActivity = this;
         this.startTime = new Date().getTime();
 
         ParseAnalytics.trackAppOpenedInBackground(this.getIntent());
@@ -67,7 +84,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         mViewPager.setOnPageChangeListener(this);
         mViewPager.setCurrentItem(1);
 
-        Utils.mainActivity = this;
+
         Utils.makeMeRequest(); // retrieve user's Facebook ID
 
         Resources res = getResources();
@@ -268,7 +285,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     public void takePic(View v)
     {
-        ((ShareFragment)fragments[0]).isPicTaken = true;
+        this.getShareFragment().setPicTaken (true);
 
         startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE), Utils.PIC_CAPTURE_REQUEST_CODE);
     }
@@ -284,19 +301,21 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                 switch(resultCode)
                 {
                     case RESULT_OK:
-                        ((ShareFragment)fragments[0]).picButton.setText("Picture taken ✓");
+                        this.getShareFragment().getPicButton().setText("Picture taken ✓");
 
-                        if(data.getData() == null)
-                        {
-                            ((ShareFragment) fragments[0]).pic = (Bitmap)data.getExtras().get("data");
-                        }else try
-                        {
-                            ((ShareFragment) fragments[0]).pic = MediaStore.Images.Media.getBitmap(this.getContentResolver(), data.getData());
+                        if(data.getData() == null){
+                            this.getShareFragment().setPic ( (Bitmap)data.getExtras().get("data"));
                         }
-                        catch (IOException ioe)
-                        {
-                            ioe.printStackTrace();
+                        else{
+                            try{
+                                this.getShareFragment().setPic (MediaStore.Images.Media.getBitmap(this.getContentResolver(), data.getData()));
+                            }
+                            catch (IOException ioe){
+                                ioe.printStackTrace();
+                            }
                         }
+                        break;
+
                 }
         }
     }

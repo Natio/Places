@@ -60,7 +60,26 @@ public class PlacesApplication extends Application{
 
     private static String locality;
 
-    public static String weather = "";
+    //shared variable for handling weather conditions
+    private static String weather = "";
+
+    /**
+     *
+     * @return string representing weather conditions
+     */
+    public static String getWeather(){
+        return PlacesApplication.weather;
+    }
+
+    /**
+     * Sets the weather
+     * @param weather string representing the weather
+     */
+    public static void setWeather(String weather){
+        PlacesApplication.weather = weather;
+    }
+
+
 
     //made synchronized for thread safety and added fake location if running on emulator
     public static synchronized Location getLocation(){

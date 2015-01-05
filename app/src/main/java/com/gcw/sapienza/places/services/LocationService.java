@@ -19,7 +19,6 @@ import android.widget.Toast;
 
 import com.gcw.sapienza.places.MMapFragment;
 import com.gcw.sapienza.places.MainActivity;
-import com.gcw.sapienza.places.MosaicFragment;
 import com.gcw.sapienza.places.Notifications;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
@@ -39,7 +38,6 @@ import com.parse.ParseQuery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Handler;
 
 public class LocationService extends Service implements
         GoogleApiClient.ConnectionCallbacks,
@@ -162,8 +160,12 @@ public class LocationService extends Service implements
             {
                 Toast.makeText(getApplicationContext(), "You won't be able to see any flags with these settings", Toast.LENGTH_LONG).show();
 
-                if(parseObjects == null) parseObjects = new ArrayList<Flag>();
-                else parseObjects.clear();
+                if(parseObjects == null){
+                    parseObjects = new ArrayList<>();
+                }
+                else{
+                    parseObjects.clear();
+                }
 
                 updateApplication();
 
@@ -180,14 +182,14 @@ public class LocationService extends Service implements
             @Override
             public void done(List<Flag> parseObjects, ParseException e) {
                 if(parseObjects == null){
-                    parseObjects = new ArrayList<Flag>();
+                    parseObjects = new ArrayList<>();
                 }
                 LocationService.this.parseObjects = parseObjects;
                 Log.d(TAG, "Found " + parseObjects.size() +
                         " pins within " + Utils.MAP_RADIUS + " km");
                 updateApplication();
 
-                MosaicFragment.configureListViewWithFlags();
+                Utils.mainActivity.getMosaicFragment().configureListViewWithFlags();
                 MMapFragment.updateMarkersOnMap();
             }
         });

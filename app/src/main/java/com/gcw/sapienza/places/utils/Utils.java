@@ -1,12 +1,9 @@
 package com.gcw.sapienza.places.utils;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -27,7 +24,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by mic_head on 02/01/15.
@@ -37,7 +33,7 @@ public class Utils
     private static final String TAG = "Utils";
 
     public static String fbId = "";
-    public static ArrayList<String> friends = new ArrayList<String>();
+    public static ArrayList<String> friends = new ArrayList<>();
     public static HashMap<String, String> userIdMap = new HashMap<>();
     public static HashMap<String, String> userProfilePicMapSmall = new HashMap<>();
     public static HashMap<String, String> userProfilePicMapLarge = new HashMap<>();
@@ -55,7 +51,7 @@ public class Utils
 
     public static String[] categories;
 
-    public static Activity mainActivity;
+    public static MainActivity mainActivity;
 
     public static void clearUserData()
     {
@@ -87,7 +83,7 @@ public class Utils
                         {
                             Log.v(TAG, "Couldn't resolve facebook user's name.  Error: " + e.toString());
                             e.printStackTrace();
-                        };
+                        }
                     }
                 });
 
@@ -121,7 +117,7 @@ public class Utils
                         {
                             Log.v(TAG, "Couldn't retrieve facebook user data.  Error: " + e.toString());
                             e.printStackTrace();
-                        };
+                        }
                     }
                 }
         );
@@ -159,7 +155,7 @@ public class Utils
                     {
                         Log.v(TAG, "Couldn't retrieve user's friends.  Error: " + e.toString());
                         e.printStackTrace();
-                    };
+                    }
                 }
             }
         );
@@ -168,10 +164,11 @@ public class Utils
     }
 
     @Deprecated // Daniele says its 'getLocation' is much better than mine, that's why it's deprecated.
+    @SuppressWarnings("unused")
     public static Location getLocation(Context context)
     {
         Location location;
-        LocationManager locationManager = (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
         boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -195,7 +192,9 @@ public class Utils
                 }
             }
         }
-        else Toast.makeText(context, "Please enable GPS data", Toast.LENGTH_LONG).show();
+        else{
+            Toast.makeText(context, "Please enable GPS data", Toast.LENGTH_LONG).show();
+        }
 
         return null;
     }

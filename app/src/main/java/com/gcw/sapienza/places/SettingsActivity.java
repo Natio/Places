@@ -48,7 +48,7 @@ Toast radiusToast;
             int value = (int)newValue + 1;
 
             Utils.MAP_RADIUS = value / 10f;
-            MosaicFragment.updateHeaderText();
+            Utils.mainActivity.getMosaicFragment().updateHeaderText();
 
             showToast("Radius set to " + value * 100 + " meters.");
 
@@ -61,7 +61,7 @@ Toast radiusToast;
             int value = Utils.stepValues[(int)newValue];
 
             Utils.MAX_PINS = value;
-            MosaicFragment.updateHeaderText();
+            Utils.mainActivity.getMosaicFragment().updateHeaderText();
 
             showToast("Max number of visible flags: " + value + ".");
 
