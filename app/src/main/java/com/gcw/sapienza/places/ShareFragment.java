@@ -217,7 +217,9 @@ public class ShareFragment extends Fragment{
 
     public void resetShareFragment()
     {
+        this.mView = getView();
         this.textView.setText("");
+        this.picButton = (Button)this.mView.findViewById(R.id.pic_button);
         this.picButton.setText("Take a picture");
 
         hideKeyboard();
