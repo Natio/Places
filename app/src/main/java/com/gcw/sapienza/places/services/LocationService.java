@@ -49,8 +49,9 @@ public class LocationService extends Service implements
 
     private final IBinder mBinder = new LocalBinder();
 
-    private static final long INTERVAL = 1000 * 30;
-    private static final long FASTEST_INTERVAL = 1000 * 5;
+    public static long INTERVAL = 1000 * 30;
+    public static long FASTEST_INTERVAL = 1000 * 5;
+
     private static final long ONE_MIN = 1000 * 60;
     private static final long REFRESH_TIME = ONE_MIN * 5; //TODO adjusted for alpha release, increase frequency when debugging
 
@@ -93,6 +94,16 @@ public class LocationService extends Service implements
             // Return this instance of LocalService so clients can call public methods
             return LocationService.this;
         }
+    }
+
+    public static void setBackgroundFrequency(){
+        LocationService.INTERVAL = 1000 * 45;
+        LocationService.FASTEST_INTERVAL = 1000 * 20;
+    }
+
+    public static void setForegroundFrequency(){
+        LocationService.INTERVAL = 1000 * 30;
+        LocationService.FASTEST_INTERVAL = 1000 * 5;
     }
 
     public void queryParsewithLocation(Location location)

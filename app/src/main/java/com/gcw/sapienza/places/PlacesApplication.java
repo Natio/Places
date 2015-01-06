@@ -108,7 +108,6 @@ public class PlacesApplication extends Application{
 
         //initialize the location manager
 
-        //fixme location service not connecting to google api properly
         startLocationService();
 
         // initialize Parse.com

@@ -263,6 +263,9 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     {
         super.onResume();
         this.startTime = new Date().getTime();
+
+        LocationService.setForegroundFrequency();
+
         isForeground = true;
         Log.d(TAG,"resume");
     }
@@ -271,6 +274,9 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     public void onPause()
     {
         super.onPause();
+
+        LocationService.setBackgroundFrequency();
+
         isForeground = false;
 
         /*
