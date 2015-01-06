@@ -199,7 +199,7 @@ public class ShareFragment extends Fragment{
 
     protected void setPicButtonAsPicTaken()
     {
-        // this.mView = getView();
+        this.mView = getView();
         this.picButton = (Button)this.mView.findViewById(R.id.pic_button);
         this.picButton.setText("Picture taken ✓");
     }
