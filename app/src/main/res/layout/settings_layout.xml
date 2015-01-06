@@ -48,7 +48,7 @@
             android:key="strangersFilter"
             />
         <CheckBoxPreference
-            android:summary="Higher relevance to older flags"
+            android:summary="Assign higher relevance to older flags"
             android:defaultValue="false"
             android:key="timeFilter"
             />
