@@ -57,10 +57,10 @@ public class LocationService extends Service implements
 
     private static final int NOTIFICATION_ID = 12345;
 
-    private LocationRequest locationRequest;
-    private GoogleApiClient googleApiClient;
+    private static LocationRequest locationRequest;
+    private static GoogleApiClient googleApiClient;
     private Location location;
-    private FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
+    private static FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
 
     private ILocationUpdater listener;
 
@@ -68,9 +68,12 @@ public class LocationService extends Service implements
 
     private Location notificationLocation;
 
+    private static LocationService locationService;
+
     @Override
     public void onConnected(Bundle connectionHint)
     {
+        locationService = this;
         Log.d(TAG, "Connected to Google Api");
         Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
         if (currentLocation != null) {
@@ -96,14 +99,25 @@ public class LocationService extends Service implements
         }
     }
 
-    public static void setBackgroundFrequency(){
-        LocationService.INTERVAL = 1000 * 45;
-        LocationService.FASTEST_INTERVAL = 1000 * 20;
+    public static void setBackgroundInterval(){
+            LocationService.INTERVAL = 1000 * 45;
+            LocationService.FASTEST_INTERVAL = 1000 * 20;
+        if(locationService != null)
+            updateLocationUpdatesInterval();
     }
 
-    public static void setForegroundFrequency(){
-        LocationService.INTERVAL = 1000 * 30;
-        LocationService.FASTEST_INTERVAL = 1000 * 5;
+    public static void setForegroundInterval(){
+            LocationService.INTERVAL = 1000 * 30;
+            LocationService.FASTEST_INTERVAL = 1000 * 5;
+        if(locationService != null)
+            updateLocationUpdatesInterval();
+    }
+
+    private static void updateLocationUpdatesInterval(){
+        fusedLocationProviderApi.removeLocationUpdates(googleApiClient, locationService);
+        locationRequest.setInterval(INTERVAL);
+        locationRequest.setFastestInterval(FASTEST_INTERVAL);
+        fusedLocationProviderApi.requestLocationUpdates(googleApiClient, locationRequest, locationService);
     }
 
     public void queryParsewithLocation(Location location)
@@ -280,6 +294,10 @@ public class LocationService extends Service implements
     @Override
     public void onCreate() {
         super.onCreate();
+        connectToGoogleAPI();
+    }
+
+    private void connectToGoogleAPI() {
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(INTERVAL);
