@@ -28,12 +28,12 @@ public class MosaicFragment extends Fragment{
 
     private static final String TAG = "MosaicFragment";
 
-    private View view;
-    private ListView listView;
+    private static View view;
+    private static ListView listView;
 
-    private TextView textHeader;
+    private static TextView textHeader;
 
-    private FlagsArrayAdapter adapter;
+    private static FlagsArrayAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -119,7 +119,7 @@ public class MosaicFragment extends Fragment{
         textHeader.setText("within " + (int)(Utils.MAP_RADIUS * 1000) + " meters");
     }
 
-    public void configureListViewWithFlags()
+    public static void configureListViewWithFlags()
     {
         if(listView != null)
         {

@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.gcw.sapienza.places.MMapFragment;
 import com.gcw.sapienza.places.MainActivity;
+import com.gcw.sapienza.places.MosaicFragment;
 import com.gcw.sapienza.places.Notifications;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
@@ -192,10 +193,7 @@ public class LocationService extends Service implements
                         " pins within " + Utils.MAP_RADIUS + " km");
                 updateApplication();
 
-                if(PlacesApplication.getMainActivity() == null) Log.v(TAG, "MainActivity is null");
-                else if(PlacesApplication.getMainActivity().getMosaicFragment() == null) Log.v(TAG, "MosaicFragment is null");
-
-                PlacesApplication.getMainActivity().getMosaicFragment().configureListViewWithFlags();
+                MosaicFragment.configureListViewWithFlags();
                 MMapFragment.updateMarkersOnMap();
             }
         });
@@ -235,6 +233,8 @@ public class LocationService extends Service implements
                 this.notificationLocation = this.location;
             }
             updateApplication();
+
+
         }
     }
 

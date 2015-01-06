@@ -70,7 +70,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        PlacesApplication.SINGLETON_INSTANCE = this;
+
         Utils.mainActivity = this;
         this.startTime = new Date().getTime();
 

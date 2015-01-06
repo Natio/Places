@@ -79,18 +79,6 @@ public class PlacesApplication extends Application{
         PlacesApplication.weather = weather;
     }
 
-
-    public static MainActivity SINGLETON_INSTANCE;
-
-    public static MainActivity getMainActivity(){
-        if(PlacesApplication.SINGLETON_INSTANCE == null){
-            throw new RuntimeException("MainActivity is not ready yet");
-        }
-        return PlacesApplication.SINGLETON_INSTANCE;
-    }
-
-
-
     //made synchronized for thread safety and added fake location if running on emulator
     public static synchronized Location getLocation(){
         if (PlacesApplication.isRunningOnEmulator && currentLocation == null) {
