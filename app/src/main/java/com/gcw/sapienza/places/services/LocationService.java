@@ -100,15 +100,15 @@ public class LocationService extends Service implements
     }
 
     public static void setBackgroundInterval(){
-            LocationService.INTERVAL = 1000 * 45;
-            LocationService.FASTEST_INTERVAL = 1000 * 20;
+            LocationService.INTERVAL = ONE_MIN * 10;
+            LocationService.FASTEST_INTERVAL = ONE_MIN * 2;
         if(locationService != null)
             updateLocationUpdatesInterval();
     }
 
     public static void setForegroundInterval(){
-            LocationService.INTERVAL = 1000 * 30;
-            LocationService.FASTEST_INTERVAL = 1000 * 5;
+            LocationService.INTERVAL = ONE_MIN * 2;
+            LocationService.FASTEST_INTERVAL = ONE_MIN;
         if(locationService != null)
             updateLocationUpdatesInterval();
     }
@@ -248,7 +248,7 @@ public class LocationService extends Service implements
         float distance = location.distanceTo(this.location) / 1000;
         Log.d(TAG, "Distance from last known location: " + distance);
 //        if (elapsed_time > 20000) { //for quick debugging
-        if (elapsed_time > REFRESH_TIME && distance > Utils.MAP_RADIUS / 2) { //TODO comment second condition for debugging ease
+        if (elapsed_time > REFRESH_TIME) {
             this.location = location;
             queryParsewithLocation(location);
             if(this.parseObjects.size() > 0 && !MainActivity.isForeground()) {
@@ -299,9 +299,10 @@ public class LocationService extends Service implements
 
     private void connectToGoogleAPI() {
         locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(INTERVAL);
-        locationRequest.setFastestInterval(FASTEST_INTERVAL);
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setInterval(MainActivity.isForeground() ? ONE_MIN * 2 : ONE_MIN * 10);
+        locationRequest.setFastestInterval(MainActivity.isForeground() ? ONE_MIN : ONE_MIN * 2);
+        locationRequest.setSmallestDisplacement(Utils.MAP_RADIUS * 1000 / 2);
 
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
