@@ -1,5 +1,6 @@
 package com.gcw.sapienza.places;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
@@ -69,8 +70,9 @@ public class ShareFragment extends Fragment{
         this.shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ShareFragment.this.share();
                 v.setClickable(false);
+                ShareFragment.this.share();
+
             }
         });
 
@@ -243,14 +245,14 @@ public class ShareFragment extends Fragment{
         hideKeyboard();
 
         Toast.makeText(getActivity().getApplicationContext(), toastText, Toast.LENGTH_LONG).show();
-
         this.shareButton.setClickable(true);
+
     }
 
     public void hideKeyboard()
     {
         if(getActivity().getCurrentFocus()!=null) {
-            InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(getActivity().getApplicationContext().INPUT_METHOD_SERVICE);
+            InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
         }
     }

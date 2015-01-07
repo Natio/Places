@@ -264,8 +264,6 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         super.onResume();
         this.startTime = new Date().getTime();
 
-        LocationService.setForegroundInterval();
-
         isForeground = true;
         Log.d(TAG,"resume");
     }
@@ -274,8 +272,6 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     public void onPause()
     {
         super.onPause();
-
-        LocationService.setBackgroundInterval();
 
         isForeground = false;
 
@@ -294,7 +290,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     public void takePic(View v)
     {
-        this.getShareFragment().setPicTaken (true);
+
 
         startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE), Utils.PIC_CAPTURE_REQUEST_CODE);
     }

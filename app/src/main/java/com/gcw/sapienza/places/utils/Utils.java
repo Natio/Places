@@ -33,10 +33,10 @@ public class Utils
     private static final String TAG = "Utils";
 
     public static String fbId = "";
-    public static ArrayList<String> friends = new ArrayList<>();
-    public static HashMap<String, String> userIdMap = new HashMap<>();
-    public static HashMap<String, String> userProfilePicMapSmall = new HashMap<>();
-    public static HashMap<String, String> userProfilePicMapLarge = new HashMap<>();
+    public static final ArrayList<String> friends = new ArrayList<>();
+    public static final HashMap<String, String> userIdMap = new HashMap<>();
+    public static final HashMap<String, String> userProfilePicMapSmall = new HashMap<>();
+    public static final HashMap<String, String> userProfilePicMapLarge = new HashMap<>();
 
     public static final int UPDATE_DELAY = 200;
     public static float MAP_RADIUS = 0.5f;
@@ -126,7 +126,7 @@ public class Utils
         req.executeAsync();
     }
 
-    public static void fetchFbFriends() throws MalformedURLException, IOException
+    public static void fetchFbFriends() throws  IOException, MalformedURLException
     {
         friends.clear();
 
@@ -217,8 +217,10 @@ public class Utils
                             {
                                 Utils.fetchFbFriends();
                             }
-                            catch(MalformedURLException mue){ mue.printStackTrace(); }
-                            catch(IOException ioe){ ioe.printStackTrace(); }
+                            catch(IOException mue){
+                                mue.printStackTrace();
+                            }
+
                         }
                     }
                 });

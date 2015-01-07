@@ -12,12 +12,12 @@ import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.gcw.sapienza.places.remotesettings.RemoteSettings;
 import com.gcw.sapienza.places.model.Flag;
-import com.gcw.sapienza.places.remotesettings.RemoteSettingsCallBacks;
 import com.gcw.sapienza.places.services.ILocationUpdater;
 import com.gcw.sapienza.places.services.LocationService;
+import com.parse.ConfigCallback;
 import com.parse.Parse;
+import com.parse.ParseConfig;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParseException;
@@ -114,25 +114,23 @@ public class PlacesApplication extends Application{
         ParseObject.registerSubclass(Flag.class);
         Parse.initialize(this, PARSE_COM_APP_KEY , PARSE_COM_CLIENT_KEY);
         ParseFacebookUtils.initialize(getString(R.string.app_id));
-
+        ParseConfig.getInBackground(new ConfigCallback() {
+            @Override
+            public void done(ParseConfig parseConfig, ParseException e) {
+                if(e != null){
+                    Log.d(TAG, "Error while configuring: "+e.getMessage());
+                }
+                else{
+                    Log.d(TAG, "Got new Configuration");
+                }
+            }
+        });
 //        PushService.setDefaultPushCallback(this, MainActivity.class);
 
 
         //Parse push notifications
         subscribeToParseBroadcast();
 
-        //Syncs settings with the server
-        RemoteSettings.getInstance().synchWithFileAtURL("https://dl.dropboxusercontent.com/u/2181964/remote_config.json", new RemoteSettingsCallBacks() {
-            @Override
-            public void onRemoteConfig() {
-                Log.d(TAG, "RemoteSettings configured");
-            }
-
-            @Override
-            public void onError(String error) {
-                Log.d(TAG, "RemoteSettings configuration error: "+error);
-            }
-        });
     }
 
     private void subscribeToParseBroadcast() {
