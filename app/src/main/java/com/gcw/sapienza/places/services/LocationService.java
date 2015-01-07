@@ -49,13 +49,14 @@ public class LocationService extends Service implements
 
     private final IBinder mBinder = new LocalBinder();
 
-    public static long INTERVAL = 1000 * 30;
-    public static long FASTEST_INTERVAL = 1000 * 5;
-
     private static final long ONE_MIN = 1000 * 60;
-    private static final long REFRESH_TIME = ONE_MIN * 5; //TODO adjusted for alpha release, increase frequency when debugging
+
+    private static final long INTERVAL = ONE_MIN * 5;
+    private static final long FASTEST_INTERVAL = ONE_MIN * 2;
 
     private static final int NOTIFICATION_ID = 12345;
+
+
 
     private static LocationRequest locationRequest;
     private static GoogleApiClient googleApiClient;
@@ -97,27 +98,6 @@ public class LocationService extends Service implements
             // Return this instance of LocalService so clients can call public methods
             return LocationService.this;
         }
-    }
-
-    public static void setBackgroundInterval(){
-            LocationService.INTERVAL = ONE_MIN * 10;
-            LocationService.FASTEST_INTERVAL = ONE_MIN * 2;
-        if(locationService != null)
-            updateLocationUpdatesInterval();
-    }
-
-    public static void setForegroundInterval(){
-            LocationService.INTERVAL = ONE_MIN * 2;
-            LocationService.FASTEST_INTERVAL = ONE_MIN;
-        if(locationService != null)
-            updateLocationUpdatesInterval();
-    }
-
-    private static void updateLocationUpdatesInterval(){
-        fusedLocationProviderApi.removeLocationUpdates(googleApiClient, locationService);
-        locationRequest.setInterval(INTERVAL);
-        locationRequest.setFastestInterval(FASTEST_INTERVAL);
-        fusedLocationProviderApi.requestLocationUpdates(googleApiClient, locationRequest, locationService);
     }
 
     public void queryParsewithLocation(Location location)
@@ -237,6 +217,9 @@ public class LocationService extends Service implements
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.d(TAG, "Interval: " + INTERVAL);
+        Log.d(TAG, "Fastest Interval: " + FASTEST_INTERVAL);
+        Log.d(TAG, "Location accuracy: " + location.getAccuracy());
         if(notificationLocation != null && (location.distanceTo(this.notificationLocation) / 1000) > Utils.MAP_RADIUS){
             NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             nManager.cancel(NOTIFICATION_ID);
@@ -248,19 +231,15 @@ public class LocationService extends Service implements
         float distance = location.distanceTo(this.location) / 1000;
         Log.d(TAG, "Distance from last known location: " + distance);
 //        if (elapsed_time > 20000) { //for quick debugging
-        if (elapsed_time > REFRESH_TIME) {
-            this.location = location;
-            queryParsewithLocation(location);
-            if(this.parseObjects.size() > 0 && !MainActivity.isForeground()) {
-                Log.d(TAG, "Notifying user..." +
-                        this.parseObjects.size() + " pins found");
-                notifyUser();
-                this.notificationLocation = this.location;
-            }
-            updateApplication();
-
-
+        this.location = location;
+        queryParsewithLocation(location);
+        if(this.parseObjects != null && this.parseObjects.size() > 0 && !MainActivity.isForeground()) {
+            Log.d(TAG, "Notifying user..." +
+                    this.parseObjects.size() + " pins found");
+            notifyUser();
+            this.notificationLocation = this.location;
         }
+        updateApplication();
     }
 
     private void notifyUser() {
@@ -300,8 +279,9 @@ public class LocationService extends Service implements
     private void connectToGoogleAPI() {
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        locationRequest.setInterval(MainActivity.isForeground() ? ONE_MIN * 2 : ONE_MIN * 10);
-        locationRequest.setFastestInterval(MainActivity.isForeground() ? ONE_MIN : ONE_MIN * 2);
+        locationRequest.setInterval(INTERVAL);
+        locationRequest.setFastestInterval(FASTEST_INTERVAL);
+        Log.d(TAG, "Smallest displacement: " + Utils.MAP_RADIUS * 1000 / 2);
         locationRequest.setSmallestDisplacement(Utils.MAP_RADIUS * 1000 / 2);
 
         googleApiClient = new GoogleApiClient.Builder(this)
