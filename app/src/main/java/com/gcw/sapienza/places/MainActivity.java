@@ -310,7 +310,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                 switch(resultCode)
                 {
                     case RESULT_OK:
-                        this.getShareFragment().setPicButtonAsPicTaken();
+                        // this.getShareFragment().setPicButtonAsPicTaken();
 
                         if(data.getData() == null){
                             this.getShareFragment().setPic ( (Bitmap)data.getExtras().get("data"));

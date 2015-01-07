@@ -1,29 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="100dp"
-
-        android:text="@string/com_facebook_loginview_log_out_button"
-        android:textColor="@color/com_facebook_loginview_text_color"
-        android:textSize="@dimen/com_facebook_loginview_text_size"
-        android:textStyle="bold"
-
-        android:background="@drawable/com_facebook_button_blue"
-        android:drawableLeft="@drawable/com_facebook_inverse_icon"
-        android:drawablePadding="@dimen/com_facebook_likebutton_compound_drawable_padding"
-        android:paddingLeft="@dimen/com_facebook_loginview_padding_left"
-        android:paddingTop="@dimen/com_facebook_loginview_padding_top"
-        android:paddingRight="@dimen/com_facebook_loginview_padding_right"
-        android:paddingBottom="@dimen/com_facebook_loginview_padding_bottom"
-        android:onClick="onLogoutButtonClicked"/>
-
-</LinearLayout> -->
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="wrap_content"

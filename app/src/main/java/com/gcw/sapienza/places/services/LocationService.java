@@ -181,7 +181,7 @@ public class LocationService extends Service implements
                 query.whereContainedIn("fbId", meAndMyFriends);
             }
             else if(lone_wolf) query.whereEqualTo("fbId", Utils.fbId);
-            else if(with_friends_surrounded) query.whereEqualTo("fbId", Utils.friends);
+            else if(with_friends_surrounded) query.whereContainedIn("fbId", Utils.friends);
             else
             {
                 Toast.makeText(getApplicationContext(), "You won't be able to see any flags with these settings", Toast.LENGTH_LONG).show();

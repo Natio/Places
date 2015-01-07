@@ -49,7 +49,12 @@ public class ShareFragment extends Fragment{
     private boolean isVideoTaken = false;
     private boolean isSoundCaptured = false;
 
-
+    private final String FLAG_PLACED_TEXT = "Flag has been placed!";
+    private final String ERROR_ENCOUNTERED_TEXT = "Error encountered while placing flag\nPlease try again";
+    private final String FB_ID_NOT_FOUND_TEXT = "Couldn't retrieve your Facebook credentials\nPlease check your internet connection.";
+    private final String EMPTY_FLAG_TEXT = "Please insert text or take a picture";
+    private final String ENABLE_NETWORK_SERVICE_TEXT = "Please enable GPS/Network service";
+    private final String PIC_NOT_FOUND_TEXT = "Error encountered while retrieving picture\nFlag won't be stored";
 
 
     @Override
@@ -104,25 +109,24 @@ public class ShareFragment extends Fragment{
 
         //if there is no content
         //TODO remember to fix this when adding videos
-        if(this.textView.getText().toString().length() == 0 && !isPicTaken){
-            Toast.makeText(getActivity().getApplicationContext(), "Please Insert text or take a picture", Toast.LENGTH_LONG).show();
+        if(this.textView.getText().toString().length() == 0 && !isPicTaken)
+        {
             Map<String, String> dimensions = new HashMap<>();
             dimensions.put("reason", "Share without any content");
             ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
 
-            resetShareFragment();
+            resetShareFragment(EMPTY_FLAG_TEXT);
             return;
         }
 
         if(current_location == null)
         {
-            Toast.makeText(getActivity().getApplicationContext(), "Please enable GPS/Network service", Toast.LENGTH_LONG).show();
             Log.d(TAG, "No GPS data");
 
             Map<String, String> dimensions = new HashMap<>();
             dimensions.put("reason", "Share with No GPS");
             ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
-            resetShareFragment();
+            resetShareFragment(ENABLE_NETWORK_SERVICE_TEXT);
             return;
         }
 
@@ -131,13 +135,10 @@ public class ShareFragment extends Fragment{
 
         if(Utils.fbId.equals(""))
         {
-            Toast.makeText(getActivity().getApplicationContext(),
-                    "Couldn't retrieve your Facebook credentials,\nplease check your internet connection.",
-                    Toast.LENGTH_LONG).show();
             Map<String, String> dimensions = new HashMap<>();
             dimensions.put("reason", "Share with No Facebook");
             ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
-            resetShareFragment();
+            resetShareFragment(FB_ID_NOT_FOUND_TEXT);
             return;
         }
         final String category = spinner.getSelectedItem().toString();
@@ -182,14 +183,18 @@ public class ShareFragment extends Fragment{
                             Map<String, String> dimensions = new HashMap<>();
                             dimensions.put("reason", e.getMessage());
                             ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
-                        } else {
+
+                            resetShareFragment(ERROR_ENCOUNTERED_TEXT);
+                        }
+                        else
+                        {
                             ((com.gcw.sapienza.places.MainActivity) getActivity()).refresh();
                             Map<String, String> dimensions = new HashMap<>();
                             dimensions.put("category", category);
                             ParseAnalytics.trackEventInBackground("sharing_succeded", dimensions);
-                        }
 
-                        resetShareFragment();
+                            resetShareFragment(FLAG_PLACED_TEXT);
+                        }
                         resetMedia();
                     }
                 });
@@ -197,11 +202,24 @@ public class ShareFragment extends Fragment{
         }).start();
     }
 
+    @Deprecated
     protected void setPicButtonAsPicTaken()
     {
         this.mView = getView();
         this.picButton = (Button)this.mView.findViewById(R.id.pic_button);
         this.picButton.setText("Picture taken ✓");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if(pic != null)
+        {
+            this.mView = getView();
+            this.picButton = (Button)this.mView.findViewById(R.id.pic_button);
+            this.picButton.setText("Picture taken ✓");
+        }
     }
 
     protected void resetMedia()
@@ -215,7 +233,7 @@ public class ShareFragment extends Fragment{
         this.audio = null;
     }
 
-    public void resetShareFragment()
+    public void resetShareFragment(String toastText)
     {
         this.mView = getView();
         this.textView.setText("");
@@ -224,7 +242,8 @@ public class ShareFragment extends Fragment{
 
         hideKeyboard();
 
-        Toast.makeText(getActivity().getApplicationContext(), "Flag has been placed!", Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity().getApplicationContext(), toastText, Toast.LENGTH_LONG).show();
+
         this.shareButton.setClickable(true);
     }
 
