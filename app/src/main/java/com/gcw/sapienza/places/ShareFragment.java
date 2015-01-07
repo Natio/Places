@@ -213,11 +213,15 @@ public class ShareFragment extends Fragment{
     }
 
     @Override
-    public void onResume() {
+    public void onResume()
+    {
         super.onResume();
+
+        Log.v(TAG, "ShareFragment resumed!");
 
         if(pic != null)
         {
+            this.isPicTaken = true;
             this.mView = getView();
             this.picButton = (Button)this.mView.findViewById(R.id.pic_button);
             this.picButton.setText("Picture taken ✓");
