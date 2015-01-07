@@ -294,7 +294,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     public void takePic(View v)
     {
-        this.getShareFragment().setPicTaken (true);
+
 
         startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE), Utils.PIC_CAPTURE_REQUEST_CODE);
     }
@@ -310,6 +310,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                 switch(resultCode)
                 {
                     case RESULT_OK:
+                        this.getShareFragment().setPicTaken(true);
                         this.getShareFragment().setPicButtonAsPicTaken();
 
                         if(data.getData() == null){
