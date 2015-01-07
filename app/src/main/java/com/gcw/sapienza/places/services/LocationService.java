@@ -51,6 +51,8 @@ public class LocationService extends Service implements
 
     private static final long ONE_MIN = 1000 * 60;
 
+    private static final int KM_TO_M = 1000;
+
     private static final long INTERVAL = ONE_MIN * 5;
     private static final long FASTEST_INTERVAL = ONE_MIN * 2;
 
@@ -220,7 +222,7 @@ public class LocationService extends Service implements
         Log.d(TAG, "Interval: " + INTERVAL);
         Log.d(TAG, "Fastest Interval: " + FASTEST_INTERVAL);
         Log.d(TAG, "Location accuracy: " + location.getAccuracy());
-        if(notificationLocation != null && (location.distanceTo(this.notificationLocation) / 1000) > Utils.MAP_RADIUS){
+        if(notificationLocation != null && location.distanceTo(this.notificationLocation) > (Utils.MAP_RADIUS * KM_TO_M)       ){
             NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             nManager.cancel(NOTIFICATION_ID);
         }
@@ -228,12 +230,12 @@ public class LocationService extends Service implements
         long elapsed_time = location.getTime() -
                 (this.location == null ? 0l : this.location.getTime());
         Log.d(TAG, "Elapsed time: " + elapsed_time);
-        float distance = location.distanceTo(this.location) / 1000;
+        float distance = location.distanceTo(this.location) / KM_TO_M;
         Log.d(TAG, "Distance from last known location: " + distance);
-//        if (elapsed_time > 20000) { //for quick debugging
         this.location = location;
         queryParsewithLocation(location);
-        if(this.parseObjects != null && this.parseObjects.size() > 0 && !MainActivity.isForeground()) {
+        if(this.parseObjects != null && this.parseObjects.size() > 0
+                && !MainActivity.isForeground() && !Utils.fbId.equals("")) {
             Log.d(TAG, "Notifying user..." +
                     this.parseObjects.size() + " pins found");
             notifyUser();
@@ -248,7 +250,7 @@ public class LocationService extends Service implements
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
                         .setAutoCancel(true)
-                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setSmallIcon(R.drawable.app_logo_small)
                         .setContentTitle(Notifications.notifications[(int) (Math.random() * Notifications.notifications.length)])
                         .setContentText(this.parseObjects.size() + " time capsules around!")
                         .setSound(soundUri)
@@ -281,8 +283,8 @@ public class LocationService extends Service implements
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         locationRequest.setInterval(INTERVAL);
         locationRequest.setFastestInterval(FASTEST_INTERVAL);
-        Log.d(TAG, "Smallest displacement: " + Utils.MAP_RADIUS * 1000 / 2);
-        locationRequest.setSmallestDisplacement(Utils.MAP_RADIUS * 1000 / 2);
+        Log.d(TAG, "Smallest displacement: " + Utils.MAP_RADIUS * KM_TO_M / 2);
+        locationRequest.setSmallestDisplacement(Utils.MAP_RADIUS * KM_TO_M / 2);
 
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
@@ -335,6 +337,4 @@ public class LocationService extends Service implements
         random_loc.setLongitude(foundLongitude);
         return random_loc;
     }
-
-
 }
