@@ -27,7 +27,10 @@ import java.util.List;
 public class FlagsArrayAdapter extends ArrayAdapter<Flag> {
 
     private static final String TAG = "FlagsArrayAdapter";
+
     private Activity activity;
+
+    private final int TEXT_MAX_LENGTH_IN_PREVIEW = 30;
 
     public FlagsArrayAdapter(Context context, int layoutResourceId, List<Flag> data, Activity activity){
         super(context, layoutResourceId, data);
@@ -56,7 +59,14 @@ public class FlagsArrayAdapter extends ArrayAdapter<Flag> {
         TextView textView = (TextView)row.findViewById(R.id.flag_list_item_first_line);
         // final TextView subtitleTextView = (TextView)row.findViewById(R.id.flag_list_item_subtitle);
 
-        textView.setText(current_post.getText());
+        String flag_text = current_post.getText();
+        if(flag_text.length() > TEXT_MAX_LENGTH_IN_PREVIEW)
+        {
+            // If text is too long, only the first EXT_MAX_LENGTH_IN_PREVIEW will be shown in the preview
+            String flag_text_head = flag_text.substring(0, TEXT_MAX_LENGTH_IN_PREVIEW) + "...";
+            textView.setText(flag_text_head);
+        }
+        else textView.setText(flag_text);
 
         final String fbId = current_post.getFbId();
 

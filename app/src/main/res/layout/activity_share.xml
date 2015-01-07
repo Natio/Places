@@ -18,13 +18,14 @@
         android:layout_weight="0.1" />
 
     <EditText
+        android:inputType="textMultiLine|textNoSuggestions|textCapSentences"
         android:layout_marginTop="5dp"
         android:layout_width="fill_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_weight="0.65"
         android:textSize="25sp"
         android:id="@+id/share_text_field"
-        android:inputType="textImeMultiLine"
+        android:gravity="center_vertical|center_horizontal"
         android:paddingBottom="20dp" />
 
     <!-- <TableRow
