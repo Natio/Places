@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
@@ -63,6 +64,8 @@ public class PlacesApplication extends Application{
     //shared variable for handling weather conditions
     private static String weather = "";
 
+    public static PlacesApplication placesApplication;
+
     /**
      *
      * @return string representing weather conditions
@@ -106,6 +109,8 @@ public class PlacesApplication extends Application{
 
         PlacesApplication.PLACES_CONTEXT = this.getApplicationContext();
 
+        placesApplication = this;
+
         //initialize the location manager
 
         startLocationService();
@@ -146,12 +151,18 @@ public class PlacesApplication extends Application{
         });
     }
 
-    private void startLocationService() {
-        Intent locInt = new Intent(this, LocationService.class);
-        Log.d("Places Application", "Starting Location Service");
-//        stopService(locInt);
-        startService(locInt);
-        bindService(locInt, mConnection, BIND_AUTO_CREATE);
+    public void startLocationService() {
+        LocationManager locationManager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+            Intent locInt = new Intent(this, LocationService.class);
+            Log.d("Places Application", "Starting Location Service");
+    //        stopService(locInt);
+            startService(locInt);
+            bindService(locInt, mConnection, BIND_AUTO_CREATE);
+        }else{
+            Log.w("Places Application", "Location Service not started!");
+        }
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {

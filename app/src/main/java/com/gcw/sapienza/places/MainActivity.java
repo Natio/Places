@@ -322,6 +322,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                         break;
 
                 }
+            case Utils.GPS_ENABLE_REQUEST_CODE:
+                PlacesApplication.placesApplication.startLocationService();
         }
     }
 }
