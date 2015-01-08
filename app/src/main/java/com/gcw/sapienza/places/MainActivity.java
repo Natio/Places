@@ -1,10 +1,13 @@
 package com.gcw.sapienza.places;
 
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -271,7 +274,29 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         super.onResume();
         this.startTime = new Date().getTime();
 
-        PlacesApplication.placesApplication.startLocationService();
+        LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                &&!locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Location Services disabled");
+            builder.setCancelable(false);
+            builder.setMessage("Places requires Location Services to be turned on in order to work properly.\n" +
+                    "Edit Location Settings?");
+            builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    startActivityForResult(new Intent
+                            (android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), Utils.GPS_ENABLE_REQUEST_CODE);
+                }
+            });
+            builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    finish();
+                }
+            });
+            builder.create().show();
+        }else {
+            PlacesApplication.placesApplication.startLocationService();
+        }
 
         isForeground = true;
         Log.d(TAG,"resume");

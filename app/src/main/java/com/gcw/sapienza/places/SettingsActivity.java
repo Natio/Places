@@ -38,6 +38,7 @@ Toast radiusToast;
                 preference.getKey().equals("strangersFilter") ||
                 preference.getKey().equals("timeFilter"))
         {
+            Log.d(TAG, "Called onPreferenceChange for: " + preference.getKey());
             editor.putBoolean(preference.getKey(), (boolean)newValue);
             editor.commit();
         }
