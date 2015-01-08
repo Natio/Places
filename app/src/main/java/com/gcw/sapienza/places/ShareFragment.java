@@ -63,6 +63,8 @@ public class ShareFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        Log.d(TAG, "onCreateView");
+
         this.mView = inflater.inflate(R.layout.activity_share, container, false);
 
         this.textView = (TextView)mView.findViewById(R.id.share_text_field);
@@ -221,6 +223,8 @@ public class ShareFragment extends Fragment{
     public void onResume() {
         super.onResume();
 
+        Log.d(TAG, "Is Pic null? " + (pic == null));
+
         onVisiblePage();
     }
 
@@ -228,17 +232,17 @@ public class ShareFragment extends Fragment{
     {
         Log.v(TAG, "ShareFragment visible!");
 
-        this.mView = getView();
+        if(mView == null) mView = getView();
         if(mView != null)
         {
-            this.picButton = (Button) this.mView.findViewById(R.id.pic_button);
+            picButton = (Button) mView.findViewById(R.id.pic_button);
 
             if (pic != null) {
-                this.isPicTaken = true;
-                this.picButton.setText("Picture taken ✓");
+                isPicTaken = true;
+                picButton.setText("Picture taken ✓");
             } else {
-                this.isPicTaken = false;
-                this.picButton.setText("Attach picture");
+                isPicTaken = false;
+                picButton.setText("Attach picture");
             }
         }
     }
