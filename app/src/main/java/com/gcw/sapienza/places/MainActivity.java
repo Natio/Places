@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.Utils;
@@ -168,7 +169,11 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     protected void refresh()
     {
-        PlacesApplication.mService.queryParsewithLocation(PlacesApplication.getLocation());
+        if(PlacesApplication.getLocation() != null)
+            PlacesApplication.mService.queryParsewithLocation(PlacesApplication.getLocation());
+        else
+            Toast.makeText(this, "No location data available\n" +
+                    "Are Location Services enabled?", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -263,6 +268,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     {
         super.onResume();
         this.startTime = new Date().getTime();
+
+        PlacesApplication.placesApplication.startLocationService();
 
         isForeground = true;
         Log.d(TAG,"resume");

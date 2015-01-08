@@ -230,8 +230,10 @@ public class LocationService extends Service implements
         long elapsed_time = location.getTime() -
                 (this.location == null ? 0l : this.location.getTime());
         Log.d(TAG, "Elapsed time: " + elapsed_time);
-        float distance = location.distanceTo(this.location) / KM_TO_M;
-        Log.d(TAG, "Distance from last known location: " + distance);
+        if(this.location != null) {
+            float distance = location.distanceTo(this.location) / KM_TO_M;
+            Log.d(TAG, "Distance from last known location: " + distance);
+        }
         this.location = location;
         queryParsewithLocation(location);
         if(this.parseObjects != null && this.parseObjects.size() > 0

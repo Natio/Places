@@ -42,28 +42,6 @@ public class MosaicFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        LocationManager locationManager = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-                &&!locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            //GPS Provider disabled
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Location Services disabled.");  // GPS not found
-            builder.setMessage("Places needs Location Services to be turned on to work properly."); // Want to enable?
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    startActivityForResult(new Intent
-                            (android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), Utils.GPS_ENABLE_REQUEST_CODE);
-                }
-            });
-            builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    getActivity().finish();
-                    System.exit(0);
-                }
-            });
-            builder.create().show();
-        }
-
         view = inflater.inflate(R.layout.flags_list_layout, container, false);
 
         //retrieve the listviews
@@ -139,6 +117,32 @@ public class MosaicFragment extends Fragment{
         Utils.MAX_PINS = step;
         Log.d(TAG, "Updated max pins to " + Utils.MAX_PINS);
         updateHeaderText();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        LocationManager locationManager = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                &&!locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            //GPS Provider disabled
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Location Services disabled.");  // GPS not found
+            builder.setMessage("Places needs Location Services to be turned on to work properly."); // Want to enable?
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    startActivityForResult(new Intent
+                            (android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), Utils.GPS_ENABLE_REQUEST_CODE);
+                }
+            });
+            builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    getActivity().finish();
+                    System.exit(0);
+                }
+            });
+            builder.create().show();
+        }
     }
 
     public void updateHeaderText(){
