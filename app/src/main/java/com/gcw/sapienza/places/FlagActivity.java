@@ -76,7 +76,8 @@ public class FlagActivity extends Activity {
                 }
             });
         }
-        else  ((TextView)findViewById(R.id.author)).setText(Utils.userIdMap.get(id) + ", " + date + weatherString);
+        else  ((TextView)findViewById(R.id.author)).setText(Utils.userIdMap.get(id)
+                + ", " + date + weatherString + "\nCategory: " + category);
 
         if(!Utils.userProfilePicMapLarge.containsKey(id))
         {

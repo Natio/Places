@@ -87,7 +87,8 @@
             android:screenOrientation="portrait">
         </activity>
 
-        <activity android:name=".FlagActivity">
+        <activity android:name=".FlagActivity"
+            android:screenOrientation="portrait">
         </activity>
 
         <activity
