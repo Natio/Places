@@ -6,4 +6,10 @@
     <color name="white">#ffffffff</color>
     <color name="green">#00884a</color>
     <color name="grey">#ff888888</color>
+    <color name="yellow">#ffff00</color>
+    <color name="blue">#0000ff</color>
+    <color name="violet">#663399</color>
+    <color name="orange">#ffa500</color>
+    <color name="aqua">#69A583</color>
+    <color name="magenta">#ff00ff</color>
 </resources>

@@ -18,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gcw.sapienza.places.adapters.MSpinnerAdapter;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.Utils;
@@ -27,6 +28,7 @@ import com.parse.ParseGeoPoint;
 import com.parse.SaveCallback;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,13 +44,13 @@ public class ShareFragment extends Fragment{
     private Button shareButton;
     private Button picButton;
 
-    private Bitmap pic;
-    private MediaStore.Video video;
-    private MediaStore.Audio audio;
-
     private boolean isPicTaken = false;
     private boolean isVideoTaken = false;
     private boolean isSoundCaptured = false;
+
+    protected Bitmap pic;
+    protected MediaStore.Video video;
+    protected MediaStore.Audio audio;
 
     private final String FLAG_PLACED_TEXT = "Flag has been placed!";
     private final String ERROR_ENCOUNTERED_TEXT = "Error encountered while placing flag\nPlease try again";
@@ -77,9 +79,12 @@ public class ShareFragment extends Fragment{
         });
 
         this.spinner = (Spinner)this.mView.findViewById(R.id.spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
-                R.array.categories, R.layout.custom_spinner);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.categories, R.layout.custom_spinner);
+        // adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        MSpinnerAdapter adapter = new MSpinnerAdapter(getActivity().getApplicationContext(), Arrays.asList(getResources().getStringArray(R.array.categories)));
+
         this.spinner.setAdapter(adapter);
 
         return this.mView;
@@ -213,18 +218,28 @@ public class ShareFragment extends Fragment{
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
-        Log.v(TAG, "ShareFragment resumed!");
+        onVisiblePage();
+    }
 
-        if(pic != null)
+    public void onVisiblePage()
+    {
+        Log.v(TAG, "ShareFragment visible!");
+
+        this.mView = getView();
+        if(mView != null)
         {
-            this.isPicTaken = true;
-            this.mView = getView();
-            this.picButton = (Button)this.mView.findViewById(R.id.pic_button);
-            this.picButton.setText("Picture taken ✓");
+            this.picButton = (Button) this.mView.findViewById(R.id.pic_button);
+
+            if (pic != null) {
+                this.isPicTaken = true;
+                this.picButton.setText("Picture taken ✓");
+            } else {
+                this.isPicTaken = false;
+                this.picButton.setText("Attach picture");
+            }
         }
     }
 
@@ -234,9 +249,9 @@ public class ShareFragment extends Fragment{
         this.isVideoTaken = false;
         this.isSoundCaptured = false;
 
-        this.pic = null;
-        this.video = null;
-        this.audio = null;
+        pic = null;
+        video = null;
+        audio = null;
     }
 
     public void resetShareFragment(String toastText)
@@ -244,7 +259,7 @@ public class ShareFragment extends Fragment{
         this.mView = getView();
         this.textView.setText("");
         this.picButton = (Button)this.mView.findViewById(R.id.pic_button);
-        this.picButton.setText("Take a picture");
+        this.picButton.setText("Attach picture");
 
         hideKeyboard();
 
@@ -267,30 +282,6 @@ public class ShareFragment extends Fragment{
 
     public Button getPicButton() {
         return picButton;
-    }
-
-    public Bitmap getPic() {
-        return pic;
-    }
-
-    public void setPic(Bitmap pic) {
-        this.pic = pic;
-    }
-
-    public MediaStore.Video getVideo() {
-        return video;
-    }
-
-    public void setVideo(MediaStore.Video video) {
-        this.video = video;
-    }
-
-    public MediaStore.Audio getAudio() {
-        return audio;
-    }
-
-    public void setAudio(MediaStore.Audio audio) {
-        this.audio = audio;
     }
 
     public boolean isPicTaken() {

@@ -140,10 +140,10 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
     protected static float getCategoryColor(String category)
     {
         if (Utils.categories == null || category == null || category.equals(Utils.categories[0]) || category.equals(""))
-            return BitmapDescriptorFactory.HUE_CYAN;
+            return BitmapDescriptorFactory.HUE_RED;
         if (category.equals(Utils.categories[1])) return BitmapDescriptorFactory.HUE_AZURE;
-        else if (category.equals(Utils.categories[2])) return BitmapDescriptorFactory.HUE_BLUE;
-        else if (category.equals(Utils.categories[3])) return BitmapDescriptorFactory.HUE_GREEN;
-        else return BitmapDescriptorFactory.HUE_YELLOW; // 'Food' category
+        else if (category.equals(Utils.categories[2])) return BitmapDescriptorFactory.HUE_ORANGE;
+        else if (category.equals(Utils.categories[3])) return BitmapDescriptorFactory.HUE_BLUE;
+        else return BitmapDescriptorFactory.HUE_MAGENTA; // 'Food' category
     }
 }
