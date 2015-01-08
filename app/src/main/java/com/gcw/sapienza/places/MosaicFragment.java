@@ -75,6 +75,7 @@ public class MosaicFragment extends Fragment{
                 bundle.putString("date", sDate);
                 bundle.putByteArray("pic", ((Flag) parent.getItemAtPosition(position)).getPic());
                 bundle.putString("weather", ((Flag) parent.getItemAtPosition(position)).getWeather());
+                bundle.putString("category", ((Flag) parent.getItemAtPosition(position)).getCategory());
 
                 intent.putExtras(bundle);
 

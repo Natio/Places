@@ -25,6 +25,7 @@ public class FlagActivity extends Activity {
     private String date;
     private byte[] pic;
     private String weather;
+    private String category;
 
     private static final String TAG = "FlagActivity";
 
@@ -41,6 +42,7 @@ public class FlagActivity extends Activity {
         id = bundle.getString("id");
         date = bundle.getString("date");
         weather = bundle.getString("weather");
+        category = bundle.getString("category");
 
         ImageView iw = ((ImageView)findViewById(R.id.pic));
 
@@ -69,7 +71,8 @@ public class FlagActivity extends Activity {
                 @Override
                 public void run() {
                     if (!Utils.userIdMap.containsKey(id)) handler.postDelayed(this, Utils.UPDATE_DELAY);
-                    else ((TextView)findViewById(R.id.author)).setText(Utils.userIdMap.get(id) + ", " + date + weatherString);
+                    else ((TextView)findViewById(R.id.author)).setText(Utils.userIdMap.get(id) +
+                            ", " + date + weatherString + "\nCategory: " + category);
                 }
             });
         }
