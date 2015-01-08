@@ -103,7 +103,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         Resources res = getResources();
         Utils.categories = res.getStringArray(R.array.categories);
 
-        for(int i = 0; i < 3; i++) fragments[i].setRetainInstance(true);
+        for(int i = 0; i < fragments.length; i++) fragments[i].setRetainInstance(true);
     }
 
     private void startDownloadingFacebookInfo(){
@@ -417,7 +417,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                 PlacesApplication.placesApplication.startLocationService();
                 break;
             case Utils.LOGIN_REQUEST_CODE:
-                Log.d(TAG, "AAAAAAAAAAAAAAAAAAAAAA "+resultCode);
+
                 if(resultCode == RESULT_OK){
                     this.startDownloadingFacebookInfo();
                 }

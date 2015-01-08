@@ -72,12 +72,10 @@ public class LocationService extends Service implements
 
     private Location notificationLocation;
 
-    private static LocationService locationService;
 
     @Override
     public void onConnected(Bundle connectionHint)
     {
-        locationService = this;
         Log.d(TAG, "Connected to Google Api");
         Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
         if (currentLocation != null) {
@@ -140,16 +138,21 @@ public class LocationService extends Service implements
         Log.v(TAG, "Storytellers In The Dark enabled: " + storytellers_in_the_dark);
         Log.v(TAG, "Archaeologist enabled: " + archaeologist);
 
-        if(!FacebookUtils.getInstance().hasCurrentUserId())
+        if(FacebookUtils.getInstance().hasCurrentUserId() == false)
         {
             final android.os.Handler handler = new android.os.Handler();
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (FacebookUtils.getInstance().hasCurrentUserId()) handler.postDelayed(this, Utils.UPDATE_DELAY);
-                    else queryParsewithLocation(getLocation());
+                    if (FacebookUtils.getInstance().hasCurrentUserId() == false){
+                        handler.postDelayed(this, Utils.UPDATE_DELAY);
+                    }
+                    else{
+                        queryParsewithLocation(getLocation());
+                    }
                 }
             });
+            return;
         }
 
         if(!lone_wolf) query.whereNotEqualTo("fbId", FacebookUtils.getInstance().getCurrentUserId());
