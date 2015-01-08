@@ -120,31 +120,6 @@ public class MosaicFragment extends Fragment{
         updateHeaderText();
     }
 
-    @Override
-    public void onResume(){
-        super.onResume();
-        LocationManager locationManager = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-                &&!locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Location Services disabled");
-            builder.setMessage("Places requires Location Services to be turned on in order to work properly.\n" +
-                    "Edit Location Settings?");
-            builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    startActivityForResult(new Intent
-                            (android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), Utils.GPS_ENABLE_REQUEST_CODE);
-                }
-            });
-            builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    getActivity().finish();
-                }
-            });
-            builder.create().show();
-        }
-    }
-
     public void updateHeaderText(){
         textHeader.setText("within " + (int)(Utils.MAP_RADIUS * 1000) + " meters");
     }

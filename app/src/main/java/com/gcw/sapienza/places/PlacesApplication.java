@@ -113,7 +113,7 @@ public class PlacesApplication extends Application{
 
         //initialize the location manager
 
-        startLocationService();
+//        startLocationService();
 
         // initialize Parse.com
         ParseObject.registerSubclass(Flag.class);
