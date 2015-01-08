@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,8 @@ import android.widget.TextView;
 
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.utils.FacebookUtilCallback;
+import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
 
 import java.io.IOException;
@@ -70,42 +73,28 @@ public class FlagsArrayAdapter extends ArrayAdapter<Flag> {
 
         final String fbId = current_post.getFbId();
 
-        /*
-        if(!Utils.userIdMap.containsKey(fbId))
-        {
-            Utils.fetchFbUsername(fbId);
-
-            final Handler handler = new Handler();
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (!Utils.userIdMap.containsKey(fbId)) handler.postDelayed(this, Utils.UPDATE_DELAY);
-                    else subtitleTextView.setText(Utils.userIdMap.get(fbId));
-                }
-            });
-        }
-        else subtitleTextView.setText(Utils.userIdMap.get(fbId));
-        */
-
-        if(!Utils.userProfilePicMapSmall.containsKey(fbId))
-        {
+        String small_profile_pic_url = FacebookUtils.getInstance().getProfilePictureSmall(fbId);
+        if(small_profile_pic_url == null){
             try
             {
-                Utils.fetchFbProfilePic(fbId, Utils.SMALL_PIC_SIZE);
+                 FacebookUtils.getInstance().fetchFbProfilePic(fbId, FacebookUtils.SMALL_PIC_SIZE,new FacebookUtilCallback() {
+                     @Override
+                     public void onResult(String result, Exception e) {
+                         if(e != null){
+                             Log.d(TAG,e.getMessage());
+                             return;
+                         }
+                         FlagsArrayAdapter.this.streamProfilePicToAdapter(final_row, fbId);
+                     }
+                 });
             }
             catch(MalformedURLException mue){ mue.printStackTrace(); }
             catch (IOException ioe){ ioe.printStackTrace(); }
 
-            final Handler handler = new Handler();
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (!Utils.userProfilePicMapSmall.containsKey(fbId)) handler.postDelayed(this, Utils.UPDATE_DELAY);
-                    else streamProfilePicToAdapter(final_row, fbId);
-                }
-            });
         }
-        else streamProfilePicToAdapter(row, fbId);
+        else{
+            streamProfilePicToAdapter(row, fbId);
+        }
   
         return row;
     }
@@ -119,7 +108,8 @@ public class FlagsArrayAdapter extends ArrayAdapter<Flag> {
             {
                 try
                 {
-                    final Bitmap bitmap = BitmapFactory.decodeStream(new URL(Utils.userProfilePicMapSmall.get(fbId)).openConnection().getInputStream());
+                    String small_profile_pic_url = FacebookUtils.getInstance().getProfilePictureSmall(fbId);
+                    final Bitmap bitmap = BitmapFactory.decodeStream(new URL(small_profile_pic_url).openConnection().getInputStream());
 
                     activity.runOnUiThread(new Runnable() {
                         @Override

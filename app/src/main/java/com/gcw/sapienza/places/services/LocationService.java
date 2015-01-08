@@ -24,6 +24,7 @@ import com.gcw.sapienza.places.Notifications;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -139,31 +140,31 @@ public class LocationService extends Service implements
         Log.v(TAG, "Storytellers In The Dark enabled: " + storytellers_in_the_dark);
         Log.v(TAG, "Archaeologist enabled: " + archaeologist);
 
-        if(Utils.fbId.equals(""))
+        if(!FacebookUtils.getInstance().hasCurrentUserId())
         {
             final android.os.Handler handler = new android.os.Handler();
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (Utils.fbId.equals("")) handler.postDelayed(this, Utils.UPDATE_DELAY);
+                    if (FacebookUtils.getInstance().hasCurrentUserId()) handler.postDelayed(this, Utils.UPDATE_DELAY);
                     else queryParsewithLocation(getLocation());
                 }
             });
         }
 
-        if(!lone_wolf) query.whereNotEqualTo("fbId", Utils.fbId);
-        if(!with_friends_surrounded) query.whereNotContainedIn("fbId", Utils.friends); // this is rather expensive
+        if(!lone_wolf) query.whereNotEqualTo("fbId", FacebookUtils.getInstance().getCurrentUserId());
+        if(!with_friends_surrounded) query.whereNotContainedIn("fbId", FacebookUtils.getInstance().getFriends()); // this is rather expensive
         if(!storytellers_in_the_dark)
         {
             if(lone_wolf && with_friends_surrounded)
             {
                 ArrayList<String> meAndMyFriends = new ArrayList<>();
-                meAndMyFriends.add(Utils.fbId);
-                meAndMyFriends.addAll(Utils.friends);
+                meAndMyFriends.add(FacebookUtils.getInstance().getCurrentUserId());
+                meAndMyFriends.addAll(FacebookUtils.getInstance().getFriends());
                 query.whereContainedIn("fbId", meAndMyFriends);
             }
-            else if(lone_wolf) query.whereEqualTo("fbId", Utils.fbId);
-            else if(with_friends_surrounded) query.whereContainedIn("fbId", Utils.friends);
+            else if(lone_wolf) query.whereEqualTo("fbId", FacebookUtils.getInstance().getCurrentUserId());
+            else if(with_friends_surrounded) query.whereContainedIn("fbId", FacebookUtils.getInstance().getFriends());
             else
             {
                 Toast.makeText(getApplicationContext(), "You won't be able to see any flags with these settings", Toast.LENGTH_LONG).show();
@@ -237,7 +238,7 @@ public class LocationService extends Service implements
         this.location = location;
         queryParsewithLocation(location);
         if(this.parseObjects != null && this.parseObjects.size() > 0
-                && !MainActivity.isForeground() && !Utils.fbId.equals("")) {
+                && !MainActivity.isForeground() && !FacebookUtils.getInstance().hasCurrentUserId()) {
             Log.d(TAG, "Notifying user..." +
                     this.parseObjects.size() + " pins found");
             notifyUser();

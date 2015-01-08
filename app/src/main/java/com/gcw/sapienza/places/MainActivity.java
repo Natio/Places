@@ -2,6 +2,7 @@ package com.gcw.sapienza.places;
 
 import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,6 +26,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.gcw.sapienza.places.services.LocationService;
+import com.gcw.sapienza.places.utils.FacebookUtilCallback;
+import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseAnalytics;
 import com.parse.ParseFacebookUtils;
@@ -92,7 +95,23 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         mViewPager.setOnPageChangeListener(this);
         mViewPager.setCurrentItem(1);
 
-        Utils.makeMeRequest(); // retrieve user's Facebook ID
+        final ProgressDialog progress = new ProgressDialog(this);
+        progress.setTitle("Loading");
+        progress.setMessage("Wait while loading...");
+        progress.show();
+        FacebookUtils.getInstance().makeMeRequest(new FacebookUtilCallback() {
+            @Override
+            public void onResult(String result, Exception e) {
+                if(e != null){
+                    Log.d(TAG, e.getMessage());
+                    progress.setMessage(e.getMessage());
+                }
+                else{
+                    progress.dismiss();
+                    Log.d(TAG, result);
+                }
+            }
+        }); // retrieve user's Facebook ID
 
         Resources res = getResources();
         Utils.categories = res.getStringArray(R.array.categories);
@@ -149,7 +168,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         // Log the user out
         ParseUser.logOut();
 
-        Utils.clearUserData();
+        FacebookUtils.getInstance().clearUserData();
 
         // Go to the login view
         startLoginActivity();

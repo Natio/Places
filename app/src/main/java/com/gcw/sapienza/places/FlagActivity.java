@@ -5,10 +5,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gcw.sapienza.places.utils.FacebookUtilCallback;
+import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
 
 import java.io.IOException;
@@ -62,46 +65,56 @@ public class FlagActivity extends Activity {
 
         final String weatherString = (weather == null || weather.equals("")) ? "" : ", " + weather;
 
-        if(!Utils.userIdMap.containsKey(id))
-        {
-            Utils.fetchFbUsername(id);
+        String fb_user_id = FacebookUtils.getInstance().getUserNameFromId(this.id);
 
-            final Handler handler = new Handler();
-            handler.post(new Runnable() {
+        if(fb_user_id == null)
+        {
+            FacebookUtils.getInstance().fetchFbUsername(this.id, new FacebookUtilCallback() {
                 @Override
-                public void run() {
-                    if (!Utils.userIdMap.containsKey(id)) handler.postDelayed(this, Utils.UPDATE_DELAY);
-                    else ((TextView)findViewById(R.id.author)).setText(Utils.userIdMap.get(id) +
-                            ", " + date + weatherString + "\nCategory: " + category);
+                public void onResult(String result, Exception e) {
+                    if(e != null){
+                        Log.d(TAG, e.getMessage());
+                        return;
+                    }
+                    TextView author_tv = (TextView)findViewById(R.id.author);
+                    String author_text = result + ", " + date + weatherString + "\nCategory: " + category;
+                    author_tv.setText(author_text);
                 }
             });
-        }
-        else  ((TextView)findViewById(R.id.author)).setText(Utils.userIdMap.get(id)
-                + ", " + date + weatherString + "\nCategory: " + category);
 
-        if(!Utils.userProfilePicMapLarge.containsKey(id))
+        }
+        else{
+            ((TextView)findViewById(R.id.author)).setText(fb_user_id+ ", " + date + weatherString + "\nCategory: " + category);
+        }
+
+        String pic_large_url = FacebookUtils.getInstance().getProfilePictureLarge(this.id);
+        if(pic_large_url == null)
         {
             try
             {
-                Utils.fetchFbProfilePic(id, Utils.LARGE_PIC_SIZE);
+                FacebookUtils.getInstance().fetchFbProfilePic(this.id, FacebookUtils.LARGE_PIC_SIZE, new FacebookUtilCallback() {
+                    @Override
+                    public void onResult(String result, Exception e) {
+                        if(e != null){
+                            Log.d(TAG, e.getMessage());
+                            return;
+                        }
+                        FlagActivity.this.streamProfilePic(result);
+                    }
+                });
+
             }
             catch(MalformedURLException mue){ mue.printStackTrace(); }
             catch (IOException ioe){ ioe.printStackTrace(); }
 
-            final Handler handler = new Handler();
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (!Utils.userProfilePicMapLarge.containsKey(id)) handler.postDelayed(this, Utils.UPDATE_DELAY);
-                    else streamProfilePic();
-                }
-            });
+
         }
-        else streamProfilePic();
+        else{
+            this.streamProfilePic(pic_large_url);
+        }
     }
 
-    protected void streamProfilePic()
-    {
+    protected void streamProfilePic(final String image_url){
         new Thread(new Runnable()
         {
             @Override
@@ -109,7 +122,7 @@ public class FlagActivity extends Activity {
             {
                 try
                 {
-                    final Bitmap bitmap = BitmapFactory.decodeStream(new URL(Utils.userProfilePicMapLarge.get(id)).openConnection().getInputStream());
+                    final Bitmap bitmap = BitmapFactory.decodeStream(new URL(image_url).openConnection().getInputStream());
 
                     runOnUiThread(new Runnable() {
                         @Override

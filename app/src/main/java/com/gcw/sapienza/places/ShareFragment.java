@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -21,7 +20,7 @@ import android.widget.Toast;
 import com.gcw.sapienza.places.adapters.MSpinnerAdapter;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.services.LocationService;
-import com.gcw.sapienza.places.utils.Utils;
+import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
@@ -142,7 +141,7 @@ public class ShareFragment extends Fragment{
         final Flag f = new Flag();
         ParseGeoPoint p = new ParseGeoPoint(current_location.getLatitude(), current_location.getLongitude());
 
-        if(Utils.fbId.equals(""))
+        if(!FacebookUtils.getInstance().hasCurrentUserId())
         {
             Map<String, String> dimensions = new HashMap<>();
             dimensions.put("reason", "Share with No Facebook");
@@ -151,7 +150,7 @@ public class ShareFragment extends Fragment{
             return;
         }
         final String category = spinner.getSelectedItem().toString();
-        f.put("fbId", Utils.fbId);
+        f.put("fbId", FacebookUtils.getInstance().getCurrentUserId());
         f.put("category", category);
         f.put("location",p);
         f.put("text",this.textView.getText().toString());
