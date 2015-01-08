@@ -93,7 +93,8 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
                     {
                         initMap(googleMap);
 
-                        ((MainActivity)getActivity()).refresh();
+                        if(getActivity() != null)
+                            ((MainActivity)getActivity()).refresh();
                     }
                 }
             });
