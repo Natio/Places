@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -31,7 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
-
+import java.util.prefs.PreferenceChangeEvent;
 
 
 public class MainActivity extends ActionBarActivity implements ViewPager.OnPageChangeListener, SwipeRefreshLayout.OnRefreshListener {
@@ -42,8 +43,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     private long startTime = -1;///used to track session timing (statistics)
 
+    private static Fragment[] fragments = {new ShareFragment(), new MosaicFragment(), new MMapFragment()};
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    private Fragment[] fragments = {new ShareFragment(), new MosaicFragment(), new MMapFragment()};
     private ViewPager mViewPager;
     private SwipeRefreshLayout srl;
 
@@ -69,7 +70,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         Utils.mainActivity = this;
@@ -297,8 +299,6 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     public void takePic(View v)
     {
-
-
         startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE), Utils.PIC_CAPTURE_REQUEST_CODE);
     }
 
@@ -313,13 +313,27 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                 switch(resultCode)
                 {
                     case RESULT_OK:
+                        Log.v(TAG, "Camera Intent result OK");
                         // this.getShareFragment().setPicButtonAsPicTaken();
 
-                        if(data.getData() == null){
-                            this.getShareFragment().setPic ( (Bitmap)data.getExtras().get("data"));
+                        if(data.getData() == null)
+                        {
+                            Log.v(TAG, "getData() returns null in OnActivityResult");
+                            Bitmap image = (Bitmap)data.getExtras().get("data");
+
+                            if(image == null)
+                            {
+                                Toast.makeText(getApplicationContext(), "Error encountered while taking picture", Toast.LENGTH_LONG).show();
+                                Log.v(TAG, "Error encountered while taking picture");
+                            }
+
+                            this.getShareFragment().setPic((Bitmap)data.getExtras().get("data"));
                         }
-                        else{
-                            try{
+                        else
+                        {
+                            Log.v(TAG, "getData() is not null in OnActivityResult");
+                            try
+                            {
                                 this.getShareFragment().setPic (MediaStore.Images.Media.getBitmap(this.getContentResolver(), data.getData()));
                             }
                             catch (IOException ioe){
@@ -327,7 +341,9 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                             }
                         }
                         break;
-
+                    case RESULT_CANCELED:
+                        Log.v(TAG, "Camera Intent result canceled");
+                        break;
                 }
             case Utils.GPS_ENABLE_REQUEST_CODE:
                 PlacesApplication.placesApplication.startLocationService();
