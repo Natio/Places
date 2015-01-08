@@ -24,6 +24,7 @@ public class Utils
     public static final int PIC_CAPTURE_REQUEST_CODE = 91;
     public static final int SETTINGS_REQUEST_CODE = 92;
     public static final int GPS_ENABLE_REQUEST_CODE = 93;
+    public static final int LOGIN_REQUEST_CODE = 94;
 
     public static String[] categories;
 

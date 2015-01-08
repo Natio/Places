@@ -95,6 +95,18 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         mViewPager.setOnPageChangeListener(this);
         mViewPager.setCurrentItem(1);
 
+        if(ParseFacebookUtils.getSession() != null && ParseFacebookUtils.getSession().isOpened()){
+            this.startDownloadingFacebookInfo();
+        }
+
+
+        Resources res = getResources();
+        Utils.categories = res.getStringArray(R.array.categories);
+
+        for(int i = 0; i < 3; i++) fragments[i].setRetainInstance(true);
+    }
+
+    private void startDownloadingFacebookInfo(){
         final ProgressDialog progress = new ProgressDialog(this);
         progress.setTitle("Loading");
         progress.setMessage("Wait while loading...");
@@ -112,11 +124,6 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                 }
             }
         }); // retrieve user's Facebook ID
-
-        Resources res = getResources();
-        Utils.categories = res.getStringArray(R.array.categories);
-
-        for(int i = 0; i < 3; i++) fragments[i].setRetainInstance(true);
     }
 
     private void logRun() {
@@ -187,7 +194,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
             // builder.setAppLogo(R.drawable.app_logo);
 
-            startActivityForResult(builder.build(), 0);
+            startActivityForResult(builder.build(), Utils.LOGIN_REQUEST_CODE);
         }
     }
 
@@ -408,6 +415,14 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                 }
             case Utils.GPS_ENABLE_REQUEST_CODE:
                 PlacesApplication.placesApplication.startLocationService();
+                break;
+            case Utils.LOGIN_REQUEST_CODE:
+                Log.d(TAG, "AAAAAAAAAAAAAAAAAAAAAA "+resultCode);
+                if(resultCode == RESULT_OK){
+                    this.startDownloadingFacebookInfo();
+                }
+
+                break;
         }
     }
 }
