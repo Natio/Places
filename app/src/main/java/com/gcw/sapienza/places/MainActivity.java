@@ -171,7 +171,11 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     protected void refresh()
     {
-        PlacesApplication.mService.queryParsewithLocation(PlacesApplication.getLocation());
+        if(PlacesApplication.getLocation() != null)
+            PlacesApplication.mService.queryParsewithLocation(PlacesApplication.getLocation());
+        else
+            Toast.makeText(this, "No location data available\n" +
+                    "Are Location Services enabled?", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -267,6 +271,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         super.onResume();
         this.startTime = new Date().getTime();
 
+        PlacesApplication.placesApplication.startLocationService();
+
         isForeground = true;
         Log.d(TAG,"resume");
     }
@@ -339,6 +345,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                         Log.v(TAG, "Camera Intent result canceled");
                         break;
                 }
+            case Utils.GPS_ENABLE_REQUEST_CODE:
+                PlacesApplication.placesApplication.startLocationService();
         }
     }
 }
