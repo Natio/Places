@@ -37,7 +37,7 @@ public class ShareFragment extends Fragment{
 
     private static final String TAG = "ShareFragment";
 
-    private  View mView;
+    private static View mView;
 
     private Spinner spinner;
     private TextView textView;
@@ -48,9 +48,9 @@ public class ShareFragment extends Fragment{
     private boolean isVideoTaken = false;
     private boolean isSoundCaptured = false;
 
-    protected Bitmap pic;
-    protected MediaStore.Video video;
-    protected MediaStore.Audio audio;
+    protected static Bitmap pic;
+    protected static MediaStore.Video video;
+    protected static MediaStore.Audio audio;
 
     private final String FLAG_PLACED_TEXT = "Flag has been placed!";
     private final String ERROR_ENCOUNTERED_TEXT = "Error encountered while placing flag\nPlease try again";

@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.gcw.sapienza.places.services.LocationService;
@@ -236,7 +237,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
         MainActivity mainActivity;
 
-        public SectionsPagerAdapter(FragmentManager fm, MainActivity mainActivity) {
+        public SectionsPagerAdapter(FragmentManager fm, MainActivity mainActivity)
+        {
             super(fm);
             this.mainActivity = mainActivity;
         }
@@ -257,7 +259,16 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
             return null;
         }
 
-        public Fragment getItem(int i) {
+        /*
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object)
+        {
+            Log.d(TAG, "Item at position " + position + " was destroyed!");
+        }
+        */
+
+        public Fragment getItem(int i)
+        {
             if (mainActivity.fragments[i] == null)
             {
                 if(i == 0) mainActivity.fragments[i] = new ShareFragment();
