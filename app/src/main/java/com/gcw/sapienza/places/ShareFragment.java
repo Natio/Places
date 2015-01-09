@@ -11,8 +11,10 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,6 +44,7 @@ public class ShareFragment extends Fragment{
     private TextView textView;
     private Button shareButton;
     private Button picButton;
+    private FrameLayout progressBarHolder;
 
     private boolean isPicTaken = false;
     private boolean isVideoTaken = false;
@@ -50,6 +53,8 @@ public class ShareFragment extends Fragment{
     protected static Bitmap pic;
     protected static MediaStore.Video video;
     protected static MediaStore.Audio audio;
+
+    private final int ANIMATION_DURATION = 300;
 
     private final String FLAG_PLACED_TEXT = "Flag has been placed!";
     private final String ERROR_ENCOUNTERED_TEXT = "Error encountered while placing flag\nPlease try again";
@@ -65,6 +70,8 @@ public class ShareFragment extends Fragment{
         Log.d(TAG, "onCreateView");
 
         this.mView = inflater.inflate(R.layout.activity_share, container, false);
+
+        this.progressBarHolder = (FrameLayout)mView.findViewById(R.id.frame_layout);
 
         this.textView = (TextView)mView.findViewById(R.id.share_text_field);
         this.textView.setGravity(Gravity.CENTER);
@@ -181,6 +188,18 @@ public class ShareFragment extends Fragment{
                     }
                 }
 
+                getActivity().runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        AlphaAnimation inAnim = new AlphaAnimation(0, 1);
+                        inAnim.setDuration(ANIMATION_DURATION);
+                        progressBarHolder.setAnimation(inAnim);
+                        progressBarHolder.setVisibility(View.VISIBLE);
+                    }
+                });
+
                 f.saveInBackground(new SaveCallback()
                 {
                     @Override
@@ -203,6 +222,19 @@ public class ShareFragment extends Fragment{
 
                             resetShareFragment(FLAG_PLACED_TEXT);
                         }
+
+                        getActivity().runOnUiThread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                AlphaAnimation outAnim = new AlphaAnimation(1, 0);
+                                outAnim.setDuration(ANIMATION_DURATION);
+                                progressBarHolder.setAnimation(outAnim);
+                                progressBarHolder.setVisibility(View.GONE);
+                            }
+                        });
+
                         resetMedia();
                     }
                 });
