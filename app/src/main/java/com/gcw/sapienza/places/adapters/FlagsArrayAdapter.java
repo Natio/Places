@@ -15,9 +15,12 @@ import android.widget.TextView;
 
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.utils.CropCircleTransformation;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Transformation;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -34,6 +37,11 @@ public class FlagsArrayAdapter extends ArrayAdapter<Flag> {
     private Activity activity;
 
     private final int TEXT_MAX_LENGTH_IN_PREVIEW = 30;
+
+    /**
+     * Transformation that will be applied to profile pictures
+     */
+    private final Transformation transformation = new CropCircleTransformation();
 
     public FlagsArrayAdapter(Context context, int layoutResourceId, List<Flag> data, Activity activity){
         super(context, layoutResourceId, data);
@@ -54,6 +62,7 @@ public class FlagsArrayAdapter extends ArrayAdapter<Flag> {
         }
 
         final View final_row = row;
+        final ImageView imageView = (ImageView) final_row.findViewById(R.id.flag_list_item_pic);
 
         //obtain current post
         final Flag current_post =  this.getItem(position);
@@ -79,26 +88,39 @@ public class FlagsArrayAdapter extends ArrayAdapter<Flag> {
             {
                  FacebookUtils.getInstance().fetchFbProfilePic(fbId, FacebookUtils.SMALL_PIC_SIZE,new FacebookUtilCallback() {
                      @Override
-                     public void onResult(String result, Exception e) {
+                     public void onResult(String result_url, Exception e) {
                          if(e != null){
                              Log.d(TAG,e.getMessage());
                              return;
                          }
-                         FlagsArrayAdapter.this.streamProfilePicToAdapter(final_row, fbId);
+                         FlagsArrayAdapter.this.loadImageFromUrl(imageView, result_url);
+                         //streamProfilePicToAdapter(final_row, fbId);
                      }
                  });
             }
-            catch(MalformedURLException mue){ mue.printStackTrace(); }
-            catch (IOException ioe){ ioe.printStackTrace(); }
+            catch (IOException ioe){
+                ioe.printStackTrace();
+            }
 
         }
         else{
-            streamProfilePicToAdapter(row, fbId);
+            //streamProfilePicToAdapter(row, fbId);
+            this.loadImageFromUrl(imageView, small_profile_pic_url);
         }
   
         return row;
     }
 
+
+
+    private void loadImageFromUrl(ImageView imageView, String image_url){
+        //Picasso.with(this.getContext()).load(image_url).transform(this.transformation).into(imageView);
+        Picasso.with(this.getContext()).load(image_url).into(imageView);
+    }
+
+
+    //now USE loadImageFromUrl that has image caching
+    @Deprecated
     protected void streamProfilePicToAdapter(final View row, final String fbId)
     {
         new Thread(new Runnable()

@@ -26,6 +26,7 @@ import com.gcw.sapienza.places.services.LocationService.LocalBinder;
 //Parse push notifications
 import com.parse.ParsePush;
 import com.parse.SaveCallback;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.List;
@@ -107,13 +108,15 @@ public class PlacesApplication extends Application{
     public void onCreate() {
         super.onCreate();
 
+
         PlacesApplication.PLACES_CONTEXT = this.getApplicationContext();
 
         placesApplication = this;
 
-        //initialize the location manager
+        if(BuildConfig.DEBUG){
+            Picasso.with(this).setIndicatorsEnabled(true); // if in debug show color indicators on pictures
+        }
 
-//        startLocationService();
 
         // initialize Parse.com
         ParseObject.registerSubclass(Flag.class);

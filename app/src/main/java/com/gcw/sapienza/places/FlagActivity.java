@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -94,12 +95,13 @@ public class FlagActivity extends Activity {
             {
                 FacebookUtils.getInstance().fetchFbProfilePic(this.id, FacebookUtils.LARGE_PIC_SIZE, new FacebookUtilCallback() {
                     @Override
-                    public void onResult(String result, Exception e) {
+                    public void onResult(String result_url, Exception e) {
                         if(e != null){
                             Log.d(TAG, e.getMessage());
                             return;
                         }
-                        FlagActivity.this.streamProfilePic(result);
+                        //FlagActivity.this.streamProfilePic(result);
+                        FlagActivity.this.loadProfilePictureFromUrl(result_url);
                     }
                 });
 
@@ -110,10 +112,15 @@ public class FlagActivity extends Activity {
 
         }
         else{
-            this.streamProfilePic(pic_large_url);
+            this.loadProfilePictureFromUrl(pic_large_url);
         }
     }
 
+    private void loadProfilePictureFromUrl(String url){
+        Picasso.with(this.getApplicationContext()).load(url).into((ImageView)findViewById(R.id.profile_pic));
+    }
+
+    @Deprecated //use loadProfilePictureFromUrl
     protected void streamProfilePic(final String image_url){
         new Thread(new Runnable()
         {
