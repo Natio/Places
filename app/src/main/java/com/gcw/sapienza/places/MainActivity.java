@@ -162,11 +162,13 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
             ParseAnalytics.trackEventInBackground("logout");
             logout();
         }
+        /*
         else if(id == R.id.action_refresh)
         {
             ParseAnalytics.trackEventInBackground("refresh");
             refresh();
         }
+        */
 
         return super.onOptionsItemSelected(item);
     }

@@ -155,8 +155,6 @@ public class LocationService extends Service implements
             return;
         }
 
-        if(!lone_wolf) query.whereNotEqualTo("fbId", FacebookUtils.getInstance().getCurrentUserId());
-        if(!with_friends_surrounded) query.whereNotContainedIn("fbId", FacebookUtils.getInstance().getFriends()); // this is rather expensive
         if(!storytellers_in_the_dark)
         {
             if(lone_wolf && with_friends_surrounded)
@@ -183,6 +181,13 @@ public class LocationService extends Service implements
 
                 return;
             }
+        }
+        else
+        {
+            if (!lone_wolf)
+                query.whereNotEqualTo("fbId", FacebookUtils.getInstance().getCurrentUserId());
+            if (!with_friends_surrounded)
+                query.whereNotContainedIn("fbId", FacebookUtils.getInstance().getFriends()); // this is rather expensive
         }
 
         if(archaeologist) query.orderByAscending("createdAt");

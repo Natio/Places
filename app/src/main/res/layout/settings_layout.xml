@@ -41,9 +41,15 @@
             android:progress="1"
             android:key="maxFetch"
             />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="About">
+
         <Preference
             android:key="version"
-            android:title="Places Version" />
+            android:title="Places version" />
 
     </PreferenceCategory>
 

@@ -3,7 +3,7 @@
 
     <string name="app_name">Places</string>
     <string name="action_settings">Settings</string>
-    <string name="action_logout">Log Out</string>
+    <string name="action_logout">Log out</string>
     <string name="action_refresh">Refresh</string>
     <string name="app_id">883622278337228</string>
     <string name="mosaic">Flags nearby</string>
