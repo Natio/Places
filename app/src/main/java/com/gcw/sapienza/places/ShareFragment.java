@@ -229,7 +229,7 @@ public class ShareFragment extends Fragment{
                     {
                         Log.v(TAG, "Successfully retrieved recording.");
 
-                        ParseFile parse_audio = new ParseFile(System.currentTimeMillis()+"", ShareFragment.audio);
+                        ParseFile parse_audio = new ParseFile(System.currentTimeMillis()+".3gp", ShareFragment.audio);
                         parse_audio.saveInBackground();
                         f.put("audio", parse_audio);
                     }
