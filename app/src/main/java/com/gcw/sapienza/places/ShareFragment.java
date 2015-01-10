@@ -230,6 +230,7 @@ public class ShareFragment extends Fragment{
                         Log.v(TAG, "Successfully retrieved recording.");
 
                         ParseFile parse_audio = new ParseFile(System.currentTimeMillis()+".3gp", ShareFragment.audio);
+
                         // TODO maybe we should wait for it, in the meantime showing a progress bar
                         parse_audio.saveInBackground();
                         f.put("audio", parse_audio);
