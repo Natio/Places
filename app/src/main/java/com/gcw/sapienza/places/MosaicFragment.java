@@ -1,20 +1,17 @@
 package com.gcw.sapienza.places;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,8 +24,8 @@ import com.gcw.sapienza.places.adapters.FlagsArrayAdapter;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
+import com.parse.ParseFile;
 import com.parse.DeleteCallback;
-import com.parse.ParseException;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -65,8 +62,13 @@ public class MosaicFragment extends Fragment{
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 0) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(Utils.VIBRATION_DURATION);
+
+                if(position == 0)
+                {
                     startActivity(new Intent(getActivity().getApplicationContext(), SettingsActivity.class));
                     return;
                 }
@@ -79,12 +81,23 @@ public class MosaicFragment extends Fragment{
 
                 Bundle bundle = new Bundle();
 
-                bundle.putString("text", ((Flag) parent.getItemAtPosition(position)).getText());
-                bundle.putString("id", ((Flag) parent.getItemAtPosition(position)).getFbId());
-                bundle.putString("date", sDate);
-                bundle.putByteArray("pic", ((Flag) parent.getItemAtPosition(position)).getPic());
-                bundle.putString("weather", ((Flag) parent.getItemAtPosition(position)).getWeather());
-                bundle.putString("category", ((Flag) parent.getItemAtPosition(position)).getCategory());
+                    bundle.putString("text", ((Flag) parent.getItemAtPosition(position)).getText());
+                    bundle.putString("id", ((Flag) parent.getItemAtPosition(position)).getFbId());
+                    bundle.putString("date", sDate);
+                    bundle.putByteArray("pic", ((Flag) parent.getItemAtPosition(position)).getPic());
+                    bundle.putString("weather", ((Flag) parent.getItemAtPosition(position)).getWeather());
+                    bundle.putString("category", ((Flag) parent.getItemAtPosition(position)).getCategory());
+
+                try {
+                    ParseFile audio_file;
+                    if((audio_file = ((Flag) parent.getItemAtPosition(position)).getAudio()) != null)
+                    bundle.putByteArray("audio", audio_file.getData());
+                }
+                catch(com.parse.ParseException pe)
+                {
+                    Log.v(TAG, "Parse file couldn't be retrieved");
+                    pe.printStackTrace();
+                }
 
                 intent.putExtras(bundle);
 
@@ -152,7 +165,7 @@ public class MosaicFragment extends Fragment{
             case Utils.DELETE_POST:
                 sel_usr.deleteInBackground(new DeleteCallback() {
                     @Override
-                    public void done(ParseException e) {
+                    public void done(com.parse.ParseException e) {
                         Toast.makeText(getActivity(), "Flag deleted", Toast.LENGTH_SHORT);
                         Utils.mainActivity.refresh();
                     }

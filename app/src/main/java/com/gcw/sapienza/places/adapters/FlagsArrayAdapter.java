@@ -114,7 +114,7 @@ public class FlagsArrayAdapter extends ArrayAdapter<Flag> {
 
 
     private void loadImageFromUrl(ImageView imageView, String image_url){
-        //Picasso.with(this.getContext()).load(image_url).transform(this.transformation).into(imageView);
+        // Picasso.with(this.getContext()).load(image_url).transform(this.transformation).into(imageView);
         Picasso.with(this.getContext()).load(image_url).into(imageView);
     }
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,12 +25,15 @@ import com.gcw.sapienza.places.adapters.MSpinnerAdapter;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.FacebookUtils;
+import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.SaveCallback;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,26 +48,37 @@ public class ShareFragment extends Fragment{
     private Spinner spinner;
     private TextView textView;
     private Button shareButton;
-    private Button picButton;
     private FrameLayout progressBarHolder;
 
-    private boolean isPicTaken = false;
-    private boolean isVideoTaken = false;
-    private boolean isSoundCaptured = false;
+    protected static ImageView picButton;
+    protected static ImageView micButton;
+    protected static ImageView vidButton;
 
-    protected static Bitmap pic;
-    protected static MediaStore.Video video;
-    protected static MediaStore.Audio audio;
+    protected static boolean clearMedia = true;
 
-    private final int ANIMATION_DURATION = 300;
+    protected static boolean isPicTaken = false;
+    protected static boolean isVideoShoot = false;
+    protected static boolean isSoundCaptured = false;
 
-    private final String FLAG_PLACED_TEXT = "Flag has been placed!";
-    private final String ERROR_ENCOUNTERED_TEXT = "Error encountered while placing flag\nPlease try again";
-    private final String FB_ID_NOT_FOUND_TEXT = "Couldn't retrieve your Facebook credentials\nPlease check your internet connection.";
-    private final String EMPTY_FLAG_TEXT = "Please insert text or take a picture";
-    private final String ENABLE_NETWORK_SERVICE_TEXT = "Please enable GPS/Network service";
-    private final String PIC_NOT_FOUND_TEXT = "Error encountered while retrieving picture\nFlag won't be stored";
+    protected static Bitmap pic; // for compatibiity
+    protected static byte[] picture;
+    protected static byte[] video;
+    protected static byte[] audio;
 
+    private static final int ANIMATION_DURATION = 300;
+
+    private static final String FLAG_PLACED_TEXT = "Flag has been placed!";
+    private static final String ERROR_ENCOUNTERED_TEXT = "Error encountered while placing flag\nPlease try again";
+    private static final String FB_ID_NOT_FOUND_TEXT = "Couldn't retrieve your Facebook credentials\nPlease check your internet connection.";
+    private static final String EMPTY_FLAG_TEXT = "Please insert text or take a picture";
+    private static final String ENABLE_NETWORK_SERVICE_TEXT = "Please enable GPS/Network service";
+    private static final String PIC_NOT_FOUND_TEXT = "Error encountered while retrieving picture\nFlag won't be stored";
+    private static final String AUDIO_NOT_FOUND_TEXT = "Error encountered while retrieving recording\nFlag won't be stored";
+    private static final String VIDEO_NOT_FOUND_TEXT = "Error encountered while retrieving video\nFlag won't be stored";
+
+    protected static final float MEDIA_AVAILABLE_ALPHA = 0.3f;
+
+    protected static final int CHUNK_SIZE = 4096;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -72,6 +88,14 @@ public class ShareFragment extends Fragment{
         this.mView = inflater.inflate(R.layout.activity_share, container, false);
 
         this.progressBarHolder = (FrameLayout)mView.findViewById(R.id.frame_layout);
+
+        this.picButton = (ImageView)mView.findViewById(R.id.pic_button);
+        this.micButton = (ImageView)mView.findViewById(R.id.mic_button);
+        this.vidButton = (ImageView)mView.findViewById(R.id.vid_button);
+
+        this.picButton.setOnLongClickListener((View.OnLongClickListener)getActivity());
+        this.micButton.setOnLongClickListener((View.OnLongClickListener)getActivity());
+        this.vidButton.setOnLongClickListener((View.OnLongClickListener)getActivity());
 
         this.textView = (TextView)mView.findViewById(R.id.share_text_field);
         this.textView.setGravity(Gravity.CENTER);
@@ -156,7 +180,12 @@ public class ShareFragment extends Fragment{
             resetShareFragment(FB_ID_NOT_FOUND_TEXT);
             return;
         }
+
+        Vibrator vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(Utils.VIBRATION_DURATION);
+
         final String category = spinner.getSelectedItem().toString();
+
         f.put("fbId", FacebookUtils.getInstance().getCurrentUserId());
         f.put("category", category);
         f.put("location",p);
@@ -169,11 +198,11 @@ public class ShareFragment extends Fragment{
             @Override
             public void run() {
 
-                if (ShareFragment.this.isPicTaken)
+                if (ShareFragment.isPicTaken)
                 {
                     if (pic == null)
                     {
-                        Toast.makeText(getActivity(), "Error encountered while retrieving picture\nFlag won't be stored",
+                        Toast.makeText(getActivity(), PIC_NOT_FOUND_TEXT,
                                 Toast.LENGTH_LONG).show();
                         return;
                     }
@@ -185,6 +214,24 @@ public class ShareFragment extends Fragment{
                         pic.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                         byte[] byteArray = stream.toByteArray();
                         f.put("pic", byteArray);
+                    }
+                }
+
+                if (ShareFragment.isSoundCaptured)
+                {
+                    if (audio == null)
+                    {
+                        Toast.makeText(getActivity(), AUDIO_NOT_FOUND_TEXT,
+                                Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    else
+                    {
+                        Log.v(TAG, "Successfully retrieved recording.");
+
+                        ParseFile parse_audio = new ParseFile(System.currentTimeMillis()+"", ShareFragment.audio);
+                        parse_audio.saveInBackground();
+                        f.put("audio", parse_audio);
                     }
                 }
 
@@ -246,15 +293,13 @@ public class ShareFragment extends Fragment{
     protected void setPicButtonAsPicTaken()
     {
         this.mView = getView();
-        this.picButton = (Button)this.mView.findViewById(R.id.pic_button);
-        this.picButton.setText("Picture taken ✓");
+        this.picButton = (ImageView)this.mView.findViewById(R.id.pic_button);
+        this.picButton.setAlpha(MEDIA_AVAILABLE_ALPHA);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
-        Log.d(TAG, "Is Pic null? " + (pic == null));
 
         onVisiblePage();
     }
@@ -266,14 +311,23 @@ public class ShareFragment extends Fragment{
         if(mView == null) mView = getView();
         if(mView != null)
         {
-            picButton = (Button) mView.findViewById(R.id.pic_button);
+            picButton = (ImageView)mView.findViewById(R.id.pic_button);
+            micButton = (ImageView)mView.findViewById(R.id.mic_button);
 
             if (pic != null) {
                 isPicTaken = true;
-                picButton.setText("Picture taken ✓");
+                this.picButton.setAlpha(MEDIA_AVAILABLE_ALPHA);
             } else {
                 isPicTaken = false;
-                picButton.setText("Attach picture");
+                this.picButton.setAlpha(1f);
+            }
+
+            if (audio != null) {
+                isSoundCaptured = true;
+                this.micButton.setAlpha(MEDIA_AVAILABLE_ALPHA);
+            } else {
+                isSoundCaptured = false;
+                this.micButton.setAlpha(1f);
             }
         }
     }
@@ -281,20 +335,27 @@ public class ShareFragment extends Fragment{
     protected void resetMedia()
     {
         this.isPicTaken = false;
-        this.isVideoTaken = false;
+        this.isVideoShoot = false;
         this.isSoundCaptured = false;
 
         pic = null;
         video = null;
         audio = null;
+
+        Log.v(TAG, "Media has been cleared!");
     }
 
     public void resetShareFragment(String toastText)
     {
         this.mView = getView();
+
         this.textView.setText("");
-        this.picButton = (Button)this.mView.findViewById(R.id.pic_button);
-        this.picButton.setText("Attach picture");
+
+        this.picButton = (ImageView)this.mView.findViewById(R.id.pic_button);
+        this.picButton.setAlpha(1f);
+
+        this.micButton = (ImageView)this.mView.findViewById(R.id.mic_button);
+        this.micButton.setAlpha(1f);
 
         hideKeyboard();
 
@@ -310,37 +371,4 @@ public class ShareFragment extends Fragment{
             inputMethodManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
         }
     }
-
-    //=========================================
-    // Getters & Setters
-    //=========================================
-
-    public Button getPicButton() {
-        return picButton;
-    }
-
-    public boolean isPicTaken() {
-        return isPicTaken;
-    }
-
-    public void setPicTaken(boolean isPicTaken) {
-        this.isPicTaken = isPicTaken;
-    }
-
-    public boolean isVideoTaken() {
-        return isVideoTaken;
-    }
-
-    public void setVideoTaken(boolean isVideoTaken) {
-        this.isVideoTaken = isVideoTaken;
-    }
-
-    public boolean isSoundCaptured() {
-        return isSoundCaptured;
-    }
-
-    public void setSoundCaptured(boolean isSoundCaptured) {
-        this.isSoundCaptured = isSoundCaptured;
-    }
-
 }
