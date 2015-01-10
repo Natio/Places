@@ -137,6 +137,7 @@ public class PlacesApplication extends Application{
 
 
         //Parse push notifications
+        ParsePush.subscribeInBackground("Developers"); //TODO developers channel, remove for user version
         subscribeToParseBroadcast();
 
     }

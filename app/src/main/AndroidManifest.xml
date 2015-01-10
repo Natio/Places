@@ -138,6 +138,9 @@
             </intent-filter>
         </receiver>
 
+        <!-- replace @drawable/push_icon with your push icon identifier -->
+        <meta-data android:name="com.parse.push.notification_icon" android:resource="@drawable/app_logo_small"/>
+
     </application>
 
 </manifest>
