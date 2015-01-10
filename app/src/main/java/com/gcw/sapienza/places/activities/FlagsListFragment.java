@@ -97,53 +97,14 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
         flagViewHolder.main_text.setText(f.getText());
 
         String user_id = f.getFbId();
-        final String fb_user_name = FacebookUtils.getInstance().getUserNameFromId(user_id);
 
-        if(fb_user_name == null)
-        {
-            FacebookUtils.getInstance().fetchFbUsername(user_id, new FacebookUtilCallback() {
-                @Override
-                public void onResult(String result, Exception e) {
-                    if(e != null){
-                        Log.d(TAG, e.getMessage());
-                        return;
-                    }
-                    flagViewHolder.username.setText(result);
-                }
-            });
-
-        }
-        else{
-            flagViewHolder.username.setText(fb_user_name);
-        }
-
-
-        final String small_profile_pic_url = FacebookUtils.getInstance().getProfilePictureSmall(user_id);
-        if(small_profile_pic_url == null){
-            try
-            {
-                FacebookUtils.getInstance().fetchFbProfilePic(user_id, FacebookUtils.SMALL_PIC_SIZE,new FacebookUtilCallback() {
-                    @Override
-                    public void onResult(String result_url, Exception e) {
-                        if(e != null){
-                            Log.d(TAG,e.getMessage());
-                            return;
-                        }
-                        FacebookUtils.getInstance().getProfilePictureSmall(fb_user_name);
-                        Picasso.with(FlagsAdapter.this.context).load(result_url).transform(transformation).into(flagViewHolder.user_profile_pic);
-                        //streamProfilePicToAdapter(final_row, fbId);
-                    }
-                });
+        FacebookUtils.getInstance().loadUsernameIntoTextView(user_id, flagViewHolder.username);
+        FacebookUtils.getInstance().getFbProfilePictureURL(user_id, FacebookUtils.PicSize.SMALL, new FacebookUtilCallback() {
+            @Override
+            public void onResult(String result, Exception e) {
+                Picasso.with(FlagsAdapter.this.context).load(result).transform(transformation).into(flagViewHolder.user_profile_pic);
             }
-            catch (IOException ioe){
-                ioe.printStackTrace();
-            }
-
-        }
-        else{
-            //streamProfilePicToAdapter(row, fbId);
-            Picasso.with(FlagsAdapter.this.context).load(small_profile_pic_url).transform(transformation).into(flagViewHolder.user_profile_pic);
-        }
+        });
 
         byte[] pic = f.getPic();
         if(pic != null){

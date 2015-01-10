@@ -4,19 +4,14 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
-import android.media.MediaFormat;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Handler;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
-import com.gcw.sapienza.places.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -82,57 +77,22 @@ public class FlagActivity extends Activity {
         }
 
         ((EditText)findViewById(R.id.text)).setText(text);
-
         final String weatherString = (weather == null || weather.equals("")) ? "" : ", " + weather;
 
-        String fb_user_id = FacebookUtils.getInstance().getUserNameFromId(this.id);
-
-        if(fb_user_id == null)
-        {
-            FacebookUtils.getInstance().fetchFbUsername(this.id, new FacebookUtilCallback() {
-                @Override
-                public void onResult(String result, Exception e) {
-                    if(e != null){
-                        Log.d(TAG, e.getMessage());
-                        return;
-                    }
-                    TextView author_tv = (TextView)findViewById(R.id.author);
-                    String author_text = result + ", " + date + weatherString + "\nCategory: " + category;
-                    author_tv.setText(author_text);
-                }
-            });
-
-        }
-        else{
-            ((TextView)findViewById(R.id.author)).setText(fb_user_id+ ", " + date + weatherString + "\nCategory: " + category);
-        }
-
-        String pic_large_url = FacebookUtils.getInstance().getProfilePictureLarge(this.id);
-        if(pic_large_url == null)
-        {
-            try
-            {
-                FacebookUtils.getInstance().fetchFbProfilePic(this.id, FacebookUtils.LARGE_PIC_SIZE, new FacebookUtilCallback() {
-                    @Override
-                    public void onResult(String result_url, Exception e) {
-                        if(e != null){
-                            Log.d(TAG, e.getMessage());
-                            return;
-                        }
-                        //FlagActivity.this.streamProfilePic(result);
-                        FlagActivity.this.loadProfilePictureFromUrl(result_url);
-                    }
-                });
-
+        final String bottomLineText = ", " + date + weatherString + "\nCategory: " + category;
+        final TextView authorTextView = (TextView)findViewById(R.id.author);
+        FacebookUtils.getInstance().getFacebookUsernameFromID(this.id, new FacebookUtilCallback() {
+            @Override
+            public void onResult(String result, Exception e) {
+                authorTextView.setText(result+bottomLineText);
             }
-            catch(MalformedURLException mue){ mue.printStackTrace(); }
-            catch (IOException ioe){ ioe.printStackTrace(); }
+        });
 
 
-        }
-        else{
-            this.loadProfilePictureFromUrl(pic_large_url);
-        }
+        ImageView profilePicimageView = (ImageView)findViewById(R.id.profile_pic);
+
+        FacebookUtils.getInstance().loadProfilePicIntoImageView(this.id, profilePicimageView, FacebookUtils.PicSize.LARGE);
+
     }
 
     private void playRecording(byte[] sound_array)
@@ -169,6 +129,7 @@ public class FlagActivity extends Activity {
         }
     }
 
+    @Deprecated
     private void loadProfilePictureFromUrl(String url){
         Picasso.with(this.getApplicationContext()).load(url).into((ImageView)findViewById(R.id.profile_pic));
     }

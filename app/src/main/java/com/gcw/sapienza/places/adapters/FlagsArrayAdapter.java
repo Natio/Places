@@ -82,37 +82,14 @@ public class FlagsArrayAdapter extends ArrayAdapter<Flag> {
 
         final String fbId = current_post.getFbId();
 
-        String small_profile_pic_url = FacebookUtils.getInstance().getProfilePictureSmall(fbId);
-        if(small_profile_pic_url == null){
-            try
-            {
-                 FacebookUtils.getInstance().fetchFbProfilePic(fbId, FacebookUtils.SMALL_PIC_SIZE,new FacebookUtilCallback() {
-                     @Override
-                     public void onResult(String result_url, Exception e) {
-                         if(e != null){
-                             Log.d(TAG,e.getMessage());
-                             return;
-                         }
-                         FlagsArrayAdapter.this.loadImageFromUrl(imageView, result_url);
-                         //streamProfilePicToAdapter(final_row, fbId);
-                     }
-                 });
-            }
-            catch (IOException ioe){
-                ioe.printStackTrace();
-            }
+        //load profile picture into imageView
+        FacebookUtils.getInstance().loadProfilePicIntoImageView(fbId, imageView, FacebookUtils.PicSize.SMALL);
 
-        }
-        else{
-            //streamProfilePicToAdapter(row, fbId);
-            this.loadImageFromUrl(imageView, small_profile_pic_url);
-        }
-  
         return row;
     }
 
 
-
+    @Deprecated
     private void loadImageFromUrl(ImageView imageView, String image_url){
         // Picasso.with(this.getContext()).load(image_url).transform(this.transformation).into(imageView);
         Picasso.with(this.getContext()).load(image_url).into(imageView);
