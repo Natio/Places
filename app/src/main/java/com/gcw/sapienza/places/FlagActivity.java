@@ -3,6 +3,7 @@ package com.gcw.sapienza.places;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.AudioManager;
 import android.media.MediaFormat;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -38,6 +39,8 @@ public class FlagActivity extends Activity {
 
     private byte[] pic;
     private byte[] audio;
+
+    private MediaPlayer mediaPlayer;
 
     private static final String TAG = "FlagActivity";
 
@@ -142,7 +145,17 @@ public class FlagActivity extends Activity {
             outStream.write(sound_array);
             outStream.close();
 
-            MediaPlayer mediaPlayer = new MediaPlayer();
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+            {
+                @Override
+                public void onCompletion(MediaPlayer mp)
+                {
+                    mp.release();
+                }
+            });
 
             FileInputStream inStream = new FileInputStream(temp);
             mediaPlayer.setDataSource(inStream.getFD());

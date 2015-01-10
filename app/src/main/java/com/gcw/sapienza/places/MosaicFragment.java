@@ -1,11 +1,8 @@
 package com.gcw.sapienza.places;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -13,20 +10,24 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gcw.sapienza.places.adapters.FlagsArrayAdapter;
 import com.gcw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseFile;
+import com.parse.DeleteCallback;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -59,8 +60,7 @@ public class MosaicFragment extends Fragment{
         textHeader.setText("within " + (int)(Utils.MAP_RADIUS * 1000) + " meters");
         listView.addHeaderView(header);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
@@ -105,6 +105,16 @@ public class MosaicFragment extends Fragment{
             }
         });
 
+//        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+//                if (position == 0) return true;
+//                Toast.makeText(getActivity(), "Long Click!", Toast.LENGTH_LONG).show();
+//                return true;
+//            }
+//        });
+
         loadDefaultSettings();
 
 
@@ -124,7 +134,50 @@ public class MosaicFragment extends Fragment{
             }
         }
 
+        registerForContextMenu(listView);
+
         return view;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.setHeaderTitle("Edit");
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        int pos = info.position;
+        Flag sel_usr = (Flag)(listView.getItemAtPosition(info.position));
+        String fb_id = sel_usr.getFbId();
+        if(FacebookUtils.getInstance().getCurrentUserId().equals(fb_id)) {
+            menu.add(0, Utils.DELETE_POST, 0, "Delete Flag");
+        }else {
+            menu.add(0, Utils.REPORT_POST, 0, "Report Flag as inappropriate");
+        }
+//        inflater.inflate(R.menu.context_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        Flag sel_usr = (Flag)(listView.getItemAtPosition(info.position));
+        int pos = info.position;
+        switch (item.getItemId()) {
+            case Utils.DELETE_POST:
+                sel_usr.deleteInBackground(new DeleteCallback() {
+                    @Override
+                    public void done(com.parse.ParseException e) {
+                        Toast.makeText(getActivity(), "Flag deleted", Toast.LENGTH_SHORT);
+                        Utils.mainActivity.refresh();
+                    }
+                });
+                return true;
+            case Utils.REPORT_POST:
+                //TODO
+                Toast.makeText(getActivity(), "Flag reported", Toast.LENGTH_SHORT).show();
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 
     private void loadDefaultSettings() {

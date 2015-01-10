@@ -18,6 +18,8 @@ public class Flag extends ParseObject{
      * @return the text content of the post
      */
 
+    public String getObjectId(){ return (String)this.get("objectId"); };
+
     public String getText(){ return (String)this.get("text"); }
 
     public String getCategory(){ return(String)this.get("category"); }

@@ -528,8 +528,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     public void shootVid(View v)
     {
-        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        vibrator.vibrate(Utils.VIBRATION_DURATION);
+        // Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        // vibrator.vibrate(Utils.VIBRATION_DURATION);
 
         Toast.makeText(this, "Feature available soon!", Toast.LENGTH_LONG).show();
         v.setClickable(false);

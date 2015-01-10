@@ -140,9 +140,6 @@ public class ShareFragment extends Fragment{
 
     private void share()
     {
-        Vibrator vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
-        vibrator.vibrate(Utils.VIBRATION_DURATION);
-
         Location current_location =  PlacesApplication.getLocation();
         if(PlacesApplication.isRunningOnEmulator){
             current_location = LocationService.getRandomLocation(current_location, 100);
@@ -183,7 +180,12 @@ public class ShareFragment extends Fragment{
             resetShareFragment(FB_ID_NOT_FOUND_TEXT);
             return;
         }
+
+        Vibrator vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(Utils.VIBRATION_DURATION);
+
         final String category = spinner.getSelectedItem().toString();
+
         f.put("fbId", FacebookUtils.getInstance().getCurrentUserId());
         f.put("category", category);
         f.put("location",p);
