@@ -30,6 +30,7 @@ public class FlagActivity extends Activity {
     private byte[] pic;
     private String weather;
     private String category;
+    private String [] reports;
 
     private static final String TAG = "FlagActivity";
 

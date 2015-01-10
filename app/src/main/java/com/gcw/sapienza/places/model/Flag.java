@@ -4,7 +4,9 @@ import com.parse.ParseClassName;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Class that encapsulate the Post table on Parse.com
@@ -37,4 +39,7 @@ public class Flag extends ParseObject{
     public byte[] getPic() { return (byte[])this.get("pic"); }
 
     public String getWeather() { return (String)this.get("weather");  }
+
+    public ArrayList<String> getReports() { return (ArrayList<String>)this.get("reports");  }
+
 }
