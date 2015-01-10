@@ -9,8 +9,10 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.location.LocationManager;
+import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -19,10 +21,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gcw.sapienza.places.services.LocationService;
@@ -34,13 +39,17 @@ import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 import com.parse.ui.ParseLoginBuilder;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Date;
 
 
-public class MainActivity extends ActionBarActivity implements ViewPager.OnPageChangeListener, SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends ActionBarActivity implements ViewPager.OnPageChangeListener, SwipeRefreshLayout.OnRefreshListener, View.OnLongClickListener {
 
     private static final String TAG = "MainActivity";
 
@@ -60,7 +69,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         this.srl = srl;
     }
 
-
+    protected MediaRecorder audioRec;
+    protected String audio_filename;
 
     public ShareFragment getShareFragment(){
         return (ShareFragment)this.fragments[0];
@@ -215,29 +225,11 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     }
 
     @Override
-    public void onPageSelected(int i) {
-        Log.d(TAG, "Page selected, is Location Service running? " + isMyServiceRunning(LocationService.class));
-
-        // I commented it out because I consider it an overkill -- Simone
-        /*
-        Fragment sel = fragments[i];
-        if(sel instanceof MMapFragment){
-            Log.d(TAG, "Page selected. Updating markers...");
-            MMapFragment.updateMarkersOnMap();
-        }
-        else if(sel instanceof MosaicFragment){
-            Log.d(TAG, "Page selected. Updating flags...");
-            MosaicFragment.configureListViewWithFlags();
-        }
-        */
-
+    public void onPageSelected(int i)
+    {
         Log.d(TAG, "Page selected: " + i);
 
-        if(i == 0)
-        {
-            ((ShareFragment)fragments[i]).resetMedia();
-            ((ShareFragment)fragments[i]).onVisiblePage();
-        }
+        if(i == 0) ((ShareFragment)fragments[i]).onVisiblePage();
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -261,6 +253,69 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         refresh();
 
         srl.setRefreshing(false);
+    }
+
+    @Override
+    public boolean onLongClick(final View v)
+    {
+        if(v.getId() == ShareFragment.vidButton.getId()) return false;
+        else
+        {
+            Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+            vibrator.vibrate(Utils.VIBRATION_DURATION);
+
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which){
+                        case DialogInterface.BUTTON_POSITIVE:
+                            if(v.getId() == ShareFragment.picButton.getId())
+                            {
+                                ShareFragment.picButton.setAlpha(1f);
+                                ShareFragment.isPicTaken = false;
+                                ShareFragment.pic = null; // this is supposed to disappear in future releases
+                                ShareFragment.picture = null;
+                            }
+                            else if (v.getId() == ShareFragment.micButton.getId())
+                            {
+                                ShareFragment.micButton.setAlpha(1f);
+                                ShareFragment.isSoundCaptured = false;
+                                ShareFragment.audio = null;
+                            }
+                            break;
+
+                        case DialogInterface.BUTTON_NEGATIVE:
+                    }
+                }
+            };
+
+            AlertDialog.Builder builder;
+            AlertDialog dialog;
+
+            if(v.getId() == ShareFragment.micButton.getId())
+            {
+                if(ShareFragment.audio == null) return true;
+
+                builder  = new AlertDialog.Builder(this);
+                dialog = builder.setMessage("Discard recording?").setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
+            }
+
+            else /*if(v.getId() == ShareFragment.picButton.getId())*/
+            {
+                if(ShareFragment.pic == null) return true;
+
+                builder  = new AlertDialog.Builder(this);
+                dialog = builder.setMessage("Discard picture?").setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
+            }
+
+            TextView dialogText = (TextView)dialog.findViewById(android.R.id.message);
+            dialogText.setGravity(Gravity.CENTER);
+            dialog.show();
+        }
+
+        return true;
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
@@ -287,14 +342,6 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
             }
             return null;
         }
-
-        /*
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object)
-        {
-            Log.d(TAG, "Item at position " + position + " was destroyed!");
-        }
-        */
 
         public Fragment getItem(int i)
         {
@@ -368,6 +415,9 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     public void takePic(View v)
     {
+        Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(Utils.VIBRATION_DURATION);
+
         startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE), Utils.PIC_CAPTURE_REQUEST_CODE);
     }
 
@@ -426,5 +476,77 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
                 break;
         }
+    }
+
+    public void captureSound(View v)
+    {
+        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(Utils.VIBRATION_DURATION);
+
+        if(v.getAlpha() > 0.1f)
+        {
+            audio_filename = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + System.currentTimeMillis() + ".3gp";
+
+            audioRec = new MediaRecorder();
+            audioRec.setAudioSource(MediaRecorder.AudioSource.MIC);
+            audioRec.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            audioRec.setOutputFile(audio_filename);
+            audioRec.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+            try {
+                audioRec.prepare();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+                Toast.makeText(this, "Audio recording failed", Toast.LENGTH_LONG).show();
+                Log.e(TAG, "Audio recording failed");
+            }
+
+            audioRec.start();
+            v.setAlpha(0.1f);
+        }
+        else
+        {
+            audioRec.stop();
+            audioRec.release();
+            audioRec = null;
+            v.setAlpha(ShareFragment.MEDIA_AVAILABLE_ALPHA);
+
+            File audio_file = new File(audio_filename);
+            try
+            {
+                FileInputStream inStream = new FileInputStream(audio_file);
+                byte[] audio = new byte[inStream.available()];
+                ShareFragment.audio = convertStreamToByteArray(inStream);
+
+                inStream.close();
+            }
+            catch(IOException ioe){ ioe.printStackTrace(); }
+
+            ShareFragment.isSoundCaptured = true;
+        }
+    }
+
+    public void shootVid(View v)
+    {
+        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(Utils.VIBRATION_DURATION);
+
+        Toast.makeText(this, "Feature available soon!", Toast.LENGTH_LONG).show();
+        v.setClickable(false);
+    }
+
+    public static byte[] convertStreamToByteArray(FileInputStream is) throws IOException
+    {
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+
+        byte[] buff = new byte[ShareFragment.CHUNK_SIZE];
+        int i = Integer.MAX_VALUE;
+
+        while ((i = is.read(buff, 0, buff.length)) > 0)
+        {
+            outStream.write(buff, 0, i);
+        }
+
+        return outStream.toByteArray();
     }
 }

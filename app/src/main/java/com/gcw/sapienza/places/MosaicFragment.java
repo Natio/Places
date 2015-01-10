@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -22,8 +23,10 @@ import android.widget.TextView;
 import com.gcw.sapienza.places.adapters.FlagsArrayAdapter;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.utils.Utils;
+import com.parse.ParseFile;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -61,7 +64,11 @@ public class MosaicFragment extends Fragment{
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                if(position == 0) {
+                Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(Utils.VIBRATION_DURATION);
+
+                if(position == 0)
+                {
                     startActivity(new Intent(getActivity().getApplicationContext(), SettingsActivity.class));
                     return;
                 }
@@ -74,12 +81,23 @@ public class MosaicFragment extends Fragment{
 
                 Bundle bundle = new Bundle();
 
-                bundle.putString("text", ((Flag) parent.getItemAtPosition(position)).getText());
-                bundle.putString("id", ((Flag) parent.getItemAtPosition(position)).getFbId());
-                bundle.putString("date", sDate);
-                bundle.putByteArray("pic", ((Flag) parent.getItemAtPosition(position)).getPic());
-                bundle.putString("weather", ((Flag) parent.getItemAtPosition(position)).getWeather());
-                bundle.putString("category", ((Flag) parent.getItemAtPosition(position)).getCategory());
+                    bundle.putString("text", ((Flag) parent.getItemAtPosition(position)).getText());
+                    bundle.putString("id", ((Flag) parent.getItemAtPosition(position)).getFbId());
+                    bundle.putString("date", sDate);
+                    bundle.putByteArray("pic", ((Flag) parent.getItemAtPosition(position)).getPic());
+                    bundle.putString("weather", ((Flag) parent.getItemAtPosition(position)).getWeather());
+                    bundle.putString("category", ((Flag) parent.getItemAtPosition(position)).getCategory());
+
+                try {
+                    ParseFile audio_file;
+                    if((audio_file = ((Flag) parent.getItemAtPosition(position)).getAudio()) != null)
+                    bundle.putByteArray("audio", audio_file.getData());
+                }
+                catch(com.parse.ParseException pe)
+                {
+                    Log.v(TAG, "Parse file couldn't be retrieved");
+                    pe.printStackTrace();
+                }
 
                 intent.putExtras(bundle);
 

@@ -3,8 +3,11 @@ package com.gcw.sapienza.places;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaFormat;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -15,6 +18,9 @@ import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,9 +33,11 @@ public class FlagActivity extends Activity {
     private String text;
     private String id;
     private String date;
-    private byte[] pic;
     private String weather;
     private String category;
+
+    private byte[] pic;
+    private byte[] audio;
 
     private static final String TAG = "FlagActivity";
 
@@ -60,6 +68,14 @@ public class FlagActivity extends Activity {
         {
             iw.setMaxHeight(0);
             iw.setMaxWidth(0);
+        }
+
+        if(bundle.getByteArray("audio") != null)
+        {
+            audio = new byte[bundle.getByteArray("audio").length];
+            System.arraycopy(bundle.getByteArray("audio"), 0, audio, 0, audio.length);
+
+            playRecording(audio);
         }
 
         ((EditText)findViewById(R.id.text)).setText(text);
@@ -113,6 +129,30 @@ public class FlagActivity extends Activity {
         }
         else{
             this.loadProfilePictureFromUrl(pic_large_url);
+        }
+    }
+
+    private void playRecording(byte[] sound_array)
+    {
+        try {
+            File temp = File.createTempFile("places_temp_audio", "3gp", getCacheDir());
+            temp.deleteOnExit();
+
+            FileOutputStream outStream = new FileOutputStream(temp);
+            outStream.write(sound_array);
+            outStream.close();
+
+            MediaPlayer mediaPlayer = new MediaPlayer();
+
+            FileInputStream inStream = new FileInputStream(temp);
+            mediaPlayer.setDataSource(inStream.getFD());
+
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+
+        } catch (IOException ioe)
+        {
+            ioe.printStackTrace();
         }
     }
 
