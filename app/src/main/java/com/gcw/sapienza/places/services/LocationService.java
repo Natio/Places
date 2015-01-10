@@ -257,13 +257,16 @@ public class LocationService extends Service implements
 
     private void notifyUser() {
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        int numFlags = this.parseObjects.size();
+        String textIfOne = "A flag for you!";
+        String textMoreThanOne = "Hey, " + this.parseObjects.size() + " Flags around!";
 
-        NotificationCompat.Builder builder =
+                NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
                         .setAutoCancel(true)
                         .setSmallIcon(R.drawable.app_logo_small)
                         .setContentTitle(Notifications.notifications[(int) (Math.random() * Notifications.notifications.length)])
-                        .setContentText(this.parseObjects.size() + "There are Flags around!")
+                        .setContentText(numFlags > 1 ? textMoreThanOne : textIfOne)
                         .setSound(soundUri)
                         .setLights(0xff00ff00, 1000, 3000);
 

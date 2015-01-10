@@ -30,6 +30,7 @@ public class Utils
 
     public static final int DELETE_POST = 0;
     public static final int REPORT_POST = 1;
+    public static final int REMOVE_REPORT_POST = 2;
 
     public static String[] categories;
 
@@ -71,5 +72,4 @@ public class Utils
 
         return null;
     }
-
 }

@@ -26,9 +26,11 @@ import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseFile;
 import com.parse.DeleteCallback;
-
+import com.parse.ParseException;
+import com.parse.SaveCallback;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -145,13 +147,16 @@ public class MosaicFragment extends Fragment{
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.setHeaderTitle("Edit");
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        int pos = info.position;
         Flag sel_usr = (Flag)(listView.getItemAtPosition(info.position));
         String fb_id = sel_usr.getFbId();
+        ArrayList<String> reports = sel_usr.getReports();
         if(FacebookUtils.getInstance().getCurrentUserId().equals(fb_id)) {
             menu.add(0, Utils.DELETE_POST, 0, "Delete Flag");
-        }else {
+        }else if(reports == null || !reports.contains(FacebookUtils.getInstance().getCurrentUserId())) {
             menu.add(0, Utils.REPORT_POST, 0, "Report Flag as inappropriate");
+        }else{
+            menu.add(0, Utils.REMOVE_REPORT_POST, 0, "Revoke Flag report");
+
         }
 //        inflater.inflate(R.menu.context_menu, menu);
     }
@@ -160,7 +165,6 @@ public class MosaicFragment extends Fragment{
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         Flag sel_usr = (Flag)(listView.getItemAtPosition(info.position));
-        int pos = info.position;
         switch (item.getItemId()) {
             case Utils.DELETE_POST:
                 sel_usr.deleteInBackground(new DeleteCallback() {
@@ -172,8 +176,30 @@ public class MosaicFragment extends Fragment{
                 });
                 return true;
             case Utils.REPORT_POST:
-                //TODO
-                Toast.makeText(getActivity(), "Flag reported", Toast.LENGTH_SHORT).show();
+                ArrayList<String> newReports = sel_usr.getReports();
+                if(newReports == null)
+                    newReports = new ArrayList<String>();
+                newReports.add(FacebookUtils.getInstance().getCurrentUserId());
+                sel_usr.put("reports", newReports);
+                sel_usr.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        Toast.makeText(getActivity(), "Flag reported", Toast.LENGTH_SHORT).show();
+                        Utils.mainActivity.refresh();
+                    }
+                });
+                return true;
+            case Utils.REMOVE_REPORT_POST:
+                ArrayList<String> delReports =sel_usr.getReports();
+                delReports.remove(FacebookUtils.getInstance().getCurrentUserId());
+                sel_usr.put("reports", delReports);
+                sel_usr.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        Toast.makeText(getActivity(), "Flag report revoked", Toast.LENGTH_SHORT).show();
+                        Utils.mainActivity.refresh();
+                    }
+                });
                 return true;
             default:
                 return super.onContextItemSelected(item);

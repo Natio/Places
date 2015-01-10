@@ -31,6 +31,7 @@ public class FlagActivity extends Activity {
     private String date;
     private String weather;
     private String category;
+    private String [] reports;
 
     private byte[] pic;
     private byte[] audio;
