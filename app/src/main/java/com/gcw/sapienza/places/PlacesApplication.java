@@ -99,6 +99,7 @@ public class PlacesApplication extends Application{
         return pinsNearby;
     }
 
+    @SuppressWarnings("unused")
     public static Context getPlacesAppContext(){
         return PlacesApplication.PLACES_CONTEXT;
     }
@@ -107,7 +108,7 @@ public class PlacesApplication extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
-
+        Log.d(TAG,"CIAO");
 
         PlacesApplication.PLACES_CONTEXT = this.getApplicationContext();
 

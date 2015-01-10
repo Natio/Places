@@ -64,7 +64,7 @@ public final class FacebookUtils {
     /**
      * Returns  fb user name for a given id
      * @param id the facebook id of a user
-     * @return
+     * @return fb user name for a given id
      */
     public String getUserNameFromId(String id){
         return this.userIdMap.get(id);
@@ -102,8 +102,6 @@ public final class FacebookUtils {
                         try
                         {
                             GraphObject go = response.getGraphObject();
-                            Log.d(TAG, ""+go);
-                            Log.d(TAG, ""+id);
                             JSONObject obj = go.getInnerJSONObject();
                             String name = obj.getString("name");
                             FacebookUtils.this.userIdMap.put(id, name);
@@ -111,7 +109,7 @@ public final class FacebookUtils {
                                 callback.onResult(name, null);
                             }
                         }
-                        catch(JSONException e)
+                        catch(JSONException | NullPointerException e)
                         {
                             Log.v(TAG, "Couldn't resolve facebook user's name.  Error: " + e.toString());
                             e.printStackTrace();
@@ -125,7 +123,7 @@ public final class FacebookUtils {
         req.executeAsync();
     }
 
-    public synchronized void fetchFbProfilePic(final String id, final String size, final FacebookUtilCallback cbk) throws MalformedURLException, IOException
+    public synchronized void fetchFbProfilePic(final String id, final String size, final FacebookUtilCallback cbk) throws  IOException
     {
         Bundle bundle = new Bundle();
         bundle.putBoolean("redirect", false);
@@ -170,7 +168,7 @@ public final class FacebookUtils {
         req.executeAsync();
     }
 
-    public void fetchFbFriends(final FacebookUtilsFriendsCallback cbk) throws  IOException, MalformedURLException
+    public void fetchFbFriends(final FacebookUtilsFriendsCallback cbk) throws  IOException
     {
         this.friends.clear();
 

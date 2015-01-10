@@ -2,9 +2,12 @@ package com.gcw.sapienza.places.activities;
 
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,7 +20,7 @@ import com.gcw.sapienza.places.R;
 
 
 public class MainActivity2 extends ActionBarActivity {
-
+    public static String TAG = MainActivity2.class.getName();
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private ActionBarDrawerToggle drawerToggle;
@@ -29,6 +32,7 @@ public class MainActivity2 extends ActionBarActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "CIAO");
         setContentView(R.layout.activity_main_drawer_layout);
         this.current_title = this.getTitle();
         this.drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -105,21 +109,21 @@ public class MainActivity2 extends ActionBarActivity {
             return;
         }
         // Create a new fragment and specify the planet to show based on position
-       /*
-        Fragment fragment = new ShareFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
+
+        Fragment fragment = new FlagsListFragment();
+
 
         // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-
+/*
         // Highlight the selected item, update the title, and close the drawer
         this.drawerList.setItemChecked(position, true);
         this.setTitle(MainActivity2.section_titles[position]);
         this.drawerLayout.closeDrawer(this.drawerList);
-        */
+
         this.selected_item_index = position;
+        */
     }
 
     @Override
