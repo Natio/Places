@@ -263,7 +263,7 @@ public class LocationService extends Service implements
                         .setAutoCancel(true)
                         .setSmallIcon(R.drawable.app_logo_small)
                         .setContentTitle(Notifications.notifications[(int) (Math.random() * Notifications.notifications.length)])
-                        .setContentText(this.parseObjects.size() + " time capsules around!")
+                        .setContentText(this.parseObjects.size() + "There are Flags around!")
                         .setSound(soundUri)
                         .setLights(0xff00ff00, 1000, 3000);
 
