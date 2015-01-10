@@ -1,6 +1,7 @@
 package com.gcw.sapienza.places.model;
 
 import com.parse.ParseClassName;
+import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 
@@ -41,5 +42,7 @@ public class Flag extends ParseObject{
     public String getWeather() { return (String)this.get("weather");  }
 
     public ArrayList<String> getReports() { return (ArrayList<String>)this.get("reports");  }
+
+    public ParseFile getAudio() { return (ParseFile)this.get("audio");  }
 
 }

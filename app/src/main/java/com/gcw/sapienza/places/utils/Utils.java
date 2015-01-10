@@ -26,6 +26,8 @@ public class Utils
     public static final int GPS_ENABLE_REQUEST_CODE = 93;
     public static final int LOGIN_REQUEST_CODE = 94;
 
+    public static final int VIBRATION_DURATION = 0; // I didn't like it that much
+
     public static final int DELETE_POST = 0;
     public static final int REPORT_POST = 1;
     public static final int REMOVE_REPORT_POST = 2;
