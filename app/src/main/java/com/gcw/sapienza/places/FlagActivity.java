@@ -57,10 +57,10 @@ public class FlagActivity extends Activity {
 
         ImageView iw = ((ImageView)findViewById(R.id.pic));
 
-        if(bundle.getByteArray("pic") != null)
+        if(bundle.getByteArray("picture") != null)
         {
-            pic = new byte[bundle.getByteArray("pic").length];
-            System.arraycopy(bundle.getByteArray("pic"), 0, pic, 0, pic.length);
+            pic = new byte[bundle.getByteArray("picture").length];
+            System.arraycopy(bundle.getByteArray("picture"), 0, pic, 0, pic.length);
             iw.setImageBitmap(BitmapFactory.decodeByteArray(pic, 0, pic.length));
         }
         else

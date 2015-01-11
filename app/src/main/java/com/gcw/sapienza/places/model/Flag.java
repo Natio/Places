@@ -35,9 +35,9 @@ public class Flag extends ParseObject{
         return (ParseGeoPoint)this.get("location");
     }
 
-    public Date getDate() { return (Date)this.getCreatedAt(); }
+    public Date getDate() { return this.getCreatedAt(); }
 
-    public byte[] getPic() { return (byte[])this.get("pic"); }
+    public ParseFile getPic() { return (ParseFile)this.get("picture"); }
 
     public String getWeather() { return (String)this.get("weather");  }
 

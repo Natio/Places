@@ -1,5 +1,6 @@
 package com.gcw.sapienza.places;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
@@ -16,6 +17,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -30,6 +32,7 @@ import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
+import com.parse.ProgressCallback;
 import com.parse.SaveCallback;
 
 import java.io.ByteArrayOutputStream;
@@ -50,9 +53,9 @@ public class ShareFragment extends Fragment{
     private Button shareButton;
     private FrameLayout progressBarHolder;
 
-    protected static ImageView picButton;
-    protected static ImageView micButton;
-    protected static ImageView vidButton;
+    protected static ImageButton picButton;
+    protected static ImageButton micButton;
+    protected static ImageButton vidButton;
 
     protected static boolean clearMedia = true;
 
@@ -60,8 +63,7 @@ public class ShareFragment extends Fragment{
     protected static boolean isVideoShoot = false;
     protected static boolean isSoundCaptured = false;
 
-    protected static Bitmap pic; // for compatibiity
-    protected static byte[] picture;
+    protected static Bitmap pic;
     protected static byte[] video;
     protected static byte[] audio;
 
@@ -89,9 +91,9 @@ public class ShareFragment extends Fragment{
 
         this.progressBarHolder = (FrameLayout)mView.findViewById(R.id.frame_layout);
 
-        this.picButton = (ImageView)mView.findViewById(R.id.pic_button);
-        this.micButton = (ImageView)mView.findViewById(R.id.mic_button);
-        this.vidButton = (ImageView)mView.findViewById(R.id.vid_button);
+        this.picButton = (ImageButton)mView.findViewById(R.id.pic_button);
+        this.micButton = (ImageButton)mView.findViewById(R.id.mic_button);
+        this.vidButton = (ImageButton)mView.findViewById(R.id.vid_button);
 
         this.picButton.setOnLongClickListener((View.OnLongClickListener)getActivity());
         this.micButton.setOnLongClickListener((View.OnLongClickListener)getActivity());
@@ -211,9 +213,24 @@ public class ShareFragment extends Fragment{
                         Log.v(TAG, "Successfully retrieved pic.");
 
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        pic.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                        byte[] byteArray = stream.toByteArray();
-                        f.put("pic", byteArray);
+                        pic.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                        byte[] pic_byteArray = stream.toByteArray();
+
+                        ParseFile parse_pic = new ParseFile(System.currentTimeMillis()+".png", pic_byteArray);
+
+                        parse_pic.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e)
+                            {
+                                if(e != null) Toast.makeText(getActivity(), "Error encountered while uploading picture", Toast.LENGTH_LONG).show();
+                            }
+                        }, new ProgressCallback() {
+                            @Override
+                            public void done(Integer integer) {
+                                // TODO maybe we could display a progress bar while uploading pic
+                            }
+                        });
+                        f.put("picture", parse_pic);
                     }
                 }
 
@@ -231,8 +248,18 @@ public class ShareFragment extends Fragment{
 
                         ParseFile parse_audio = new ParseFile(System.currentTimeMillis()+".3gp", ShareFragment.audio);
 
-                        // TODO maybe we should wait for it, in the meantime showing a progress bar
-                        parse_audio.saveInBackground();
+                        parse_audio.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e)
+                            {
+                                if(e != null) Toast.makeText(getActivity(), "Error encountered while uploading recording", Toast.LENGTH_LONG).show();
+                            }
+                        }, new ProgressCallback() {
+                            @Override
+                            public void done(Integer integer) {
+                                // TODO maybe we could display a progress bar while uploading recording
+                            }
+                        });
                         f.put("audio", parse_audio);
                     }
                 }
@@ -295,41 +322,58 @@ public class ShareFragment extends Fragment{
     protected void setPicButtonAsPicTaken()
     {
         this.mView = getView();
-        this.picButton = (ImageView)this.mView.findViewById(R.id.pic_button);
-        this.picButton.setAlpha(MEDIA_AVAILABLE_ALPHA);
+        this.picButton = (ImageButton)this.mView.findViewById(R.id.pic_button);
+        this.picButton.setImageDrawable(getResources().getDrawable(R.drawable.camera_green_taken));
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
+        Log.v(TAG, "onResume called in ShareFragment");
+
         onVisiblePage();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        Log.v(TAG, "onAttach called in ShareFragment");
+
+        // onVisiblePage();
     }
 
     public void onVisiblePage()
     {
         Log.v(TAG, "ShareFragment visible!");
 
+        if(!isAdded())
+        {
+            Log.v(TAG, "ShareFragment not attached to MainActivity");
+            return;
+        }
+
         if(mView == null) mView = getView();
         if(mView != null)
         {
-            picButton = (ImageView)mView.findViewById(R.id.pic_button);
-            micButton = (ImageView)mView.findViewById(R.id.mic_button);
+            picButton = (ImageButton)mView.findViewById(R.id.pic_button);
+            micButton = (ImageButton)mView.findViewById(R.id.mic_button);
 
             if (pic != null) {
                 isPicTaken = true;
-                this.picButton.setAlpha(MEDIA_AVAILABLE_ALPHA);
+                this.picButton.setImageDrawable(getResources().getDrawable(R.drawable.camera_green_taken));
             } else {
                 isPicTaken = false;
-                this.picButton.setAlpha(1f);
+                this.picButton.setImageDrawable(getResources().getDrawable(R.drawable.cam_selector));
             }
 
             if (audio != null) {
                 isSoundCaptured = true;
-                this.micButton.setAlpha(MEDIA_AVAILABLE_ALPHA);
+                this.micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_green_taken));
             } else {
                 isSoundCaptured = false;
-                this.micButton.setAlpha(1f);
+                this.micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_selector));
             }
         }
     }
@@ -353,11 +397,13 @@ public class ShareFragment extends Fragment{
 
         this.textView.setText("");
 
-        this.picButton = (ImageView)this.mView.findViewById(R.id.pic_button);
-        this.picButton.setAlpha(1f);
+        this.spinner.setSelection(0);
 
-        this.micButton = (ImageView)this.mView.findViewById(R.id.mic_button);
-        this.micButton.setAlpha(1f);
+        this.picButton = (ImageButton)this.mView.findViewById(R.id.pic_button);
+        this.picButton.setImageDrawable(getResources().getDrawable(R.drawable.cam_selector));
+
+        this.micButton = (ImageButton)this.mView.findViewById(R.id.mic_button);
+        this.micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_selector));
 
         hideKeyboard();
 

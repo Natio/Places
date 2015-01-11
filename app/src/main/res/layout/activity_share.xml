@@ -4,7 +4,8 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:weightSum="1"
-    android:gravity="center_horizontal|bottom">
+    android:gravity="center_horizontal|bottom"
+    android:clickable="true" >
 
     <TextView
         android:layout_width="wrap_content"
@@ -60,34 +61,41 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0.125" >
+        android:layout_weight="0.125"
+        android:clickable="true" >
 
-        <ImageView
+        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/pic_button"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/camera_green"
+            android:src="@drawable/cam_selector"
+            android:background="@android:color/transparent"
             android:onClick="takePic"
-            android:padding="30dp" />
+            android:padding="30dp"
+            android:clickable="true" />
 
-        <ImageView
+        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/mic_button"
             android:layout_alignParentLeft="true"
             android:padding="30dp"
-            android:src="@drawable/mic_green"
+            android:background="@android:color/transparent"
+            android:src="@drawable/mic_selector"
+            android:clickable="true"
             android:onClick="captureSound" />
 
-        <ImageView
+        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/vid_button"
-            android:src="@drawable/videocam_green"
+            android:background="@android:color/transparent"
+            android:src="@drawable/videocam_selector"
             android:layout_alignParentRight="true"
             android:padding="30dp"
             android:onClick="shootVid"
+            android:clickable="true"
             android:alpha="0.1" />
 
     </RelativeLayout>
