@@ -11,7 +11,7 @@ import com.gcw.sapienza.places.R;
 
 
 public class ShareActivity extends Activity {
-    private static final String TAG = "ShareActivity";
+
 
     private TextView textView;
 

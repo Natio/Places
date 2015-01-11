@@ -1,8 +1,6 @@
 package com.gcw.sapienza.places.adapters;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,8 +16,8 @@ import java.util.List;
 /**
  * Created by mic_head on 08/01/15.
  */
-public class MSpinnerAdapter extends ArrayAdapter implements SpinnerAdapter
-{
+public class MSpinnerAdapter extends ArrayAdapter implements SpinnerAdapter{
+    @SuppressWarnings("unused")
     private static final String TAG = "MSpinnerFragment";
 
     Context mContext;

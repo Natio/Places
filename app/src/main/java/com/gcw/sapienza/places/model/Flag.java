@@ -5,7 +5,6 @@ import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 /**

@@ -19,7 +19,7 @@ public class CropCircleTransformation implements Transformation{
         Bitmap output = Bitmap.createBitmap(source.getWidth(),
                 source.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
-        final int color = 0xff424242;
+        //final int color = 0xff424242;
         final Paint paint = new Paint();
         final Rect rect = new Rect(0, 0, source.getWidth(), source.getHeight());
 
