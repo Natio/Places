@@ -54,8 +54,8 @@ public class LocationService extends Service implements
 
     private static final int KM_TO_M = 1000;
 
-    private static final long INTERVAL = ONE_MIN * 2;
-    private static final long FASTEST_INTERVAL = ONE_MIN * 1;
+    private static final long INTERVAL = ONE_MIN * 5;
+    private static final long FASTEST_INTERVAL = ONE_MIN * 3;
 
     private static final int NOTIFICATION_ID = 12345;
 
@@ -294,7 +294,7 @@ public class LocationService extends Service implements
 
     private void connectToGoogleAPI() {
         locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         locationRequest.setInterval(INTERVAL);
         locationRequest.setFastestInterval(FASTEST_INTERVAL);
         Log.d(TAG, "Smallest displacement: " + Utils.MAP_RADIUS * KM_TO_M / 2);
