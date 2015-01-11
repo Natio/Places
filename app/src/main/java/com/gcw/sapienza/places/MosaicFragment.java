@@ -83,12 +83,23 @@ public class MosaicFragment extends Fragment{
 
                 Bundle bundle = new Bundle();
 
-                    bundle.putString("text", ((Flag) parent.getItemAtPosition(position)).getText());
-                    bundle.putString("id", ((Flag) parent.getItemAtPosition(position)).getFbId());
-                    bundle.putString("date", sDate);
-                    bundle.putByteArray("pic", ((Flag) parent.getItemAtPosition(position)).getPic());
-                    bundle.putString("weather", ((Flag) parent.getItemAtPosition(position)).getWeather());
-                    bundle.putString("category", ((Flag) parent.getItemAtPosition(position)).getCategory());
+                bundle.putString("text", ((Flag) parent.getItemAtPosition(position)).getText());
+                bundle.putString("id", ((Flag) parent.getItemAtPosition(position)).getFbId());
+                bundle.putString("date", sDate);
+                // bundle.putByteArray("pic", ((Flag) parent.getItemAtPosition(position)).getPic());
+                bundle.putString("weather", ((Flag) parent.getItemAtPosition(position)).getWeather());
+                bundle.putString("category", ((Flag) parent.getItemAtPosition(position)).getCategory());
+
+                try {
+                    ParseFile pic_file;
+                    if((pic_file = ((Flag) parent.getItemAtPosition(position)).getPic()) != null)
+                        bundle.putByteArray("picture", pic_file.getData());
+                }
+                catch(com.parse.ParseException pe)
+                {
+                    Log.v(TAG, "Parse file couldn't be retrieved");
+                    pe.printStackTrace();
+                }
 
                 try {
                     ParseFile audio_file;

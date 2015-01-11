@@ -6,12 +6,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.location.LocationManager;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -25,12 +27,10 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
@@ -42,9 +42,7 @@ import com.parse.ui.ParseLoginBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -109,11 +107,10 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
             this.startDownloadingFacebookInfo();
         }
 
+        if(savedInstanceState != null) ShareFragment.audio = savedInstanceState.getByteArray("audio");
 
         Resources res = getResources();
         Utils.categories = res.getStringArray(R.array.categories);
-
-        for(int i = 0; i < fragments.length; i++) fragments[i].setRetainInstance(true);
     }
 
     private void startDownloadingFacebookInfo(){
@@ -148,8 +145,13 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         }
     }
 
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(Bundle outState)
+    {
         super.onSaveInstanceState(outState);
+
+        Log.v(TAG, "onSaveInstanceState called!");
+
+        outState.putByteArray("audio", ShareFragment.audio);
     }
 
     @Override
@@ -271,14 +273,13 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                         case DialogInterface.BUTTON_POSITIVE:
                             if(v.getId() == ShareFragment.picButton.getId())
                             {
-                                ShareFragment.picButton.setAlpha(1f);
+                                ShareFragment.picButton.setImageDrawable(getResources().getDrawable(R.drawable.cam_selector));
                                 ShareFragment.isPicTaken = false;
-                                ShareFragment.pic = null; // this is supposed to disappear in future releases
-                                ShareFragment.picture = null;
+                                ShareFragment.pic = null;
                             }
                             else if (v.getId() == ShareFragment.micButton.getId())
                             {
-                                ShareFragment.micButton.setAlpha(1f);
+                                ShareFragment.micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_selector));
                                 ShareFragment.isSoundCaptured = false;
                                 ShareFragment.audio = null;
                             }
@@ -483,7 +484,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
 
-        if(v.getAlpha() > 0.1f)
+        if(audioRec == null)
         {
             audio_filename = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + System.currentTimeMillis() + ".3gp";
 
@@ -502,20 +503,20 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
             }
 
             audioRec.start();
-            v.setAlpha(0.1f);
+
+            Toast.makeText(this, "Tap mic button again to stop recording", Toast.LENGTH_SHORT).show();
         }
         else
         {
             audioRec.stop();
             audioRec.release();
             audioRec = null;
-            v.setAlpha(ShareFragment.MEDIA_AVAILABLE_ALPHA);
+            ((ImageButton)v).setImageDrawable(getResources().getDrawable(R.drawable.mic_green_taken));
 
             File audio_file = new File(audio_filename);
             try
             {
                 FileInputStream inStream = new FileInputStream(audio_file);
-                byte[] audio = new byte[inStream.available()];
                 ShareFragment.audio = convertStreamToByteArray(inStream);
 
                 inStream.close();

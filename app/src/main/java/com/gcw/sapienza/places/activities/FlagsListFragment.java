@@ -24,6 +24,7 @@ import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.squareup.picasso.Picasso;
@@ -106,7 +107,22 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
             }
         });
 
-        byte[] pic = f.getPic();
+        byte[] pic = null;
+
+        try
+        {
+            if(f.getPic() != null)
+            {
+                pic = new byte[f.getPic().getData().length];
+                System.arraycopy(f.getPic().getData(), 0, pic, 0, pic.length);
+            }
+        }
+        catch(com.parse.ParseException pe)
+        {
+            Log.v(TAG, "Parse file couldn't be retrieved");
+            pe.printStackTrace();
+        }
+
         if(pic != null){
             flagViewHolder.main_image.setImageBitmap(BitmapFactory.decodeByteArray(pic, 0, pic.length));
             flagViewHolder.main_image.setVisibility(View.VISIBLE);
