@@ -12,8 +12,8 @@ import java.net.URL;
  */
 public class WeatherHttpClient {
 
-    private static String BASE_URL = "http://api.openweathermap.org/data/2.5/weather?q=";
-    private static String IMG_URL = "http://openweathermap.org/img/w/";
+    private static final String BASE_URL = "http://api.openweathermap.org/data/2.5/weather?q=";
+    private static final String IMG_URL = "http://openweathermap.org/img/w/";
 
 
     public String getWeatherData(String location) {
@@ -28,12 +28,16 @@ public class WeatherHttpClient {
             con.connect();
 
             // Let's read the response
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             is = con.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            String line = null;
-            while (  (line = br.readLine()) != null )
-                buffer.append(line + "\r\n");
+            String line;
+            while (  (line = br.readLine()) != null ){
+                buffer.append(line);
+                buffer.append("\r\n");
+            }
+
+
 
             is.close();
             con.disconnect();

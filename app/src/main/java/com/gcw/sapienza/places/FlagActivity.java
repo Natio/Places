@@ -34,7 +34,6 @@ public class FlagActivity extends Activity {
     private String date;
     private String weather;
     private String category;
-    private String [] reports;
 
     private byte[] pic;
     private byte[] audio;
@@ -180,7 +179,6 @@ public class FlagActivity extends Activity {
                         }
                     });
                 }
-                catch(MalformedURLException mue){ mue.printStackTrace(); }
                 catch (IOException ioe){ ioe.printStackTrace(); }
             }
         }).start();

@@ -38,7 +38,7 @@ public class Utils
 
     public static MainActivity mainActivity;
 
-
+/*
     @Deprecated // Daniele says its 'getLocation' is much better than mine, that's why it's deprecated.
     @SuppressWarnings("unused")
     public static Location getLocation(Context context)
@@ -74,4 +74,5 @@ public class Utils
 
         return null;
     }
+*/
 }

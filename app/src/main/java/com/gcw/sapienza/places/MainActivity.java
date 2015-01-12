@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -15,7 +14,6 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.PersistableBundle;
 import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -56,13 +54,13 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     private static boolean isForeground = false;
 
-    private long startTime = -1;///used to track session timing (statistics)
 
     private Fragment[] fragments = {new ShareFragment(), new MosaicFragment(), new MMapFragment()};
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private SwipeRefreshLayout srl;
 
+    @SuppressWarnings("unused")
     public SwipeRefreshLayout getSwipeRefreshLayout(){
         return this.srl;
     }
@@ -79,6 +77,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     public MosaicFragment getMosaicFragment(){ return (MosaicFragment)this.fragments[1]; }
 
+    @SuppressWarnings("unused")
     public MMapFragment getMapFragment(){
         return (MMapFragment)this.fragments[2];
     }
@@ -91,7 +90,6 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         super.onCreate(savedInstanceState);
 
         Utils.mainActivity = this;
-        this.startTime = new Date().getTime();
 
         ParseAnalytics.trackAppOpenedInBackground(this.getIntent());
         setContentView(R.layout.activity_main);
@@ -384,7 +382,6 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     public void onResume()
     {
         super.onResume();
-        this.startTime = new Date().getTime();
 
         LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
@@ -425,12 +422,6 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
         isForeground = false;
 
-        /*
-        long time_diff = ((new Date().getTime() - this.startTime)/1000)/60;
-        Map<String, String> dimensions = new HashMap<String, String>();
-        dimensions.put("time_minutes", ""+time_diff);
-        ParseAnalytics.trackEventInBackground("session_time", dimensions);
-        */
         Log.d(TAG,"pause");
     }
 
