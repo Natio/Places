@@ -8,9 +8,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.location.LocationManager;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PersistableBundle;
@@ -42,6 +44,7 @@ import com.parse.ui.ParseLoginBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
@@ -107,7 +110,13 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
             this.startDownloadingFacebookInfo();
         }
 
-        if(savedInstanceState != null) ShareFragment.audio = savedInstanceState.getByteArray("audio");
+        if(savedInstanceState != null)
+        {
+            ShareFragment.pic = savedInstanceState.getByteArray("pic");
+            ShareFragment.audio = savedInstanceState.getByteArray("audio");
+            ShareFragment.video = savedInstanceState.getByteArray("video");
+        }
+
 
         Resources res = getResources();
         Utils.categories = res.getStringArray(R.array.categories);
@@ -152,6 +161,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         Log.v(TAG, "onSaveInstanceState called!");
 
         outState.putByteArray("audio", ShareFragment.audio);
+        outState.putByteArray("pic", ShareFragment.pic);
+        outState.putByteArray("video", ShareFragment.video);
     }
 
     @Override
@@ -260,61 +271,74 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     @Override
     public boolean onLongClick(final View v)
     {
-        if(v.getId() == ShareFragment.vidButton.getId()) return false;
-        else
-        {
-            Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
-            vibrator.vibrate(Utils.VIBRATION_DURATION);
+        Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(Utils.VIBRATION_DURATION);
 
-            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    switch (which){
-                        case DialogInterface.BUTTON_POSITIVE:
-                            if(v.getId() == ShareFragment.picButton.getId())
-                            {
-                                ShareFragment.picButton.setImageDrawable(getResources().getDrawable(R.drawable.cam_selector));
-                                ShareFragment.isPicTaken = false;
-                                ShareFragment.pic = null;
-                            }
-                            else if (v.getId() == ShareFragment.micButton.getId())
-                            {
-                                ShareFragment.micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_selector));
-                                ShareFragment.isSoundCaptured = false;
-                                ShareFragment.audio = null;
-                            }
-                            break;
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        if(v.getId() == ShareFragment.picButton.getId())
+                        {
+                            ShareFragment.picButton.setImageDrawable(getResources().getDrawable(R.drawable.cam_selector));
+                            ShareFragment.isPicTaken = false;
+                            ShareFragment.pic = null;
+                        }
+                        else if (v.getId() == ShareFragment.micButton.getId())
+                        {
+                            ShareFragment.micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_selector));
+                            ShareFragment.isSoundCaptured = false;
+                            ShareFragment.audio = null;
+                        }
+                        else if (v.getId() == ShareFragment.vidButton.getId())
+                        {
+                            ShareFragment.vidButton.setImageDrawable(getResources().getDrawable(R.drawable.videocam_selector));
+                            ShareFragment.isVideoShoot = false;
+                            ShareFragment.video = null;
+                        }
+                        break;
 
-                        case DialogInterface.BUTTON_NEGATIVE:
-                    }
+                    case DialogInterface.BUTTON_NEGATIVE:
                 }
-            };
-
-            AlertDialog.Builder builder;
-            AlertDialog dialog;
-
-            if(v.getId() == ShareFragment.micButton.getId())
-            {
-                if(ShareFragment.audio == null) return true;
-
-                builder  = new AlertDialog.Builder(this);
-                dialog = builder.setMessage("Discard recording?").setPositiveButton("Yes", dialogClickListener)
-                        .setNegativeButton("No", dialogClickListener).show();
             }
+        };
 
-            else /*if(v.getId() == ShareFragment.picButton.getId())*/
-            {
-                if(ShareFragment.pic == null) return true;
+        AlertDialog.Builder builder;
+        AlertDialog dialog = null;
 
-                builder  = new AlertDialog.Builder(this);
-                dialog = builder.setMessage("Discard picture?").setPositiveButton("Yes", dialogClickListener)
-                        .setNegativeButton("No", dialogClickListener).show();
-            }
+        if(v.getId() == ShareFragment.micButton.getId())
+        {
+            if(ShareFragment.audio == null) return true;
 
-            TextView dialogText = (TextView)dialog.findViewById(android.R.id.message);
-            dialogText.setGravity(Gravity.CENTER);
-            dialog.show();
+            builder  = new AlertDialog.Builder(this);
+            dialog = builder.setMessage("Discard recording?").setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener).show();
         }
+
+        else if(v.getId() == ShareFragment.picButton.getId())
+        {
+            if(ShareFragment.pic == null) return true;
+
+            builder  = new AlertDialog.Builder(this);
+            dialog = builder.setMessage("Discard picture?").setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener).show();
+        }
+
+        else if(v.getId() == ShareFragment.vidButton.getId())
+        {
+            if(ShareFragment.video == null) return true;
+
+            builder  = new AlertDialog.Builder(this);
+            dialog = builder.setMessage("Discard video?").setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener).show();
+        }
+
+        if(dialog == null) return false;
+
+        TextView dialogText = (TextView)dialog.findViewById(android.R.id.message);
+        dialogText.setGravity(Gravity.CENTER);
+        dialog.show();
 
         return true;
     }
@@ -436,6 +460,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                         Log.v(TAG, "Camera Intent OK");
                         // this.getShareFragment().setPicButtonAsPicTaken();
 
+                        Bitmap bm = null;
+
                         if(data.getData() == null)
                         {
                             Log.v(TAG, "getData() returns null in OnActivityResult");
@@ -447,20 +473,24 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                                 Log.v(TAG, "Error encountered while taking picture");
                             }
 
-                            this.getShareFragment().pic = (Bitmap)data.getExtras().get("data");
-                            // Utils.pic = (Bitmap)data.getExtras().get("data");
+                            bm = (Bitmap)data.getExtras().get("data");
                         }
                         else
                         {
                             Log.v(TAG, "getData() is not null in OnActivityResult");
                             try
                             {
-                                this.getShareFragment().pic = MediaStore.Images.Media.getBitmap(this.getContentResolver(), data.getData());
+                                bm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), data.getData());
                             }
                             catch (IOException ioe){
                                 ioe.printStackTrace();
                             }
                         }
+
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                        ShareFragment.pic = stream.toByteArray();
+
                         break;
                     case RESULT_CANCELED:
                         Log.v(TAG, "Camera Intent canceled");
@@ -476,6 +506,22 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                 }
 
                 break;
+            case Utils.VID_SHOOT_REQUEST_CODE:
+                switch (resultCode)
+                {
+                    case RESULT_OK:
+                        Uri videoUri = data.getData();
+                        try
+                        {
+                            File file = new File(getRealPathFromURI(this, videoUri));
+                            FileInputStream inStream = new FileInputStream(file);
+                            ShareFragment.video = convertStreamToByteArray(inStream);
+                        }
+                        catch(IOException ioe) {ioe.printStackTrace();}
+                        break;
+                    case RESULT_CANCELED:
+                        Log.v(TAG, "Video Intent canceled");
+                }
         }
     }
 
@@ -529,11 +575,14 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     public void shootVid(View v)
     {
-        // Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        // vibrator.vibrate(Utils.VIBRATION_DURATION);
+        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(Utils.VIBRATION_DURATION);
 
-        Toast.makeText(this, "Feature available soon!", Toast.LENGTH_LONG).show();
-        v.setClickable(false);
+        Intent videoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        if (videoIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(videoIntent, Utils.VID_SHOOT_REQUEST_CODE);
+        }
+
     }
 
     public static byte[] convertStreamToByteArray(FileInputStream is) throws IOException
@@ -550,4 +599,23 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
         return outStream.toByteArray();
     }
+
+
+
+    public String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = { MediaStore.Video.Media.DATA };
+            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+
 }

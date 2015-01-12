@@ -21,7 +21,9 @@ public class Utils
 
     public static int[] stepValues = {1, 5, 10, 15, 20};
 
+    public static final int VID_SHOOT_REQUEST_CODE = 90;
     public static final int PIC_CAPTURE_REQUEST_CODE = 91;
+
     public static final int SETTINGS_REQUEST_CODE = 92;
     public static final int GPS_ENABLE_REQUEST_CODE = 93;
     public static final int LOGIN_REQUEST_CODE = 94;

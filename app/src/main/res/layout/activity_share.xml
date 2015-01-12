@@ -95,8 +95,7 @@
             android:layout_alignParentRight="true"
             android:padding="30dp"
             android:onClick="shootVid"
-            android:clickable="true"
-            android:alpha="0.1" />
+            android:clickable="true" />
 
     </RelativeLayout>
 

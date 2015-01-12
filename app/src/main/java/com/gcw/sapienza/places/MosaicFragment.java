@@ -28,6 +28,10 @@ import com.parse.ParseFile;
 import com.parse.DeleteCallback;
 import com.parse.ParseException;
 import com.parse.SaveCallback;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -86,29 +90,36 @@ public class MosaicFragment extends Fragment{
                 bundle.putString("text", ((Flag) parent.getItemAtPosition(position)).getText());
                 bundle.putString("id", ((Flag) parent.getItemAtPosition(position)).getFbId());
                 bundle.putString("date", sDate);
-                // bundle.putByteArray("pic", ((Flag) parent.getItemAtPosition(position)).getPic());
                 bundle.putString("weather", ((Flag) parent.getItemAtPosition(position)).getWeather());
                 bundle.putString("category", ((Flag) parent.getItemAtPosition(position)).getCategory());
 
-                try {
+                try
+                {
                     ParseFile pic_file;
                     if((pic_file = ((Flag) parent.getItemAtPosition(position)).getPic()) != null)
                         bundle.putByteArray("picture", pic_file.getData());
-                }
-                catch(com.parse.ParseException pe)
-                {
-                    Log.v(TAG, "Parse file couldn't be retrieved");
-                    pe.printStackTrace();
-                }
 
-                try {
                     ParseFile audio_file;
                     if((audio_file = ((Flag) parent.getItemAtPosition(position)).getAudio()) != null)
                     bundle.putByteArray("audio", audio_file.getData());
+
+                    ParseFile video_file;
+                    if((video_file = ((Flag) parent.getItemAtPosition(position)).getVideo()) != null)
+                    {
+                        File temp = File.createTempFile("places_temp_video", "mp4", getActivity().getCacheDir());
+                        temp.deleteOnExit();
+
+                        FileOutputStream outStream = new FileOutputStream(temp);
+                        outStream.write(video_file.getData());
+                        outStream.close();
+
+                        bundle.putString("video", temp.getPath());
+                    }
                 }
+                catch(IOException ioe){ioe.printStackTrace();}
                 catch(com.parse.ParseException pe)
                 {
-                    Log.v(TAG, "Parse file couldn't be retrieved");
+                    Log.v(TAG, "Parse file(s) couldn't be retrieved");
                     pe.printStackTrace();
                 }
 
