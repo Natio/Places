@@ -24,13 +24,11 @@ import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -84,7 +82,7 @@ public class FlagsListFragment extends Fragment {
 
 class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
     private static final String TAG = "FlagsAdapter";
-    private List<Flag> flags;
+    private final List<Flag> flags;
     private final Context context;
     private final Transformation transformation = new CropCircleTransformation();
 

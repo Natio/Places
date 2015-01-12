@@ -22,15 +22,19 @@ import android.widget.Toast;
 
 import com.gcw.sapienza.places.adapters.FlagsArrayAdapter;
 import com.gcw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.model.FlagReport;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseFile;
 import com.parse.DeleteCallback;
 import com.parse.ParseException;
 import com.parse.SaveCallback;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -86,29 +90,36 @@ public class MosaicFragment extends Fragment{
                 bundle.putString("text", ((Flag) parent.getItemAtPosition(position)).getText());
                 bundle.putString("id", ((Flag) parent.getItemAtPosition(position)).getFbId());
                 bundle.putString("date", sDate);
-                // bundle.putByteArray("pic", ((Flag) parent.getItemAtPosition(position)).getPic());
                 bundle.putString("weather", ((Flag) parent.getItemAtPosition(position)).getWeather());
                 bundle.putString("category", ((Flag) parent.getItemAtPosition(position)).getCategory());
 
-                try {
+                try
+                {
                     ParseFile pic_file;
                     if((pic_file = ((Flag) parent.getItemAtPosition(position)).getPic()) != null)
                         bundle.putByteArray("picture", pic_file.getData());
-                }
-                catch(com.parse.ParseException pe)
-                {
-                    Log.v(TAG, "Parse file couldn't be retrieved");
-                    pe.printStackTrace();
-                }
 
-                try {
                     ParseFile audio_file;
                     if((audio_file = ((Flag) parent.getItemAtPosition(position)).getAudio()) != null)
                     bundle.putByteArray("audio", audio_file.getData());
+
+                    ParseFile video_file;
+                    if((video_file = ((Flag) parent.getItemAtPosition(position)).getVideo()) != null)
+                    {
+                        File temp = File.createTempFile("places_temp_video", "mp4", getActivity().getCacheDir());
+                        temp.deleteOnExit();
+
+                        FileOutputStream outStream = new FileOutputStream(temp);
+                        outStream.write(video_file.getData());
+                        outStream.close();
+
+                        bundle.putString("video", temp.getPath());
+                    }
                 }
+                catch(IOException ioe){ioe.printStackTrace();}
                 catch(com.parse.ParseException pe)
                 {
-                    Log.v(TAG, "Parse file couldn't be retrieved");
+                    Log.v(TAG, "Parse file(s) couldn't be retrieved");
                     pe.printStackTrace();
                 }
 
@@ -160,15 +171,15 @@ public class MosaicFragment extends Fragment{
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         Flag sel_usr = (Flag)(listView.getItemAtPosition(info.position));
         String fb_id = sel_usr.getFbId();
-        ArrayList<String> reports = sel_usr.getReports();
+
         if(FacebookUtils.getInstance().getCurrentUserId().equals(fb_id)) {
             menu.add(0, Utils.DELETE_POST, 0, "Delete Flag");
-        }else if(reports == null || !reports.contains(FacebookUtils.getInstance().getCurrentUserId())) {
+        }else {
             menu.add(0, Utils.REPORT_POST, 0, "Report Flag as inappropriate");
-        }else{
+        }/*else{
             menu.add(0, Utils.REMOVE_REPORT_POST, 0, "Revoke Flag report");
 
-        }
+        }*/
 //        inflater.inflate(R.menu.context_menu, menu);
     }
 
@@ -177,30 +188,15 @@ public class MosaicFragment extends Fragment{
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         Flag sel_usr = (Flag)(listView.getItemAtPosition(info.position));
         switch (item.getItemId()) {
+
             case Utils.DELETE_POST:
-                sel_usr.deleteInBackground(new DeleteCallback() {
-                    @Override
-                    public void done(com.parse.ParseException e) {
-                        Toast.makeText(getActivity(), "Flag deleted", Toast.LENGTH_SHORT);
-                        Utils.mainActivity.refresh();
-                    }
-                });
+                this.deleteFlag(sel_usr);
                 return true;
+
             case Utils.REPORT_POST:
-                ArrayList<String> newReports = sel_usr.getReports();
-                if(newReports == null)
-                    newReports = new ArrayList<String>();
-                newReports.add(FacebookUtils.getInstance().getCurrentUserId());
-                sel_usr.put("reports", newReports);
-                sel_usr.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        Toast.makeText(getActivity(), "Flag reported", Toast.LENGTH_SHORT).show();
-                        Utils.mainActivity.refresh();
-                    }
-                });
+                this.reportFlag(sel_usr);
                 return true;
-            case Utils.REMOVE_REPORT_POST:
+           /* case Utils.REMOVE_REPORT_POST:
                 ArrayList<String> delReports =sel_usr.getReports();
                 delReports.remove(FacebookUtils.getInstance().getCurrentUserId());
                 sel_usr.put("reports", delReports);
@@ -211,11 +207,46 @@ public class MosaicFragment extends Fragment{
                         Utils.mainActivity.refresh();
                     }
                 });
-                return true;
+                return true;*/
             default:
                 return super.onContextItemSelected(item);
         }
     }
+
+    /**
+     * Deletes the Flag
+     * @param f flag to delete
+     */
+    private void deleteFlag(Flag f){
+        f.deleteInBackground(new DeleteCallback() {
+            @Override
+            public void done(com.parse.ParseException e) {
+                Toast.makeText(getActivity(), "Flag deleted", Toast.LENGTH_SHORT).show();
+                Utils.mainActivity.refresh();
+            }
+        });
+    }
+
+    /**
+     * Reports a flag
+     * @param f flag to report
+     */
+    private void reportFlag(final Flag f){
+
+        FlagReport report = FlagReport.createFlagReportFromFlag(f);
+        report.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.d(TAG, e.getMessage());
+                } else {
+                    Toast.makeText(getActivity(), "Flag Reported", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+
 
     private void loadDefaultSettings() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());

@@ -21,7 +21,9 @@ public class Utils
 
     public static int[] stepValues = {1, 5, 10, 15, 20};
 
+    public static final int VID_SHOOT_REQUEST_CODE = 90;
     public static final int PIC_CAPTURE_REQUEST_CODE = 91;
+
     public static final int SETTINGS_REQUEST_CODE = 92;
     public static final int GPS_ENABLE_REQUEST_CODE = 93;
     public static final int LOGIN_REQUEST_CODE = 94;
@@ -36,7 +38,7 @@ public class Utils
 
     public static MainActivity mainActivity;
 
-
+/*
     @Deprecated // Daniele says its 'getLocation' is much better than mine, that's why it's deprecated.
     @SuppressWarnings("unused")
     public static Location getLocation(Context context)
@@ -72,4 +74,5 @@ public class Utils
 
         return null;
     }
+*/
 }

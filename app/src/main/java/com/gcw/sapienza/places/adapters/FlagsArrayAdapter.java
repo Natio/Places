@@ -2,10 +2,6 @@ package com.gcw.sapienza.places.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,15 +12,9 @@ import android.widget.TextView;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.utils.CropCircleTransformation;
-import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
-import com.gcw.sapienza.places.utils.Utils;
-import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 /**
@@ -34,29 +24,27 @@ public class FlagsArrayAdapter extends ArrayAdapter<Flag> {
 
     private static final String TAG = "FlagsArrayAdapter";
 
-    private Activity activity;
+    private final Activity activity;
 
-    private final int TEXT_MAX_LENGTH_IN_PREVIEW = 30;
+    private static final int TEXT_MAX_LENGTH_IN_PREVIEW = 30;
 
     /**
      * Transformation that will be applied to profile pictures
      */
     private final Transformation transformation = new CropCircleTransformation();
 
-    public FlagsArrayAdapter(Context context, int layoutResourceId, List<Flag> data, Activity activity){
+    public FlagsArrayAdapter(Context context, int layoutResourceId, List<Flag> data, Activity activity) {
         super(context, layoutResourceId, data);
 
         this.activity = activity;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent)
-    {
+    public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
 
-        if(row == null)
-        {
-            LayoutInflater inflater = ((Activity)this.getContext()).getLayoutInflater();
+        if (row == null) {
+            LayoutInflater inflater = ((Activity) this.getContext()).getLayoutInflater();
             //inflate the row from the xml file
             row = inflater.inflate(R.layout.new_flags_list_item, parent, false);
         }
@@ -65,20 +53,18 @@ public class FlagsArrayAdapter extends ArrayAdapter<Flag> {
         final ImageView imageView = (ImageView) final_row.findViewById(R.id.flag_list_item_pic);
 
         //obtain current post
-        final Flag current_post =  this.getItem(position);
+        final Flag current_post = this.getItem(position);
 
         //obtain post's subviews and configure them
-        TextView textView = (TextView)row.findViewById(R.id.flag_list_item_first_line);
+        TextView textView = (TextView) row.findViewById(R.id.flag_list_item_first_line);
         // final TextView subtitleTextView = (TextView)row.findViewById(R.id.flag_list_item_subtitle);
 
         String flag_text = current_post.getText();
-        if(flag_text.length() > TEXT_MAX_LENGTH_IN_PREVIEW)
-        {
+        if (flag_text.length() > TEXT_MAX_LENGTH_IN_PREVIEW) {
             // If text is too long, only the first EXT_MAX_LENGTH_IN_PREVIEW will be shown in the preview
             String flag_text_head = flag_text.substring(0, TEXT_MAX_LENGTH_IN_PREVIEW) + "...";
             textView.setText(flag_text_head);
-        }
-        else textView.setText(flag_text);
+        } else textView.setText(flag_text);
 
         final String fbId = current_post.getFbId();
 
@@ -88,38 +74,4 @@ public class FlagsArrayAdapter extends ArrayAdapter<Flag> {
         return row;
     }
 
-
-    @Deprecated
-    private void loadImageFromUrl(ImageView imageView, String image_url){
-        // Picasso.with(this.getContext()).load(image_url).transform(this.transformation).into(imageView);
-        Picasso.with(this.getContext()).load(image_url).into(imageView);
-    }
-
-
-    //now USE loadImageFromUrl that has image caching
-    @Deprecated
-    protected void streamProfilePicToAdapter(final View row, final String fbId)
-    {
-        new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    String small_profile_pic_url = FacebookUtils.getInstance().getProfilePictureSmall(fbId);
-                    final Bitmap bitmap = BitmapFactory.decodeStream(new URL(small_profile_pic_url).openConnection().getInputStream());
-
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ((ImageView) row.findViewById(R.id.flag_list_item_pic)).setImageBitmap(bitmap);
-                        }
-                    });
-                }
-                catch(MalformedURLException mue){ mue.printStackTrace(); }
-                catch (IOException ioe){ ioe.printStackTrace(); }
-            }
-        }).start();
-    }
 }

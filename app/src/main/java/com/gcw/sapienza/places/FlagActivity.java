@@ -5,10 +5,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
@@ -31,12 +34,14 @@ public class FlagActivity extends Activity {
     private String date;
     private String weather;
     private String category;
-    private String [] reports;
 
     private byte[] pic;
     private byte[] audio;
+    private String video_path;
 
     private MediaPlayer mediaPlayer;
+
+    private VideoView vv;
 
     private static final String TAG = "FlagActivity";
 
@@ -57,6 +62,8 @@ public class FlagActivity extends Activity {
 
         ImageView iw = ((ImageView)findViewById(R.id.pic));
 
+        vv = (VideoView)findViewById(R.id.vid);
+
         if(bundle.getByteArray("picture") != null)
         {
             pic = new byte[bundle.getByteArray("picture").length];
@@ -76,6 +83,14 @@ public class FlagActivity extends Activity {
 
             playRecording(audio);
         }
+
+        if(bundle.getString("video") != null)
+        {
+            video_path = bundle.getString("video");
+
+            playVideo(video_path);
+        }
+        else vv.setVisibility(View.INVISIBLE);
 
         ((EditText)findViewById(R.id.text)).setText(text);
         final String weatherString = (weather == null || weather.equals("")) ? "" : ", " + weather;
@@ -130,6 +145,17 @@ public class FlagActivity extends Activity {
         }
     }
 
+    private void playVideo(String video_path)
+    {
+        Uri videoUri = Uri.parse(video_path);
+
+        if(videoUri != null)
+        {
+            vv.setVideoURI(videoUri);
+            vv.start();
+        }
+    }
+
     @Deprecated
     private void loadProfilePictureFromUrl(String url){
         Picasso.with(this.getApplicationContext()).load(url).into((ImageView)findViewById(R.id.profile_pic));
@@ -153,7 +179,6 @@ public class FlagActivity extends Activity {
                         }
                     });
                 }
-                catch(MalformedURLException mue){ mue.printStackTrace(); }
                 catch (IOException ioe){ ioe.printStackTrace(); }
             }
         }).start();
