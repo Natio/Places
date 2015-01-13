@@ -26,7 +26,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+<<<<<<< HEAD
 import android.widget.ImageButton;
+=======
+import android.widget.TextView;
+>>>>>>> 0cb3ae6ebc0f29356b2e35bbcc3d523b2db032a4
 import android.widget.Toast;
 
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
@@ -64,9 +68,12 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         this.srl = srl;
     }
 
+<<<<<<< HEAD
     private MediaRecorder audioRec;
     private String audio_filename;
 
+=======
+>>>>>>> 0cb3ae6ebc0f29356b2e35bbcc3d523b2db032a4
     public ShareFragment getShareFragment(){
         return (ShareFragment)this.fragments[0];
     }
@@ -431,8 +438,12 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                         {
                             File file = new File(getRealPathFromURI(this, videoUri));
                             FileInputStream inStream = new FileInputStream(file);
+<<<<<<< HEAD
                             //ShareFragment.video = convertStreamToByteArray(inStream);
                             this.getShareFragment().setVideo(convertStreamToByteArray(inStream));
+=======
+                            ShareFragment.video = Utils.convertStreamToByteArray(inStream);
+>>>>>>> 0cb3ae6ebc0f29356b2e35bbcc3d523b2db032a4
                         }
                         catch(IOException ioe) {ioe.printStackTrace();}
                         break;
@@ -442,6 +453,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         }
     }
 
+<<<<<<< HEAD
     public void captureSound(View v)
     {
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -491,6 +503,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         }
     }
 
+=======
+>>>>>>> 0cb3ae6ebc0f29356b2e35bbcc3d523b2db032a4
     public void shootVid(View v)
     {
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -502,23 +516,6 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         }
 
     }
-
-    public static byte[] convertStreamToByteArray(FileInputStream is) throws IOException
-    {
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-
-        byte[] buff = new byte[ShareFragment.CHUNK_SIZE];
-        int i = Integer.MAX_VALUE;
-
-        while ((i = is.read(buff, 0, buff.length)) > 0)
-        {
-            outStream.write(buff, 0, i);
-        }
-
-        return outStream.toByteArray();
-    }
-
-
 
     public String getRealPathFromURI(Context context, Uri contentUri) {
         Cursor cursor = null;

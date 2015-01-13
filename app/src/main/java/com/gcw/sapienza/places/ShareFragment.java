@@ -5,12 +5,15 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.location.Location;
+import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Vibrator;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
@@ -32,6 +35,9 @@ import com.parse.ParseAnalytics;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,6 +67,9 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     private byte[] video;
     private byte[] audio;
 
+    protected static MediaRecorder audioRec;
+    protected static String audio_filename;
+
     private static final int ANIMATION_DURATION = 300;
 
     private static final String FLAG_PLACED_TEXT = "Flag has been placed!";
@@ -73,6 +82,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     private static final String VIDEO_NOT_FOUND_TEXT = "Error encountered while retrieving video\nFlag won't be stored";
 
 
+<<<<<<< HEAD
     protected static final int CHUNK_SIZE = 4096;
 
 
@@ -127,6 +137,8 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         return audio;
     }
 
+=======
+>>>>>>> 0cb3ae6ebc0f29356b2e35bbcc3d523b2db032a4
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -144,6 +156,64 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         this.picButton.setOnLongClickListener(this);
         this.micButton.setOnLongClickListener(this);
         this.vidButton.setOnLongClickListener(this);
+
+        micButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Vibrator vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+                vibrator.vibrate(Utils.VIBRATION_DURATION);
+
+                if (event.getAction() == MotionEvent.ACTION_DOWN)
+                {
+                    audio_filename = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + System.currentTimeMillis() + ".3gp";
+
+                    audioRec = new MediaRecorder();
+                    audioRec.setAudioSource(MediaRecorder.AudioSource.MIC);
+                    audioRec.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                    audioRec.setOutputFile(audio_filename);
+                    audioRec.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+                    try {
+                        audioRec.prepare();
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                        Toast.makeText(getActivity(), "Audio recording failed", Toast.LENGTH_LONG).show();
+                        Log.e(TAG, "Audio recording failed");
+                    }
+
+                    audioRec.start();
+                }
+                else if(event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    if(audioRec == null)
+                    {
+                        Toast.makeText(getActivity(), "Error encountered while recording", Toast.LENGTH_LONG).show();
+                        Log.v(TAG, "Error encountered while recording");
+
+                        return true;
+                    }
+
+                    audioRec.stop();
+                    audioRec.release();
+                    audioRec = null;
+                    ((ImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.mic_green_taken));
+
+                    File audio_file = new File(audio_filename);
+                    try {
+                        FileInputStream inStream = new FileInputStream(audio_file);
+                        ShareFragment.audio = Utils.convertStreamToByteArray(inStream);
+
+                        inStream.close();
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                    }
+
+                    ShareFragment.isSoundCaptured = true;
+                }
+
+                return true;
+            }
+        });
 
         this.textView = (TextView)mView.findViewById(R.id.share_text_field);
         this.textView.setGravity(Gravity.CENTER);

@@ -83,8 +83,7 @@
             android:padding="30dp"
             android:background="@android:color/transparent"
             android:src="@drawable/mic_selector"
-            android:clickable="true"
-            android:onClick="captureSound" />
+            android:clickable="true" />
 
         <ImageButton
             android:layout_width="wrap_content"

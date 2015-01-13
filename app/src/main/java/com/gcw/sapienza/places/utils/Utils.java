@@ -6,6 +6,11 @@ import android.location.LocationManager;
 import android.widget.Toast;
 
 import com.gcw.sapienza.places.MainActivity;
+import com.gcw.sapienza.places.ShareFragment;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 
 /**
@@ -33,6 +38,8 @@ public class Utils
     public static final int DELETE_POST = 0;
     public static final int REPORT_POST = 1;
     public static final int REMOVE_REPORT_POST = 2;
+
+    protected static final int CHUNK_SIZE = 4096;
 
     public static String[] categories;
 
@@ -75,4 +82,19 @@ public class Utils
         return null;
     }
 */
+
+    public static byte[] convertStreamToByteArray(FileInputStream is) throws IOException
+    {
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+
+        byte[] buff = new byte[CHUNK_SIZE];
+        int i = Integer.MAX_VALUE;
+
+        while ((i = is.read(buff, 0, buff.length)) > 0)
+        {
+            outStream.write(buff, 0, i);
+        }
+
+        return outStream.toByteArray();
+    }
 }
