@@ -121,7 +121,7 @@
         android:id="@+id/share_button"
         android:layout_weight="0.2" />
 
-    <FrameLayout
+    <RelativeLayout
         android:id="@+id/frame_layout"
         android:animateLayoutChanges="true"
         android:visibility="gone"
@@ -135,8 +135,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:indeterminate="true"
-            android:layout_gravity="center" />
-    </FrameLayout>
+            android:layout_gravity="center"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/share_progress_bar"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/share_progress_bar"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text=""
+            android:id="@+id/share_progress_text_view" />
+    </RelativeLayout>
 
     <!-- </TableRow> -->
 

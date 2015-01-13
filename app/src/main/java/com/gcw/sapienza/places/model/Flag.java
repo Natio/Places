@@ -41,4 +41,16 @@ public class Flag extends ParseObject{
 
     public ParseFile getVideo() { return (ParseFile)this.get("video");  }
 
+    public void setPictureFile(ParseFile pic){
+        this.put("picture", pic);
+    }
+
+    public void setAudioFile(ParseFile audio){
+        this.put("audio", audio);
+    }
+
+    public void setVideoFile(ParseFile video){
+        this.put("video", video);
+    }
+
 }
