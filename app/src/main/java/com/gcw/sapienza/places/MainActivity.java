@@ -27,7 +27,6 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,10 +41,8 @@ import com.parse.ui.ParseLoginBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Date;
 
 
 public class MainActivity extends ActionBarActivity implements ViewPager.OnPageChangeListener, SwipeRefreshLayout.OnRefreshListener, View.OnLongClickListener {
@@ -67,9 +64,6 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     public void setSwipeRefreshLayout(SwipeRefreshLayout srl){
         this.srl = srl;
     }
-
-    protected MediaRecorder audioRec;
-    protected String audio_filename;
 
     public ShareFragment getShareFragment(){
         return (ShareFragment)this.fragments[0];
@@ -506,61 +500,13 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                         {
                             File file = new File(getRealPathFromURI(this, videoUri));
                             FileInputStream inStream = new FileInputStream(file);
-                            ShareFragment.video = convertStreamToByteArray(inStream);
+                            ShareFragment.video = Utils.convertStreamToByteArray(inStream);
                         }
                         catch(IOException ioe) {ioe.printStackTrace();}
                         break;
                     case RESULT_CANCELED:
                         Log.v(TAG, "Video Intent canceled");
                 }
-        }
-    }
-
-    public void captureSound(View v)
-    {
-        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        vibrator.vibrate(Utils.VIBRATION_DURATION);
-
-        if(audioRec == null)
-        {
-            audio_filename = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + System.currentTimeMillis() + ".3gp";
-
-            audioRec = new MediaRecorder();
-            audioRec.setAudioSource(MediaRecorder.AudioSource.MIC);
-            audioRec.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-            audioRec.setOutputFile(audio_filename);
-            audioRec.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-
-            try {
-                audioRec.prepare();
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-                Toast.makeText(this, "Audio recording failed", Toast.LENGTH_LONG).show();
-                Log.e(TAG, "Audio recording failed");
-            }
-
-            audioRec.start();
-
-            Toast.makeText(this, "Tap mic button again to stop recording", Toast.LENGTH_SHORT).show();
-        }
-        else
-        {
-            audioRec.stop();
-            audioRec.release();
-            audioRec = null;
-            ((ImageButton)v).setImageDrawable(getResources().getDrawable(R.drawable.mic_green_taken));
-
-            File audio_file = new File(audio_filename);
-            try
-            {
-                FileInputStream inStream = new FileInputStream(audio_file);
-                ShareFragment.audio = convertStreamToByteArray(inStream);
-
-                inStream.close();
-            }
-            catch(IOException ioe){ ioe.printStackTrace(); }
-
-            ShareFragment.isSoundCaptured = true;
         }
     }
 
@@ -575,23 +521,6 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         }
 
     }
-
-    public static byte[] convertStreamToByteArray(FileInputStream is) throws IOException
-    {
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-
-        byte[] buff = new byte[ShareFragment.CHUNK_SIZE];
-        int i = Integer.MAX_VALUE;
-
-        while ((i = is.read(buff, 0, buff.length)) > 0)
-        {
-            outStream.write(buff, 0, i);
-        }
-
-        return outStream.toByteArray();
-    }
-
-
 
     public String getRealPathFromURI(Context context, Uri contentUri) {
         Cursor cursor = null;
