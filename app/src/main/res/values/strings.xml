@@ -9,5 +9,8 @@
     <string name="mosaic">Flags nearby</string>
     <string name="map">Map</string>
     <string name="share">Place a flag</string>
+    <string name="upload_picture_progress">Uploading Picture</string>
+    <string name="upload_video_progress">Uploading Video</string>
+    <string name="upload_audio_progress">Uploading Audio</string>
 
 </resources>

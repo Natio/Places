@@ -2,7 +2,6 @@ package com.gcw.sapienza.places;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -15,8 +14,8 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,15 +24,12 @@ import com.gcw.sapienza.places.adapters.MSpinnerAdapter;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.FacebookUtils;
+import com.gcw.sapienza.places.utils.FlagUploader;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseAnalytics;
-import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
-import com.parse.ProgressCallback;
-import com.parse.SaveCallback;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +44,8 @@ public class ShareFragment extends Fragment{
     private Spinner spinner;
     private TextView textView;
     private Button shareButton;
-    private FrameLayout progressBarHolder;
+    private RelativeLayout progressBarHolder;
+    private TextView progressTextView;
 
     protected static ImageButton picButton;
     protected static ImageButton micButton;
@@ -84,7 +81,8 @@ public class ShareFragment extends Fragment{
 
         mView = inflater.inflate(R.layout.activity_share, container, false);
 
-        this.progressBarHolder = (FrameLayout)mView.findViewById(R.id.frame_layout);
+        this.progressBarHolder = (RelativeLayout)mView.findViewById(R.id.frame_layout);
+        this.progressTextView = (TextView)mView.findViewById(R.id.share_progress_text_view);
 
         picButton = (ImageButton)mView.findViewById(R.id.pic_button);
         micButton = (ImageButton)mView.findViewById(R.id.mic_button);
@@ -135,6 +133,47 @@ public class ShareFragment extends Fragment{
         Log.v(TAG, "onDestroyView called.");
     }
 
+
+
+
+    /**
+     * Checks if all sharing constraints are satisfied. This method also shows Toasts if constraints are not satisfied
+     * @return true if it is possible to share
+     */
+
+    private boolean canShare(Location current_location){
+        //if there is no content
+        if(this.textView.getText().toString().length() == 0 && !isPicTaken && !isVideoShoot && !isSoundCaptured)
+        {
+            Map<String, String> dimensions = new HashMap<>();
+            dimensions.put("reason", "Share without any content");
+            ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
+
+            resetShareFragment(EMPTY_FLAG_TEXT);
+            return false;
+        }
+        else if(current_location == null){
+
+            Log.d(TAG, "No GPS data");
+            Map<String, String> dimensions = new HashMap<>();
+            dimensions.put("reason", "Share with No GPS");
+            ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
+            resetShareFragment(ENABLE_NETWORK_SERVICE_TEXT);
+            return false;
+        }
+        else if(!FacebookUtils.getInstance().hasCurrentUserId()){
+
+            Map<String, String> dimensions = new HashMap<>();
+            dimensions.put("reason", "Share with No Facebook");
+            ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
+            resetShareFragment(FB_ID_NOT_FOUND_TEXT);
+            return false;
+        }
+
+        return true;
+    }
+
+
     private void share()
     {
         Location current_location =  PlacesApplication.getLocation();
@@ -143,40 +182,13 @@ public class ShareFragment extends Fragment{
             Log.d(TAG, "Generata Posizione casuale per simulatore: "+current_location);
         }
 
-        //if there is no content
-        //TODO remember to fix this when adding videos
-        if(this.textView.getText().toString().length() == 0 && !isPicTaken && !isVideoShoot && !isSoundCaptured)
-        {
-            Map<String, String> dimensions = new HashMap<>();
-            dimensions.put("reason", "Share without any content");
-            ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
-
-            resetShareFragment(EMPTY_FLAG_TEXT);
-            return;
-        }
-
-        if(current_location == null)
-        {
-            Log.d(TAG, "No GPS data");
-
-            Map<String, String> dimensions = new HashMap<>();
-            dimensions.put("reason", "Share with No GPS");
-            ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
-            resetShareFragment(ENABLE_NETWORK_SERVICE_TEXT);
+        if(!this.canShare(current_location)){
             return;
         }
 
         final Flag f = new Flag();
-        ParseGeoPoint p = new ParseGeoPoint(current_location.getLatitude(), current_location.getLongitude());
 
-        if(!FacebookUtils.getInstance().hasCurrentUserId())
-        {
-            Map<String, String> dimensions = new HashMap<>();
-            dimensions.put("reason", "Share with No Facebook");
-            ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
-            resetShareFragment(FB_ID_NOT_FOUND_TEXT);
-            return;
-        }
+        ParseGeoPoint p = new ParseGeoPoint(current_location.getLatitude(), current_location.getLongitude());
 
         Vibrator vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
@@ -189,154 +201,78 @@ public class ShareFragment extends Fragment{
         f.put("text",this.textView.getText().toString());
         f.put("weather", PlacesApplication.getWeather());
 
+        FlagUploader uploader = new FlagUploader(f, this.getActivity());
 
-        new Thread(new Runnable()
-        {
+        if( isPicTaken && pic != null){
+            Log.v(TAG, "Successfully retrieved pic.");
+            ParseFile parse_pic = new ParseFile(System.currentTimeMillis()+".png", ShareFragment.pic);
+            uploader.setPictureFile(parse_pic);
+            f.setPictureFile(parse_pic);
+        }
+        else if( isPicTaken ){ // equals isPicTaken && pic == null)
+            Toast.makeText(getActivity(), PIC_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if(isSoundCaptured && audio != null){
+            Log.v(TAG, "Successfully retrieved recording.");
+            ParseFile parse_audio = new ParseFile(System.currentTimeMillis()+".3gp", ShareFragment.audio);
+            uploader.setAudioFile(parse_audio);
+            f.setAudioFile(parse_audio);
+        }
+        else if(isSoundCaptured){ //equals isSoundCaptured && audio == null
+            Toast.makeText(getActivity(), AUDIO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (isVideoShoot && video != null){
+            Log.v(TAG, "Successfully retrieved video.");
+            ParseFile parse_video = new ParseFile(System.currentTimeMillis()+".mp4", ShareFragment.video);
+            uploader.setVideoFile(parse_video);
+            f.setVideoFile(parse_video);
+        }
+        else if(isVideoShoot){
+            Toast.makeText(getActivity(), VIDEO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        AlphaAnimation inAnim = new AlphaAnimation(0, 1);
+        inAnim.setDuration(ANIMATION_DURATION);
+        progressBarHolder.setAnimation(inAnim);
+        progressBarHolder.setVisibility(View.VISIBLE);
+
+        uploader.upload(new FlagUploader.FlagUploaderCallbacks() {
             @Override
-            public void run() {
-
-                if (ShareFragment.isPicTaken)
-                {
-                    if (pic == null)
-                    {
-                        Toast.makeText(getActivity(), PIC_NOT_FOUND_TEXT,
-                                Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    else
-                    {
-                        Log.v(TAG, "Successfully retrieved pic.");
-
-                        ParseFile parse_pic = new ParseFile(System.currentTimeMillis()+".png", pic);
-
-                        parse_pic.saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(ParseException e)
-                            {
-                                if(e != null) Toast.makeText(getActivity(), "Error encountered while uploading picture", Toast.LENGTH_LONG).show();
-                            }
-                        }, new ProgressCallback() {
-                            @Override
-                            public void done(Integer integer) {
-                                // TODO maybe we could display a progress bar while uploading pic
-                            }
-                        });
-                        f.put("picture", parse_pic);
-                    }
-                }
-
-                if (ShareFragment.isSoundCaptured)
-                {
-                    if (audio == null)
-                    {
-                        Toast.makeText(getActivity(), AUDIO_NOT_FOUND_TEXT,
-                                Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    else
-                    {
-                        Log.v(TAG, "Successfully retrieved recording.");
-
-                        ParseFile parse_audio = new ParseFile(System.currentTimeMillis()+".3gp", ShareFragment.audio);
-
-                        parse_audio.saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(ParseException e)
-                            {
-                                if(e != null) Toast.makeText(getActivity(), "Error encountered while uploading recording", Toast.LENGTH_LONG).show();
-                            }
-                        }, new ProgressCallback() {
-                            @Override
-                            public void done(Integer integer) {
-                                // TODO maybe we could display a progress bar while uploading recording
-                            }
-                        });
-                        f.put("audio", parse_audio);
-                    }
-                }
-
-                if(ShareFragment.isVideoShoot)
-                {
-                    if (video == null)
-                    {
-                        Toast.makeText(getActivity(), VIDEO_NOT_FOUND_TEXT,
-                                Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    else
-                    {
-                        Log.v(TAG, "Successfully retrieved video.");
-
-                        ParseFile parse_video = new ParseFile(System.currentTimeMillis()+".mp4", ShareFragment.video);
-
-                        parse_video.saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(ParseException e)
-                            {
-                                if(e != null) Toast.makeText(getActivity(), "Error encountered while uploading video", Toast.LENGTH_LONG).show();
-                            }
-                        }, new ProgressCallback() {
-                            @Override
-                            public void done(Integer integer) {
-                                // TODO maybe we could display a progress bar while uploading recording
-                            }
-                        });
-                        f.put("video", parse_video);
-                    }
-                }
-
-                getActivity().runOnUiThread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        AlphaAnimation inAnim = new AlphaAnimation(0, 1);
-                        inAnim.setDuration(ANIMATION_DURATION);
-                        progressBarHolder.setAnimation(inAnim);
-                        progressBarHolder.setVisibility(View.VISIBLE);
-                    }
-                });
-
-                f.saveInBackground(new SaveCallback()
-                {
-                    @Override
-                    public void done(ParseException e)
-                    {
-                        if (e != null) {
-                            Log.d(TAG, e.getMessage());
-                            Map<String, String> dimensions = new HashMap<>();
-                            dimensions.put("reason", e.getMessage());
-                            ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
-
-                            resetShareFragment(ERROR_ENCOUNTERED_TEXT);
-                        }
-                        else
-                        {
-                            ((com.gcw.sapienza.places.MainActivity) getActivity()).refresh();
-                            Map<String, String> dimensions = new HashMap<>();
-                            dimensions.put("category", category);
-                            ParseAnalytics.trackEventInBackground("sharing_succeded", dimensions);
-
-                            resetShareFragment(FLAG_PLACED_TEXT);
-                        }
-
-                        getActivity().runOnUiThread(new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                AlphaAnimation outAnim = new AlphaAnimation(1, 0);
-                                outAnim.setDuration(ANIMATION_DURATION);
-                                progressBarHolder.setAnimation(outAnim);
-                                progressBarHolder.setVisibility(View.GONE);
-                            }
-                        });
-
-                        resetMedia();
-                    }
-                });
+            public void onPercentage(int percentage, String text_to_show) {
+                ShareFragment.this.progressTextView.setText(text_to_show+" "+percentage+"%");
             }
-        }).start();
+
+            @Override
+            public void onError(Exception e) {
+                Log.d(TAG, e.getMessage());
+                Map<String, String> dimensions = new HashMap<>();
+                dimensions.put("reason", e.getMessage());
+                ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
+                resetShareFragment(ERROR_ENCOUNTERED_TEXT);
+            }
+
+            @Override
+            public void onSuccess() {
+                Log.d(TAG, "Success");
+                ((com.gcw.sapienza.places.MainActivity) getActivity()).refresh();
+                Map<String, String> dimensions = new HashMap<>();
+                dimensions.put("category", category);
+                ParseAnalytics.trackEventInBackground("sharing_succeded", dimensions);
+
+                resetShareFragment(FLAG_PLACED_TEXT);
+                AlphaAnimation outAnim = new AlphaAnimation(1, 0);
+                outAnim.setDuration(ANIMATION_DURATION);
+                progressBarHolder.setAnimation(outAnim);
+                progressBarHolder.setVisibility(View.GONE);
+            }
+        });
+
+
     }
 
     @Override
