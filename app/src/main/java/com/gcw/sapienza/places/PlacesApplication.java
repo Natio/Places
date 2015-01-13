@@ -66,7 +66,11 @@ public class PlacesApplication extends Application{
     //shared variable for handling weather conditions
     private static String weather = "";
 
-    public static PlacesApplication placesApplication;
+    private static PlacesApplication placesApplication;
+
+    public static PlacesApplication getPlacesApplication(){
+        return PlacesApplication.placesApplication;
+    }
 
     /**
      *

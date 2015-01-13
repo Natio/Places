@@ -23,12 +23,10 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
@@ -42,20 +40,18 @@ import com.parse.ui.ParseLoginBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Date;
 
 
-public class MainActivity extends ActionBarActivity implements ViewPager.OnPageChangeListener, SwipeRefreshLayout.OnRefreshListener, View.OnLongClickListener {
+public class MainActivity extends ActionBarActivity implements ViewPager.OnPageChangeListener, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "MainActivity";
 
     private static boolean isForeground = false;
 
 
-    private Fragment[] fragments = {new ShareFragment(), new MosaicFragment(), new MMapFragment()};
+    private final Fragment[] fragments = {new ShareFragment(), new MosaicFragment(), new MMapFragment()};
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private SwipeRefreshLayout srl;
@@ -68,8 +64,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         this.srl = srl;
     }
 
-    protected MediaRecorder audioRec;
-    protected String audio_filename;
+    private MediaRecorder audioRec;
+    private String audio_filename;
 
     public ShareFragment getShareFragment(){
         return (ShareFragment)this.fragments[0];
@@ -110,9 +106,9 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
         if(savedInstanceState != null)
         {
-            ShareFragment.pic = savedInstanceState.getByteArray("pic");
-            ShareFragment.audio = savedInstanceState.getByteArray("audio");
-            ShareFragment.video = savedInstanceState.getByteArray("video");
+            this.getShareFragment().setPicture(savedInstanceState.getByteArray("pic"));
+            this.getShareFragment().setAudio(savedInstanceState.getByteArray("audio"));
+            this.getShareFragment().setVideo(savedInstanceState.getByteArray("video"));
         }
 
 
@@ -158,9 +154,9 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
         Log.v(TAG, "onSaveInstanceState called!");
 
-        outState.putByteArray("audio", ShareFragment.audio);
-        outState.putByteArray("pic", ShareFragment.pic);
-        outState.putByteArray("video", ShareFragment.video);
+        outState.putByteArray("audio", this.getShareFragment().getAudio());
+        outState.putByteArray("pic", this.getShareFragment().getPic());
+        outState.putByteArray("video", this.getShareFragment().getVideo());
     }
 
     @Override
@@ -243,6 +239,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         if(i == 0) ((ShareFragment)fragments[i]).onVisiblePage();
     }
 
+    @SuppressWarnings("unused")
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
@@ -266,83 +263,10 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         srl.setRefreshing(false);
     }
 
-    @Override
-    public boolean onLongClick(final View v)
-    {
-        Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
-        vibrator.vibrate(Utils.VIBRATION_DURATION);
 
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE:
-                        if(v.getId() == ShareFragment.picButton.getId())
-                        {
-                            ShareFragment.picButton.setImageDrawable(getResources().getDrawable(R.drawable.cam_selector));
-                            ShareFragment.isPicTaken = false;
-                            ShareFragment.pic = null;
-                        }
-                        else if (v.getId() == ShareFragment.micButton.getId())
-                        {
-                            ShareFragment.micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_selector));
-                            ShareFragment.isSoundCaptured = false;
-                            ShareFragment.audio = null;
-                        }
-                        else if (v.getId() == ShareFragment.vidButton.getId())
-                        {
-                            ShareFragment.vidButton.setImageDrawable(getResources().getDrawable(R.drawable.videocam_selector));
-                            ShareFragment.isVideoShoot = false;
-                            ShareFragment.video = null;
-                        }
-                        break;
-
-                    case DialogInterface.BUTTON_NEGATIVE:
-                }
-            }
-        };
-
-        AlertDialog.Builder builder;
-        AlertDialog dialog = null;
-
-        if(v.getId() == ShareFragment.micButton.getId())
-        {
-            if(ShareFragment.audio == null) return true;
-
-            builder  = new AlertDialog.Builder(this);
-            dialog = builder.setMessage("Discard recording?").setPositiveButton("Yes", dialogClickListener)
-                    .setNegativeButton("No", dialogClickListener).show();
-        }
-
-        else if(v.getId() == ShareFragment.picButton.getId())
-        {
-            if(ShareFragment.pic == null) return true;
-
-            builder  = new AlertDialog.Builder(this);
-            dialog = builder.setMessage("Discard picture?").setPositiveButton("Yes", dialogClickListener)
-                    .setNegativeButton("No", dialogClickListener).show();
-        }
-
-        else if(v.getId() == ShareFragment.vidButton.getId())
-        {
-            if(ShareFragment.video == null) return true;
-
-            builder  = new AlertDialog.Builder(this);
-            dialog = builder.setMessage("Discard video?").setPositiveButton("Yes", dialogClickListener)
-                    .setNegativeButton("No", dialogClickListener).show();
-        }
-
-        if(dialog == null) return false;
-
-        TextView dialogText = (TextView)dialog.findViewById(android.R.id.message);
-        dialogText.setGravity(Gravity.CENTER);
-        dialog.show();
-
-        return true;
-    }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
-        MainActivity mainActivity;
+        private final MainActivity mainActivity;
 
         public SectionsPagerAdapter(FragmentManager fm, MainActivity mainActivity)
         {
@@ -388,7 +312,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                 &&!locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             promptForLocationServices();
         }else {
-            PlacesApplication.placesApplication.startLocationService();
+            PlacesApplication.getPlacesApplication().startLocationService();
         }
 
         isForeground = true;
@@ -480,7 +404,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
                         bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                        ShareFragment.pic = stream.toByteArray();
+                        //ShareFragment.pic = stream.toByteArray();
+                        this.getShareFragment().setPicture(stream.toByteArray());
 
                         break;
                     case RESULT_CANCELED:
@@ -488,7 +413,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                         break;
                 }
             case Utils.GPS_ENABLE_REQUEST_CODE:
-                PlacesApplication.placesApplication.startLocationService();
+                PlacesApplication.getPlacesApplication().startLocationService();
                 break;
             case Utils.LOGIN_REQUEST_CODE:
 
@@ -506,7 +431,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                         {
                             File file = new File(getRealPathFromURI(this, videoUri));
                             FileInputStream inStream = new FileInputStream(file);
-                            ShareFragment.video = convertStreamToByteArray(inStream);
+                            //ShareFragment.video = convertStreamToByteArray(inStream);
+                            this.getShareFragment().setVideo(convertStreamToByteArray(inStream));
                         }
                         catch(IOException ioe) {ioe.printStackTrace();}
                         break;
@@ -554,13 +480,14 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
             try
             {
                 FileInputStream inStream = new FileInputStream(audio_file);
-                ShareFragment.audio = convertStreamToByteArray(inStream);
+                //ShareFragment.audio = convertStreamToByteArray(inStream);
+                this.getShareFragment().setAudio(convertStreamToByteArray(inStream));
 
                 inStream.close();
             }
             catch(IOException ioe){ ioe.printStackTrace(); }
 
-            ShareFragment.isSoundCaptured = true;
+            //ShareFragment.isSoundCaptured = true;
         }
     }
 

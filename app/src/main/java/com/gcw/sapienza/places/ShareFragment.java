@@ -1,7 +1,9 @@
 package com.gcw.sapienza.places;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -35,11 +37,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class ShareFragment extends Fragment{
+public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
     private static final String TAG = "ShareFragment";
 
-    private static View mView;
+    private View mView;
 
     private Spinner spinner;
     private TextView textView;
@@ -47,17 +49,17 @@ public class ShareFragment extends Fragment{
     private RelativeLayout progressBarHolder;
     private TextView progressTextView;
 
-    protected static ImageButton picButton;
-    protected static ImageButton micButton;
-    protected static ImageButton vidButton;
+    private ImageButton picButton;
+    private ImageButton micButton;
+    private ImageButton vidButton;
 
-    protected static boolean isPicTaken = false;
-    protected static boolean isVideoShoot = false;
-    protected static boolean isSoundCaptured = false;
+    private boolean isPicTaken = false;
+    private boolean isVideoShoot = false;
+    private boolean isSoundCaptured = false;
 
-    protected static byte[] pic;
-    protected static byte[] video;
-    protected static byte[] audio;
+    private byte[] pic;
+    private byte[] video;
+    private byte[] audio;
 
     private static final int ANIMATION_DURATION = 300;
 
@@ -70,27 +72,78 @@ public class ShareFragment extends Fragment{
     private static final String AUDIO_NOT_FOUND_TEXT = "Error encountered while retrieving recording\nFlag won't be stored";
     private static final String VIDEO_NOT_FOUND_TEXT = "Error encountered while retrieving video\nFlag won't be stored";
 
-    protected static final float MEDIA_AVAILABLE_ALPHA = 0.3f;
 
     protected static final int CHUNK_SIZE = 4096;
+
+
+    public void setVideo(byte[] video){
+        this.video = video;
+        if(video == null){
+            this.isVideoShoot = false;
+            this.vidButton.setImageDrawable(getResources().getDrawable(R.drawable.videocam_selector));
+        }
+        else{
+            this.isVideoShoot = true;
+            this.vidButton.setImageDrawable(getResources().getDrawable(R.drawable.videocam_green_taken));
+        }
+
+    }
+
+    public void setAudio(byte[] audio){
+        this.audio = audio;
+        if(audio == null){
+            this.isSoundCaptured = false;
+            this.micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_selector));
+        }
+        else{
+            this.isSoundCaptured = true;
+            this.micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_green_taken));
+        }
+
+    }
+
+    public void setPicture(byte[] pic){
+        this.pic = pic;
+        if(pic == null){
+            this.isPicTaken = false;
+            this.picButton.setImageDrawable(getResources().getDrawable(R.drawable.cam_selector));
+        }
+        else{
+            this.isPicTaken = true;
+            this.picButton.setImageDrawable(getResources().getDrawable(R.drawable.camera_green_taken));
+        }
+
+    }
+
+    public byte[] getPic() {
+        return pic;
+    }
+
+    public byte[] getVideo() {
+        return video;
+    }
+
+    public byte[] getAudio() {
+        return audio;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         Log.d(TAG, "onCreateView");
 
-        mView = inflater.inflate(R.layout.activity_share, container, false);
+        this.mView = inflater.inflate(R.layout.activity_share, container, false);
 
         this.progressBarHolder = (RelativeLayout)mView.findViewById(R.id.frame_layout);
         this.progressTextView = (TextView)mView.findViewById(R.id.share_progress_text_view);
 
-        picButton = (ImageButton)mView.findViewById(R.id.pic_button);
-        micButton = (ImageButton)mView.findViewById(R.id.mic_button);
-        vidButton = (ImageButton)mView.findViewById(R.id.vid_button);
+        this.picButton = (ImageButton)mView.findViewById(R.id.pic_button);
+        this.micButton = (ImageButton)mView.findViewById(R.id.mic_button);
+        this.vidButton = (ImageButton)mView.findViewById(R.id.vid_button);
 
-        picButton.setOnLongClickListener((View.OnLongClickListener)getActivity());
-        micButton.setOnLongClickListener((View.OnLongClickListener)getActivity());
-        vidButton.setOnLongClickListener((View.OnLongClickListener)getActivity());
+        this.picButton.setOnLongClickListener(this);
+        this.micButton.setOnLongClickListener(this);
+        this.vidButton.setOnLongClickListener(this);
 
         this.textView = (TextView)mView.findViewById(R.id.share_text_field);
         this.textView.setGravity(Gravity.CENTER);
@@ -134,6 +187,76 @@ public class ShareFragment extends Fragment{
     }
 
 
+    @Override
+    public boolean onLongClick(final View v)
+    {
+
+        Vibrator vibrator = (Vibrator) this.getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(Utils.VIBRATION_DURATION);
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        if(v.getId() == ShareFragment.this.picButton.getId())
+                        {
+                            ShareFragment.this.setPicture(null);
+                        }
+                        else if (v.getId() == ShareFragment.this.micButton.getId())
+                        {
+                            ShareFragment.this.setVideo(null);
+                        }
+                        else if (v.getId() == ShareFragment.this.vidButton.getId())
+                        {
+                            ShareFragment.this.setVideo(null);
+                        }
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                }
+            }
+        };
+
+        AlertDialog.Builder builder;
+        AlertDialog dialog = null;
+
+        if(v.getId() == ShareFragment.this.micButton.getId())
+        {
+            if(this.audio == null) return true;
+
+            builder  = new AlertDialog.Builder(this.getActivity());
+            dialog = builder.setMessage("Discard recording?").setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener).show();
+        }
+
+        else if(v.getId() == ShareFragment.this.picButton.getId())
+        {
+            if(this.pic == null) return true;
+
+            builder  = new AlertDialog.Builder(this.getActivity());
+            dialog = builder.setMessage("Discard picture?").setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener).show();
+        }
+
+        else if(v.getId() == ShareFragment.this.vidButton.getId())
+        {
+            if(this.video == null) return true;
+
+            builder  = new AlertDialog.Builder(this.getActivity());
+            dialog = builder.setMessage("Discard video?").setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener).show();
+        }
+
+        if(dialog == null) return false;
+
+        TextView dialogText = (TextView)dialog.findViewById(android.R.id.message);
+        dialogText.setGravity(Gravity.CENTER);
+        dialog.show();
+
+        return true;
+
+    }
 
 
     /**
@@ -205,7 +328,7 @@ public class ShareFragment extends Fragment{
 
         if( isPicTaken && pic != null){
             Log.v(TAG, "Successfully retrieved pic.");
-            ParseFile parse_pic = new ParseFile(System.currentTimeMillis()+".png", ShareFragment.pic);
+            ParseFile parse_pic = new ParseFile(System.currentTimeMillis()+".png", this.pic);
             uploader.setPictureFile(parse_pic);
             f.setPictureFile(parse_pic);
         }
@@ -216,7 +339,7 @@ public class ShareFragment extends Fragment{
 
         if(isSoundCaptured && audio != null){
             Log.v(TAG, "Successfully retrieved recording.");
-            ParseFile parse_audio = new ParseFile(System.currentTimeMillis()+".3gp", ShareFragment.audio);
+            ParseFile parse_audio = new ParseFile(System.currentTimeMillis()+".3gp", this.audio);
             uploader.setAudioFile(parse_audio);
             f.setAudioFile(parse_audio);
         }
@@ -227,7 +350,7 @@ public class ShareFragment extends Fragment{
 
         if (isVideoShoot && video != null){
             Log.v(TAG, "Successfully retrieved video.");
-            ParseFile parse_video = new ParseFile(System.currentTimeMillis()+".mp4", ShareFragment.video);
+            ParseFile parse_video = new ParseFile(System.currentTimeMillis()+".mp4", this.video);
             uploader.setVideoFile(parse_video);
             f.setVideoFile(parse_video);
         }
@@ -262,7 +385,7 @@ public class ShareFragment extends Fragment{
                 ((com.gcw.sapienza.places.MainActivity) getActivity()).refresh();
                 Map<String, String> dimensions = new HashMap<>();
                 dimensions.put("category", category);
-                ParseAnalytics.trackEventInBackground("sharing_succeded", dimensions);
+                ParseAnalytics.trackEventInBackground("sharing_succeeded", dimensions);
 
                 resetShareFragment(FLAG_PLACED_TEXT);
                 AlphaAnimation outAnim = new AlphaAnimation(1, 0);
@@ -272,6 +395,7 @@ public class ShareFragment extends Fragment{
             }
         });
 
+        this.resetMedia();
 
     }
 
@@ -306,8 +430,8 @@ public class ShareFragment extends Fragment{
         if(mView == null) mView = getView();
         if(mView != null)
         {
-            picButton = (ImageButton)mView.findViewById(R.id.pic_button);
-            micButton = (ImageButton)mView.findViewById(R.id.mic_button);
+            //picButton = (ImageButton)mView.findViewById(R.id.pic_button);
+            //micButton = (ImageButton)mView.findViewById(R.id.mic_button);
 
             if (pic != null) {
                 isPicTaken = true;
@@ -337,13 +461,17 @@ public class ShareFragment extends Fragment{
 
     protected void resetMedia()
     {
-        isPicTaken = false;
-        isVideoShoot = false;
-        isSoundCaptured = false;
+        this.isPicTaken = false;
+        this.isVideoShoot = false;
+        this.isSoundCaptured = false;
 
-        pic = null;
-        video = null;
-        audio = null;
+        this.pic = null;
+        this.video = null;
+        this.audio = null;
+
+        this.micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_selector));
+        this.picButton.setImageDrawable(getResources().getDrawable(R.drawable.cam_selector));
+        this.vidButton.setImageDrawable(getResources().getDrawable(R.drawable.videocam_selector));
 
         Log.v(TAG, "Media has been cleared!");
     }
@@ -356,13 +484,13 @@ public class ShareFragment extends Fragment{
 
         this.spinner.setSelection(0);
 
-        picButton = (ImageButton)this.mView.findViewById(R.id.pic_button);
+       // picButton = (ImageButton)this.mView.findViewById(R.id.pic_button);
         picButton.setImageDrawable(getResources().getDrawable(R.drawable.cam_selector));
 
-        micButton = (ImageButton)this.mView.findViewById(R.id.mic_button);
+       // micButton = (ImageButton)this.mView.findViewById(R.id.mic_button);
         micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_selector));
 
-        micButton = (ImageButton)this.mView.findViewById(R.id.vid_button);
+      //  micButton = (ImageButton)this.mView.findViewById(R.id.vid_button);
         micButton.setImageDrawable(getResources().getDrawable(R.drawable.videocam_selector));
 
         hideKeyboard();
@@ -371,6 +499,9 @@ public class ShareFragment extends Fragment{
         this.shareButton.setClickable(true);
 
     }
+
+
+
 
     public void hideKeyboard()
     {
