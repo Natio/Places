@@ -47,8 +47,6 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
     private static final String TAG = "ShareFragment";
 
-    private View mView;
-
     private Spinner spinner;
     private TextView textView;
     private Button shareButton;
@@ -82,8 +80,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     private static final String VIDEO_NOT_FOUND_TEXT = "Error encountered while retrieving video\nFlag won't be stored";
 
 
-<<<<<<< HEAD
-    protected static final int CHUNK_SIZE = 4096;
+    //protected static final int CHUNK_SIZE = 4096;
 
 
     public void setVideo(byte[] video){
@@ -137,14 +134,12 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         return audio;
     }
 
-=======
->>>>>>> 0cb3ae6ebc0f29356b2e35bbcc3d523b2db032a4
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         Log.d(TAG, "onCreateView");
 
-        this.mView = inflater.inflate(R.layout.activity_share, container, false);
+        View mView = inflater.inflate(R.layout.activity_share, container, false);
 
         this.progressBarHolder = (RelativeLayout)mView.findViewById(R.id.frame_layout);
         this.progressTextView = (TextView)mView.findViewById(R.id.share_progress_text_view);
@@ -153,6 +148,10 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         this.micButton = (ImageButton)mView.findViewById(R.id.mic_button);
         this.vidButton = (ImageButton)mView.findViewById(R.id.vid_button);
 
+        this.setPicture(this.pic);
+        this.setVideo(this.video);
+        this.setAudio(this.audio);
+
         this.picButton.setOnLongClickListener(this);
         this.micButton.setOnLongClickListener(this);
         this.vidButton.setOnLongClickListener(this);
@@ -160,8 +159,14 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         micButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+
+                if(ShareFragment.this.isSoundCaptured){
+                    return false;
+                }
+
                 Vibrator vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
                 vibrator.vibrate(Utils.VIBRATION_DURATION);
+
 
                 if (event.getAction() == MotionEvent.ACTION_DOWN)
                 {
@@ -201,14 +206,13 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
                     File audio_file = new File(audio_filename);
                     try {
                         FileInputStream inStream = new FileInputStream(audio_file);
-                        ShareFragment.audio = Utils.convertStreamToByteArray(inStream);
+                        ShareFragment.this.setAudio(Utils.convertStreamToByteArray(inStream));
 
                         inStream.close();
                     } catch (IOException ioe) {
                         ioe.printStackTrace();
                     }
 
-                    ShareFragment.isSoundCaptured = true;
                 }
 
                 return true;
@@ -275,7 +279,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
                         }
                         else if (v.getId() == ShareFragment.this.micButton.getId())
                         {
-                            ShareFragment.this.setVideo(null);
+                            ShareFragment.this.setAudio(null);
                         }
                         else if (v.getId() == ShareFragment.this.vidButton.getId())
                         {
@@ -342,7 +346,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
             dimensions.put("reason", "Share without any content");
             ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
 
-            resetShareFragment(EMPTY_FLAG_TEXT);
+            this.onShareFailed(EMPTY_FLAG_TEXT);
             return false;
         }
         else if(current_location == null){
@@ -351,7 +355,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
             Map<String, String> dimensions = new HashMap<>();
             dimensions.put("reason", "Share with No GPS");
             ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
-            resetShareFragment(ENABLE_NETWORK_SERVICE_TEXT);
+            this.onShareFailed(ENABLE_NETWORK_SERVICE_TEXT);
             return false;
         }
         else if(!FacebookUtils.getInstance().hasCurrentUserId()){
@@ -359,7 +363,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
             Map<String, String> dimensions = new HashMap<>();
             dimensions.put("reason", "Share with No Facebook");
             ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
-            resetShareFragment(FB_ID_NOT_FOUND_TEXT);
+            this.onShareFailed(FB_ID_NOT_FOUND_TEXT);
             return false;
         }
 
@@ -446,7 +450,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
                 Map<String, String> dimensions = new HashMap<>();
                 dimensions.put("reason", e.getMessage());
                 ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
-                resetShareFragment(ERROR_ENCOUNTERED_TEXT);
+                onShareSucceeded(ERROR_ENCOUNTERED_TEXT);
             }
 
             @Override
@@ -457,7 +461,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
                 dimensions.put("category", category);
                 ParseAnalytics.trackEventInBackground("sharing_succeeded", dimensions);
 
-                resetShareFragment(FLAG_PLACED_TEXT);
+                onShareSucceeded(FLAG_PLACED_TEXT);
                 AlphaAnimation outAnim = new AlphaAnimation(1, 0);
                 outAnim.setDuration(ANIMATION_DURATION);
                 progressBarHolder.setAnimation(outAnim);
@@ -474,8 +478,6 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         super.onResume();
 
         Log.v(TAG, "onResume called in ShareFragment");
-
-        onVisiblePage();
     }
 
     @Override
@@ -486,9 +488,10 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
         // onVisiblePage();
     }
-
+/*
     public void onVisiblePage()
     {
+
         Log.v(TAG, "ShareFragment visible!");
 
         if(!isAdded())
@@ -527,45 +530,36 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
                 vidButton.setImageDrawable(getResources().getDrawable(R.drawable.videocam_selector));
             }
         }
+
     }
+*/
 
     protected void resetMedia()
     {
-        this.isPicTaken = false;
-        this.isVideoShoot = false;
-        this.isSoundCaptured = false;
-
-        this.pic = null;
-        this.video = null;
-        this.audio = null;
-
-        this.micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_selector));
-        this.picButton.setImageDrawable(getResources().getDrawable(R.drawable.cam_selector));
-        this.vidButton.setImageDrawable(getResources().getDrawable(R.drawable.videocam_selector));
+        this.setAudio(null);
+        this.setPicture(null);
+        this.setVideo(null);
 
         Log.v(TAG, "Media has been cleared!");
     }
 
-    public void resetShareFragment(String toastText)
+    protected void onShareFailed(String toastText){
+        Toast.makeText(getActivity().getApplicationContext(), toastText, Toast.LENGTH_LONG).show();
+        this.shareButton.setClickable(true);
+    }
+
+    protected void onShareSucceeded(String toastText)
     {
-        this.mView = getView();
 
         this.textView.setText("");
 
         this.spinner.setSelection(0);
 
-       // picButton = (ImageButton)this.mView.findViewById(R.id.pic_button);
-        picButton.setImageDrawable(getResources().getDrawable(R.drawable.cam_selector));
-
-       // micButton = (ImageButton)this.mView.findViewById(R.id.mic_button);
-        micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_selector));
-
-      //  micButton = (ImageButton)this.mView.findViewById(R.id.vid_button);
-        micButton.setImageDrawable(getResources().getDrawable(R.drawable.videocam_selector));
-
-        hideKeyboard();
+        this.resetMedia();
+        this.hideKeyboard();
 
         Toast.makeText(getActivity().getApplicationContext(), toastText, Toast.LENGTH_LONG).show();
+
         this.shareButton.setClickable(true);
 
     }

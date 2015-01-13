@@ -1,12 +1,7 @@
 package com.gcw.sapienza.places.utils;
 
-import android.content.Context;
-import android.location.Location;
-import android.location.LocationManager;
-import android.widget.Toast;
 
 import com.gcw.sapienza.places.MainActivity;
-import com.gcw.sapienza.places.ShareFragment;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;

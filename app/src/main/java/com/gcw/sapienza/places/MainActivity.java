@@ -10,7 +10,6 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.location.LocationManager;
-import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -26,11 +25,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-<<<<<<< HEAD
-import android.widget.ImageButton;
-=======
-import android.widget.TextView;
->>>>>>> 0cb3ae6ebc0f29356b2e35bbcc3d523b2db032a4
 import android.widget.Toast;
 
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
@@ -68,12 +62,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         this.srl = srl;
     }
 
-<<<<<<< HEAD
-    private MediaRecorder audioRec;
-    private String audio_filename;
 
-=======
->>>>>>> 0cb3ae6ebc0f29356b2e35bbcc3d523b2db032a4
     public ShareFragment getShareFragment(){
         return (ShareFragment)this.fragments[0];
     }
@@ -243,7 +232,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     {
         Log.d(TAG, "Page selected: " + i);
 
-        if(i == 0) ((ShareFragment)fragments[i]).onVisiblePage();
+        //if(i == 0) ((ShareFragment)fragments[i]).onVisiblePage();
     }
 
     @SuppressWarnings("unused")
@@ -438,12 +427,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                         {
                             File file = new File(getRealPathFromURI(this, videoUri));
                             FileInputStream inStream = new FileInputStream(file);
-<<<<<<< HEAD
                             //ShareFragment.video = convertStreamToByteArray(inStream);
-                            this.getShareFragment().setVideo(convertStreamToByteArray(inStream));
-=======
-                            ShareFragment.video = Utils.convertStreamToByteArray(inStream);
->>>>>>> 0cb3ae6ebc0f29356b2e35bbcc3d523b2db032a4
+                            this.getShareFragment().setVideo(Utils.convertStreamToByteArray(inStream));
                         }
                         catch(IOException ioe) {ioe.printStackTrace();}
                         break;
@@ -452,8 +437,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                 }
         }
     }
-
-<<<<<<< HEAD
+/*
     public void captureSound(View v)
     {
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -503,8 +487,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         }
     }
 
-=======
->>>>>>> 0cb3ae6ebc0f29356b2e35bbcc3d523b2db032a4
+*/
     public void shootVid(View v)
     {
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
