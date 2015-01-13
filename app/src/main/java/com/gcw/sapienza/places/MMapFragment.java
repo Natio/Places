@@ -29,6 +29,7 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
 
     private static final String TAG = "MMapFragment";
     private SupportMapFragment mapFragment;
+
     private static View view;
 
     protected static Location location;
@@ -63,6 +64,7 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
         }
 
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.flags_map);
+
         mapFragment.getMapAsync(this);
 
         return view;
@@ -73,9 +75,13 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
     {
         location = PlacesApplication.getLocation();
 
+        googleMap.getUiSettings().setScrollGesturesEnabled(false);
+        gMap = googleMap;
+
         if(location!=null)
         {
-            initMap(googleMap);
+            //show continuously my location on map
+            gMap.setMyLocationEnabled(true);
 
             updateMarkersOnMap();
         }
@@ -90,7 +96,7 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
                     if (location == null) handler.postDelayed(this, Utils.UPDATE_DELAY);
                     else
                     {
-                        initMap(googleMap);
+                        gMap.setMyLocationEnabled(true);
 
                         if(getActivity() != null)
                             ((MainActivity)getActivity()).refresh();
@@ -98,16 +104,6 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
                 }
             });
         }
-    }
-
-    protected void initMap(final GoogleMap googleMap)
-    {
-        googleMap.getUiSettings().setScrollGesturesEnabled(false);
-
-        gMap = googleMap;
-
-        //show continuously my location on map
-        gMap.setMyLocationEnabled(true);
     }
 
     public static void updateMarkersOnMap()
