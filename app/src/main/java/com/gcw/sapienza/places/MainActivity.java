@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,9 +34,7 @@ import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 import com.parse.ui.ParseLoginBuilder;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -51,9 +48,9 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
 
     private  Fragment[] fragments;// = {new ShareFragment(), new MosaicFragment(), new MMapFragment()};
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-    private ViewPager mViewPager;
     private SwipeRefreshLayout srl;
+
+    private File imageFile;
 
     @SuppressWarnings("unused")
     public SwipeRefreshLayout getSwipeRefreshLayout(){
@@ -114,8 +111,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
 
 
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), this);
-        mViewPager = (ViewPager) findViewById(R.id.pager);
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), this);
+        ViewPager mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setOnPageChangeListener(this);
         mViewPager.setCurrentItem(1);
@@ -126,9 +123,9 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
         if(savedInstanceState != null && this.getShareFragment().isAdded())
         {
-            this.getShareFragment().setPicture(savedInstanceState.getByteArray("pic"));
-            this.getShareFragment().setAudio(savedInstanceState.getByteArray("audio"));
-            this.getShareFragment().setVideo(savedInstanceState.getByteArray("video"));
+            this.getShareFragment().setPicture(savedInstanceState.getString("pic"));
+            this.getShareFragment().setAudio(savedInstanceState.getString("audio"));
+            this.getShareFragment().setVideo(savedInstanceState.getString("video"));
 
         }
 
@@ -175,9 +172,9 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     {
         super.onSaveInstanceState(outState);
 
-        outState.putByteArray("audio", this.getShareFragment().getAudio());
-        outState.putByteArray("pic", this.getShareFragment().getPic());
-        outState.putByteArray("video", this.getShareFragment().getVideo());
+        outState.putString("audio", this.getShareFragment().getAudioPath());
+        outState.putString("pic", this.getShareFragment().getPicPath());
+        outState.putString("video", this.getShareFragment().getVideoPath());
     }
 
     @Override
@@ -257,7 +254,6 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     {
         Log.d(TAG, "Page selected: " + i);
 
-        //if(i == 0) ((ShareFragment)fragments[i]).onVisiblePage();
     }
 
     @SuppressWarnings("unused")
@@ -282,39 +278,6 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         refresh();
         srl.setRefreshing(false);
     }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-    }
-
-    @Override
-    public void onAttachFragment(android.app.Fragment fragment) {
-        super.onAttachFragment(fragment);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onResumeFragments() {
-        super.onResumeFragments();
-    }
-
-
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
         private final MainActivity mainActivity;
@@ -407,7 +370,21 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
 
-        startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE), Utils.PIC_CAPTURE_REQUEST_CODE);
+        Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if(takePicture.resolveActivity(this.getPackageManager()) != null){
+            this.imageFile = null;
+            try{
+                this.imageFile = Utils.createImageFile(ShareFragment.PICTURE_FORMAT);
+            }
+            catch (IOException e){
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+            if(this.imageFile != null){
+                takePicture.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(this.imageFile));
+                this.startActivityForResult(takePicture, Utils.PIC_CAPTURE_REQUEST_CODE);
+            }
+        }
     }
 
     @Override
@@ -421,42 +398,22 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                 switch(resultCode)
                 {
                     case RESULT_OK:
-                        Log.v(TAG, "Camera Intent OK");
-                        // this.getShareFragment().setPicButtonAsPicTaken();
-
-                        Bitmap bm = null;
-
-                        if(data.getData() == null)
-                        {
-                            Log.v(TAG, "getData() returns null in OnActivityResult");
-                            Bitmap image = (Bitmap)data.getExtras().get("data");
-
-                            if(image == null)
-                            {
-                                Toast.makeText(getApplicationContext(), "Error encountered while taking picture", Toast.LENGTH_LONG).show();
-                                Log.v(TAG, "Error encountered while taking picture");
-                            }
-
-                            bm = (Bitmap)data.getExtras().get("data");
-                        }
-                        else
-                        {
-                            Log.v(TAG, "getData() is not null in OnActivityResult");
-                            try
-                            {
-                                bm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), data.getData());
-                            }
-                            catch (IOException ioe){
-                                ioe.printStackTrace();
-                            }
+                        if(this.imageFile == null || !this.imageFile.canRead()){
+                            Toast.makeText(getApplicationContext(), "Error encountered while taking picture", Toast.LENGTH_LONG).show();
+                            Log.v(TAG, "Error encountered while taking picture");
+                            this.imageFile = null;
+                            break;
                         }
 
+                        /*Log.d(TAG, this.imageFile.getAbsolutePath());
+                        Bitmap bitmap = BitmapFactory.decodeFile(this.imageFile.getAbsolutePath());
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                        //ShareFragment.pic = stream.toByteArray();
-                        this.getShareFragment().setPicture(stream.toByteArray());
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
+                        this.getShareFragment().setPicture(stream.toByteArray());*/
+                        this.getShareFragment().setPicture(this.imageFile.getAbsolutePath());
+                        this.imageFile = null;
 
-                        break;
+                       break;
                     case RESULT_CANCELED:
                         Log.v(TAG, "Camera Intent canceled");
                         break;
@@ -476,71 +433,19 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                 {
                     case RESULT_OK:
                         Uri videoUri = data.getData();
-                        try
-                        {
-                            File file = new File(getRealPathFromURI(this, videoUri));
-                            FileInputStream inStream = new FileInputStream(file);
-                            //ShareFragment.video = convertStreamToByteArray(inStream);
-                            this.getShareFragment().setVideo(Utils.convertStreamToByteArray(inStream));
-                        }
-                        catch(IOException ioe) {ioe.printStackTrace();}
+
+                        //File file = new File(getRealPathFromURI(this, videoUri));
+                        //FileInputStream inStream = new FileInputStream(file);
+                        String videoPath = this.getRealPathFromURI(this, videoUri);
+                        this.getShareFragment().setVideo(videoPath);
+
                         break;
                     case RESULT_CANCELED:
                         Log.v(TAG, "Video Intent canceled");
                 }
         }
     }
-    /*
-        public void captureSound(View v)
-        {
-            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            vibrator.vibrate(Utils.VIBRATION_DURATION);
 
-            if(audioRec == null)
-            {
-                audio_filename = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + System.currentTimeMillis() + ".3gp";
-
-                audioRec = new MediaRecorder();
-                audioRec.setAudioSource(MediaRecorder.AudioSource.MIC);
-                audioRec.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-                audioRec.setOutputFile(audio_filename);
-                audioRec.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-
-                try {
-                    audioRec.prepare();
-                } catch (IOException ioe) {
-                    ioe.printStackTrace();
-                    Toast.makeText(this, "Audio recording failed", Toast.LENGTH_LONG).show();
-                    Log.e(TAG, "Audio recording failed");
-                }
-
-                audioRec.start();
-
-                Toast.makeText(this, "Tap mic button again to stop recording", Toast.LENGTH_SHORT).show();
-            }
-            else
-            {
-                audioRec.stop();
-                audioRec.release();
-                audioRec = null;
-                ((ImageButton)v).setImageDrawable(getResources().getDrawable(R.drawable.mic_green_taken));
-
-                File audio_file = new File(audio_filename);
-                try
-                {
-                    FileInputStream inStream = new FileInputStream(audio_file);
-                    //ShareFragment.audio = convertStreamToByteArray(inStream);
-                    this.getShareFragment().setAudio(convertStreamToByteArray(inStream));
-
-                    inStream.close();
-                }
-                catch(IOException ioe){ ioe.printStackTrace(); }
-
-                //ShareFragment.isSoundCaptured = true;
-            }
-        }
-
-    */
     public void shootVid(View v)
     {
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);

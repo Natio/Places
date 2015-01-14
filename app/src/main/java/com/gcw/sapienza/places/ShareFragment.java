@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.location.Location;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Vibrator;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -45,6 +44,8 @@ import java.util.Map;
 public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
     private static final String TAG = "ShareFragment";
+    public static final String PICTURE_FORMAT = ".jpg";
+    public static final String AUDIO_FORMAT = ".3gp";
 
     private Spinner spinner;
     private TextView textView;
@@ -62,9 +63,9 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     private boolean isVideoShoot = false;
     private boolean isSoundCaptured = false;
 
-    private byte[] pic;
-    private byte[] video;
-    private byte[] audio;
+    private File pic;
+    private File video;
+    private File audio;
 
     protected static MediaRecorder audioRec;
     protected static String audio_filename;
@@ -81,9 +82,15 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     private static final String VIDEO_NOT_FOUND_TEXT = "Error encountered while retrieving video\nFlag won't be stored";
     private static final String ERROR_WHILE_RECORDING_TEXT = "Error encountered while recording";
 
-    public void setVideo(byte[] video){
-        this.video = video;
-        this.isVideoShoot = video != null;
+    public void setVideo(String video){
+        this.video = null;
+        Log.d(TAG, video+"");
+        if(video != null){
+            File f = new File(video);
+            this.video = f.canRead() ? f : null;
+        }
+
+        this.isVideoShoot = this.video != null;
 
         if(this.isAdded() && this.vidButton != null){
             int res =R.drawable.videocam_selector;
@@ -95,9 +102,16 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
     }
 
-    public void setAudio(byte[] audio){
-        this.audio = audio;
-        this.isSoundCaptured = audio != null;
+    public void setAudio(String audio){
+        Log.d(TAG, audio+"");
+        this.audio = null;
+
+        if(audio != null){
+            File f = new File(audio);
+            this.audio = f.canRead() ? f : null;
+        }
+
+        this.isSoundCaptured = this.audio != null;
 
         if(this.isAdded() && this.micButton != null){
             int res =R.drawable.mic_selector;
@@ -109,10 +123,14 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
     }
 
-    public void setPicture(byte[] pic){
-        Log.d(TAG, "PIC: "+ (pic==null) + " "+this.hashCode());
-        this.pic = pic;
-        this.isPicTaken = pic != null;
+    public void setPicture(String pic){
+        Log.d(TAG, pic+"");
+        this.pic = null;
+        if(pic != null){
+            File f = new File(pic);
+            this.pic = f.canRead() ? f : null;
+        }
+        this.isPicTaken = this.pic != null;
 
         if(this.isAdded() && this.picButton != null){
             int res =R.drawable.cam_selector;
@@ -125,16 +143,16 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
     }
 
-    public byte[] getPic() {
-        return pic;
+    public String getPicPath() {
+        return this.pic == null ? null : this.pic.getAbsolutePath();
     }
 
-    public byte[] getVideo() {
-        return video;
+    public String getVideoPath() {
+        return this.video == null ? null : this.video.getAbsolutePath();
     }
 
-    public byte[] getAudio() {
-        return audio;
+    public String getAudioPath() {
+        return this.video == null ? null : this.video.getAbsolutePath();
     }
 
     @Override
@@ -157,9 +175,10 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         this.micButton = (ImageButton)mView.findViewById(R.id.mic_button);
         this.vidButton = (ImageButton)mView.findViewById(R.id.vid_button);
 
-        this.setPicture(this.pic);
-        this.setVideo(this.video);
-        this.setAudio(this.audio);
+        //these lines are necessary for a correct visualization
+        this.setPicture(this.getPicPath());
+        this.setVideo(this.getVideoPath());
+        this.setAudio(this.getAudioPath());
 
         this.picButton.setOnLongClickListener(this);
         this.micButton.setOnLongClickListener(this);
@@ -179,16 +198,16 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
                 if (event.getAction() == MotionEvent.ACTION_DOWN)
                 {
-                    audio_filename = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + System.currentTimeMillis() + ".3gp";
 
-                    audioRec = new MediaRecorder();
-                    audioRec.setAudioSource(MediaRecorder.AudioSource.MIC);
-                    audioRec.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-                    audioRec.setOutputFile(audio_filename);
-                    audioRec.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
                     try
                     {
+                        audio_filename = Utils.createAudioFile(ShareFragment.AUDIO_FORMAT, ShareFragment.this.getActivity()).getAbsolutePath(); //Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + System.currentTimeMillis() + ".3gp";
+                        audioRec = new MediaRecorder();
+                        audioRec.setAudioSource(MediaRecorder.AudioSource.MIC);
+                        audioRec.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                        audioRec.setOutputFile(audio_filename);
+                        audioRec.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
                         audioRec.prepare();
                     } catch (IOException ioe)
                     {
@@ -223,8 +242,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
                     try
                     {
                         FileInputStream inStream = new FileInputStream(audio_file);
-                        ShareFragment.this.setAudio(Utils.convertStreamToByteArray(inStream));
-
+                        ShareFragment.this.setAudio(audio_filename);
                         inStream.close();
                     } catch (IOException ioe) {
                         ioe.printStackTrace();
@@ -400,38 +418,45 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
         FlagUploader uploader = new FlagUploader(f, mContext);
 
-        if( isPicTaken && pic != null){
-            Log.v(TAG, "Successfully retrieved pic.");
-            ParseFile parse_pic = new ParseFile(System.currentTimeMillis()+".png", this.pic);
-            uploader.setPictureFile(parse_pic);
-            f.setPictureFile(parse_pic);
+        try{
+            if( isPicTaken && this.pic != null){
+                Log.v(TAG, "Successfully retrieved pic.");
+                ParseFile parse_pic = new ParseFile(this.pic.getName(), Utils.convertFileToByteArray(this.pic));
+                uploader.setPictureFile(parse_pic);
+                f.setPictureFile(parse_pic);
+            }
+            else if( isPicTaken ){ // equals isPicTaken && pic == null)
+                Toast.makeText(mContext, PIC_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            if(isSoundCaptured && this.audio != null){
+                Log.v(TAG, "Successfully retrieved recording.");
+                ParseFile parse_audio = new ParseFile(this.audio.getName(), Utils.convertFileToByteArray(this.audio));
+                uploader.setAudioFile(parse_audio);
+                f.setAudioFile(parse_audio);
+            }
+            else if(isSoundCaptured){ //equals isSoundCaptured && audio == null
+                Toast.makeText(mContext, AUDIO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            if (isVideoShoot && video != null){
+                Log.v(TAG, "Successfully retrieved video.");
+                ParseFile parse_video = new ParseFile(this.video.getName(), Utils.convertFileToByteArray(this.video));
+                uploader.setVideoFile(parse_video);
+                f.setVideoFile(parse_video);
+            }
+            else if(isVideoShoot){
+                Toast.makeText(mContext, VIDEO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
+                return;
+            }
         }
-        else if( isPicTaken ){ // equals isPicTaken && pic == null)
-            Toast.makeText(mContext, PIC_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
+        catch (IOException e){
+            Log.d(TAG, "Error", e);
             return;
         }
 
-        if(isSoundCaptured && audio != null){
-            Log.v(TAG, "Successfully retrieved recording.");
-            ParseFile parse_audio = new ParseFile(System.currentTimeMillis()+".3gp", this.audio);
-            uploader.setAudioFile(parse_audio);
-            f.setAudioFile(parse_audio);
-        }
-        else if(isSoundCaptured){ //equals isSoundCaptured && audio == null
-            Toast.makeText(mContext, AUDIO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        if (isVideoShoot && video != null){
-            Log.v(TAG, "Successfully retrieved video.");
-            ParseFile parse_video = new ParseFile(System.currentTimeMillis()+".mp4", this.video);
-            uploader.setVideoFile(parse_video);
-            f.setVideoFile(parse_video);
-        }
-        else if(isVideoShoot){
-            Toast.makeText(mContext, VIDEO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
-            return;
-        }
 
         AlphaAnimation inAnim = new AlphaAnimation(0, 1);
         inAnim.setDuration(ANIMATION_DURATION);
@@ -478,6 +503,9 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
     protected void resetMedia()
     {
+        if(this.audio != null){
+            this.audio.delete();
+        }
         this.setAudio(null);
         this.setPicture(null);
         this.setVideo(null);

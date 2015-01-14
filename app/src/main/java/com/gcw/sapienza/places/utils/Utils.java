@@ -1,11 +1,17 @@
 package com.gcw.sapienza.places.utils;
 
 
+import android.content.Context;
+import android.os.Environment;
+
 import com.gcw.sapienza.places.MainActivity;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 /**
@@ -13,6 +19,7 @@ import java.io.IOException;
  */
 public class Utils
 {
+    @SuppressWarnings("unused")
     private static final String TAG = "Utils";
 
     public static final int UPDATE_DELAY = 200;
@@ -78,6 +85,13 @@ public class Utils
     }
 */
 
+    public static byte[] convertFileToByteArray(File f) throws IOException{
+        FileInputStream stream = new FileInputStream(f);
+        byte [] res = Utils.convertStreamToByteArray(stream);
+        stream.close();
+        return res;
+    }
+
     public static byte[] convertStreamToByteArray(FileInputStream is) throws IOException
     {
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
@@ -92,4 +106,35 @@ public class Utils
 
         return outStream.toByteArray();
     }
+
+    private static String generateRandomName(){
+        return "_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + "_";
+    }
+
+    public static File createAudioFile(String extension, Context ctx) throws IOException{
+
+        String imageFileName = "AUDIO" + Utils.generateRandomName();
+
+        File cache_dir = ctx.getExternalCacheDir();
+        return File.createTempFile(
+                imageFileName,
+                extension,
+                cache_dir
+        );
+
+
+    }
+
+    public static File createImageFile(String image_extension) throws IOException {
+        // Create an image file name
+        String imageFileName = "IMG" + Utils.generateRandomName();
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        return File.createTempFile(
+                imageFileName,  /* prefix */
+                image_extension,         /* suffix */
+                storageDir      /* directory */
+        );
+    }
+
 }
