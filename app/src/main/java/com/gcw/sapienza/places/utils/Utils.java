@@ -108,12 +108,12 @@ public class Utils
     }
 
     private static String generateRandomName(){
-        return "_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + "_";
+        return "_" + System.currentTimeMillis() + "_";
     }
 
     public static File createAudioFile(String extension, Context ctx) throws IOException{
 
-        String imageFileName = "AUDIO" + Utils.generateRandomName();
+        String imageFileName = "A" + Utils.generateRandomName();
 
         File cache_dir = ctx.getExternalCacheDir();
         return File.createTempFile(
