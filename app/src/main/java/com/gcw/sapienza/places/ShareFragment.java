@@ -56,6 +56,8 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     private ImageButton micButton;
     private ImageButton vidButton;
 
+    private Context mContext;
+
     private boolean isPicTaken = false;
     private boolean isVideoShoot = false;
     private boolean isSoundCaptured = false;
@@ -77,9 +79,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     private static final String PIC_NOT_FOUND_TEXT = "Error encountered while retrieving picture\nFlag won't be stored";
     private static final String AUDIO_NOT_FOUND_TEXT = "Error encountered while retrieving recording\nFlag won't be stored";
     private static final String VIDEO_NOT_FOUND_TEXT = "Error encountered while retrieving video\nFlag won't be stored";
-
-
-
+    private static final String ERROR_WHILE_RECORDING_TEXT = "Error encountered while recording";
 
     public void setVideo(byte[] video){
         this.video = video;
@@ -138,6 +138,14 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+
+        mContext = getActivity().getApplicationContext();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View mView = inflater.inflate(R.layout.activity_share, container, false);
@@ -159,53 +167,61 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
         micButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                if(ShareFragment.this.isSoundCaptured){
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if(ShareFragment.this.isSoundCaptured)
+                {
                     return false;
                 }
 
-                Vibrator vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+                Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
                 vibrator.vibrate(Utils.VIBRATION_DURATION);
-
 
                 if (event.getAction() == MotionEvent.ACTION_DOWN)
                 {
                     audio_filename = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + System.currentTimeMillis() + ".3gp";
-                    Log.d(TAG, audio_filename);
+
                     audioRec = new MediaRecorder();
                     audioRec.setAudioSource(MediaRecorder.AudioSource.MIC);
                     audioRec.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
                     audioRec.setOutputFile(audio_filename);
                     audioRec.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
-                    try {
+                    try
+                    {
                         audioRec.prepare();
-                    } catch (IOException ioe) {
+                    } catch (IOException ioe)
+                    {
                         ioe.printStackTrace();
-                        Toast.makeText(getActivity(), "Audio recording failed", Toast.LENGTH_LONG).show();
-                        Log.e(TAG, "Audio recording failed");
+                        Toast.makeText(mContext, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
+                        Log.e(TAG, ERROR_WHILE_RECORDING_TEXT);
                     }
-
                     audioRec.start();
                 }
                 else if(event.getAction() == MotionEvent.ACTION_UP)
                 {
                     if(audioRec == null)
                     {
-                        Toast.makeText(getActivity(), "Error encountered while recording", Toast.LENGTH_LONG).show();
-                        Log.v(TAG, "Error encountered while recording");
-
+                        Toast.makeText(mContext, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
+                        Log.v(TAG, ERROR_WHILE_RECORDING_TEXT);
                         return true;
                     }
-
-                    audioRec.stop();
-                    audioRec.release();
-                    audioRec = null;
+                    else try
+                    {
+                        audioRec.stop();
+                        audioRec.release();
+                        audioRec = null;
+                    }
+                    catch(RuntimeException re)
+                    {
+                        re.printStackTrace();
+                        Toast.makeText(mContext, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
+                        return true;
+                    }
                     ((ImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.mic_green_taken));
-
                     File audio_file = new File(audio_filename);
-                    try {
+                    try
+                    {
                         FileInputStream inStream = new FileInputStream(audio_file);
                         ShareFragment.this.setAudio(Utils.convertStreamToByteArray(inStream));
 
@@ -213,9 +229,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
                     } catch (IOException ioe) {
                         ioe.printStackTrace();
                     }
-
                 }
-
                 return true;
             }
         });
@@ -238,7 +252,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         // ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.categories, R.layout.custom_spinner);
         // adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        MSpinnerAdapter adapter = new MSpinnerAdapter(getActivity().getApplicationContext(), Arrays.asList(getResources().getStringArray(R.array.categories)));
+        MSpinnerAdapter adapter = new MSpinnerAdapter(mContext, Arrays.asList(getResources().getStringArray(R.array.categories)));
 
         this.spinner.setAdapter(adapter);
 
@@ -252,7 +266,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     public boolean onLongClick(final View v)
     {
 
-        Vibrator vibrator = (Vibrator) this.getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+        Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -286,7 +300,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         {
             if(this.audio == null) return true;
 
-            builder  = new AlertDialog.Builder(this.getActivity());
+            builder  = new AlertDialog.Builder(getActivity());
             dialog = builder.setMessage("Discard recording?").setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener).show();
         }
@@ -295,7 +309,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         {
             if(this.pic == null) return true;
 
-            builder  = new AlertDialog.Builder(this.getActivity());
+            builder  = new AlertDialog.Builder(mContext);
             dialog = builder.setMessage("Discard picture?").setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener).show();
         }
@@ -304,7 +318,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         {
             if(this.video == null) return true;
 
-            builder  = new AlertDialog.Builder(this.getActivity());
+            builder  = new AlertDialog.Builder(mContext);
             dialog = builder.setMessage("Discard video?").setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener).show();
         }
@@ -318,7 +332,6 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         return true;
 
     }
-
 
     /**
      * Checks if all sharing constraints are satisfied. This method also shows Toasts if constraints are not satisfied
@@ -374,7 +387,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
         ParseGeoPoint p = new ParseGeoPoint(current_location.getLatitude(), current_location.getLongitude());
 
-        Vibrator vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+        Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
 
         final String category = spinner.getSelectedItem().toString();
@@ -385,7 +398,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         f.put("text",this.textView.getText().toString());
         f.put("weather", PlacesApplication.getWeather());
 
-        FlagUploader uploader = new FlagUploader(f, this.getActivity());
+        FlagUploader uploader = new FlagUploader(f, mContext);
 
         if( isPicTaken && pic != null){
             Log.v(TAG, "Successfully retrieved pic.");
@@ -394,7 +407,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
             f.setPictureFile(parse_pic);
         }
         else if( isPicTaken ){ // equals isPicTaken && pic == null)
-            Toast.makeText(getActivity(), PIC_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
+            Toast.makeText(mContext, PIC_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -405,7 +418,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
             f.setAudioFile(parse_audio);
         }
         else if(isSoundCaptured){ //equals isSoundCaptured && audio == null
-            Toast.makeText(getActivity(), AUDIO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
+            Toast.makeText(mContext, AUDIO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -416,7 +429,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
             f.setVideoFile(parse_video);
         }
         else if(isVideoShoot){
-            Toast.makeText(getActivity(), VIDEO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
+            Toast.makeText(mContext, VIDEO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -441,7 +454,8 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
             }
 
             @Override
-            public void onSuccess() {
+            public void onSuccess()
+            {
                 Log.d(TAG, "Success");
                 ((com.gcw.sapienza.places.MainActivity) getActivity()).refresh();
                 Map<String, String> dimensions = new HashMap<>();
@@ -472,7 +486,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     }
 
     protected void onShareFailed(String toastText){
-        Toast.makeText(getActivity().getApplicationContext(), toastText, Toast.LENGTH_LONG).show();
+        Toast.makeText(mContext, toastText, Toast.LENGTH_LONG).show();
         this.shareButton.setClickable(true);
     }
 
@@ -486,7 +500,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         this.resetMedia();
         this.hideKeyboard();
 
-        Toast.makeText(getActivity().getApplicationContext(), toastText, Toast.LENGTH_LONG).show();
+        Toast.makeText(mContext, toastText, Toast.LENGTH_LONG).show();
 
         this.shareButton.setClickable(true);
 
@@ -497,8 +511,9 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
     public void hideKeyboard()
     {
-        if(getActivity().getCurrentFocus()!=null) {
-            InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if(getActivity().getCurrentFocus()!=null)
+        {
+            InputMethodManager inputMethodManager = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
         }
     }
