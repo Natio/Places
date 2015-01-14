@@ -1,5 +1,6 @@
 package com.gcw.sapienza.places;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,6 +9,7 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Vibrator;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
@@ -79,6 +81,9 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     private static final String VIDEO_NOT_FOUND_TEXT = "Error encountered while retrieving video\nFlag won't be stored";
 
 
+    //protected static final int CHUNK_SIZE = 4096;
+
+    public ShareFragment(){}
 
 
     public void setVideo(byte[] video){
@@ -110,7 +115,6 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     }
 
     public void setPicture(byte[] pic){
-        Log.d(TAG, "PIC: "+ (pic==null) + " "+this.hashCode());
         this.pic = pic;
         this.isPicTaken = pic != null;
 
@@ -149,6 +153,10 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         this.micButton = (ImageButton)mView.findViewById(R.id.mic_button);
         this.vidButton = (ImageButton)mView.findViewById(R.id.vid_button);
 
+        Log.d(TAG,"Audio "+(this.audio == null));
+        Log.d(TAG,"Video "+(this.video == null));
+        Log.d(TAG,"Picture "+(this.pic == null));
+
         this.setPicture(this.pic);
         this.setVideo(this.video);
         this.setAudio(this.audio);
@@ -172,7 +180,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
                 if (event.getAction() == MotionEvent.ACTION_DOWN)
                 {
                     audio_filename = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + System.currentTimeMillis() + ".3gp";
-                    Log.d(TAG, audio_filename);
+
                     audioRec = new MediaRecorder();
                     audioRec.setAudioSource(MediaRecorder.AudioSource.MIC);
                     audioRec.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -235,9 +243,6 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
         this.spinner = (Spinner)mView.findViewById(R.id.spinner);
 
-        // ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.categories, R.layout.custom_spinner);
-        // adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
         MSpinnerAdapter adapter = new MSpinnerAdapter(getActivity().getApplicationContext(), Arrays.asList(getResources().getStringArray(R.array.categories)));
 
         this.spinner.setAdapter(adapter);
@@ -245,9 +250,22 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         return mView;
     }
 
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+    }
 
+    @Override
+    public void onDestroyView()
+    {
+        super.onDestroyView();
+    }
 
-
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
     @Override
     public boolean onLongClick(final View v)
     {
@@ -363,7 +381,6 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         Location current_location =  PlacesApplication.getLocation();
         if(PlacesApplication.isRunningOnEmulator){
             current_location = LocationService.getRandomLocation(current_location, 100);
-            Log.d(TAG, "Generata Posizione casuale per simulatore: "+current_location);
         }
 
         if(!this.canShare(current_location)){
@@ -460,7 +477,20 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+    }
 
     protected void resetMedia()
     {

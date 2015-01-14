@@ -80,7 +80,6 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
 
         Utils.mainActivity = this;
@@ -175,7 +174,6 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     protected void onSaveInstanceState(Bundle outState)
     {
         super.onSaveInstanceState(outState);
-
 
         outState.putByteArray("audio", this.getShareFragment().getAudio());
         outState.putByteArray("pic", this.getShareFragment().getPic());
@@ -285,6 +283,37 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         srl.setRefreshing(false);
     }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onAttachFragment(android.app.Fragment fragment) {
+        super.onAttachFragment(fragment);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onResumeFragments() {
+        super.onResumeFragments();
+    }
+
 
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
@@ -338,7 +367,6 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         }
 
         isForeground = true;
-        Log.d(TAG,"onResume "+this.hashCode() + " pic: "+(this.getShareFragment().getPic() == null)+" frag "+this.getShareFragment().hashCode());
     }
 
     private void promptForLocationServices() {
@@ -426,7 +454,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
                         bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
                         //ShareFragment.pic = stream.toByteArray();
-                        Log.d(TAG, "settingPicture to frag: "+this.getShareFragment().hashCode());
+                        this.getShareFragment().setPicture(stream.toByteArray());
 
                         break;
                     case RESULT_CANCELED:
@@ -462,7 +490,57 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                 }
         }
     }
+    /*
+        public void captureSound(View v)
+        {
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            vibrator.vibrate(Utils.VIBRATION_DURATION);
 
+            if(audioRec == null)
+            {
+                audio_filename = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + System.currentTimeMillis() + ".3gp";
+
+                audioRec = new MediaRecorder();
+                audioRec.setAudioSource(MediaRecorder.AudioSource.MIC);
+                audioRec.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                audioRec.setOutputFile(audio_filename);
+                audioRec.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+                try {
+                    audioRec.prepare();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                    Toast.makeText(this, "Audio recording failed", Toast.LENGTH_LONG).show();
+                    Log.e(TAG, "Audio recording failed");
+                }
+
+                audioRec.start();
+
+                Toast.makeText(this, "Tap mic button again to stop recording", Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                audioRec.stop();
+                audioRec.release();
+                audioRec = null;
+                ((ImageButton)v).setImageDrawable(getResources().getDrawable(R.drawable.mic_green_taken));
+
+                File audio_file = new File(audio_filename);
+                try
+                {
+                    FileInputStream inStream = new FileInputStream(audio_file);
+                    //ShareFragment.audio = convertStreamToByteArray(inStream);
+                    this.getShareFragment().setAudio(convertStreamToByteArray(inStream));
+
+                    inStream.close();
+                }
+                catch(IOException ioe){ ioe.printStackTrace(); }
+
+                //ShareFragment.isSoundCaptured = true;
+            }
+        }
+
+    */
     public void shootVid(View v)
     {
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
