@@ -102,9 +102,13 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
         if(savedInstanceState != null)
         {
-            this.getShareFragment().setPicture(savedInstanceState.getByteArray("pic"));
-            this.getShareFragment().setAudio(savedInstanceState.getByteArray("audio"));
-            this.getShareFragment().setVideo(savedInstanceState.getByteArray("video"));
+            // this.getShareFragment().setPicture(savedInstanceState.getByteArray("pic"));
+            // this.getShareFragment().setAudio(savedInstanceState.getByteArray("audio"));
+            // this.getShareFragment().setVideo(savedInstanceState.getByteArray("video"));
+
+            ShareFragment.pic = savedInstanceState.getByteArray("pic");
+            ShareFragment.audio = savedInstanceState.getByteArray("audio");
+            ShareFragment.video = savedInstanceState.getByteArray("video");
         }
 
 
@@ -150,9 +154,13 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
         Log.v(TAG, "onSaveInstanceState called!");
 
-        outState.putByteArray("audio", this.getShareFragment().getAudio());
-        outState.putByteArray("pic", this.getShareFragment().getPic());
-        outState.putByteArray("video", this.getShareFragment().getVideo());
+        // outState.putByteArray("audio", this.getShareFragment().getAudio());
+        // outState.putByteArray("pic", this.getShareFragment().getPic());
+        // outState.putByteArray("video", this.getShareFragment().getVideo());
+
+        outState.putByteArray("pic", ShareFragment.pic);
+        outState.putByteArray("audio", ShareFragment.audio);
+        outState.putByteArray("video", ShareFragment.video);
     }
 
     @Override
@@ -223,7 +231,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     }
 
     @Override
-    public void onPageScrolled(int i, float v, int i2) {
+    public void onPageScrolled(int i, float v, int i2)
+    {
 
     }
 
@@ -231,8 +240,6 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     public void onPageSelected(int i)
     {
         Log.d(TAG, "Page selected: " + i);
-
-        //if(i == 0) ((ShareFragment)fragments[i]).onVisiblePage();
     }
 
     @SuppressWarnings("unused")
@@ -400,8 +407,10 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
                         bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                        //ShareFragment.pic = stream.toByteArray();
-                        this.getShareFragment().setPicture(stream.toByteArray());
+
+                        // this.getShareFragment().setPicture(stream.toByteArray());
+                        ShareFragment.pic = stream.toByteArray();
+                        this.getShareFragment().setPicture();
 
                         break;
                     case RESULT_CANCELED:
@@ -427,8 +436,10 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                         {
                             File file = new File(getRealPathFromURI(this, videoUri));
                             FileInputStream inStream = new FileInputStream(file);
-                            //ShareFragment.video = convertStreamToByteArray(inStream);
-                            this.getShareFragment().setVideo(Utils.convertStreamToByteArray(inStream));
+
+                            // this.getShareFragment().setVideo(Utils.convertStreamToByteArray(inStream));
+                            ShareFragment.video = Utils.convertStreamToByteArray(inStream);
+                            this.getShareFragment().setVideo();
                         }
                         catch(IOException ioe) {ioe.printStackTrace();}
                         break;
@@ -464,6 +475,4 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
             }
         }
     }
-
-
 }

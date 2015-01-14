@@ -53,17 +53,19 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     private RelativeLayout progressBarHolder;
     private TextView progressTextView;
 
-    private ImageButton picButton;
-    private ImageButton micButton;
-    private ImageButton vidButton;
+    public static Context context;
 
-    private boolean isPicTaken = false;
-    private boolean isVideoShoot = false;
-    private boolean isSoundCaptured = false;
+    private static ImageButton picButton;
+    private static ImageButton micButton;
+    private static ImageButton vidButton;
 
-    private byte[] pic;
-    private byte[] video;
-    private byte[] audio;
+    private static boolean isPicTaken = false;
+    private static boolean isVideoShoot = false;
+    private static boolean isSoundCaptured = false;
+
+    protected static byte[] pic;
+    protected static byte[] video;
+    protected static byte[] audio;
 
     protected static MediaRecorder audioRec;
     protected static String audio_filename;
@@ -73,53 +75,44 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     private static final String FLAG_PLACED_TEXT = "Flag has been placed!";
     private static final String ERROR_ENCOUNTERED_TEXT = "Error encountered while placing flag\nPlease try again";
     private static final String FB_ID_NOT_FOUND_TEXT = "Couldn't retrieve your Facebook credentials\nPlease check your internet connection.";
-    private static final String EMPTY_FLAG_TEXT = "Please insert text or take a picture";
+    private static final String EMPTY_FLAG_TEXT = "Please insert text or media";
     private static final String ENABLE_NETWORK_SERVICE_TEXT = "Please enable GPS/Network service";
     private static final String PIC_NOT_FOUND_TEXT = "Error encountered while retrieving picture\nFlag won't be stored";
     private static final String AUDIO_NOT_FOUND_TEXT = "Error encountered while retrieving recording\nFlag won't be stored";
     private static final String VIDEO_NOT_FOUND_TEXT = "Error encountered while retrieving video\nFlag won't be stored";
+    private static final String ERROR_WHILE_RECORDING_TEXT = "Error encountered while recording";
 
+    public void setVideo()
+    {
+        isVideoShoot = video != null;
 
-    //protected static final int CHUNK_SIZE = 4096;
-
-
-    public void setVideo(byte[] video){
-        this.video = video;
-        if(video == null){
-            this.isVideoShoot = false;
-            this.vidButton.setImageDrawable(getResources().getDrawable(R.drawable.videocam_selector));
+        int res =R.drawable.videocam_selector;
+        if(isVideoShoot){
+            res = R.drawable.videocam_green_taken;
         }
-        else{
-            this.isVideoShoot = true;
-            this.vidButton.setImageDrawable(getResources().getDrawable(R.drawable.videocam_green_taken));
-        }
-
+        vidButton.setImageDrawable( context.getResources().getDrawable(res));
     }
 
-    public void setAudio(byte[] audio){
-        this.audio = audio;
-        if(audio == null){
-            this.isSoundCaptured = false;
-            this.micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_selector));
-        }
-        else{
-            this.isSoundCaptured = true;
-            this.micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_green_taken));
-        }
+    public void setAudio()
+    {
+        isSoundCaptured = audio != null;
 
+        int res =R.drawable.mic_selector;
+        if(isSoundCaptured){
+            res = R.drawable.mic_green_taken;
+        }
+        micButton.setImageDrawable( context.getResources().getDrawable(res));
     }
 
-    public void setPicture(byte[] pic){
-        this.pic = pic;
-        if(pic == null){
-            this.isPicTaken = false;
-            this.picButton.setImageDrawable(getResources().getDrawable(R.drawable.cam_selector));
-        }
-        else{
-            this.isPicTaken = true;
-            this.picButton.setImageDrawable(getResources().getDrawable(R.drawable.camera_green_taken));
-        }
+    public void setPicture()
+    {
+        isPicTaken = pic != null;
 
+        int res =R.drawable.cam_selector;
+        if(isPicTaken){
+            res = R.drawable.camera_green_taken;
+        }
+        picButton.setImageDrawable( context.getResources().getDrawable(res));
     }
 
     public byte[] getPic() {
@@ -135,22 +128,27 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
         Log.d(TAG, "onCreateView");
+
+        context = getActivity();
 
         View mView = inflater.inflate(R.layout.activity_share, container, false);
 
         this.progressBarHolder = (RelativeLayout)mView.findViewById(R.id.frame_layout);
         this.progressTextView = (TextView)mView.findViewById(R.id.share_progress_text_view);
 
-        this.picButton = (ImageButton)mView.findViewById(R.id.pic_button);
-        this.micButton = (ImageButton)mView.findViewById(R.id.mic_button);
-        this.vidButton = (ImageButton)mView.findViewById(R.id.vid_button);
+        picButton = (ImageButton)mView.findViewById(R.id.pic_button);
+        micButton = (ImageButton)mView.findViewById(R.id.mic_button);
+        vidButton = (ImageButton)mView.findViewById(R.id.vid_button);
 
-        this.setPicture(this.pic);
-        this.setVideo(this.video);
-        this.setAudio(this.audio);
+        if(pic == null) Log.v(TAG, "pic null!");
+        else Log.v(TAG, "pic not null!");
+
+        this.setPicture();
+        this.setVideo();
+        this.setAudio();
 
         this.picButton.setOnLongClickListener(this);
         this.micButton.setOnLongClickListener(this);
@@ -164,7 +162,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
                     return false;
                 }
 
-                Vibrator vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+                Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
                 vibrator.vibrate(Utils.VIBRATION_DURATION);
 
 
@@ -182,8 +180,8 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
                         audioRec.prepare();
                     } catch (IOException ioe) {
                         ioe.printStackTrace();
-                        Toast.makeText(getActivity(), "Audio recording failed", Toast.LENGTH_LONG).show();
-                        Log.e(TAG, "Audio recording failed");
+                        Toast.makeText(context, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
+                        Log.e(TAG, ERROR_WHILE_RECORDING_TEXT);
                     }
 
                     audioRec.start();
@@ -192,21 +190,33 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
                 {
                     if(audioRec == null)
                     {
-                        Toast.makeText(getActivity(), "Error encountered while recording", Toast.LENGTH_LONG).show();
-                        Log.v(TAG, "Error encountered while recording");
+                        Toast.makeText(context, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
+                        Log.v(TAG, ERROR_WHILE_RECORDING_TEXT);
+
+                        return true;
+                    }
+                    else try
+                    {
+                        audioRec.stop();
+                        audioRec.release();
+                        audioRec = null;
+                    }
+                    catch(RuntimeException re)
+                    {
+                        re.printStackTrace();
+                        Toast.makeText(context, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
 
                         return true;
                     }
 
-                    audioRec.stop();
-                    audioRec.release();
-                    audioRec = null;
                     ((ImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.mic_green_taken));
 
                     File audio_file = new File(audio_filename);
-                    try {
+                    try
+                    {
                         FileInputStream inStream = new FileInputStream(audio_file);
-                        ShareFragment.this.setAudio(Utils.convertStreamToByteArray(inStream));
+                        ShareFragment.audio = Utils.convertStreamToByteArray(inStream);
+                        ShareFragment.this.setAudio();
 
                         inStream.close();
                     } catch (IOException ioe) {
@@ -275,15 +285,15 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
                     case DialogInterface.BUTTON_POSITIVE:
                         if(v.getId() == ShareFragment.this.picButton.getId())
                         {
-                            ShareFragment.this.setPicture(null);
+                            ShareFragment.this.setPicture();
                         }
                         else if (v.getId() == ShareFragment.this.micButton.getId())
                         {
-                            ShareFragment.this.setAudio(null);
+                            ShareFragment.this.setAudio();
                         }
                         else if (v.getId() == ShareFragment.this.vidButton.getId())
                         {
-                            ShareFragment.this.setVideo(null);
+                            ShareFragment.this.setVideo();
                         }
                         break;
 
@@ -299,7 +309,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         {
             if(this.audio == null) return true;
 
-            builder  = new AlertDialog.Builder(this.getActivity());
+            builder  = new AlertDialog.Builder(context);
             dialog = builder.setMessage("Discard recording?").setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener).show();
         }
@@ -308,7 +318,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         {
             if(this.pic == null) return true;
 
-            builder  = new AlertDialog.Builder(this.getActivity());
+            builder  = new AlertDialog.Builder(context);
             dialog = builder.setMessage("Discard picture?").setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener).show();
         }
@@ -317,7 +327,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         {
             if(this.video == null) return true;
 
-            builder  = new AlertDialog.Builder(this.getActivity());
+            builder  = new AlertDialog.Builder(context);
             dialog = builder.setMessage("Discard video?").setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener).show();
         }
@@ -329,9 +339,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         dialog.show();
 
         return true;
-
     }
-
 
     /**
      * Checks if all sharing constraints are satisfied. This method also shows Toasts if constraints are not satisfied
@@ -387,7 +395,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
         ParseGeoPoint p = new ParseGeoPoint(current_location.getLatitude(), current_location.getLongitude());
 
-        Vibrator vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+        Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
 
         final String category = spinner.getSelectedItem().toString();
@@ -398,7 +406,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         f.put("text",this.textView.getText().toString());
         f.put("weather", PlacesApplication.getWeather());
 
-        FlagUploader uploader = new FlagUploader(f, this.getActivity());
+        FlagUploader uploader = new FlagUploader(f, context);
 
         if( isPicTaken && pic != null){
             Log.v(TAG, "Successfully retrieved pic.");
@@ -407,7 +415,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
             f.setPictureFile(parse_pic);
         }
         else if( isPicTaken ){ // equals isPicTaken && pic == null)
-            Toast.makeText(getActivity(), PIC_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
+            Toast.makeText(context, PIC_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -418,7 +426,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
             f.setAudioFile(parse_audio);
         }
         else if(isSoundCaptured){ //equals isSoundCaptured && audio == null
-            Toast.makeText(getActivity(), AUDIO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
+            Toast.makeText(context, AUDIO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -429,7 +437,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
             f.setVideoFile(parse_video);
         }
         else if(isVideoShoot){
-            Toast.makeText(getActivity(), VIDEO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
+            Toast.makeText(context, VIDEO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -456,7 +464,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
             @Override
             public void onSuccess() {
                 Log.d(TAG, "Success");
-                ((com.gcw.sapienza.places.MainActivity) getActivity()).refresh();
+                ((com.gcw.sapienza.places.MainActivity) context).refresh();
                 Map<String, String> dimensions = new HashMap<>();
                 dimensions.put("category", category);
                 ParseAnalytics.trackEventInBackground("sharing_succeeded", dimensions);
@@ -485,66 +493,23 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         super.onAttach(activity);
 
         Log.v(TAG, "onAttach called in ShareFragment");
-
-        // onVisiblePage();
     }
-/*
-    public void onVisiblePage()
-    {
-
-        Log.v(TAG, "ShareFragment visible!");
-
-        if(!isAdded())
-        {
-            Log.v(TAG, "ShareFragment not attached to MainActivity");
-            return;
-        }
-
-        if(mView == null) mView = getView();
-        if(mView != null)
-        {
-            //picButton = (ImageButton)mView.findViewById(R.id.pic_button);
-            //micButton = (ImageButton)mView.findViewById(R.id.mic_button);
-
-            if (pic != null) {
-                isPicTaken = true;
-                picButton.setImageDrawable(getResources().getDrawable(R.drawable.camera_green_taken));
-            } else {
-                isPicTaken = false;
-                picButton.setImageDrawable(getResources().getDrawable(R.drawable.cam_selector));
-            }
-
-            if (audio != null) {
-                isSoundCaptured = true;
-                micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_green_taken));
-            } else {
-                isSoundCaptured = false;
-                micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_selector));
-            }
-
-            if (video != null) {
-                isVideoShoot = true;
-                vidButton.setImageDrawable(getResources().getDrawable(R.drawable.videocam_green_taken));
-            } else {
-                isVideoShoot = false;
-                vidButton.setImageDrawable(getResources().getDrawable(R.drawable.videocam_selector));
-            }
-        }
-
-    }
-*/
 
     protected void resetMedia()
     {
-        this.setAudio(null);
-        this.setPicture(null);
-        this.setVideo(null);
+        pic = null;
+        audio = null;
+        video = null;
+
+        setAudio();
+        setPicture();
+        setVideo();
 
         Log.v(TAG, "Media has been cleared!");
     }
 
     protected void onShareFailed(String toastText){
-        Toast.makeText(getActivity().getApplicationContext(), toastText, Toast.LENGTH_LONG).show();
+        Toast.makeText(context, toastText, Toast.LENGTH_LONG).show();
         this.shareButton.setClickable(true);
     }
 
@@ -558,19 +523,17 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         this.resetMedia();
         this.hideKeyboard();
 
-        Toast.makeText(getActivity().getApplicationContext(), toastText, Toast.LENGTH_LONG).show();
+        Toast.makeText(context.getApplicationContext(), toastText, Toast.LENGTH_LONG).show();
 
         this.shareButton.setClickable(true);
 
     }
 
-
-
-
     public void hideKeyboard()
     {
-        if(getActivity().getCurrentFocus()!=null) {
-            InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if(getActivity().getCurrentFocus()!=null)
+        {
+            InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
         }
     }
