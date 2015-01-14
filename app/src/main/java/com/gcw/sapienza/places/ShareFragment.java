@@ -1,6 +1,5 @@
 package com.gcw.sapienza.places;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -80,44 +79,48 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     private static final String VIDEO_NOT_FOUND_TEXT = "Error encountered while retrieving video\nFlag won't be stored";
 
 
-    //protected static final int CHUNK_SIZE = 4096;
 
 
     public void setVideo(byte[] video){
         this.video = video;
-        if(video == null){
-            this.isVideoShoot = false;
-            this.vidButton.setImageDrawable(getResources().getDrawable(R.drawable.videocam_selector));
-        }
-        else{
-            this.isVideoShoot = true;
-            this.vidButton.setImageDrawable(getResources().getDrawable(R.drawable.videocam_green_taken));
+        this.isVideoShoot = video != null;
+
+        if(this.isAdded() && this.vidButton != null){
+            int res =R.drawable.videocam_selector;
+            if(this.isVideoShoot){
+                res = R.drawable.videocam_green_taken;
+            }
+            this.vidButton.setImageDrawable( getResources().getDrawable(res));
         }
 
     }
 
     public void setAudio(byte[] audio){
         this.audio = audio;
-        if(audio == null){
-            this.isSoundCaptured = false;
-            this.micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_selector));
-        }
-        else{
-            this.isSoundCaptured = true;
-            this.micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_green_taken));
+        this.isSoundCaptured = audio != null;
+
+        if(this.isAdded() && this.micButton != null){
+            int res =R.drawable.mic_selector;
+            if(this.isSoundCaptured){
+                res = R.drawable.mic_green_taken;
+            }
+            this.micButton.setImageDrawable( getResources().getDrawable(res));
         }
 
     }
 
     public void setPicture(byte[] pic){
+        Log.d(TAG, "PIC: "+ (pic==null) + " "+this.hashCode());
         this.pic = pic;
-        if(pic == null){
-            this.isPicTaken = false;
-            this.picButton.setImageDrawable(getResources().getDrawable(R.drawable.cam_selector));
-        }
-        else{
-            this.isPicTaken = true;
-            this.picButton.setImageDrawable(getResources().getDrawable(R.drawable.camera_green_taken));
+        this.isPicTaken = pic != null;
+
+        if(this.isAdded() && this.picButton != null){
+            int res =R.drawable.cam_selector;
+            if(this.isPicTaken){
+                res = R.drawable.camera_green_taken;
+            }
+
+            this.picButton.setImageDrawable( getResources().getDrawable(res));
         }
 
     }
@@ -136,8 +139,6 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        Log.d(TAG, "onCreateView");
 
         View mView = inflater.inflate(R.layout.activity_share, container, false);
 
@@ -171,7 +172,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
                 if (event.getAction() == MotionEvent.ACTION_DOWN)
                 {
                     audio_filename = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + System.currentTimeMillis() + ".3gp";
-
+                    Log.d(TAG, audio_filename);
                     audioRec = new MediaRecorder();
                     audioRec.setAudioSource(MediaRecorder.AudioSource.MIC);
                     audioRec.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -244,21 +245,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         return mView;
     }
 
-    @Override
-    public void onDestroy()
-    {
-        super.onDestroy();
 
-        Log.v(TAG, "onDestroy called.");
-    }
-
-    @Override
-    public void onDestroyView()
-    {
-        super.onDestroyView();
-
-        Log.v(TAG, "onDestroyView called.");
-    }
 
 
     @Override
@@ -473,66 +460,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
 
-        Log.v(TAG, "onResume called in ShareFragment");
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        Log.v(TAG, "onAttach called in ShareFragment");
-
-        // onVisiblePage();
-    }
-/*
-    public void onVisiblePage()
-    {
-
-        Log.v(TAG, "ShareFragment visible!");
-
-        if(!isAdded())
-        {
-            Log.v(TAG, "ShareFragment not attached to MainActivity");
-            return;
-        }
-
-        if(mView == null) mView = getView();
-        if(mView != null)
-        {
-            //picButton = (ImageButton)mView.findViewById(R.id.pic_button);
-            //micButton = (ImageButton)mView.findViewById(R.id.mic_button);
-
-            if (pic != null) {
-                isPicTaken = true;
-                picButton.setImageDrawable(getResources().getDrawable(R.drawable.camera_green_taken));
-            } else {
-                isPicTaken = false;
-                picButton.setImageDrawable(getResources().getDrawable(R.drawable.cam_selector));
-            }
-
-            if (audio != null) {
-                isSoundCaptured = true;
-                micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_green_taken));
-            } else {
-                isSoundCaptured = false;
-                micButton.setImageDrawable(getResources().getDrawable(R.drawable.mic_selector));
-            }
-
-            if (video != null) {
-                isVideoShoot = true;
-                vidButton.setImageDrawable(getResources().getDrawable(R.drawable.videocam_green_taken));
-            } else {
-                isVideoShoot = false;
-                vidButton.setImageDrawable(getResources().getDrawable(R.drawable.videocam_selector));
-            }
-        }
-
-    }
-*/
 
     protected void resetMedia()
     {
