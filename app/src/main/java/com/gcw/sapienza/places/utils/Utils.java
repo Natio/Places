@@ -10,8 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+
 
 
 /**
@@ -113,7 +112,7 @@ public class Utils
 
     public static File createAudioFile(String extension, Context ctx) throws IOException{
 
-        String imageFileName = "A" + Utils.generateRandomName();
+        String imageFileName = "a" + Utils.generateRandomName();
 
         File cache_dir = ctx.getExternalCacheDir();
         return File.createTempFile(
@@ -127,7 +126,7 @@ public class Utils
 
     public static File createImageFile(String image_extension) throws IOException {
         // Create an image file name
-        String imageFileName = "IMG" + Utils.generateRandomName();
+        String imageFileName = "img" + Utils.generateRandomName();
         File storageDir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
         return File.createTempFile(

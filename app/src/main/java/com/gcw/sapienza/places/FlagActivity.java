@@ -19,9 +19,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -35,8 +33,8 @@ public class FlagActivity extends Activity {
     private String weather;
     private String category;
 
-    private byte[] pic;
-    private byte[] audio;
+    private String pic_path;
+    private String audio_path;
     private String video_path;
 
     private MediaPlayer mediaPlayer;
@@ -63,25 +61,26 @@ public class FlagActivity extends Activity {
         ImageView iw = ((ImageView)findViewById(R.id.pic));
 
         vv = (VideoView)findViewById(R.id.vid);
-
-        if(bundle.getByteArray("picture") != null)
+        this.pic_path = bundle.getString("picture");
+        if(this.pic_path != null)
         {
-            pic = new byte[bundle.getByteArray("picture").length];
-            System.arraycopy(bundle.getByteArray("picture"), 0, pic, 0, pic.length);
-            iw.setImageBitmap(BitmapFactory.decodeByteArray(pic, 0, pic.length));
+            //pic = new byte[bundle.getByteArray("picture").length];
+            //System.arraycopy(bundle.getByteArray("picture"), 0, pic, 0, pic.length);
+            iw.setImageBitmap(BitmapFactory.decodeFile(this.pic_path));
+
         }
         else
         {
             iw.setMaxHeight(0);
             iw.setMaxWidth(0);
         }
-
-        if(bundle.getByteArray("audio") != null)
+        this.audio_path = bundle.getString("audio");
+        if(this.audio_path != null)
         {
-            audio = new byte[bundle.getByteArray("audio").length];
-            System.arraycopy(bundle.getByteArray("audio"), 0, audio, 0, audio.length);
+            //audio = new byte[bundle.getByteArray("audio").length];
+            //System.arraycopy(bundle.getByteArray("audio"), 0, audio, 0, audio.length);
 
-            playRecording(audio);
+            playRecording(this.audio_path);
         }
 
         if(bundle.getString("video") != null)
@@ -111,15 +110,10 @@ public class FlagActivity extends Activity {
 
     }
 
-    private void playRecording(byte[] sound_array)
+    private void playRecording(String audio_path)
     {
         try {
-            File temp = File.createTempFile("places_temp_audio", "3gp", getCacheDir());
-            temp.deleteOnExit();
-
-            FileOutputStream outStream = new FileOutputStream(temp);
-            outStream.write(sound_array);
-            outStream.close();
+            File temp = new File(audio_path);
 
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);

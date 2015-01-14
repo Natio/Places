@@ -46,6 +46,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     private static final String TAG = "ShareFragment";
     public static final String PICTURE_FORMAT = ".jpg";
     public static final String AUDIO_FORMAT = ".3gp";
+    public static final String VIDEO_FORMAT = ".mp4";
 
     private Spinner spinner;
     private TextView textView;
@@ -504,7 +505,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     protected void resetMedia()
     {
         if(this.audio != null){
-            this.audio.delete();
+            Log.d(TAG, "Deleted Audio File: " + this.audio.delete());
         }
         this.setAudio(null);
         this.setPicture(null);
