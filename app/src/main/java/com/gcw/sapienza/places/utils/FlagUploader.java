@@ -257,7 +257,9 @@ public class FlagUploader {
             }
         }*/
         File f = this.usedFiled.get(AUDIO_KEY);
-        Log.d(TAG, "Deleted file: "+f.getName()+ " ? " + f.delete());
+        if(f != null){
+            Log.d(TAG, "Deleted file: "+f.getName()+ " ? " + f.delete());
+        }
         this.usedFiled.clear();
     }
 
@@ -343,14 +345,8 @@ public class FlagUploader {
 
             byte[] buff = new byte[Utils.CHUNK_SIZE];
             int i;
-            double k = 0;
-            double l = f.length();
-            while ((i = is.read(buff, 0, buff.length)) > 0)
-            {
-                k+=1;
+            while ((i = is.read(buff, 0, buff.length)) > 0){
                 outStream.write(buff, 0, i);
-                Log.d(TAG, "Loading "+f.getName()+" "+(k/l)*100.0);
-
             }
             return outStream.toByteArray();
         }
