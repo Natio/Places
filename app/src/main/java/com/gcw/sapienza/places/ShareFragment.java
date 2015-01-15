@@ -30,7 +30,6 @@ import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.FlagUploader;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseAnalytics;
-import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 
 import java.io.File;
@@ -85,7 +84,6 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
     public void setVideo(String video){
         this.video = null;
-        Log.d(TAG, video+"");
         if(video != null){
             File f = new File(video);
             this.video = f.canRead() ? f : null;
@@ -104,7 +102,6 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     }
 
     public void setAudio(String audio){
-        Log.d(TAG, audio+"");
         this.audio = null;
 
         if(audio != null){
@@ -125,7 +122,6 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     }
 
     public void setPicture(String pic){
-        Log.d(TAG, pic+"");
         this.pic = null;
         if(pic != null){
             File f = new File(pic);
@@ -411,20 +407,21 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
         final String category = spinner.getSelectedItem().toString();
 
-        f.put("fbId", FacebookUtils.getInstance().getCurrentUserId());
-        f.put("category", category);
-        f.put("location",p);
-        f.put("text",this.textView.getText().toString());
-        f.put("weather", PlacesApplication.getWeather());
+        f.setFbId(FacebookUtils.getInstance().getCurrentUserId());
+        f.setCategory(category);
+        f.setLocation(p);
+        f.setText(this.textView.getText().toString());
+        f.setWeather(PlacesApplication.getWeather());
 
         FlagUploader uploader = new FlagUploader(f, mContext);
+        //uploader.setDeletesFilesOnFinish(true);
 
         try{
             if( isPicTaken && this.pic != null){
                 Log.v(TAG, "Successfully retrieved pic.");
-                ParseFile parse_pic = new ParseFile(this.pic.getName(), Utils.convertFileToByteArray(this.pic));
-                uploader.setPictureFile(parse_pic);
-                f.setPictureFile(parse_pic);
+                //ParseFile parse_pic = new ParseFile(this.pic.getName(), Utils.convertFileToByteArray(this.pic));
+                uploader.setPictureFile(this.pic);
+                //f.setPictureFile(parse_pic);
             }
             else if( isPicTaken ){ // equals isPicTaken && pic == null)
                 Toast.makeText(mContext, PIC_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
@@ -433,9 +430,9 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
             if(isSoundCaptured && this.audio != null){
                 Log.v(TAG, "Successfully retrieved recording.");
-                ParseFile parse_audio = new ParseFile(this.audio.getName(), Utils.convertFileToByteArray(this.audio));
-                uploader.setAudioFile(parse_audio);
-                f.setAudioFile(parse_audio);
+                //ParseFile parse_audio = new ParseFile(this.audio.getName(), Utils.convertFileToByteArray(this.audio));
+                uploader.setAudioFile(this.audio);
+                //f.setAudioFile(parse_audio);
             }
             else if(isSoundCaptured){ //equals isSoundCaptured && audio == null
                 Toast.makeText(mContext, AUDIO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
@@ -444,16 +441,16 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
             if (isVideoShoot && video != null){
                 Log.v(TAG, "Successfully retrieved video.");
-                ParseFile parse_video = new ParseFile(this.video.getName(), Utils.convertFileToByteArray(this.video));
-                uploader.setVideoFile(parse_video);
-                f.setVideoFile(parse_video);
+                //ParseFile parse_video = new ParseFile(this.video.getName(), Utils.convertFileToByteArray(this.video));
+                uploader.setVideoFile(this.video);
+                //f.setVideoFile(parse_video);
             }
             else if(isVideoShoot){
                 Toast.makeText(mContext, VIDEO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
                 return;
             }
         }
-        catch (IOException e){
+        catch (Exception e){
             Log.d(TAG, "Error", e);
             return;
         }
@@ -477,6 +474,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
                 dimensions.put("reason", e.getMessage());
                 ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
                 onShareSucceeded(ERROR_ENCOUNTERED_TEXT);
+                this.dismissProgressBar();
             }
 
             @Override
@@ -489,6 +487,10 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
                 ParseAnalytics.trackEventInBackground("sharing_succeeded", dimensions);
 
                 onShareSucceeded(FLAG_PLACED_TEXT);
+                this.dismissProgressBar();
+            }
+
+            void dismissProgressBar(){
                 AlphaAnimation outAnim = new AlphaAnimation(1, 0);
                 outAnim.setDuration(ANIMATION_DURATION);
                 progressBarHolder.setAnimation(outAnim);
@@ -504,9 +506,6 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
     protected void resetMedia()
     {
-        if(this.audio != null){
-            Log.d(TAG, "Deleted Audio File: " + this.audio.delete());
-        }
         this.setAudio(null);
         this.setPicture(null);
         this.setVideo(null);
@@ -534,8 +533,6 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         this.shareButton.setClickable(true);
 
     }
-
-
 
 
     public void hideKeyboard()

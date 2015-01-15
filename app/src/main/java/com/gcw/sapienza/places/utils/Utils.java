@@ -84,6 +84,7 @@ public class Utils
     }
 */
 
+    @SuppressWarnings({"UnusedDeclaration"})
     public static byte[] convertFileToByteArray(File f) throws IOException{
         FileInputStream stream = new FileInputStream(f);
         byte [] res = Utils.convertStreamToByteArray(stream);
@@ -96,7 +97,7 @@ public class Utils
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
         byte[] buff = new byte[CHUNK_SIZE];
-        int i = Integer.MAX_VALUE;
+        int i;
 
         while ((i = is.read(buff, 0, buff.length)) > 0)
         {

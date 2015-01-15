@@ -1,6 +1,7 @@
 package com.gcw.sapienza.places.utils;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Looper;
 import android.util.Log;
 
@@ -12,25 +13,64 @@ import com.parse.ParseFile;
 import com.parse.ProgressCallback;
 import com.parse.SaveCallback;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 
 
 /**
  * This class allows to asynchronously upload a Flag and to have completion callbacks
  *
+ *
+ *  Usage:
+ *
+ *      File video;
+ *      File audio;
+ *      File picture;
+ *
+ *      FlagUploader up = new FlagUploader();
+ *      up.setVideoFile(video);
+ *      up.setAudioFile(audio);
+ *      up.setPictureFile(picture);
+ *
+ *      uploader.upload(new FlagUploaderCallbacks{...});
+ *
+ *
+ *  How It Works
+ *
+ *  When upload() is called FlagUploader.loadFileLoop() is automatically invoked.
+ *  FlagUploader.loadFileLoop() is the responsible of ParseFile creation and loading.
+ *
+ *  1) loadFileLoop() checks that this.files is not empty
+ *  2) loadFileLoop() removes a File from this.files (that is the Files to upload storage)and schedules a FileLoaderTask that loads the file
+ *  in memory and creates a ParseFile.
+ *  3) When the ParseFile is configured FileLoaderTask calls FlagUploader onParseFileInMemoryLoadDone(ParseFile parse_file)
+ *  4) onParseFileInMemoryLoadDone starts the ParseFile upload; when the upload is finished control returns to 1.
+ *
+ *  5) if this.files is empty loadFlag() will be called and will upload the flag to Parse.com
+ *  6) in case of success onFinish() will be called otherwise onError()
+ *
+ *
  * Created by paolo on 12/01/15.
  */
 public class FlagUploader {
     private static final String TAG = "FlagUploader";
 
-    private static final String AUDIO_KEY = "audio";
-    private static final String VIDEO_KEY = "video";
-    private static final String PICTURE_KEY = "picture";
+    private static final String AUDIO_KEY = Flag.AUDIO_KEY;
+    private static final String VIDEO_KEY = Flag.VIDEO_KEY;
+    private static final String PICTURE_KEY = Flag.PICTURE_KEY;
 
     private final Flag flag;
-    private HashMap<String, ParseFile> files;
+    private HashMap<String, File> files;
+    private HashMap<String, File> usedFiled;
     private boolean isUploading;
     private FlagUploaderCallbacks callbacks;
+  //  private boolean deleteFilesOnFinish = false;
+
+    private String currentFileKey = null;
+
 
     private final Context context;
 
@@ -44,9 +84,14 @@ public class FlagUploader {
         this.flag = f;
         this.isUploading = false;
         this.files = new HashMap<>();
+        this.usedFiled = new HashMap<>();
         this.context = ctx;
     }
-
+/*
+    public void setDeletesFilesOnFinish(boolean deletes){
+        this.deleteFilesOnFinish = deletes;
+    }
+*/
 
     /**
      *
@@ -61,7 +106,7 @@ public class FlagUploader {
      * @throws java.lang.IllegalStateException if you call this method after having started uploading
      * @param video file to upload as a video
      */
-    public void setVideoFile(ParseFile video){
+    public void setVideoFile(File video){
         if(this.isUploading()){
             throw new IllegalStateException("Cannot set a file while uploading");
         }
@@ -73,7 +118,7 @@ public class FlagUploader {
      * @throws java.lang.IllegalStateException if you call this method after having started uploading
      * @param audio file to upload as a audio rec
      */
-    public void setAudioFile(ParseFile audio){
+    public void setAudioFile(File audio){
         if(this.isUploading()){
             throw new IllegalStateException("Cannot set a file while uploading");
         }
@@ -85,7 +130,7 @@ public class FlagUploader {
      * @throws java.lang.IllegalStateException if you call this method after having started uploading
      * @param picture file to upload as a picture
      */
-    public void setPictureFile(ParseFile picture){
+    public void setPictureFile(File picture){
         if(this.isUploading()){
             throw new IllegalStateException("Cannot set a file while uploading");
         }
@@ -126,17 +171,45 @@ public class FlagUploader {
             return;
         }
 
-        final String key = this.getNextKeyFromFilesMap();
-        final String message_to_user = this.getUserMessageForKey(key);
-        ParseFile current_file = this.files.remove(key);
+        String key = this.getNextKeyFromFilesMap();
+        this.currentFileKey = key;
+        File current_file = this.files.remove(key);
+        this.usedFiled.put(key,  current_file);
 
+        new FileLoaderTask().execute(current_file);
+
+
+    }
+
+    /**
+     * Called when an error occurs. If this method is called the upload is stopped and no data will be created on parse.com
+     * @param e error description
+     */
+
+    private void onError(Exception e){
+        this.callbacks.onError(e);
+    }
+
+
+    /**
+     * Called when a ParseFile is successfully loaded in memory
+     * @param parse_file parse file to upload
+     */
+    private void onParseFileInMemoryLoadDone(ParseFile parse_file){
+        if(parse_file == null){
+            this.onError(new Exception("Error loading file. Flag cannot be placed"));
+            return;
+        }
+        this.flag.put(this.currentFileKey, parse_file);
+        final String message_to_user = this.getUserMessageForKey(this.currentFileKey);
+        this.currentFileKey = null;
 
         FlagUploader.this.callbacks.onPercentage(0, message_to_user);
-        current_file.saveInBackground(new SaveCallback() {
+        parse_file.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if(e != null){
-                    FlagUploader.this.callbacks.onError(e);
+                    FlagUploader.this.onError(e);
                 }
                 else{
                     FlagUploader.this.loadFileLoop();
@@ -148,9 +221,10 @@ public class FlagUploader {
                 FlagUploader.this.callbacks.onPercentage(integer, message_to_user);
             }
         });
-
-
     }
+
+
+
 
     /**
      * When all files are uploaded ti uploads the flag
@@ -161,13 +235,30 @@ public class FlagUploader {
             @Override
             public void done(ParseException e) {
                 if(e != null){
-                    FlagUploader.this.callbacks.onError(e);
+                    FlagUploader.this.onError(e);
                 }
                 else{
-                    FlagUploader.this.callbacks.onSuccess();
+                    FlagUploader.this.onFinish();
                 }
             }
         });
+
+    }
+
+    /**
+     * Called when everything is uploaded. If #deleteOnFinish is true all files will be deleted
+     */
+    private void onFinish(){
+        FlagUploader.this.callbacks.onSuccess();
+        /*if(this.deleteFilesOnFinish){
+            for(String key : this.usedFiled.keySet()){
+                File f = this.usedFiled.get(key);
+                Log.d(TAG, "Deleted file: "+f.getName()+ " ? "+ f.delete());
+            }
+        }*/
+        File f = this.usedFiled.get(AUDIO_KEY);
+        Log.d(TAG, "Deleted file: "+f.getName()+ " ? " + f.delete());
+        this.usedFiled.clear();
     }
 
     /**
@@ -224,6 +315,50 @@ public class FlagUploader {
          * Called when everything is uploaded
          */
         void onSuccess();
+    }
+
+
+
+    private class FileLoaderTask extends AsyncTask<File, Integer, ParseFile>{
+        @Override
+        protected ParseFile doInBackground(File... params) {
+            if(params.length == 0){
+                return null;
+            }
+
+            File file = params[0];
+
+            try{
+                return new ParseFile(file.getName(), this.loadFileInMemory(file));
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+
+        private byte[] loadFileInMemory(File f) throws IOException{
+            FileInputStream is = new FileInputStream(f);
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+
+            byte[] buff = new byte[Utils.CHUNK_SIZE];
+            int i;
+            double k = 0;
+            double l = f.length();
+            while ((i = is.read(buff, 0, buff.length)) > 0)
+            {
+                k+=1;
+                outStream.write(buff, 0, i);
+                Log.d(TAG, "Loading "+f.getName()+" "+(k/l)*100.0);
+
+            }
+            return outStream.toByteArray();
+        }
+
+        @Override
+        protected void onPostExecute(ParseFile file) {
+            FlagUploader.this.onParseFileInMemoryLoadDone(file);
+        }
     }
 
 }
