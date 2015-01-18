@@ -21,22 +21,20 @@ import java.util.List;
  * Adapter class for easily showing Posts in a ListView
  */
 public class FlagsArrayAdapter extends ArrayAdapter<Flag> {
-
+    @SuppressWarnings("UnusedDeclaration")
     private static final String TAG = "FlagsArrayAdapter";
 
-    private final Activity activity;
 
     private static final int TEXT_MAX_LENGTH_IN_PREVIEW = 30;
 
     /**
      * Transformation that will be applied to profile pictures
      */
+    @SuppressWarnings("UnusedDeclaration")
     private final Transformation transformation = new CropCircleTransformation();
 
-    public FlagsArrayAdapter(Context context, int layoutResourceId, List<Flag> data, Activity activity) {
+    public FlagsArrayAdapter(Context context, int layoutResourceId, List<Flag> data) {
         super(context, layoutResourceId, data);
-
-        this.activity = activity;
     }
 
     @Override

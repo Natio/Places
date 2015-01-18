@@ -1,13 +1,15 @@
 package com.gcw.sapienza.places;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -16,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +26,7 @@ import android.widget.Toast;
 import com.gcw.sapienza.places.adapters.FlagsArrayAdapter;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.model.FlagReport;
+import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseFile;
@@ -36,23 +40,31 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 
-public class MosaicFragment extends Fragment{
+public class MosaicFragment extends Fragment implements  AdapterView.OnItemClickListener{
 
     private static final String TAG = "MosaicFragment";
 
-    private static View view;
-    private static ListView listView;
+    private ListView listView;
 
-    private static TextView textHeader;
+    private TextView textHeader;
 
-    private static FlagsArrayAdapter adapter;
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction().equals(LocationService.FOUND_NEW_FLAGS_NOTIFICATION)){
+                MosaicFragment.this.configureListViewWithFlags(PlacesApplication.getPins());
+            }
+        }
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        view = inflater.inflate(R.layout.flags_list_layout, container, false);
+        View view = inflater.inflate(R.layout.flags_list_layout, container, false);
 
         //retrieve the listviews
         listView = (ListView)view.findViewById(R.id.flags_list_view);
@@ -66,117 +78,29 @@ public class MosaicFragment extends Fragment{
         textHeader.setText("within " + (int)(Utils.MAP_RADIUS * 1000) + " meters");
         listView.addHeaderView(header);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
-                Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
-                v.vibrate(Utils.VIBRATION_DURATION);
-
-                if(position == 0)
-                {
-                    startActivity(new Intent(getActivity().getApplicationContext(), SettingsActivity.class));
-                    return;
-                }
-
-                Intent intent = new Intent(getActivity().getApplicationContext(), FlagActivity.class);
-
-                Date date = ((Flag) parent.getItemAtPosition(position)).getDate();
-                DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-                String sDate = df.format(date);
-
-                Bundle bundle = new Bundle();
-
-                bundle.putString("text", ((Flag) parent.getItemAtPosition(position)).getText());
-                bundle.putString("id", ((Flag) parent.getItemAtPosition(position)).getFbId());
-                bundle.putString("date", sDate);
-                bundle.putString("weather", ((Flag) parent.getItemAtPosition(position)).getWeather());
-                bundle.putString("category", ((Flag) parent.getItemAtPosition(position)).getCategory());
-
-                try
-                {
-                    ParseFile pic_file;
-                    if((pic_file = ((Flag) parent.getItemAtPosition(position)).getPic()) != null){
-                        File temp = File.createTempFile("places_temp_pic", ShareFragment.PICTURE_FORMAT, getActivity().getCacheDir());
-                        temp.deleteOnExit();
-
-                        FileOutputStream outStream = new FileOutputStream(temp);
-                        outStream.write(pic_file.getData());
-                        outStream.close();
-
-                        bundle.putString("picture", temp.getAbsolutePath());
-                    }
-
-                    ParseFile audio_file;
-                    if((audio_file = ((Flag) parent.getItemAtPosition(position)).getAudio()) != null){
-                        File temp = File.createTempFile("places_temp_audio", ShareFragment.AUDIO_FORMAT, getActivity().getCacheDir());
-                        temp.deleteOnExit();
-
-                        FileOutputStream outStream = new FileOutputStream(temp);
-                        outStream.write(audio_file.getData());
-                        outStream.close();
-                        bundle.putString("audio", temp.getAbsolutePath());
-                    }
-
-
-                    ParseFile video_file;
-                    if((video_file = ((Flag) parent.getItemAtPosition(position)).getVideo()) != null)
-                    {
-                        File temp = File.createTempFile("places_temp_video", ShareFragment.VIDEO_FORMAT, getActivity().getCacheDir());
-                        temp.deleteOnExit();
-
-                        FileOutputStream outStream = new FileOutputStream(temp);
-                        outStream.write(video_file.getData());
-                        outStream.close();
-
-                        bundle.putString("video", temp.getAbsolutePath());
-                    }
-                }
-                catch(IOException ioe){ioe.printStackTrace();}
-                catch(com.parse.ParseException pe)
-                {
-                    Log.v(TAG, "Parse file(s) couldn't be retrieved");
-                    pe.printStackTrace();
-                }
-
-                intent.putExtras(bundle);
-
-                startActivity(intent);
-            }
-        });
-
-//        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-//
-//            @Override
-//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-//                if (position == 0) return true;
-//                Toast.makeText(getActivity(), "Long Click!", Toast.LENGTH_LONG).show();
-//                return true;
-//            }
-//        });
+        listView.setOnItemClickListener(this);
 
         loadDefaultSettings();
 
 
-        if(PlacesApplication.getLocation() != null && adapter == null)
-        {
-            if(PlacesApplication.mService != null) PlacesApplication.mService.queryParsewithLocation(PlacesApplication.getLocation());
-            else
-            {
-                final Handler handler = new Handler();
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(PlacesApplication.mService == null) handler.postDelayed(this, Utils.UPDATE_DELAY);
-                        else PlacesApplication.mService.queryParsewithLocation(PlacesApplication.getLocation());
-                    }
-                });
-            }
-        }
 
         registerForContextMenu(listView);
 
+        this.configureListViewWithFlags(PlacesApplication.getPins());
+
+         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
+
+
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d(TAG, "onDestroyView");
+        LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(this.receiver);
+        this.listView = null;
+        this.textHeader = null;
     }
 
     @Override
@@ -212,18 +136,6 @@ public class MosaicFragment extends Fragment{
             case Utils.REPORT_POST:
                 this.reportFlag(sel_usr);
                 return true;
-           /* case Utils.REMOVE_REPORT_POST:
-                ArrayList<String> delReports =sel_usr.getReports();
-                delReports.remove(FacebookUtils.getInstance().getCurrentUserId());
-                sel_usr.put("reports", delReports);
-                sel_usr.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        Toast.makeText(getActivity(), "Flag report revoked", Toast.LENGTH_SHORT).show();
-                        Utils.mainActivity.refresh();
-                    }
-                });
-                return true;*/
             default:
                 return super.onContextItemSelected(item);
         }
@@ -269,8 +181,7 @@ public class MosaicFragment extends Fragment{
         int range = prefs.getInt("seekBar", 1) + 1;
         Utils.MAP_RADIUS = range / 10f;
         Log.d(TAG, "Updated map radius to " + Utils.MAP_RADIUS);
-        int step = Utils.stepValues[prefs.getInt("maxFetch", 1)];
-        Utils.MAX_PINS = step;
+        Utils.MAX_PINS = Utils.stepValues[prefs.getInt("maxFetch", 1)];
         Log.d(TAG, "Updated max pins to " + Utils.MAX_PINS);
         updateHeaderText();
     }
@@ -279,18 +190,96 @@ public class MosaicFragment extends Fragment{
         textHeader.setText("within " + (int)(Utils.MAP_RADIUS * 1000) + " meters");
     }
 
-    public static void configureListViewWithFlags()
-    {
-        if(listView != null)
-        {
-            adapter =
-                    new FlagsArrayAdapter
-                                    (Utils.mainActivity,
-                                    R.layout.flags_list_item,
-                                    PlacesApplication.mService.parseObjects,
-                                    Utils.mainActivity);
 
-            listView.setAdapter(adapter);
+    public void configureListViewWithFlags(List<Flag> flags)
+    {
+        if(this.listView != null && flags != null)
+        {
+            ListAdapter adapter = new FlagsArrayAdapter(Utils.mainActivity,
+                                            R.layout.flags_list_item,
+                                            PlacesApplication.getPins());
+
+            this.listView.setAdapter(adapter);
         }
     }
+
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+    {
+        Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+        v.vibrate(Utils.VIBRATION_DURATION);
+
+        if(position == 0)
+        {
+            startActivity(new Intent(getActivity().getApplicationContext(), SettingsActivity.class));
+            return;
+        }
+
+        Intent intent = new Intent(getActivity().getApplicationContext(), FlagActivity.class);
+
+        Date date = ((Flag) parent.getItemAtPosition(position)).getDate();
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
+        String sDate = df.format(date);
+
+        Bundle bundle = new Bundle();
+
+        bundle.putString("text", ((Flag) parent.getItemAtPosition(position)).getText());
+        bundle.putString("id", ((Flag) parent.getItemAtPosition(position)).getFbId());
+        bundle.putString("date", sDate);
+        bundle.putString("weather", ((Flag) parent.getItemAtPosition(position)).getWeather());
+        bundle.putString("category", ((Flag) parent.getItemAtPosition(position)).getCategory());
+
+        try
+        {
+            ParseFile pic_file;
+            if((pic_file = ((Flag) parent.getItemAtPosition(position)).getPic()) != null){
+                File temp = File.createTempFile("places_temp_pic", ShareFragment.PICTURE_FORMAT, getActivity().getCacheDir());
+                temp.deleteOnExit();
+
+                FileOutputStream outStream = new FileOutputStream(temp);
+                outStream.write(pic_file.getData());
+                outStream.close();
+
+                bundle.putString("picture", temp.getAbsolutePath());
+            }
+
+            ParseFile audio_file;
+            if((audio_file = ((Flag) parent.getItemAtPosition(position)).getAudio()) != null){
+                File temp = File.createTempFile("places_temp_audio", ShareFragment.AUDIO_FORMAT, getActivity().getCacheDir());
+                temp.deleteOnExit();
+
+                FileOutputStream outStream = new FileOutputStream(temp);
+                outStream.write(audio_file.getData());
+                outStream.close();
+                bundle.putString("audio", temp.getAbsolutePath());
+            }
+
+
+            ParseFile video_file;
+            if((video_file = ((Flag) parent.getItemAtPosition(position)).getVideo()) != null)
+            {
+                File temp = File.createTempFile("places_temp_video", ShareFragment.VIDEO_FORMAT, getActivity().getCacheDir());
+                temp.deleteOnExit();
+
+                FileOutputStream outStream = new FileOutputStream(temp);
+                outStream.write(video_file.getData());
+                outStream.close();
+
+                bundle.putString("video", temp.getAbsolutePath());
+            }
+        }
+        catch(IOException ioe){ioe.printStackTrace();}
+        catch(com.parse.ParseException pe)
+        {
+            Log.v(TAG, "Parse file(s) couldn't be retrieved");
+            pe.printStackTrace();
+        }
+
+        intent.putExtras(bundle);
+
+        startActivity(intent);
+    }
+
+
 }

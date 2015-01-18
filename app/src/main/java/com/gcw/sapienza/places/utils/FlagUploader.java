@@ -83,20 +83,16 @@ public class FlagUploader {
     public FlagUploader(Flag f, Context ctx){
         this.flag = f;
         this.isUploading = false;
-        this.files = new HashMap<>();
-        this.usedFiled = new HashMap<>();
+        this.files = new HashMap<>(3);
+        this.usedFiled = new HashMap<>(3);
         this.context = ctx;
     }
-/*
-    public void setDeletesFilesOnFinish(boolean deletes){
-        this.deleteFilesOnFinish = deletes;
-    }
-*/
 
     /**
      *
      * @return true if method upload has been already called, false otherwise
      */
+    @SuppressWarnings("UnusedDeclaration")
     public boolean isUploading(){
         return this.isUploading;
     }
@@ -107,7 +103,7 @@ public class FlagUploader {
      * @param video file to upload as a video
      */
     public void setVideoFile(File video){
-        if(this.isUploading()){
+        if(this.isUploading){
             throw new IllegalStateException("Cannot set a file while uploading");
         }
         this.files.put(VIDEO_KEY, video);
@@ -119,7 +115,7 @@ public class FlagUploader {
      * @param audio file to upload as a audio rec
      */
     public void setAudioFile(File audio){
-        if(this.isUploading()){
+        if(this.isUploading){
             throw new IllegalStateException("Cannot set a file while uploading");
         }
         this.files.put(AUDIO_KEY, audio);
@@ -131,7 +127,7 @@ public class FlagUploader {
      * @param picture file to upload as a picture
      */
     public void setPictureFile(File picture){
-        if(this.isUploading()){
+        if(this.isUploading){
             throw new IllegalStateException("Cannot set a file while uploading");
         }
         this.files.put(PICTURE_KEY, picture);

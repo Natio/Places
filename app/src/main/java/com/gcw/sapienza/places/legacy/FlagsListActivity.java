@@ -34,6 +34,7 @@ public class FlagsListActivity extends Activity {
         ParseGeoPoint p = new ParseGeoPoint(41.8883656,12.5066291);
         q.whereWithinKilometers("location",p, 1);
         q.findInBackground(new FindCallback<Flag>() {
+            @Override
             public void done(List<Flag> flags, ParseException e) {
                 if (e == null) {
                     //if flags are retrieved configure the ListView
@@ -55,7 +56,7 @@ public class FlagsListActivity extends Activity {
         //retrieve the listview
         ListView listView = (ListView)this.findViewById(R.id.flags_list_view);
         //configure the adapter
-        FlagsArrayAdapter adapter = new FlagsArrayAdapter(this, R.layout.flags_list_item, flags, this);
+        FlagsArrayAdapter adapter = new FlagsArrayAdapter(this, R.layout.flags_list_item, flags);
         listView.setAdapter(adapter);
     }
 

@@ -17,15 +17,15 @@
         android:layout_height="fill_parent"
         tools:context=".MapActivity"
         android:id="@+id/map_holder" >
+    <!--
+            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/flags_map"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:name="com.google.android.gms.maps.SupportMapFragment" /> -->
 
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/flags_map"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:name="com.google.android.gms.maps.SupportMapFragment" />
+        </FrameLayout>
 
-    </FrameLayout>
-
-    <!-- </LinearLayout> -->
+        <!-- </LinearLayout> -->
 
 </ScrollView>

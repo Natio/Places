@@ -30,6 +30,7 @@ import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -113,8 +114,8 @@ public class PlacesApplication extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG,"CIAO");
-
+        Log.d(TAG, "CIAO");
+        PlacesApplication.pinsNearby = new ArrayList<>(0);
         PlacesApplication.PLACES_CONTEXT = this.getApplicationContext();
 
         placesApplication = this;
@@ -185,7 +186,6 @@ public class PlacesApplication extends Application{
             LocalBinder binder = (LocalBinder) service;
             mService = binder.getService();
             mService.setListener(listener);
-            Log.d(TAG, "*******************************"+mService+"");
             mBound = true;
         }
 
@@ -197,10 +197,12 @@ public class PlacesApplication extends Application{
     };
 
     private ILocationUpdater listener = new ILocationUpdater() {
+        @Override
         public void setLocation(Location l){
             PlacesApplication.currentLocation = l;
             updateWeatherInfo();
         }
+        @Override
         public void setPinsNearby(List<Flag> l){
             PlacesApplication.pinsNearby = l;
         }
@@ -218,7 +220,7 @@ public class PlacesApplication extends Application{
                 locality = addresses.get(0).getLocality();
                 String cc = addresses.get(0).getCountryCode();
                 JSONWeatherTask task = new JSONWeatherTask();
-                task.execute(new String[]{locality + "," + cc});
+                task.execute(new String[]{locality + ',' + cc});
             }
         }catch (IOException e){
             Log.e(TAG, "No locality found! Error: " + e.toString());

@@ -14,12 +14,11 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.gcw.sapienza.places.MMapFragment;
 import com.gcw.sapienza.places.MainActivity;
-import com.gcw.sapienza.places.MosaicFragment;
 import com.gcw.sapienza.places.Notifications;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
@@ -47,6 +46,8 @@ public class LocationService extends Service implements
         LocationListener {
 
     private static final String TAG = "LocationService";
+
+    public static final String FOUND_NEW_FLAGS_NOTIFICATION = "FOUND_NEW_FLAGS_NOTIFICATION";
 
     private final IBinder mBinder = new LocalBinder();
 
@@ -171,7 +172,7 @@ public class LocationService extends Service implements
                 Toast.makeText(getApplicationContext(), "You won't be able to see any flags with these settings", Toast.LENGTH_LONG).show();
 
                 if(parseObjects == null){
-                    parseObjects = new ArrayList<>();
+                    parseObjects = new ArrayList<>(0);
                 }
                 else{
                     parseObjects.clear();
@@ -198,6 +199,7 @@ public class LocationService extends Service implements
             query.setLimit(50);
         }
 
+
         query.findInBackground(new FindCallback<Flag>() {
             @Override
             public void done(List<Flag> parseObjects, ParseException e) {
@@ -209,8 +211,11 @@ public class LocationService extends Service implements
                         " pins within " + Utils.MAP_RADIUS + " km");
                 updateApplication();
 
-                MosaicFragment.configureListViewWithFlags();
-                MMapFragment.updateMarkersOnMap();
+                //MosaicFragment.configureListViewWithFlags();
+                //MMapFragment.updateMarkersOnMap();
+
+                LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
+
             }
         });
     }
@@ -237,7 +242,7 @@ public class LocationService extends Service implements
         }
         Log.d(TAG, "Location changed");
         long elapsed_time = location.getTime() -
-                (this.location == null ? 0l : this.location.getTime());
+                (this.location == null ? 0L : this.location.getTime());
         Log.d(TAG, "Elapsed time: " + elapsed_time);
         if(this.location != null) {
             float distance = location.distanceTo(this.location) / KM_TO_M;

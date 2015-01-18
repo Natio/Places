@@ -1,16 +1,19 @@
 package com.gcw.sapienza.places;
 
-import android.location.Location;
-import android.os.Handler;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.gcw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -18,6 +21,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
@@ -28,15 +32,17 @@ import java.util.List;
 public class MMapFragment extends Fragment implements OnMapReadyCallback {
 
     private static final String TAG = "MMapFragment";
-    private SupportMapFragment mapFragment;
 
-    private static View view;
+    private GoogleMap gMap;
 
-    protected static Location location;
-
-    protected static final int MAP_ZOOM = 22;
-
-    protected static GoogleMap gMap;
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction().equals(LocationService.FOUND_NEW_FLAGS_NOTIFICATION)){
+                MMapFragment.this.updateMarkersOnMap();
+            }
+        }
+    };
 
     @Override
     public void onHiddenChanged(boolean hidden) {
@@ -48,94 +54,75 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        if (view != null) {
-            ViewGroup parent = (ViewGroup) view.getParent();
-            if (parent != null)
-                parent.removeView(view);
-        }
+        View view = inflater.inflate(R.layout.activity_flags_map, container, false);
 
-        try
-        {
-            view = inflater.inflate(R.layout.activity_flags_map, container, false);
-        }
-        catch(InflateException e)
-        {
-            Log.v(TAG, "Map not created, since it's already there.");
-        }
-
-        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.flags_map);
-
+        SupportMapFragment mapFragment = new SupportMapFragment();
+        this.getFragmentManager().beginTransaction().replace(R.id.map_holder, mapFragment).commit();
         mapFragment.getMapAsync(this);
 
         return view;
     }
 
     @Override
-    public void onMapReady(final GoogleMap googleMap)
-    {
-        location = PlacesApplication.getLocation();
-
-        googleMap.getUiSettings().setScrollGesturesEnabled(false);
-        gMap = googleMap;
-
-        if(location!=null)
-        {
-            //show continuously my location on map
-            gMap.setMyLocationEnabled(true);
-
-            updateMarkersOnMap();
-        }
-        else
-        {
-            final Handler handler = new Handler();
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    location = PlacesApplication.getLocation();
-
-                    if (location == null) handler.postDelayed(this, Utils.UPDATE_DELAY);
-                    else
-                    {
-                        gMap.setMyLocationEnabled(true);
-
-                        if(getActivity() != null)
-                            ((MainActivity)getActivity()).refresh();
-                    }
-                }
-            });
-        }
+    public void onDestroyView() {
+        Log.d(TAG, "onDestroyView");
+        super.onDestroyView();
+        this.gMap = null;
+        LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(this.receiver);
     }
 
-    public static void updateMarkersOnMap()
+
+    @Override
+    public void onMapReady(GoogleMap googleMap)
+    {
+        this.gMap = googleMap;
+
+        this.gMap.getUiSettings().setScrollGesturesEnabled(false);
+        this.gMap.getUiSettings().setZoomGesturesEnabled(false);
+        this.gMap.setMyLocationEnabled(true);
+
+        LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
+
+        this.updateMarkersOnMap();
+    }
+
+    public void updateMarkersOnMap()
     {
         List<Flag> pins= PlacesApplication.getPins();
 
-        if(pins != null && gMap != null)
+        if(pins != null && this.gMap != null)
         {
-            gMap.clear();
+            this.gMap.clear();
 
-            location = PlacesApplication.getLocation();
-            LatLng lat_lng = new LatLng(location.getLatitude(), location.getLongitude());
-            gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lat_lng, MAP_ZOOM));
+            //zooms around all the Flags
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
             for (ParseObject p : pins)
             {
                 Flag f = (Flag) p;
                 ParseGeoPoint location = f.getLocation();
                 String text = f.getText();
+                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                builder.include(latLng);
 
-                gMap.addMarker(new MarkerOptions()
-                                .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                this.gMap.addMarker(new MarkerOptions()
+                                .position(latLng)
                                 .title(text)
                                 .icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
                                 .alpha(0.8f));
             }
+
+            if(pins.size() > 0){
+                LatLngBounds bounds = builder.build();
+                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 70));
+            }
+
         }
     }
 
     protected static float getCategoryColor(String category)
     {
-        if (Utils.categories == null || category == null || category.equals(Utils.categories[0]) || category.equals(""))
+        if (Utils.categories == null || category == null || category.equals(Utils.categories[0]) || category.isEmpty())
             return BitmapDescriptorFactory.HUE_RED;
         if (category.equals(Utils.categories[1])) return BitmapDescriptorFactory.HUE_AZURE;
         else if (category.equals(Utils.categories[2])) return BitmapDescriptorFactory.HUE_ORANGE;

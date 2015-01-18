@@ -24,6 +24,7 @@ import java.net.URL;
 
 /**
  * Created by mic_head on 01/01/15.
+ *
  */
 public class FlagActivity extends Activity {
 
@@ -41,6 +42,7 @@ public class FlagActivity extends Activity {
 
     private VideoView vv;
 
+    @SuppressWarnings("UnusedDeclaration")
     private static final String TAG = "FlagActivity";
 
     @Override
@@ -92,7 +94,7 @@ public class FlagActivity extends Activity {
         else vv.setVisibility(View.INVISIBLE);
 
         ((EditText)findViewById(R.id.text)).setText(text);
-        final String weatherString = (weather == null || weather.equals("")) ? "" : ", " + weather;
+        final String weatherString = (weather == null || weather.isEmpty()) ? "" : ", " + weather;
 
         final String bottomLineText = ", " + date + weatherString + "\nCategory: " + category;
         final TextView authorTextView = (TextView)findViewById(R.id.author);
@@ -141,10 +143,9 @@ public class FlagActivity extends Activity {
 
     private void playVideo(String video_path)
     {
-        Uri videoUri = Uri.parse(video_path);
-
-        if(videoUri != null)
+        if(video_path != null)
         {
+            Uri videoUri = Uri.parse(video_path);
             vv.setVideoURI(videoUri);
             vv.start();
         }

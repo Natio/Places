@@ -357,7 +357,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         //if there is no content
         if(this.textView.getText().toString().length() == 0 && !isPicTaken && !isVideoShoot && !isSoundCaptured)
         {
-            Map<String, String> dimensions = new HashMap<>();
+            Map<String, String> dimensions = new HashMap<>(1);
             dimensions.put("reason", "Share without any content");
             ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
 
@@ -367,7 +367,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         else if(current_location == null){
 
             Log.d(TAG, "No GPS data");
-            Map<String, String> dimensions = new HashMap<>();
+            Map<String, String> dimensions = new HashMap<>(1);
             dimensions.put("reason", "Share with No GPS");
             ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
             this.onShareFailed(ENABLE_NETWORK_SERVICE_TEXT);
@@ -375,7 +375,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         }
         else if(!FacebookUtils.getInstance().hasCurrentUserId()){
 
-            Map<String, String> dimensions = new HashMap<>();
+            Map<String, String> dimensions = new HashMap<>(1);
             dimensions.put("reason", "Share with No Facebook");
             ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
             this.onShareFailed(FB_ID_NOT_FOUND_TEXT);
@@ -464,13 +464,13 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         uploader.upload(new FlagUploader.FlagUploaderCallbacks() {
             @Override
             public void onPercentage(int percentage, String text_to_show) {
-                ShareFragment.this.progressTextView.setText(text_to_show+" "+percentage+"%");
+                ShareFragment.this.progressTextView.setText(text_to_show+' '+percentage+'%');
             }
 
             @Override
             public void onError(Exception e) {
                 Log.d(TAG, e.getMessage());
-                Map<String, String> dimensions = new HashMap<>();
+                Map<String, String> dimensions = new HashMap<>(1);
                 dimensions.put("reason", e.getMessage());
                 ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
                 onShareSucceeded(ERROR_ENCOUNTERED_TEXT);
@@ -482,7 +482,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
             {
                 Log.d(TAG, "Success");
                 ((com.gcw.sapienza.places.MainActivity) getActivity()).refresh();
-                Map<String, String> dimensions = new HashMap<>();
+                Map<String, String> dimensions = new HashMap<>(1);
                 dimensions.put("category", category);
                 ParseAnalytics.trackEventInBackground("sharing_succeeded", dimensions);
 
