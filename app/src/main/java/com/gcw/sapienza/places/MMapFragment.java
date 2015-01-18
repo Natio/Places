@@ -88,7 +88,7 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
 
     public void updateMarkersOnMap()
     {
-        List<Flag> pins= PlacesApplication.getPins();
+        List<Flag> pins= PlacesApplication.getInstance().getFlags();
 
         if(pins != null && this.gMap != null)
         {
@@ -106,10 +106,10 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
                 builder.include(latLng);
 
                 this.gMap.addMarker(new MarkerOptions()
-                                .position(latLng)
-                                .title(text)
-                                .icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
-                                .alpha(0.8f));
+                        .position(latLng)
+                        .title(text)
+                        .icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
+                        .alpha(0.8f));
             }
 
             if(pins.size() > 0){

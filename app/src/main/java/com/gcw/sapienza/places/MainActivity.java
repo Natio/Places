@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -168,6 +169,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         }
     }
 
+    @Override
     protected void onSaveInstanceState(Bundle outState)
     {
         super.onSaveInstanceState(outState);
@@ -237,8 +239,10 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
 
     protected void refresh()
     {
-        if(PlacesApplication.getLocation() != null)
-            PlacesApplication.mService.queryParsewithLocation(PlacesApplication.getLocation());
+        Location currentLocation = PlacesApplication.getInstance().getLocation();
+        if(currentLocation != null){
+            PlacesApplication.getInstance().getLocationService().queryParsewithLocation(currentLocation);
+        }
         else
             Toast.makeText(this, "No location data available\n" +
                     "Are Location Services enabled?", Toast.LENGTH_LONG).show();
@@ -288,10 +292,12 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
             this.mainActivity = mainActivity;
         }
 
+        @Override
         public int getCount() {
             return 3;
         }
 
+        @Override
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
@@ -303,7 +309,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
             }
             return null;
         }
-
+        @Override
         public Fragment getItem(int i)
         {
             /*if (mainActivity.fragments[i] == null)
@@ -326,7 +332,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                 &&!locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             promptForLocationServices();
         }else {
-            PlacesApplication.getPlacesApplication().startLocationService();
+            PlacesApplication.getInstance().startLocationService();
         }
 
         isForeground = true;
@@ -339,12 +345,14 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         builder.setMessage("Places requires Location Services to be turned on in order to work properly.\n" +
                 "Edit Location Settings?");
         builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 startActivityForResult(new Intent
                         (android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), Utils.GPS_ENABLE_REQUEST_CODE);
             }
         });
         builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 finish();
             }
@@ -419,7 +427,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                         break;
                 }
             case Utils.GPS_ENABLE_REQUEST_CODE:
-                PlacesApplication.getPlacesApplication().startLocationService();
+                PlacesApplication.getInstance().startLocationService();
                 break;
             case Utils.LOGIN_REQUEST_CODE:
 

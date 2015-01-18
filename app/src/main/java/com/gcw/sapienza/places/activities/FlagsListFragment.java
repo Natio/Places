@@ -50,7 +50,7 @@ public class FlagsListFragment extends Fragment {
         this.recyvleView.setLayoutManager(llm);
 
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
-        Location location = LocationService.getRandomLocation(PlacesApplication.getLocation(), 100 );
+        Location location = LocationService.getRandomLocation(PlacesApplication.getInstance().getLocation(), 100 );
         ParseGeoPoint gp = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
         query.whereWithinKilometers("location", gp, 10.0f);
 
@@ -91,6 +91,7 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
         this.context = ctx;
     }
 
+    @Override
     public void onBindViewHolder(final FlagsViewHolder flagViewHolder, int i) {
         Flag f = this.flags.get(i);
         flagViewHolder.main_text.setText(f.getText());

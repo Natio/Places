@@ -2,6 +2,7 @@ package com.gcw.sapienza.places;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
@@ -64,12 +65,13 @@ Toast radiusToast;
             Utils.MAX_PINS = value;
             Utils.mainActivity.getMosaicFragment().updateHeaderText();
 
-            showToast("Max number of visible flags: " + value + ".");
+            showToast("Max number of visible flags: " + value + '.');
 
             Log.d(TAG, "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
         }
 
-        PlacesApplication.mService.queryParsewithLocation(PlacesApplication.getLocation());
+        Location currentLocation = PlacesApplication.getInstance().getLocation();
+        PlacesApplication.getInstance().getLocationService().queryParsewithLocation(currentLocation);
 
         return true;
     }

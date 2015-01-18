@@ -69,7 +69,7 @@ public class LocationService extends Service implements
 
     private ILocationUpdater listener;
 
-    public List<Flag> parseObjects;
+    private List<Flag> parseObjects;
 
     private Location notificationLocation;
 
@@ -106,7 +106,7 @@ public class LocationService extends Service implements
     {
         //creates a fake location for testing if it is running on simulator
         if(PlacesApplication.isRunningOnEmulator){
-            location = PlacesApplication.getLocation();
+            location = PlacesApplication.getInstance().getLocation();
         }
 
         //this is for avoiding a crash if location is null
@@ -211,8 +211,6 @@ public class LocationService extends Service implements
                         " pins within " + Utils.MAP_RADIUS + " km");
                 updateApplication();
 
-                //MosaicFragment.configureListViewWithFlags();
-                //MMapFragment.updateMarkersOnMap();
 
                 LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
 

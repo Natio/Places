@@ -49,62 +49,86 @@ public class PlacesApplication extends Application{
     private static final String PARSE_COM_CLIENT_KEY = "Gr1g8Z2kfv3AOZqToZ30hyMyNzH24vj4yudNoKfb";
 
     //current location
-    private static Location currentLocation = null;
+    private Location currentLocation = null;
 
-    //TODO I do not know if this gives a false positive on a real device. If it does just assign false
     public static final boolean isRunningOnEmulator = Build.BRAND.toLowerCase().startsWith("generic");
 
 
 
-    private static List<Flag> pinsNearby;
+    private List<Flag> pinsNearby = new ArrayList<>(0);
 
 
-    public static LocationService mService;
-    boolean mBound = false;
+    private LocationService mService;
 
-    private static String locality;
+    @SuppressWarnings("UnusedDeclaration")
+    private boolean mBound = false;
 
     //shared variable for handling weather conditions
-    private static String weather = "";
+    private String weather = "";
 
     private static PlacesApplication placesApplication;
 
-    public static PlacesApplication getPlacesApplication(){
+    /**
+     * Call this method to access the UNIQUE PlacesApplication instance
+     * @return The unique instance of PlacesApplication
+     */
+    public static PlacesApplication getInstance(){
         return PlacesApplication.placesApplication;
     }
 
     /**
      *
+     * @return returns LocationService instance
+     */
+    public LocationService getLocationService(){
+        return this.mService;
+    }
+
+
+    /**
+     *
      * @return string representing weather conditions
      */
-    public static String getWeather(){
-        return PlacesApplication.weather;
+    public String getWeather(){
+        return this.weather;
     }
 
     /**
      * Sets the weather
      * @param weather string representing the weather
      */
-    public static void setWeather(String weather){
-        PlacesApplication.weather = weather;
+    public void setWeather(String weather){
+        this.weather = weather;
     }
 
-    //made synchronized for thread safety and added fake location if running on emulator
-    public static synchronized Location getLocation(){
-        if (PlacesApplication.isRunningOnEmulator && currentLocation == null) {
+    /**
+     * Returns the current location if available. If running on emulator this method
+     * will return a fake position somewhere in the middle of Rome.
+     * @return see description
+     */
+    public Location getLocation(){
+        if (PlacesApplication.isRunningOnEmulator && this.currentLocation == null) {
 
             Location loc = new Location("rome_center");
             loc.setLatitude(41.900193);
             loc.setLongitude(12.472916);
-            currentLocation = LocationService.getRandomLocation(loc, 1000);
+            this.currentLocation = LocationService.getRandomLocation(loc, 1000);
         }
-        return currentLocation;
+        return this.currentLocation;
     }
 
-    public static List<Flag> getPins(){
-        return pinsNearby;
+    /**
+     *
+     * @return returns the list of flags around user's location, filtered according to settings
+     */
+    public List<Flag> getFlags(){
+        return this.pinsNearby;
     }
 
+    /**
+     *
+     * @return App context
+     */
     @SuppressWarnings("unused")
     public static Context getPlacesAppContext(){
         return PlacesApplication.PLACES_CONTEXT;
@@ -115,10 +139,9 @@ public class PlacesApplication extends Application{
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "CIAO");
-        PlacesApplication.pinsNearby = new ArrayList<>(0);
-        PlacesApplication.PLACES_CONTEXT = this.getApplicationContext();
 
-        placesApplication = this;
+        PlacesApplication.PLACES_CONTEXT = this.getApplicationContext();
+        PlacesApplication.placesApplication = this;
 
         if(BuildConfig.DEBUG){
             Picasso.with(this).setIndicatorsEnabled(true); // if in debug show color indicators on pictures
@@ -150,7 +173,7 @@ public class PlacesApplication extends Application{
 
     }
 
-    private void subscribeToParseBroadcast() {
+    private static void subscribeToParseBroadcast() {
         ParsePush.subscribeInBackground("", new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -171,7 +194,7 @@ public class PlacesApplication extends Application{
             Log.d("Places Application", "Starting Location Service");
     //        stopService(locInt);
             startService(locInt);
-            bindService(locInt, mConnection, BIND_AUTO_CREATE);
+            bindService(locInt, this.mConnection, BIND_AUTO_CREATE);
         }else{
             Log.w("Places Application", "Location Service not started!");
         }
@@ -186,25 +209,25 @@ public class PlacesApplication extends Application{
             LocalBinder binder = (LocalBinder) service;
             mService = binder.getService();
             mService.setListener(listener);
-            mBound = true;
+            PlacesApplication.this.mBound = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
             mService = null;
-            mBound = false;
+            PlacesApplication.this.mBound = false;
         }
     };
 
     private ILocationUpdater listener = new ILocationUpdater() {
         @Override
         public void setLocation(Location l){
-            PlacesApplication.currentLocation = l;
-            updateWeatherInfo();
+            PlacesApplication.this.currentLocation = l;
+            PlacesApplication.this.updateWeatherInfo();
         }
         @Override
         public void setPinsNearby(List<Flag> l){
-            PlacesApplication.pinsNearby = l;
+            PlacesApplication.this.pinsNearby = l;
         }
     };
 
@@ -212,15 +235,15 @@ public class PlacesApplication extends Application{
         Geocoder gcd = new Geocoder(this, Locale.getDefault());
         try {
 
-            Location current = PlacesApplication.getLocation();
+            Location current = this.currentLocation;
 
             List<Address> addresses = gcd.getFromLocation(current.getLatitude(), current.getLongitude(), 1);
             if (addresses.size() > 0) {
                 Log.d(TAG, "Locality: " + addresses.get(0).getLocality());
-                locality = addresses.get(0).getLocality();
+                String locality = addresses.get(0).getLocality();
                 String cc = addresses.get(0).getCountryCode();
                 JSONWeatherTask task = new JSONWeatherTask();
-                task.execute(new String[]{locality + ',' + cc});
+                task.execute(locality + ',' + cc);
             }
         }catch (IOException e){
             Log.e(TAG, "No locality found! Error: " + e.toString());

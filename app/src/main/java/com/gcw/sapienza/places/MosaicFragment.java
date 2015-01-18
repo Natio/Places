@@ -56,7 +56,7 @@ public class MosaicFragment extends Fragment implements  AdapterView.OnItemClick
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals(LocationService.FOUND_NEW_FLAGS_NOTIFICATION)){
-                MosaicFragment.this.configureListViewWithFlags(PlacesApplication.getPins());
+                MosaicFragment.this.configureListViewWithFlags(PlacesApplication.getInstance().getFlags());
             }
         }
     };
@@ -86,7 +86,7 @@ public class MosaicFragment extends Fragment implements  AdapterView.OnItemClick
 
         registerForContextMenu(listView);
 
-        this.configureListViewWithFlags(PlacesApplication.getPins());
+        this.configureListViewWithFlags(PlacesApplication.getInstance().getFlags());
 
          LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
 
@@ -197,7 +197,7 @@ public class MosaicFragment extends Fragment implements  AdapterView.OnItemClick
         {
             ListAdapter adapter = new FlagsArrayAdapter(Utils.mainActivity,
                                             R.layout.flags_list_item,
-                                            PlacesApplication.getPins());
+                                            PlacesApplication.getInstance().getFlags());
 
             this.listView.setAdapter(adapter);
         }

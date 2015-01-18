@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 /**
  * Created by snowblack on 1/4/15.
+ *
  */
 public class JSONWeatherTask extends AsyncTask<String, String, String> {
 
@@ -29,10 +30,10 @@ public class JSONWeatherTask extends AsyncTask<String, String, String> {
             String cond = weatherObj.getJSONObject(0).getString("main");
             Log.d("Weather", "Condizioni: " + cond);
             String weather = round_temp + "°C, " + cond;
-            PlacesApplication.setWeather(weather);
+            PlacesApplication.getInstance().setWeather(weather);
 
         } catch (JSONException | NullPointerException e) {
-            PlacesApplication.setWeather("");
+            PlacesApplication.getInstance().setWeather("");
             e.printStackTrace();
         }
 

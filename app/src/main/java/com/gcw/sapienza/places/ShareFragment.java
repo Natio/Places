@@ -388,7 +388,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
 
     private void share()
     {
-        Location current_location =  PlacesApplication.getLocation();
+        Location current_location =  PlacesApplication.getInstance().getLocation();
         if(PlacesApplication.isRunningOnEmulator){
             current_location = LocationService.getRandomLocation(current_location, 100);
             Log.d(TAG, "Generata Posizione casuale per simulatore: "+current_location);
@@ -411,7 +411,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         f.setCategory(category);
         f.setLocation(p);
         f.setText(this.textView.getText().toString());
-        f.setWeather(PlacesApplication.getWeather());
+        f.setWeather(PlacesApplication.getInstance().getWeather());
 
         FlagUploader uploader = new FlagUploader(f, mContext);
         //uploader.setDeletesFilesOnFinish(true);
