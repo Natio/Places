@@ -1,0 +1,11 @@
+{
+    "applications": {
+        "Places": {
+            "applicationId": "BWtqN9x6uyr935MKAROcWkc6mzv8KLQMMVnFGHps", 
+            "masterKey": "jvI8WAicp4ytWRqdgWeRecpyHG8yxviI9q6Zvdkb"
+        }, 
+        "_default": {
+            "link": "Places"
+        }
+    }
+}
