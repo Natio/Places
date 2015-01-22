@@ -19,11 +19,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public final class FacebookUtils {
@@ -48,6 +49,8 @@ public final class FacebookUtils {
     private final HashMap<String, String> userIdMap = new HashMap<>();
     private final HashMap<String, String> userProfilePicMapSmall = new HashMap<>();
     private final HashMap<String, String> userProfilePicMapLarge = new HashMap<>();
+
+    private final HashMap<String, HashSet<FacebookUtilCallback>> scheduledOperationsQueue = new HashMap<>();
 
     private static final FacebookUtils shared_instance = new FacebookUtils();
 
@@ -87,7 +90,7 @@ public final class FacebookUtils {
      * @return true if there is a valid facebook id for the current user
      */
     public boolean hasCurrentUserId() {
-        return !(this.fbId == null || this.fbId.equals(""));
+        return !(this.fbId == null || this.fbId.isEmpty());
     }
 
     /**
@@ -167,7 +170,6 @@ public final class FacebookUtils {
      * Asynchronously fetches current user's facebook friends
      *
      * @param cbk callback
-     * @throws IOException
      */
     public void fetchFbFriends(final FacebookUtilsFriendsCallback cbk) {
         this.friends.clear();
@@ -221,6 +223,23 @@ public final class FacebookUtils {
         if (username != null) {
             if (cbk != null) {
                 cbk.onResult(username, null);
+                return;
+            }
+        }
+
+        final String current_key = "NAME " + fb_id;
+        synchronized (this.scheduledOperationsQueue){
+            if(this.scheduledOperationsQueue.containsKey(current_key)){
+                Set<FacebookUtilCallback> cbks = this.scheduledOperationsQueue.get(current_key);
+                cbks.add(cbk);
+                //Log.d(TAG, "Enqueued"+current_key);
+                return;
+            }
+            else{
+                HashSet<FacebookUtilCallback> newSet = new HashSet<>();
+                newSet.add(cbk);
+                this.scheduledOperationsQueue.put(current_key, newSet);
+                //Log.d(TAG, "Scheduled"+current_key);
             }
         }
 
@@ -235,15 +254,31 @@ public final class FacebookUtils {
 
                             JSONObject obj = go.getInnerJSONObject();
                             String name = obj.getString("name");
+
                             FacebookUtils.this.userIdMap.put(fb_id, name);
-                            if (cbk != null) {
-                                cbk.onResult(name, null);
+
+                            Set<FacebookUtilCallback> cbks;
+                            synchronized (FacebookUtils.this.scheduledOperationsQueue){
+                                cbks = FacebookUtils.this.scheduledOperationsQueue.remove(current_key);
+                            }
+
+
+                            if (cbks != null) {
+                                for(FacebookUtilCallback c : cbks){
+                                    c.onResult(name, null);
+                                }
                             }
                         } catch (JSONException | NullPointerException e) {
                             Log.v(TAG, "Couldn't resolve facebook user's name.  Error: " + e.toString());
                             e.printStackTrace();
-                            if (cbk != null) {
-                                cbk.onResult(null, e);
+                            Set<FacebookUtilCallback> cbks;
+                            synchronized (FacebookUtils.this.scheduledOperationsQueue){
+                                cbks = FacebookUtils.this.scheduledOperationsQueue.remove(current_key);
+                            }
+                            if (cbks != null) {
+                                for(FacebookUtilCallback c : cbks){
+                                    c.onResult(null, e);
+                                }
                             }
                         }
                     }
@@ -309,6 +344,23 @@ public final class FacebookUtils {
             return;
         }
 
+        final String current_key = "PIC_" + size + '_' + user_id;
+        synchronized (this.scheduledOperationsQueue){
+
+            if(this.scheduledOperationsQueue.containsKey(current_key)){
+                Set<FacebookUtilCallback> cbksSet = this.scheduledOperationsQueue.get(current_key);
+                cbksSet.add(cbk);
+                //Log.d(TAG, "Enqueued: " + user_id);
+                return;
+            }
+            else{
+                HashSet<FacebookUtilCallback> cbksSet = new HashSet<>();
+                cbksSet.add(cbk);
+                //Log.d(TAG, "Scheduled: " + user_id);
+                this.scheduledOperationsQueue.put(current_key, cbksSet);
+            }
+        }
+
 
         Bundle bundle = new Bundle();
         bundle.putBoolean("redirect", false);
@@ -316,7 +368,7 @@ public final class FacebookUtils {
         bundle.putString("type", "normal");
         bundle.putString("width", size.toString());
 
-        Request req = new Request(ParseFacebookUtils.getSession(), "/" + user_id + "/picture", bundle, HttpMethod.GET,
+        Request req = new Request(ParseFacebookUtils.getSession(), '/' + user_id + "/picture", bundle, HttpMethod.GET,
                 new Request.Callback() {
                     @Override
                     public void onCompleted(Response response) {
@@ -331,15 +383,32 @@ public final class FacebookUtils {
                             } else {
                                 FacebookUtils.this.userProfilePicMapLarge.put(user_id, url);
                             }
-                            if (cbk != null) {
-                                cbk.onResult(url, null);
+
+                            Set<FacebookUtilCallback> cbks;
+                            synchronized (FacebookUtils.this.scheduledOperationsQueue){
+                                cbks = FacebookUtils.this.scheduledOperationsQueue.remove(current_key);
                             }
+
+                            if(cbks != null){
+                                for (FacebookUtilCallback c : cbks){
+                                    c.onResult(url, null);
+                                }
+                            }
+
+
                         } catch (JSONException e) {
                             Log.v(TAG, "Couldn't retrieve facebook user data.  Error: " + e.toString());
                             e.printStackTrace();
-                            if (cbk != null) {
-                                cbk.onResult(null, e);
+                            Set<FacebookUtilCallback> cbks;
+                            synchronized (FacebookUtils.this.scheduledOperationsQueue){
+                                cbks = FacebookUtils.this.scheduledOperationsQueue.remove(current_key);
                             }
+                            if(cbks != null){
+                                for (FacebookUtilCallback c : cbks){
+                                    c.onResult(null, e);
+                                }
+                            }
+
                         }
                     }
                 }
