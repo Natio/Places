@@ -37,7 +37,13 @@ Toast radiusToast;
         if(preference.getKey().equals("meFilter") ||
                 preference.getKey().equals("flFilter") ||
                 preference.getKey().equals("strangersFilter") ||
-                preference.getKey().equals("timeFilter"))
+                preference.getKey().equals("timeFilter") ||
+                preference.getKey().equals("thoughtsCheck") ||
+                preference.getKey().equals("funCheck") ||
+                preference.getKey().equals("landscapeCheck") ||
+                preference.getKey().equals("foodCheck") ||
+                preference.getKey().equals("noneCheck"))
+
         {
             Log.d(TAG, "Called onPreferenceChange for: " + preference.getKey());
             editor.putBoolean(preference.getKey(), (boolean)newValue);
