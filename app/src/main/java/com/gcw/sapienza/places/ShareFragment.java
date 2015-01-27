@@ -408,12 +408,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         final String category = spinner.getSelectedItem().toString();
 
         f.setFbId(FacebookUtils.getInstance().getCurrentUserId());
-        FacebookUtils.getInstance().getFacebookUsernameFromID(FacebookUtils.getInstance().getCurrentUserId(), new FacebookUtilCallback() {
-            @Override
-            public void onResult(String result, Exception e) {
-                f.setFbName(result);
-            }
-        });
+        f.setFbName(FacebookUtils.getInstance().getCurrentUserName());
         f.setCategory(category);
         f.setLocation(p);
         f.setText(this.textView.getText().toString());

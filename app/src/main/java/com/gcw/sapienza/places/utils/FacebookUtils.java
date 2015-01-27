@@ -87,6 +87,14 @@ public final class FacebookUtils {
 
 
     /**
+     * @return current user's fb name
+     */
+    public String getCurrentUserName() {
+        return this.userIdMap.get(this.fbId);
+    }
+
+
+    /**
      * @return true if there is a valid facebook id for the current user
      */
     public boolean hasCurrentUserId() {
