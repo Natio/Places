@@ -151,6 +151,7 @@ public final class FacebookUtils {
                     public void onCompleted(GraphUser user, Response response) {
                         if (user != null) {
                             FacebookUtils.this.fbId = user.getId();
+                            FacebookUtils.this.userIdMap.put(user.getId(), user.getUsername());
 
                             FacebookUtils.this.fetchFbFriends(new FacebookUtilsFriendsCallback() {
                                 @Override
