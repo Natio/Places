@@ -287,7 +287,7 @@ public class LocationService extends Service implements
         this.location = location;
         queryParsewithLocation(location);
         if(this.parseObjects != null && this.parseObjects.size() > 0
-                && !MainActivity.isForeground() && !FacebookUtils.getInstance().hasCurrentUserId()) {
+                && !MainActivity.isForeground() && FacebookUtils.getInstance().hasCurrentUserId()) {
             Log.d(TAG, "Notifying user..." +
                     this.parseObjects.size() + " pins found");
             notifyUser();
