@@ -1,6 +1,9 @@
 package com.gcw.sapienza.places.activities;
 
 
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,7 +19,15 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.utils.FacebookUtilCallback;
+import com.gcw.sapienza.places.utils.FacebookUtils;
+import com.gcw.sapienza.places.utils.Utils;
+import com.parse.ParseFacebookUtils;
+import com.parse.ui.ParseLoginBuilder;
+
+import java.util.Arrays;
 
 
 public class MainActivity2 extends ActionBarActivity {
@@ -33,6 +44,15 @@ public class MainActivity2 extends ActionBarActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "CIAO");
+
+        if(ParseFacebookUtils.getSession() != null && ParseFacebookUtils.getSession().isOpened()){
+            this.startDownloadingFacebookInfo();
+        }
+        else{
+            this.startLoginActivity();
+        }
+
+        PlacesApplication.getInstance().startLocationService();
         setContentView(R.layout.activity_main_drawer_layout);
         this.current_title = this.getTitle();
         this.drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -43,12 +63,14 @@ public class MainActivity2 extends ActionBarActivity {
 
         this.drawerToggle = new ActionBarDrawerToggle(this, this.drawerLayout, R.drawable.ic_drawer, R.drawable.ic_drawer){
             /** Called when a drawer has settled in a completely closed state. */
+            @Override
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
                 MainActivity2.this.getSupportActionBar().setTitle(MainActivity2.this.current_title);
             }
 
             /** Called when a drawer has settled in a completely open state. */
+            @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
                 MainActivity2.this.getSupportActionBar().setTitle("To_find_a_title");//TODO find a better title!!!!!
@@ -87,6 +109,12 @@ public class MainActivity2 extends ActionBarActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        PlacesApplication.getInstance().startLocationService();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main_drawer, menu);
@@ -100,6 +128,43 @@ public class MainActivity2 extends ActionBarActivity {
         boolean drawerOpen = this.drawerLayout.isDrawerOpen(this.drawerList);
         menu.findItem(R.id.action_add_flag).setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    private void startLoginActivity()
+    {
+        if(ParseFacebookUtils.getSession() == null || ParseFacebookUtils.getSession().isClosed())
+        {
+            ParseLoginBuilder builder = new ParseLoginBuilder(this);
+
+            builder.setParseLoginEnabled(false);
+
+            builder.setFacebookLoginEnabled(true);
+            builder.setFacebookLoginPermissions(Arrays.asList("public_profile", "user_friends"/*, "user_relationships", "user_birthday", "user_location"*/));
+
+            // builder.setAppLogo(R.drawable.app_logo);
+
+            startActivityForResult(builder.build(), Utils.LOGIN_REQUEST_CODE);
+        }
+    }
+
+    private void startDownloadingFacebookInfo(){
+        final ProgressDialog progress = new ProgressDialog(this);
+        progress.setTitle("Loading");
+        progress.setMessage("Wait while loading...");
+        progress.show();
+        FacebookUtils.getInstance().makeMeRequest(new FacebookUtilCallback() {
+            @Override
+            public void onResult(String result, Exception e) {
+                if(e != null){
+                    Log.d(TAG, e.getMessage());
+                    progress.setMessage(e.getMessage());
+                }
+                else{
+                    progress.dismiss();
+                    Log.d(TAG, result);
+                }
+            }
+        }); // retrieve user's Facebook ID
     }
 
 
@@ -136,6 +201,23 @@ public class MainActivity2 extends ActionBarActivity {
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
             MainActivity2.this.selectItem(position);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode)
+        {
+            case Utils.LOGIN_REQUEST_CODE:
+
+                if(resultCode == RESULT_OK){
+                    this.startDownloadingFacebookInfo();
+                }
+                break;
+
         }
     }
 

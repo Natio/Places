@@ -140,8 +140,10 @@ public final class FacebookUtils {
     public void makeMeRequest(final FacebookUtilCallback cbk) {
 
         final Session session = ParseFacebookUtils.getSession();
-
-        if (session == null) return;
+        if (session == null){
+            cbk.onResult(null, new RuntimeException("Session not valid"));
+            return;
+        }
 
         Request request = Request.newMeRequest(session,
                 new Request.GraphUserCallback() {
