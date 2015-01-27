@@ -23,7 +23,7 @@ public class Receiver extends ParsePushBroadcastReceiver {
 //        context.startActivity(i);
 
         Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("https://drive.google.com/folderview?id=0B-l6v1CJ8xNDSzM1QVVNNGp6Tzg&usp=drive_web"));
+                Uri.parse("https://drive.google.com/folderview?id=0B1boWbY-47RQdHJnSlpScUNueTQ&usp=drive_web"));
         browserIntent.putExtras(intent.getExtras());
         browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(browserIntent);
