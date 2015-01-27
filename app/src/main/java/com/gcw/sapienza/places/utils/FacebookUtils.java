@@ -140,8 +140,10 @@ public final class FacebookUtils {
     public void makeMeRequest(final FacebookUtilCallback cbk) {
 
         final Session session = ParseFacebookUtils.getSession();
-
-        if (session == null) return;
+        if (session == null){
+            cbk.onResult(null, new RuntimeException("Session not valid"));
+            return;
+        }
 
         Request request = Request.newMeRequest(session,
                 new Request.GraphUserCallback() {
@@ -149,6 +151,7 @@ public final class FacebookUtils {
                     public void onCompleted(GraphUser user, Response response) {
                         if (user != null) {
                             FacebookUtils.this.fbId = user.getId();
+                            FacebookUtils.this.userIdMap.put(user.getId(), user.getUsername());
 
                             FacebookUtils.this.fetchFbFriends(new FacebookUtilsFriendsCallback() {
                                 @Override
