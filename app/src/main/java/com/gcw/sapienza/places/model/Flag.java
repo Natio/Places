@@ -86,6 +86,5 @@ public class Flag extends ParseObject{
         this.put(TEXT_KEY, text);
     }
 
-    public void setFbName(String name) { this.put(FB_NAME_KEY, name);
-    }
+    public void setFbName(String name) { this.put(FB_NAME_KEY, name); }
 }
