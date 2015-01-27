@@ -134,10 +134,22 @@ public class LocationService extends Service implements
         boolean storytellers_in_the_dark = preferences.getBoolean("strangersFilter", true);
         boolean archaeologist = preferences.getBoolean("timeFilter", false);
 
+        boolean thoughts_check = preferences.getBoolean("thoughtsCheck", true);
+        boolean fun_check = preferences.getBoolean("funCheck", true);
+        boolean landscape_check = preferences.getBoolean("landscapeCheck", true);
+        boolean food_check = preferences.getBoolean("foodCheck", true);
+        boolean none_check = preferences.getBoolean("noneCheck", true);
+
         Log.v(TAG, "Lone Wolf enabled: " + lone_wolf);
         Log.v(TAG, "With Friends Surrounded enabled: " + with_friends_surrounded);
         Log.v(TAG, "Storytellers In The Dark enabled: " + storytellers_in_the_dark);
         Log.v(TAG, "Archaeologist enabled: " + archaeologist);
+
+        Log.v(TAG, "Thoughts enabled: " + thoughts_check);
+        Log.v(TAG, "Fun enabled: " + fun_check);
+        Log.v(TAG, "Landscape: " + landscape_check);
+        Log.v(TAG, "Food: " + food_check);
+        Log.v(TAG, "None: " + none_check);
 
         if(FacebookUtils.getInstance().hasCurrentUserId() == false)
         {
@@ -156,6 +168,31 @@ public class LocationService extends Service implements
             return;
         }
 
+        if(!thoughts_check && !fun_check && !landscape_check
+                && ! food_check && ! none_check){
+            Toast.makeText(getApplicationContext(), "You won't be able to see any flags with these settings", Toast.LENGTH_LONG).show();
+
+            if(parseObjects == null){
+                parseObjects = new ArrayList<>(0);
+            }
+            else{
+                parseObjects.clear();
+            }
+
+            updateApplication();
+
+            return;
+
+        }
+
+        ArrayList<String> selectedCategories = new ArrayList<>();
+        if(thoughts_check) selectedCategories.add("Thoughts");
+        if(fun_check) selectedCategories.add("Fun");
+        if(landscape_check) selectedCategories.add("Landscape");
+        if(food_check) selectedCategories.add("Food");
+        if(none_check) selectedCategories.add("None");
+        query.whereContainedIn("category", selectedCategories);
+
         if(!storytellers_in_the_dark)
         {
             if(lone_wolf && with_friends_surrounded)
@@ -165,11 +202,12 @@ public class LocationService extends Service implements
                 meAndMyFriends.addAll(FacebookUtils.getInstance().getFriends());
                 query.whereContainedIn("fbId", meAndMyFriends);
             }
+
             else if(lone_wolf) query.whereEqualTo("fbId", FacebookUtils.getInstance().getCurrentUserId());
             else if(with_friends_surrounded) query.whereContainedIn("fbId", FacebookUtils.getInstance().getFriends());
             else
             {
-                Toast.makeText(getApplicationContext(), "You won't be able to see any flags with these settings", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "No filterYou won't be able to see any flags with these settings", Toast.LENGTH_LONG).show();
 
                 if(parseObjects == null){
                     parseObjects = new ArrayList<>(0);
@@ -249,7 +287,7 @@ public class LocationService extends Service implements
         this.location = location;
         queryParsewithLocation(location);
         if(this.parseObjects != null && this.parseObjects.size() > 0
-                && !MainActivity.isForeground() && !FacebookUtils.getInstance().hasCurrentUserId()) {
+                && !MainActivity.isForeground() && FacebookUtils.getInstance().hasCurrentUserId()) {
             Log.d(TAG, "Notifying user..." +
                     this.parseObjects.size() + " pins found");
             notifyUser();

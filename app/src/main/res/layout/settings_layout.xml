@@ -45,6 +45,35 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="Visible Categories">
+        <CheckBoxPreference
+            android:summary="None"
+            android:defaultValue="true"
+            android:key="noneCheck"
+            />
+        <CheckBoxPreference
+            android:summary="Thoughts"
+            android:defaultValue="true"
+            android:key="thoughtsCheck"
+            />
+        <CheckBoxPreference
+            android:summary="Fun"
+            android:defaultValue="true"
+            android:key="funCheck"
+            />
+        <CheckBoxPreference
+            android:summary="Landscape"
+            android:defaultValue="true"
+            android:key="landscapeCheck"
+            />
+        <CheckBoxPreference
+            android:summary="Food"
+            android:defaultValue="true"
+            android:key="foodCheck"
+            />
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="About">
 
         <Preference

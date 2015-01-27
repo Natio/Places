@@ -18,6 +18,7 @@ public class Flag extends ParseObject{
     public static final String PICTURE_KEY= "picture";
     public static final String WEATHER_KEY = "weather";
     public static final String FB_ID_KEY = "fbId";
+    public static final String FB_NAME_KEY = "fbName";
     public static final String CATEGORY_KEY = "category";
     public static final String TEXT_KEY = "text";
     public static final String LOCATION_KEY = "location";
@@ -85,4 +86,6 @@ public class Flag extends ParseObject{
         this.put(TEXT_KEY, text);
     }
 
+    public void setFbName(String name) { this.put(FB_NAME_KEY, name);
+    }
 }

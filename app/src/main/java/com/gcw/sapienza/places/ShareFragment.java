@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.gcw.sapienza.places.adapters.MSpinnerAdapter;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.services.LocationService;
+import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.FlagUploader;
 import com.gcw.sapienza.places.utils.Utils;
@@ -73,7 +74,6 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
     private static final int ANIMATION_DURATION = 300;
 
     private static final String FLAG_PLACED_TEXT = "Flag has been placed!";
-    private static final String ERROR_ENCOUNTERED_TEXT = "Error encountered while placing flag\nPlease try again";
     private static final String FB_ID_NOT_FOUND_TEXT = "Couldn't retrieve your Facebook credentials\nPlease check your internet connection.";
     private static final String EMPTY_FLAG_TEXT = "Please insert text or take a picture";
     private static final String ENABLE_NETWORK_SERVICE_TEXT = "Please enable GPS/Network service";
@@ -408,6 +408,12 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
         final String category = spinner.getSelectedItem().toString();
 
         f.setFbId(FacebookUtils.getInstance().getCurrentUserId());
+        FacebookUtils.getInstance().getFacebookUsernameFromID(FacebookUtils.getInstance().getCurrentUserId(), new FacebookUtilCallback() {
+            @Override
+            public void onResult(String result, Exception e) {
+                f.setFbName(result);
+            }
+        });
         f.setCategory(category);
         f.setLocation(p);
         f.setText(this.textView.getText().toString());
@@ -473,7 +479,7 @@ public class ShareFragment extends Fragment implements View.OnLongClickListener{
                 Map<String, String> dimensions = new HashMap<>(1);
                 dimensions.put("reason", e.getMessage());
                 ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
-                onShareSucceeded(ERROR_ENCOUNTERED_TEXT);
+                onShareSucceeded(e.getMessage());
                 this.dismissProgressBar();
             }
 

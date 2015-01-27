@@ -26,6 +26,12 @@ public class SettingsFragment extends PreferenceFragment {
         Preference max_fetch = findPreference("maxFetch");
         Preference version_label = findPreference("version");
 
+        Preference thoughts_check =  findPreference("thoughtsCheck");
+        Preference fun_check =  findPreference("funCheck");
+        Preference landscape_check =  findPreference("landscapeCheck");
+        Preference food_check =  findPreference("foodCheck");
+        Preference none_check =  findPreference("noneCheck");
+
         String version_name = BuildConfig.VERSION_NAME;
         int version_code = BuildConfig.VERSION_CODE;
 
@@ -36,6 +42,12 @@ public class SettingsFragment extends PreferenceFragment {
         time_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
         seek_bar.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
         max_fetch.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
+
+        thoughts_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
+        fun_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
+        landscape_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
+        food_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
+        none_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
 
     }
 }
