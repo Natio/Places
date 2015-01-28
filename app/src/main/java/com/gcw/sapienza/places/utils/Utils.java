@@ -40,6 +40,9 @@ public class Utils
     public static final int REPORT_POST = 1;
     public static final int REMOVE_REPORT_POST = 2;
 
+    public static final int SETTINGS_POSITION = 1;
+    public static final int LOGOUT_POSITION = 2;
+
     protected static final int CHUNK_SIZE = 4096;
 
     public static String[] categories;

@@ -16,8 +16,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
@@ -36,6 +38,7 @@ import java.util.List;
  * Created by paolo  on 10/01/15.
  */
 public class FlagsListFragment extends Fragment {
+
     private static final String TAG = "FlagsListFragment";
 
     private RecyclerView recyvleView;
@@ -53,17 +56,12 @@ public class FlagsListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG,"CIAO " + PlacesApplication.getInstance().getFlags().size());
         View view = inflater.inflate(R.layout.flags_list_new_layout, container, false);
 
         this.recyvleView = (RecyclerView) view.findViewById(R.id.cardList);
         LinearLayoutManager llm = new LinearLayoutManager(this.getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         this.recyvleView.setLayoutManager(llm);
-
-
-
-
 
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
 
@@ -80,10 +78,8 @@ public class FlagsListFragment extends Fragment {
 
     public void updateRecycleViewWithNewContents(List<Flag> l){
         this.recyvleView.setAdapter(new FlagsAdapter(l, this.getActivity()));
-        Log.d(TAG, l.size()+"");
+        Log.d(TAG, l.size() + "");
     }
-
-
 }
 
 class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
@@ -137,23 +133,37 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
                 from(viewGroup.getContext()).
                 inflate(R.layout.card_layout, viewGroup, false);
 
-        return new FlagsViewHolder(itemView);
+        return new FlagsViewHolder(itemView, context);
     }
 
-    public static class FlagsViewHolder extends RecyclerView.ViewHolder{
+    public static class FlagsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         protected final TextView main_text;
         protected final TextView username;
         protected final ImageView user_profile_pic;
         protected final ImageView main_image;
 
+        private final Context mContext;
 
-        public FlagsViewHolder(View v){
+        public FlagsViewHolder(View v, Context context)
+        {
             super(v);
+
+            this.mContext = context;
+
+            v.setOnClickListener(this);
+
             this.main_image = (ImageView) v.findViewById(R.id.card_imageView_image);
             this.user_profile_pic = (ImageView) v.findViewById(R.id.card_profile_pic);
             this.username = (TextView) v.findViewById(R.id.card_textView_username);
             this.main_text = (TextView) v.findViewById(R.id.card_textView_text);
+        }
+
+        @Override
+        public void onClick(View v)
+        {
+            // TODO start FlagActivity!
+            Toast.makeText(mContext, "FlagActivity integration still to be implemented!", Toast.LENGTH_SHORT).show();
         }
     }
 }
