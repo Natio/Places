@@ -107,6 +107,7 @@ public class PlacesApplication extends Application{
      * @return see description
      */
     public Location getLocation(){
+        //if (/*PlacesApplication.isRunningOnEmulator &&*/ this.currentLocation == null) {
         if (PlacesApplication.isRunningOnEmulator && this.currentLocation == null) {
 
             Location loc = new Location("rome_center");

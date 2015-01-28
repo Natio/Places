@@ -21,16 +21,19 @@ import android.widget.ListView;
 
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.SettingsActivity;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseUser;
 import com.parse.ui.ParseLoginBuilder;
 
 import java.util.Arrays;
 
 
 public class MainActivity2 extends ActionBarActivity {
+
     public static String TAG = MainActivity2.class.getName();
     private DrawerLayout drawerLayout;
     private ListView drawerList;
@@ -43,7 +46,6 @@ public class MainActivity2 extends ActionBarActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "CIAO");
 
         if(ParseFacebookUtils.getSession() != null && ParseFacebookUtils.getSession().isOpened()){
             this.startDownloadingFacebookInfo();
@@ -147,6 +149,17 @@ public class MainActivity2 extends ActionBarActivity {
         }
     }
 
+    private void logout()
+    {
+        // Log the user out
+        ParseUser.logOut();
+
+        FacebookUtils.getInstance().clearUserData();
+
+        // Go to the login view
+        startLoginActivity();
+    }
+
     private void startDownloadingFacebookInfo(){
         final ProgressDialog progress = new ProgressDialog(this);
         progress.setTitle("Loading");
@@ -169,7 +182,22 @@ public class MainActivity2 extends ActionBarActivity {
 
 
     /** Swaps fragments in the main content view */
-    private void selectItem(int position) {
+    private void selectItem(int position)
+    {
+
+        if(position == Utils.SETTINGS_POSITION)
+        {
+            startActivity(new Intent(this, SettingsActivity.class));
+
+            this.drawerLayout.closeDrawers();
+        }
+        else if(position == Utils.LOGOUT_POSITION)
+        {
+            logout();
+
+            this.drawerLayout.closeDrawers();
+        }
+
         if(position == selected_item_index){
             return;
         }

@@ -312,7 +312,8 @@ public final class FacebookUtils {
             public void onResult(String result, Exception e) {
                 if (e == null) {
                     tv.setText(result);
-                } else {
+                } else if(e.getMessage() != null)
+                {
                     Log.d(TAG, e.getMessage());
                 }
             }
