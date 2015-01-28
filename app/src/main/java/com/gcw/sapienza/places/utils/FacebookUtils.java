@@ -85,6 +85,13 @@ public final class FacebookUtils {
         return this.fbId;
     }
 
+    /**
+     * @return current user's fb name
+     */
+    public String getCurrentUserName() {
+        return this.userIdMap.get(this.fbId);
+    }
+
 
     /**
      * @return true if there is a valid facebook id for the current user
@@ -151,6 +158,7 @@ public final class FacebookUtils {
                     public void onCompleted(GraphUser user, Response response) {
                         if (user != null) {
                             FacebookUtils.this.fbId = user.getId();
+                            FacebookUtils.this.userIdMap.put(user.getId(), user.getUsername());
 
                             FacebookUtils.this.fetchFbFriends(new FacebookUtilsFriendsCallback() {
                                 @Override
@@ -304,7 +312,8 @@ public final class FacebookUtils {
             public void onResult(String result, Exception e) {
                 if (e == null) {
                     tv.setText(result);
-                } else {
+                } else if(e.getMessage() != null)
+                {
                     Log.d(TAG, e.getMessage());
                 }
             }
