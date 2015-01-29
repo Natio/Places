@@ -49,6 +49,8 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
     private MSwipeRefreshLayout srl;
     private int currentDrawerListItemIndex = -1;
 
+    private static final int SHARE_ACTIVITY_REQUEST_CODE = 95;
+
     private static final int FLAGS_LIST_POSITION = 0;
     private static final int SETTINGS_POSITION = 1;
     private static final int LOGOUT_POSITION = 2;
@@ -268,7 +270,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
 
         if(position == SETTINGS_POSITION)
         {
-            startActivity(new Intent(this, SettingsActivity.class));
+            startActivityForResult(new Intent(this, SettingsActivity.class), SHARE_ACTIVITY_REQUEST_CODE);
             this.drawerLayout.closeDrawers();
             return;
         }
@@ -332,7 +334,12 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
                     this.startDownloadingFacebookInfo();
                 }
                 break;
+            case SHARE_ACTIVITY_REQUEST_CODE:
 
+                if(resultCode == RESULT_OK){
+                    Toast.makeText(this, data.getExtras().getString("result"), Toast.LENGTH_LONG).show();
+                }
+                break;
         }
     }
 
