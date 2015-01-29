@@ -51,6 +51,10 @@ public class Flag extends ParseObject{
 
     public ParseFile getVideo() { return (ParseFile)this.get(VIDEO_KEY);  }
 
+    public String getFbName(){
+        return (String)this.get(FB_NAME_KEY);
+    }
+
     @SuppressWarnings({"UnusedDeclaration"})
     public void setPictureFile(ParseFile pic){
         this.put(PICTURE_KEY, pic);
