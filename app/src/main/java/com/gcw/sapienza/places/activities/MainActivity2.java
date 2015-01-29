@@ -47,6 +47,11 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
     private static final String [] section_titles = {"Home", "Settings", "Logout"};
     private CharSequence current_title;
     private MSwipeRefreshLayout srl;
+    private int currentDrawerListItemIndex = -1;
+
+    private static final int FLAGS_LIST_POSITION = 0;
+    private static final int SETTINGS_POSITION = 1;
+    private static final int LOGOUT_POSITION = 2;
 
 
     @Override
@@ -253,28 +258,37 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
 
 
     /** Swaps fragments in the main content view */
-    private void selectItem(int position)
-    {
+    private void selectItem(int position){
 
-        if(position == Utils.SETTINGS_POSITION)
+        if(this.currentDrawerListItemIndex == position){
+            this.drawerLayout.closeDrawers();
+            return;
+        }
+
+
+        if(position == SETTINGS_POSITION)
         {
             startActivity(new Intent(this, SettingsActivity.class));
-
             this.drawerLayout.closeDrawers();
+            return;
         }
-        else if(position == Utils.LOGOUT_POSITION)
+        else if(position == LOGOUT_POSITION)
         {
             logout();
 
             this.drawerLayout.closeDrawers();
+            return;
+        }
+        else if(position == FLAGS_LIST_POSITION){
+            Fragment fragment = new FlagsListFragment();
+            FragmentManager fragmentManager = this.getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.swipe_refresh, fragment).commit();
+
         }
 
-        Fragment fragment = new FlagsListFragment();
+        this.currentDrawerListItemIndex = position;
 
 
-        // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = this.getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.swipe_refresh, fragment).commit();
 /*
         // Highlight the selected item, update the title, and close the drawer
         this.drawerList.setItemChecked(position, true);
