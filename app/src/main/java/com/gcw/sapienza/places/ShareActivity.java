@@ -4,17 +4,18 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
 import android.location.Location;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.support.v4.app.Fragment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -71,6 +72,8 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
 
     protected static MediaRecorder audioRec;
     protected static String audio_filename;
+
+    private File imageFile;
 
     private static final int ANIMATION_DURATION = 300;
 
@@ -528,7 +531,7 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
 
     protected void onShareSucceeded(String toastText)
     {
-
+        /*
         this.textView.setText("");
 
         this.spinner.setSelection(0);
@@ -538,7 +541,11 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
 
         Toast.makeText(mContext, toastText, Toast.LENGTH_LONG).show();
 
-        this.shareButton.setClickable(true);
+        this.shareButton.setClickable(true);*/
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("result", toastText);
+        setResult(RESULT_OK,returnIntent);
+        this.finish();
 
     }
 
@@ -551,4 +558,92 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
             inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
         }
     }
+
+
+    public void takePic(View v)
+    {
+        Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(Utils.VIBRATION_DURATION);
+
+        Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if(takePicture.resolveActivity(this.getPackageManager()) != null){
+            this.imageFile = null;
+            try{
+                this.imageFile = Utils.createImageFile(ShareFragment.PICTURE_FORMAT);
+            }
+            catch (IOException e){
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+            if(this.imageFile != null){
+                takePicture.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(this.imageFile));
+                this.startActivityForResult(takePicture, Utils.PIC_CAPTURE_REQUEST_CODE);
+            }
+        }
+    }
+
+
+    public void shootVid(View v)
+    {
+        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(Utils.VIBRATION_DURATION);
+
+        Intent videoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        if (videoIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(videoIntent, Utils.VID_SHOOT_REQUEST_CODE);
+        }
+
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+
+        if(requestCode == Utils.PIC_CAPTURE_REQUEST_CODE && resultCode == RESULT_OK){
+
+            if(this.imageFile == null || !this.imageFile.canRead()){
+                Toast.makeText(getApplicationContext(), "Error encountered while taking picture", Toast.LENGTH_LONG).show();
+                Log.v(TAG, "Error encountered while taking picture");
+                this.imageFile = null;
+                return;
+            }
+
+            this.setPicture(this.imageFile.getAbsolutePath());
+            this.imageFile = null;
+        }
+        else if(requestCode == Utils.PIC_CAPTURE_REQUEST_CODE && resultCode == RESULT_CANCELED){
+            Log.v(TAG, "Camera Intent canceled");
+        }
+        else if(requestCode ==  Utils.VID_SHOOT_REQUEST_CODE && resultCode == RESULT_OK){
+            Uri videoUri = data.getData();
+
+            //File file = new File(getRealPathFromURI(this, videoUri));
+            //FileInputStream inStream = new FileInputStream(file);
+            String videoPath = ShareActivity.getRealPathFromURI(this, videoUri);
+            this.setVideo(videoPath);
+        }
+        else if(requestCode == Utils.VID_SHOOT_REQUEST_CODE && resultCode == RESULT_CANCELED){
+            Log.v(TAG, "Video Intent canceled");
+        }
+    }
+
+
+    private static String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = { MediaStore.Video.Media.DATA };
+            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
 }
