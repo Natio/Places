@@ -4,8 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,10 +14,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gcw.sapienza.places.FlagActivity;
 import com.gcw.sapienza.places.PlacesApplication;
@@ -92,7 +88,6 @@ public class FlagsListFragment extends Fragment {
 
     public void updateRecycleViewWithNewContents(List<Flag> l){
         this.recycleView.setAdapter(new FlagsAdapter(l, this.getActivity()));
-        Log.d(TAG, l.size() + "");
     }
 }
 
@@ -115,7 +110,15 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
 
         String user_id = f.getFbId();
 
-        FacebookUtils.getInstance().loadUsernameIntoTextView(user_id, flagViewHolder.username);
+        String fb_username = f.getFbName(); // checks if Flag has fb username. if there is one use it otherwise ask FB
+        if(fb_username == null){
+            FacebookUtils.getInstance().loadUsernameIntoTextView(user_id, flagViewHolder.username);
+
+        }
+        else{
+            flagViewHolder.username.setText(fb_username);
+        }
+
         FacebookUtils.getInstance().getFbProfilePictureURL(user_id, FacebookUtils.PicSize.SMALL, new FacebookUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
@@ -145,7 +148,7 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
     public int getItemViewType(int position)
     {
         // This is brilliant
-        return position;
+        return 0;
     }
 
     @Override
