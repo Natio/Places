@@ -21,8 +21,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gcw.sapienza.places.FlagActivity;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.ShareFragment;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.CropCircleTransformation;
@@ -32,7 +34,14 @@ import com.parse.ParseFile;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by paolo  on 10/01/15.
@@ -41,7 +50,7 @@ public class FlagsListFragment extends Fragment {
 
     private static final String TAG = "FlagsListFragment";
 
-    private RecyclerView recyvleView;
+    private RecyclerView recycleView;
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -54,14 +63,19 @@ public class FlagsListFragment extends Fragment {
         }
     };
 
+    public RecyclerView getRV()
+    {
+        return recycleView;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.flags_list_new_layout, container, false);
 
-        this.recyvleView = (RecyclerView) view.findViewById(R.id.cardList);
+        this.recycleView = (RecyclerView) view.findViewById(R.id.cardList);
         LinearLayoutManager llm = new LinearLayoutManager(this.getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
-        this.recyvleView.setLayoutManager(llm);
+        this.recycleView.setLayoutManager(llm);
 
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
 
@@ -77,7 +91,7 @@ public class FlagsListFragment extends Fragment {
     }
 
     public void updateRecycleViewWithNewContents(List<Flag> l){
-        this.recyvleView.setAdapter(new FlagsAdapter(l, this.getActivity()));
+        this.recycleView.setAdapter(new FlagsAdapter(l, this.getActivity()));
         Log.d(TAG, l.size() + "");
     }
 }
@@ -128,12 +142,20 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
     }
 
     @Override
-    public FlagsViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public int getItemViewType(int position)
+    {
+        // This is brilliant
+        return position;
+    }
+
+    @Override
+    public FlagsViewHolder onCreateViewHolder(ViewGroup viewGroup, int i)
+    {
         View itemView = LayoutInflater.
                 from(viewGroup.getContext()).
                 inflate(R.layout.card_layout, viewGroup, false);
 
-        return new FlagsViewHolder(itemView, context);
+        return new FlagsViewHolder(itemView, this.flags.get(i), context);
     }
 
     public static class FlagsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -145,10 +167,13 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
 
         private final Context mContext;
 
-        public FlagsViewHolder(View v, Context context)
+        private Flag mFlag;
+
+        public FlagsViewHolder(View v, Flag flag, Context context)
         {
             super(v);
 
+            this.mFlag = flag;
             this.mContext = context;
 
             v.setOnClickListener(this);
@@ -162,8 +187,69 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
         @Override
         public void onClick(View v)
         {
-            // TODO start FlagActivity!
-            Toast.makeText(mContext, "FlagActivity integration still to be implemented!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(mContext, FlagActivity.class);
+
+            Date date = mFlag.getDate();
+            DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
+            String sDate = df.format(date);
+
+            Bundle bundle = new Bundle();
+
+            bundle.putString("text", mFlag.getText());
+            bundle.putString("id", mFlag.getFbId());
+            bundle.putString("date", sDate);
+            bundle.putString("weather", mFlag.getWeather());
+            bundle.putString("category", mFlag.getCategory());
+
+            try
+            {
+                ParseFile pic_file;
+                if((pic_file = mFlag.getPic()) != null){
+                    File temp = File.createTempFile("places_temp_pic", ShareFragment.PICTURE_FORMAT, mContext.getCacheDir());
+                    temp.deleteOnExit();
+
+                    FileOutputStream outStream = new FileOutputStream(temp);
+                    outStream.write(pic_file.getData());
+                    outStream.close();
+
+                    bundle.putString("picture", temp.getAbsolutePath());
+                }
+
+                ParseFile audio_file;
+                if((audio_file = mFlag.getAudio()) != null){
+                    File temp = File.createTempFile("places_temp_audio", ShareFragment.AUDIO_FORMAT, mContext.getCacheDir());
+                    temp.deleteOnExit();
+
+                    FileOutputStream outStream = new FileOutputStream(temp);
+                    outStream.write(audio_file.getData());
+                    outStream.close();
+                    bundle.putString("audio", temp.getAbsolutePath());
+                }
+
+
+                ParseFile video_file;
+                if((video_file = mFlag.getVideo()) != null)
+                {
+                    File temp = File.createTempFile("places_temp_video", ShareFragment.VIDEO_FORMAT, mContext.getCacheDir());
+                    temp.deleteOnExit();
+
+                    FileOutputStream outStream = new FileOutputStream(temp);
+                    outStream.write(video_file.getData());
+                    outStream.close();
+
+                    bundle.putString("video", temp.getAbsolutePath());
+                }
+            }
+            catch(IOException ioe){ioe.printStackTrace();}
+            catch(com.parse.ParseException pe)
+            {
+                Log.v(TAG, "Parse file(s) couldn't be retrieved");
+                pe.printStackTrace();
+            }
+
+            intent.putExtras(bundle);
+
+            mContext.startActivity(intent);
         }
     }
 }

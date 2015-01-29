@@ -1,15 +1,19 @@
 package com.gcw.sapienza.places.activities;
 
-
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.net.Uri;
+import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,21 +22,23 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
+import android.widget.Toast;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.SettingsActivity;
+import com.gcw.sapienza.places.ShareActivity;
+import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 import com.parse.ui.ParseLoginBuilder;
-
 import java.util.Arrays;
+import java.util.List;
 
 
-public class MainActivity2 extends ActionBarActivity {
+public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     public static String TAG = MainActivity2.class.getName();
     private DrawerLayout drawerLayout;
@@ -40,7 +46,7 @@ public class MainActivity2 extends ActionBarActivity {
     private ActionBarDrawerToggle drawerToggle;
     private static final String [] section_titles = {"Home", "Settings", "Logout"};
     private CharSequence current_title;
-    private int selected_item_index = -1;
+    private MSwipeRefreshLayout srl;
 
 
     @Override
@@ -69,13 +75,14 @@ public class MainActivity2 extends ActionBarActivity {
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
                 MainActivity2.this.getSupportActionBar().setTitle(MainActivity2.this.current_title);
+                unHighlightSelection();
             }
 
             /** Called when a drawer has settled in a completely open state. */
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                MainActivity2.this.getSupportActionBar().setTitle("To_find_a_title");//TODO find a better title!!!!!
+                // MainActivity2.this.getSupportActionBar().setTitle("To_find_a_title");//TODO find a better title!!!!!
             }
         };
 
@@ -87,9 +94,67 @@ public class MainActivity2 extends ActionBarActivity {
         this.getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
 
         this.selectItem(0);
+
+        this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.green)));
+
+        srl = (MSwipeRefreshLayout)findViewById(R.id.swipe_refresh);
+        srl.setOnRefreshListener(this);
+        srl.setOnChildScrollUpListener(new MSwipeRefreshLayout.OnChildScrollUpListener()
+        {
+            @Override
+            public boolean canChildScrollUp()
+            {
+                FragmentManager fm = getSupportFragmentManager();
+                List<Fragment> frags = fm.getFragments();
+
+                if(frags.size() < 1) return false;
+
+                RecyclerView rv = null;
+
+                for(int i = 0; i < frags.size(); i++)
+                {
+                    if (frags.get(i) instanceof FlagsListFragment) {
+                        rv = ((FlagsListFragment) frags.get(i)).getRV();
+                        break;
+                    }
+                }
+
+                if(rv == null) return false;
+
+                RecyclerView.LayoutManager layoutManager = rv.getLayoutManager();
+                if (layoutManager instanceof LinearLayoutManager) {
+                    int position = ((LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
+                    return position != 0;
+                } else if (layoutManager instanceof StaggeredGridLayoutManager) {
+                    int[] positions = ((StaggeredGridLayoutManager) layoutManager).findFirstCompletelyVisibleItemPositions(null);
+                    for (int i = 0; i < positions.length; i++) {
+                        if (positions[i] == 0) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+        });
     }
 
+    @Override
+    public void onRefresh()
+    {
+        refresh();
+        srl.setRefreshing(false);
+    }
 
+    protected void refresh()
+    {
+        Location currentLocation = PlacesApplication.getInstance().getLocation();
+        if(currentLocation != null){
+            PlacesApplication.getInstance().getLocationService().queryParsewithLocation(currentLocation);
+        }
+        else
+            Toast.makeText(this, "No location data available\n" +
+                    "Are Location Services enabled?", Toast.LENGTH_LONG).show();
+    }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -102,10 +167,15 @@ public class MainActivity2 extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Pass the event to ActionBarDrawerToggle, if it returns
         // true, then it has handled the app icon touch event
-        if (drawerToggle.onOptionsItemSelected(item)) {
+
+        if (drawerToggle.onOptionsItemSelected(item))
+        {
             return true;
         }
-        // Handle your other action bar items...
+        else if(item.getItemId() == R.id.action_add_flag)
+        {
+            startActivity(new Intent(this, ShareActivity.class));
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -120,6 +190,7 @@ public class MainActivity2 extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main_drawer, menu);
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -127,7 +198,7 @@ public class MainActivity2 extends ActionBarActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // If the nav drawer is open, hide action items related to the content view
-        boolean drawerOpen = this.drawerLayout.isDrawerOpen(this.drawerList);
+        boolean drawerOpen = this.drawerLayout.isDrawerOpen(drawerList);
         menu.findItem(R.id.action_add_flag).setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
     }
@@ -198,17 +269,12 @@ public class MainActivity2 extends ActionBarActivity {
             this.drawerLayout.closeDrawers();
         }
 
-        if(position == selected_item_index){
-            return;
-        }
-        // Create a new fragment and specify the planet to show based on position
-
         Fragment fragment = new FlagsListFragment();
 
 
         // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = this.getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+        fragmentManager.beginTransaction().replace(R.id.swipe_refresh, fragment).commit();
 /*
         // Highlight the selected item, update the title, and close the drawer
         this.drawerList.setItemChecked(position, true);
@@ -217,6 +283,13 @@ public class MainActivity2 extends ActionBarActivity {
 
         this.selected_item_index = position;
         */
+    }
+
+    private void unHighlightSelection()
+    {
+        int toClear = this.drawerList.getCheckedItemPosition();
+
+        if (toClear >= 0) drawerList.setItemChecked(toClear, false);
     }
 
     @Override

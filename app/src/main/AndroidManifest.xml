@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.gcw.sapienza.places" >
 
-
     <uses-permission android:name="android.permission.INTERNET" />      <!--required for google maps api and parse and RemoteSettings-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />      <!--required for  google maps api and parse -->
 
@@ -69,8 +68,9 @@
             android:name=".activities.MainActivity2"
             android:launchMode="singleTask"
             android:label="@string/app_name"
+            android:theme="@style/CustomActionBarTheme"
             android:windowSoftInputMode="adjustPan"
-            android:screenOrientation="portrait"> <!-- soft keyboard 'done' button, force vertical orientation -->
+            android:screenOrientation="portrait" > <!-- soft keyboard 'done' button, force vertical orientation -->
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -86,6 +86,9 @@
         </activity>
 
         <activity android:name=".legacy.ShareActivity">
+        </activity>
+
+        <activity android:name=".ShareActivity">
         </activity>
 
         <activity android:name=".SettingsActivity"
