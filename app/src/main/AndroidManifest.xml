@@ -79,13 +79,7 @@
 
         </activity>
 
-        <activity android:name=".legacy.FlagsListActivity">
-        </activity>
-
-        <activity android:name=".legacy.FlagsMapActivity">
-        </activity>
-
-        <activity android:name=".legacy.ShareActivity">
+        <activity android:name=".activities.VideoCaptureActivity">
         </activity>
 
         <activity android:name=".ShareActivity">

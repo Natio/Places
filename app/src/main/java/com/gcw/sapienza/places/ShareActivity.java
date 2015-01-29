@@ -25,6 +25,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gcw.sapienza.places.activities.VideoCaptureActivity;
 import com.gcw.sapienza.places.adapters.MSpinnerAdapter;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.services.LocationService;
@@ -588,7 +589,7 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
 
-        Intent videoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        Intent videoIntent = new Intent(this, VideoCaptureActivity.class);
         if (videoIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(videoIntent, Utils.VID_SHOOT_REQUEST_CODE);
         }
@@ -618,11 +619,7 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
             Log.v(TAG, "Camera Intent canceled");
         }
         else if(requestCode ==  Utils.VID_SHOOT_REQUEST_CODE && resultCode == RESULT_OK){
-            Uri videoUri = data.getData();
-
-            //File file = new File(getRealPathFromURI(this, videoUri));
-            //FileInputStream inStream = new FileInputStream(file);
-            String videoPath = ShareActivity.getRealPathFromURI(this, videoUri);
+            String videoPath = data.getExtras().getString("result");
             this.setVideo(videoPath);
         }
         else if(requestCode == Utils.VID_SHOOT_REQUEST_CODE && resultCode == RESULT_CANCELED){
@@ -630,7 +627,7 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
         }
     }
 
-
+    @Deprecated
     private static String getRealPathFromURI(Context context, Uri contentUri) {
         Cursor cursor = null;
         try {
