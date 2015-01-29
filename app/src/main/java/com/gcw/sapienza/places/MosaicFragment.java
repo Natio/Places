@@ -149,7 +149,10 @@ public class MosaicFragment extends Fragment implements  AdapterView.OnItemClick
         f.deleteInBackground(new DeleteCallback() {
             @Override
             public void done(com.parse.ParseException e) {
-                Toast.makeText(getActivity(), "Flag deleted", Toast.LENGTH_SHORT).show();
+                if(e == null)
+                    Toast.makeText(getActivity(), "Flag deleted", Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 Utils.mainActivity.refresh();
             }
         });
