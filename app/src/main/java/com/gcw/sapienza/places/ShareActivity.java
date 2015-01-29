@@ -44,7 +44,7 @@ import java.util.Map;
 
 public class ShareActivity extends Activity implements View.OnLongClickListener {
 
-    private static final String TAG = "ShareFragment";
+    private static final String TAG = "ShareActivity";
     public static final String PICTURE_FORMAT = ".jpg";
     public static final String AUDIO_FORMAT = ".3gp";
     public static final String VIDEO_FORMAT = ".mp4";
