@@ -47,7 +47,6 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.video_capture_activity);
-        //TODO orientation now is fixed. It must be possible do take videos in landscape and in portrait
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 
         this.timeTextView = (TextView) this.findViewById(R.id.timer_textView);
