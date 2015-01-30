@@ -108,12 +108,12 @@ public class Utils
     }
 
     private static String generateRandomName(){
-        return "_" + System.currentTimeMillis() + "_";
+        return "_" + System.currentTimeMillis();
     }
 
     public static File createAudioFile(String extension, Context ctx) throws IOException{
 
-        String imageFileName = "a" + Utils.generateRandomName();
+        String imageFileName = 'a' + Utils.generateRandomName();
 
         File cache_dir = ctx.getExternalCacheDir();
         return File.createTempFile(
@@ -135,6 +135,18 @@ public class Utils
                 image_extension,         /* suffix */
                 storageDir      /* directory */
         );
+    }
+
+    public static File createRecordingVideoFile(String extension) throws IOException{
+        String imageFileName = "vid" + Utils.generateRandomName();
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_MOVIES);
+        return File.createTempFile(
+                imageFileName,  /* prefix */
+                extension,         /* suffix */
+                storageDir      /* directory */
+        );
+
     }
 
 }

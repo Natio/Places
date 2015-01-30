@@ -1,19 +1,21 @@
 package com.gcw.sapienza.places.activities;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,17 +30,29 @@ import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.SettingsActivity;
 import com.gcw.sapienza.places.ShareActivity;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
+import com.gcw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.ui.ParseLoginBuilder;
 import java.util.Arrays;
 import java.util.List;
 
 
-public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener, OnMapReadyCallback {
 
     public static String TAG = MainActivity2.class.getName();
     private DrawerLayout drawerLayout;
@@ -55,15 +69,23 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
     private static final int SETTINGS_POSITION = 1;
     private static final int LOGOUT_POSITION = 2;
 
+    private static final int MAP_BOUNDS = 70;
+
+    private GoogleMap gMap;
+
+    private BroadcastReceiver receiver;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(ParseFacebookUtils.getSession() != null && ParseFacebookUtils.getSession().isOpened()){
+        if(ParseFacebookUtils.getSession() != null && ParseFacebookUtils.getSession().isOpened())
+        {
             this.startDownloadingFacebookInfo();
         }
-        else{
+        else
+        {
             this.startLoginActivity();
         }
 
@@ -76,10 +98,12 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         // Set the adapter for the list view
         this.drawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, section_titles));
 
-        this.drawerToggle = new ActionBarDrawerToggle(this, this.drawerLayout, R.drawable.ic_drawer, R.drawable.ic_drawer){
+        this.drawerToggle = new ActionBarDrawerToggle(this, this.drawerLayout, R.drawable.ic_drawer, R.drawable.ic_drawer)
+        {
             /** Called when a drawer has settled in a completely closed state. */
             @Override
-            public void onDrawerClosed(View view) {
+            public void onDrawerClosed(View view)
+            {
                 super.onDrawerClosed(view);
                 MainActivity2.this.getSupportActionBar().setTitle(MainActivity2.this.current_title);
                 unHighlightSelection();
@@ -87,7 +111,8 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
 
             /** Called when a drawer has settled in a completely open state. */
             @Override
-            public void onDrawerOpened(View drawerView) {
+            public void onDrawerOpened(View drawerView)
+            {
                 super.onDrawerOpened(drawerView);
                 // MainActivity2.this.getSupportActionBar().setTitle("To_find_a_title");//TODO find a better title!!!!!
             }
@@ -111,8 +136,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
             @Override
             public boolean canChildScrollUp()
             {
-                FragmentManager fm = getSupportFragmentManager();
-                List<Fragment> frags = fm.getFragments();
+                List<Fragment> frags = getSupportFragmentManager().getFragments();
 
                 if(frags.size() < 1) return false;
 
@@ -129,20 +153,118 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
                 if(rv == null) return false;
 
                 RecyclerView.LayoutManager layoutManager = rv.getLayoutManager();
-                if (layoutManager instanceof LinearLayoutManager) {
-                    int position = ((LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
-                    return position != 0;
-                } else if (layoutManager instanceof StaggeredGridLayoutManager) {
-                    int[] positions = ((StaggeredGridLayoutManager) layoutManager).findFirstCompletelyVisibleItemPositions(null);
-                    for (int i = 0; i < positions.length; i++) {
-                        if (positions[i] == 0) {
-                            return false;
-                        }
-                    }
-                }
-                return true;
+
+                int position = ((LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
+
+                return position != 0;
             }
         });
+
+        SupportMapFragment mapFragment = new SupportMapFragment();
+        this.getSupportFragmentManager().beginTransaction().replace(R.id.map_holder, mapFragment).commit();
+        mapFragment.getMapAsync(this);
+
+        this.receiver = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                if(intent.getAction().equals(LocationService.FOUND_NEW_FLAGS_NOTIFICATION))
+                {
+                    updateMarkersOnMap();
+                }
+            }
+        };
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(this.receiver);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap)
+    {
+        this.gMap = googleMap;
+
+        this.gMap.getUiSettings().setScrollGesturesEnabled(false);
+        this.gMap.getUiSettings().setZoomGesturesEnabled(false);
+        this.gMap.setMyLocationEnabled(true);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
+
+        this.updateMarkersOnMap();
+    }
+
+    public void updateMarkersOnMap()
+    {
+        List<Flag> pins= PlacesApplication.getInstance().getFlags();
+
+        if(pins != null && this.gMap != null)
+        {
+            this.gMap.clear();
+
+            //zooms around all the Flags
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+            for (ParseObject p : pins)
+            {
+                Flag f = (Flag) p;
+                ParseGeoPoint location = f.getLocation();
+                String text = f.getText();
+                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                builder.include(latLng);
+
+                /*
+                int marker_id = getIconForCategory(f.getCategory());
+                Bitmap marker = BitmapFactory.decodeResource(getResources(), marker_id);
+                Bitmap halfSizeMarker = Bitmap.createScaledBitmap
+                                            (marker,
+                                            (int)(marker.getWidth() * 0.75f),
+                                            (int)(marker.getHeight() * 0.75f),
+                                            false); */
+
+                this.gMap.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .title(text)
+                        // .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
+                        // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
+                        .icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
+                        .alpha(0.9f));
+            }
+
+            if(pins.size() > 0)
+            {
+                LatLngBounds bounds = builder.build();
+                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, MAP_BOUNDS));
+            }
+
+        }
+    }
+
+    private int getIconForCategory(String category)
+    {
+        String[] category_array = this.getResources().getStringArray(R.array.categories);
+
+        if (category == null || category.equals(category_array[0])) return R.drawable.flag_red;
+        else if (category.equals(category_array[1])) return R.drawable.flag_green;
+        else if (category.equals(category_array[2])) return R.drawable.flag_yellow;
+        else if (category.equals(category_array[3])) return R.drawable.flag_blue;
+        else return R.drawable.flag_purple; // 'Food' category
+    }
+
+    private float getCategoryColor(String category)
+    {
+        String[] category_array = this.getResources().getStringArray(R.array.categories);
+
+        if (category == null || category.equals(category_array[0])) return BitmapDescriptorFactory.HUE_RED;
+        else if (category.equals(category_array[1])) return BitmapDescriptorFactory.HUE_AZURE;
+        else if (category.equals(category_array[2])) return BitmapDescriptorFactory.HUE_ORANGE;
+        else if (category.equals(category_array[3])) return BitmapDescriptorFactory.HUE_BLUE;
+        else return BitmapDescriptorFactory.HUE_MAGENTA; // 'Food' category
     }
 
     @Override
@@ -283,8 +405,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         }
         else if(position == FLAGS_LIST_POSITION){
             Fragment fragment = new FlagsListFragment();
-            FragmentManager fragmentManager = this.getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.swipe_refresh, fragment).commit();
+            this.getSupportFragmentManager().beginTransaction().replace(R.id.swipe_refresh, fragment).commit();
 
         }
 
