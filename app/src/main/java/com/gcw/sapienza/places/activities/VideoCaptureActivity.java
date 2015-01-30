@@ -13,6 +13,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.gcw.sapienza.places.R;
@@ -27,13 +28,13 @@ import java.util.TimerTask;
  * Created by paolo on 29/01/15.
  * Class that records video :)
  */
-public class VideoCaptureActivity extends Activity implements View.OnClickListener, SurfaceHolder.Callback, MediaRecorder.OnInfoListener{
+public class VideoCaptureActivity extends Activity implements View.OnClickListener, MediaRecorder.OnInfoListener{
 
     private static final String TAG = "VideoCaptureActivity";
     private static final int MAX_VIDEO_LENGTH = 60000;
 
 
-    private SurfaceHolder surfaceHolder;
+    private SurfaceHolder previewHolder;
     private ToggleButton toggleButton;
     private TextView timeTextView;
     private MediaRecorder mediaRecorder;
@@ -41,6 +42,9 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
     private File filePath;
     private Timer uiUpdateTimer;
     private long video_start_millis;
+    private boolean cameraConfigured = false;
+    private boolean inPreview=false;
+    private boolean isRecodring = false;
 
 
     @Override
@@ -53,13 +57,39 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
         this.timeTextView.setTextColor(Color.WHITE);
         this.timeTextView.setText(Integer.toString(MAX_VIDEO_LENGTH/1000));
         SurfaceView surface = (SurfaceView) this.findViewById(R.id.surfaceView);
-        this.surfaceHolder = surface.getHolder();
-        this.surfaceHolder.addCallback(this);
+        this.previewHolder = surface.getHolder();
+        this.previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        this.previewHolder.addCallback(this.surfaceCallback);
         //this.surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         this.toggleButton = (ToggleButton) this.findViewById(R.id.toggleRecordingButton);
         this.toggleButton.setOnClickListener(this);
         this.toggleButton.setTextOff("REC");
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        camera=Camera.open();
+        startPreview();
+        if(this.isRecodring){
+            this.finishVideoCapture();
+        }
+
+    }
+
+    @Override
+    public void onPause() {
+        if (inPreview) {
+            camera.stopPreview();
+        }
+
+        camera.release();
+        camera=null;
+        inPreview=false;
+
+        super.onPause();
     }
 
     @Override
@@ -86,6 +116,7 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
 
 
     private void startRecordingVideo(){
+        this.isRecodring = true;
         this.setupRecorder();
         this.toggleButton.setText("STOP");
         this.mediaRecorder.start();
@@ -94,7 +125,7 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
         this.uiUpdateTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-               // VideoCaptureActivity.this.timeTextView.setText(Integer.toString(VideoCaptureActivity.this.current_video_length));
+                // VideoCaptureActivity.this.timeTextView.setText(Integer.toString(VideoCaptureActivity.this.current_video_length));
                 VideoCaptureActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -105,10 +136,11 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
                     }
                 });
             }
-        },0,500);
+        }, 0, 500);
     }
 
     private void finishVideoCapture(){
+        this.isRecodring = false;
         this.uiUpdateTimer.cancel();
         this.uiUpdateTimer.purge();
         this.mediaRecorder.stop();
@@ -124,20 +156,26 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
 
     private void setupRecorder(){
 
-        int camera_rotation = this.lockAndReturnRightCameraRotation();
+        int camera_rotation = this.lockAndReturnRightCameraRotation(true);
 
-        if(this.camera == null){
-            this.camera = Camera.open();
-            this.camera.setDisplayOrientation(camera_rotation);
-            this.camera.unlock();
+        if (inPreview) {
+            camera.stopPreview();
+            try{
+                camera.setPreviewDisplay(null);
+            }catch (Throwable t) {
+                Log.e(TAG,"Exception in setPreviewDisplay() in setupRecorder", t);
+                Toast.makeText(this, t.getMessage(), Toast.LENGTH_LONG)
+                        .show();
+            }
+            camera.unlock();
+
         }
 
-        if(this.mediaRecorder == null){
-            this.mediaRecorder = new MediaRecorder();
-            this.mediaRecorder.setOnInfoListener(this);
-        }
+
+        this.mediaRecorder = new MediaRecorder();
+        this.mediaRecorder.setOnInfoListener(this);
         this.mediaRecorder.setCamera(this.camera);
-        this.mediaRecorder.setPreviewDisplay(this.surfaceHolder.getSurface());
+        this.mediaRecorder.setPreviewDisplay(this.previewHolder.getSurface());
 
 
         this.mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
@@ -151,7 +189,7 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
 
 
         try{
-           this.filePath = Utils.createRecordingVideoFile(".mp4");
+            this.filePath = Utils.createRecordingVideoFile(".mp4");
         }
         catch (IOException e){
             Log.d(TAG, "Error creating file", e);
@@ -164,6 +202,9 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
         this.mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 
         this.mediaRecorder.setVideoSize(640, 480);
+
+
+
         this.mediaRecorder.setOrientationHint(camera_rotation);
 
 
@@ -177,7 +218,7 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
 
     }
 
-    private int lockAndReturnRightCameraRotation(){
+    private int lockAndReturnRightCameraRotation(boolean lock){
         int orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
         int rotation = 0;
         switch(this.getWindowManager().getDefaultDisplay().getRotation()){
@@ -195,24 +236,14 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
                 break;
             case Surface.ROTATION_270:
                 orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
-                rotation = 0;
+                rotation = 180;
                 break;
         }
-        setRequestedOrientation(orientation);
+        if(lock){
+            setRequestedOrientation(orientation);
+        }
+
         return rotation;
-    }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder holder){
-
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height){}
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder){
-        this.shutdown();
     }
 
     private void shutdown() {
@@ -233,5 +264,83 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
         this.filePath = null;
     }
 
+
+
+    private Camera.Size getBestPreviewSize(int width, int height,
+                                           Camera.Parameters parameters) {
+        Camera.Size result=null;
+
+        for (Camera.Size size : parameters.getSupportedPreviewSizes()) {
+            if (size.width<=width && size.height<=height) {
+                if (result==null) {
+                    result=size;
+                }
+                else {
+                    int resultArea=result.width*result.height;
+                    int newArea=size.width*size.height;
+
+                    if (newArea>resultArea) {
+                        result=size;
+                    }
+                }
+            }
+        }
+
+        return(result);
+    }
+
+    private void initPreview(int width, int height) {
+        if (camera!=null && previewHolder.getSurface()!=null) {
+            try {
+                camera.setPreviewDisplay(previewHolder);
+
+            }
+            catch (Throwable t) {
+                Log.e(TAG,"Exception in setPreviewDisplay()", t);
+                Toast.makeText(this, t.getMessage(), Toast.LENGTH_LONG)
+                        .show();
+            }
+
+            if (!cameraConfigured) {
+                Camera.Parameters parameters=camera.getParameters();
+                Camera.Size size=getBestPreviewSize(width, height,
+                        parameters);
+                this.camera.setDisplayOrientation(this.lockAndReturnRightCameraRotation(false));
+                if (size!=null) {
+                    parameters.setPreviewSize(size.width, size.height);
+                    camera.setParameters(parameters);
+
+                    cameraConfigured=true;
+                }
+            }
+        }
+    }
+
+    private void startPreview() {
+        if (cameraConfigured && camera!=null) {
+            camera.startPreview();
+            inPreview=true;
+        }
+    }
+
+
+    SurfaceHolder.Callback surfaceCallback=new SurfaceHolder.Callback() {
+        @Override
+        public void surfaceCreated(SurfaceHolder holder) {
+            // no-op -- wait until surfaceChanged()
+        }
+        @Override
+        public void surfaceChanged(SurfaceHolder holder,
+                                   int format, int width,
+                                   int height) {
+            initPreview(width, height);
+            startPreview();
+            Log.d(TAG, "surfaceChanged");
+        }
+        @Override
+        public void surfaceDestroyed(SurfaceHolder holder) {
+            shutdown();
+        }
+    };
 
 }
