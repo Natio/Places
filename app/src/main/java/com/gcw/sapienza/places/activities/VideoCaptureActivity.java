@@ -1,6 +1,8 @@
 package com.gcw.sapienza.places.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
@@ -146,12 +148,33 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
         this.mediaRecorder.stop();
         this.mediaRecorder.reset();
 
-        Intent closeIntent = new Intent();
-        closeIntent.putExtra("result", this.filePath.getAbsolutePath());
-        Log.d(TAG, "Size: " + this.filePath.length());
 
-        this.setResult(RESULT_OK, closeIntent);
-        this.finish();
+
+
+
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        Intent closeIntent = new Intent();
+                        closeIntent.putExtra("result", VideoCaptureActivity.this.filePath.getAbsolutePath());
+                        VideoCaptureActivity.this.setResult(RESULT_OK, closeIntent);
+
+
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                }
+                VideoCaptureActivity.this.finish();
+            }
+        };
+
+        AlertDialog.Builder builder  = new AlertDialog.Builder(this);
+        builder.setMessage("Do you want to use this video ?").setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
+
     }
 
     private void setupRecorder(){

@@ -5,8 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.os.Bundle;
@@ -18,7 +16,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -72,7 +69,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
     private static final int SETTINGS_POSITION = 1;
     private static final int LOGOUT_POSITION = 2;
 
-    private static final int MAP_BOUNDS = 150;
+    private static final int MAP_BOUNDS = 70;
 
     private GoogleMap gMap;
 
