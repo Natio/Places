@@ -32,7 +32,7 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
     private static final String TAG = "VideoCaptureActivity";
     private static final int MAX_VIDEO_LENGTH = 60000;
 
-    private SurfaceView surface;
+
     private SurfaceHolder surfaceHolder;
     private ToggleButton toggleButton;
     private TextView timeTextView;
@@ -48,13 +48,13 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.video_capture_activity);
         //TODO orientation now is fixed. It must be possible do take videos in landscape and in portrait
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 
         this.timeTextView = (TextView) this.findViewById(R.id.timer_textView);
         this.timeTextView.setTextColor(Color.WHITE);
         this.timeTextView.setText(Integer.toString(MAX_VIDEO_LENGTH/1000));
-        this.surface = (SurfaceView) this.findViewById(R.id.surfaceView);
-        this.surfaceHolder = this.surface.getHolder();
+        SurfaceView surface = (SurfaceView) this.findViewById(R.id.surfaceView);
+        this.surfaceHolder = surface.getHolder();
         this.surfaceHolder.addCallback(this);
         //this.surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         this.toggleButton = (ToggleButton) this.findViewById(R.id.toggleRecordingButton);
@@ -87,6 +87,7 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
 
 
     private void startRecordingVideo(){
+        this.setupRecorder();
         this.toggleButton.setText("STOP");
         this.mediaRecorder.start();
         this.uiUpdateTimer = new Timer();
@@ -123,8 +124,12 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
     }
 
     private void setupRecorder(){
+
+        int camera_rotation = this.lockAndReturnRightCameraRotation();
+
         if(this.camera == null){
             this.camera = Camera.open();
+            this.camera.setDisplayOrientation(camera_rotation);
             this.camera.unlock();
         }
 
@@ -132,8 +137,9 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
             this.mediaRecorder = new MediaRecorder();
             this.mediaRecorder.setOnInfoListener(this);
         }
-        this.mediaRecorder.setPreviewDisplay(this.surfaceHolder.getSurface());
         this.mediaRecorder.setCamera(this.camera);
+        this.mediaRecorder.setPreviewDisplay(this.surfaceHolder.getSurface());
+
 
         this.mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         this.mediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
@@ -158,14 +164,8 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
         this.mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         this.mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 
-        int orientation = this.lockAndReturnOrientation();
-
-        if(orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT || orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT){
-            this.mediaRecorder.setVideoSize(640, 480);
-        }
-        else{
-            this.mediaRecorder.setVideoSize(640, 480);
-        }
+        this.mediaRecorder.setVideoSize(640, 480);
+        this.mediaRecorder.setOrientationHint(camera_rotation);
 
 
         try {
@@ -178,29 +178,34 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
 
     }
 
-    private int lockAndReturnOrientation(){
+    private int lockAndReturnRightCameraRotation(){
         int orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+        int rotation = 0;
         switch(this.getWindowManager().getDefaultDisplay().getRotation()){
             case Surface.ROTATION_0:
                 orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+                rotation = 90;
                 break;
             case Surface.ROTATION_90:
                 orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+                rotation = 0;
                 break;
             case Surface.ROTATION_180:
                 orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
+                rotation = 90;
                 break;
             case Surface.ROTATION_270:
                 orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
+                rotation = 0;
                 break;
         }
         setRequestedOrientation(orientation);
-        return orientation;
+        return rotation;
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder){
-        this.setupRecorder();
+
     }
 
     @Override
@@ -214,13 +219,18 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
     private void shutdown() {
         // Release MediaRecorder and especially the Camera as it's a shared
         // object that can be used by other applications
-        this.mediaRecorder.reset();
-        this.mediaRecorder.release();
-        this.camera.release();
+        if(this.mediaRecorder != null){
+            this.mediaRecorder.reset();
+            this.mediaRecorder.release();
+            this.mediaRecorder = null;
+        }
 
-        // once the objects have been released they can't be reused
-        this.mediaRecorder = null;
-        this.camera = null;
+        if(this.camera != null){
+            this.camera.release();
+            this.camera = null;
+        }
+
+
         this.filePath = null;
     }
 
