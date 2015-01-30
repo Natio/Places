@@ -50,6 +50,10 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
     public static final String AUDIO_FORMAT = ".3gp";
     public static final String VIDEO_FORMAT = ".mp4";
 
+    private static final int PIC_CODE = 0;
+    private static final int AUDIO_CODE = 1;
+    private static final int VIDEO_CODE = 2;
+
     private Spinner spinner;
     private TextView textView;
     private Button shareButton;
@@ -206,6 +210,7 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
                 if (event.getAction() == MotionEvent.ACTION_DOWN)
                 {
 
+                    restoreAlpha(AUDIO_CODE);
 
                     try
                     {
@@ -250,6 +255,9 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
                     {
                         FileInputStream inStream = new FileInputStream(audio_file);
                         ShareActivity.this.setAudio(audio_filename);
+
+                        changeAlphaBasedOnSelection(AUDIO_CODE);
+
                         inStream.close();
                     } catch (IOException ioe) {
                         ioe.printStackTrace();
@@ -306,6 +314,9 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
                         {
                             ShareActivity.this.setVideo(null);
                         }
+
+                        restoreAlpha(-1);
+
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
@@ -329,7 +340,7 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
         {
             if(this.pic == null) return true;
 
-            builder  = new AlertDialog.Builder(mContext);
+            builder  = new AlertDialog.Builder(this);
             dialog = builder.setMessage("Discard picture?").setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener).show();
         }
@@ -338,7 +349,7 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
         {
             if(this.video == null) return true;
 
-            builder  = new AlertDialog.Builder(mContext);
+            builder  = new AlertDialog.Builder(this);
             dialog = builder.setMessage("Discard video?").setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener).show();
         }
@@ -565,6 +576,8 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
         Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
 
+        restoreAlpha(PIC_CODE);
+
         Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if(takePicture.resolveActivity(this.getPackageManager()) != null){
             this.imageFile = null;
@@ -587,6 +600,8 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
     {
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
+
+        restoreAlpha(VIDEO_CODE);
 
         Intent videoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
         if (videoIntent.resolveActivity(getPackageManager()) != null) {
@@ -613,6 +628,8 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
 
             this.setPicture(this.imageFile.getAbsolutePath());
             this.imageFile = null;
+
+            changeAlphaBasedOnSelection(PIC_CODE);
         }
         else if(requestCode == Utils.PIC_CAPTURE_REQUEST_CODE && resultCode == RESULT_CANCELED){
             Log.v(TAG, "Camera Intent canceled");
@@ -624,6 +641,8 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
             //FileInputStream inStream = new FileInputStream(file);
             String videoPath = ShareActivity.getRealPathFromURI(this, videoUri);
             this.setVideo(videoPath);
+
+            changeAlphaBasedOnSelection(VIDEO_CODE);
         }
         else if(requestCode == Utils.VID_SHOOT_REQUEST_CODE && resultCode == RESULT_CANCELED){
             Log.v(TAG, "Video Intent canceled");
@@ -644,6 +663,44 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
                 cursor.close();
             }
         }
+    }
+
+    private void changeAlphaBasedOnSelection(int media_code)
+    {
+        switch(media_code)
+        {
+            case PIC_CODE:
+                this.setVideo(null);
+                this.setAudio(null);
+
+                this.vidButton.setAlpha(0.5f);
+                this.micButton.setAlpha(0.5f);
+
+                break;
+
+            case AUDIO_CODE:
+                this.setPicture(null);
+                this.setVideo(null);
+
+                this.picButton.setAlpha(0.5f);
+                this.vidButton.setAlpha(0.5f);
+
+                break;
+
+            case VIDEO_CODE:
+                this.setPicture(null);
+                this.setAudio(null);
+
+                this.picButton.setAlpha(0.5f);
+                this.micButton.setAlpha(0.5f);
+        }
+    }
+
+    private void restoreAlpha(int media_code)
+    {
+        if(media_code == -1 || media_code == PIC_CODE) this.picButton.setAlpha(1f);
+        if(media_code == -1 || media_code == AUDIO_CODE) this.micButton.setAlpha(1f);
+        if(media_code == -1 || media_code == VIDEO_CODE) this.vidButton.setAlpha(1f);
     }
 
 }
