@@ -196,6 +196,10 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
             DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
             String sDate = df.format(date);
 
+            String[] date_time = sDate.split(" ");
+
+            sDate = "\nDate: " + date_time[0] + "\nTime: " + date_time[1];
+
             Bundle bundle = new Bundle();
 
             bundle.putString("text", mFlag.getText());
