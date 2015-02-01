@@ -147,8 +147,8 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
     @Override
     public int getItemViewType(int position)
     {
-        // This is brilliant
-        return 0;
+        // This is brilliant, I can explain
+        return position;
     }
 
     @Override
