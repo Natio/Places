@@ -94,14 +94,14 @@ public class FlagActivity extends Activity {
         else vv.setVisibility(View.INVISIBLE);
 
         ((EditText)findViewById(R.id.text)).setText(text);
-        final String weatherString = (weather == null || weather.isEmpty()) ? "" : ", " + weather;
+        final String weatherString = (weather == null || weather.isEmpty()) ? "" : "\nWeather: " + weather;
 
-        final String bottomLineText = ", " + date + weatherString + "\nCategory: " + category;
+        final String bottomLineText = date + weatherString + "\nCategory: " + category;
         final TextView authorTextView = (TextView)findViewById(R.id.author);
         FacebookUtils.getInstance().getFacebookUsernameFromID(this.id, new FacebookUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
-                authorTextView.setText(result+bottomLineText);
+                authorTextView.setText("Author: " + result + bottomLineText);
             }
         });
 

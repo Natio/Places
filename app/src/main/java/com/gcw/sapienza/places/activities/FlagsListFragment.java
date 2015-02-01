@@ -147,8 +147,8 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
     @Override
     public int getItemViewType(int position)
     {
-        // This is brilliant
-        return 0;
+        // This is brilliant, I can explain
+        return position;
     }
 
     @Override
@@ -195,6 +195,10 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
             Date date = mFlag.getDate();
             DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
             String sDate = df.format(date);
+
+            String[] date_time = sDate.split(" ");
+
+            sDate = "\nDate: " + date_time[0] + "\nTime: " + date_time[1];
 
             Bundle bundle = new Bundle();
 
