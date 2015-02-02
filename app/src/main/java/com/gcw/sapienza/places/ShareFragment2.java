@@ -12,10 +12,15 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -25,6 +30,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gcw.sapienza.places.activities.MainActivity2;
 import com.gcw.sapienza.places.activities.VideoCaptureActivity;
 import com.gcw.sapienza.places.adapters.MSpinnerAdapter;
 import com.gcw.sapienza.places.model.Flag;
@@ -43,10 +49,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Created by mic_head on 02/02/15.
+ */
+public class ShareFragment2 extends Fragment implements View.OnLongClickListener, View.OnClickListener {
 
-public class ShareActivity extends Activity implements View.OnLongClickListener {
-
-    private static final String TAG = "ShareActivity";
+    private static final String TAG = "ShareFragment2";
     public static final String PICTURE_FORMAT = ".jpg";
     public static final String AUDIO_FORMAT = ".3gp";
     public static final String VIDEO_FORMAT = ".mp4";
@@ -80,11 +88,13 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
 
     private File imageFile;
 
+    private View view;
+
     private static final int ANIMATION_DURATION = 300;
 
     private static final String FLAG_PLACED_TEXT = "Flag has been placed!";
     private static final String FB_ID_NOT_FOUND_TEXT = "Couldn't retrieve your Facebook credentials\nPlease check your internet connection.";
-    private static final String EMPTY_FLAG_TEXT = "Please insert text or take a picture";
+    private static final String EMPTY_FLAG_TEXT = "You can do better than this";
     private static final String ENABLE_NETWORK_SERVICE_TEXT = "Please enable GPS/Network service";
     private static final String PIC_NOT_FOUND_TEXT = "Error encountered while retrieving picture\nFlag won't be stored";
     private static final String AUDIO_NOT_FOUND_TEXT = "Error encountered while retrieving recording\nFlag won't be stored";
@@ -176,21 +186,29 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
     {
         super.onCreate(savedInstanceState);
 
-        mContext = getApplicationContext();
+        mContext = getActivity().getApplicationContext();
+    }
 
-        setContentView(R.layout.activity_share);
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
 
-        this.progressBarHolder = (RelativeLayout)findViewById(R.id.frame_layout);
-        this.progressTextView = (TextView)findViewById(R.id.share_progress_text_view);
+        view = inflater.inflate(R.layout.activity_share, container, false);
 
-        this.picButton = (ImageButton)findViewById(R.id.pic_button);
-        this.micButton = (ImageButton)findViewById(R.id.mic_button);
-        this.vidButton = (ImageButton)findViewById(R.id.vid_button);
+        this.progressBarHolder = (RelativeLayout)view.findViewById(R.id.frame_layout);
+        this.progressTextView = (TextView)view.findViewById(R.id.share_progress_text_view);
+
+        this.picButton = (ImageButton)view.findViewById(R.id.pic_button);
+        this.micButton = (ImageButton)view.findViewById(R.id.mic_button);
+        this.vidButton = (ImageButton)view.findViewById(R.id.vid_button);
 
         //these lines are necessary for a correct visualization
         this.setPicture(this.getPicPath());
         this.setVideo(this.getVideoPath());
         this.setAudio(this.getAudioPath());
+
+        this.picButton.setOnClickListener(this);
+        this.vidButton.setOnClickListener(this);
 
         this.picButton.setOnLongClickListener(this);
         this.micButton.setOnLongClickListener(this);
@@ -200,7 +218,7 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
             @Override
             public boolean onTouch(View v, MotionEvent event)
             {
-                if(ShareActivity.this.isSoundCaptured)
+                if(isSoundCaptured)
                 {
                     return false;
                 }
@@ -215,7 +233,7 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
 
                     try
                     {
-                        audio_filename = Utils.createAudioFile(ShareFragment.AUDIO_FORMAT, ShareActivity.this).getAbsolutePath(); //Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + System.currentTimeMillis() + ".3gp";
+                        audio_filename = Utils.createAudioFile(ShareFragment.AUDIO_FORMAT, mContext).getAbsolutePath(); //Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + System.currentTimeMillis() + ".3gp";
                         audioRec = new MediaRecorder();
                         audioRec.setAudioSource(MediaRecorder.AudioSource.MIC);
                         audioRec.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -255,7 +273,7 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
                     try
                     {
                         FileInputStream inStream = new FileInputStream(audio_file);
-                        ShareActivity.this.setAudio(audio_filename);
+                        setAudio(audio_filename);
 
                         changeAlphaBasedOnSelection(AUDIO_CODE);
 
@@ -268,20 +286,20 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
             }
         });
 
-        this.textView = (TextView)findViewById(R.id.share_text_field);
+        this.textView = (TextView)view.findViewById(R.id.share_text_field);
         this.textView.setGravity(Gravity.CENTER);
 
-        this.shareButton = (Button)findViewById(R.id.share_button);
+        this.shareButton = (Button)view.findViewById(R.id.share_button);
         this.shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 v.setClickable(false);
-                ShareActivity.this.share();
+                share();
 
             }
         });
 
-        this.spinner = (Spinner)findViewById(R.id.spinner);
+        this.spinner = (Spinner)view.findViewById(R.id.spinner);
 
         // ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.categories, R.layout.custom_spinner);
         // adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -289,6 +307,8 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
         MSpinnerAdapter adapter = new MSpinnerAdapter(mContext, Arrays.asList(getResources().getStringArray(R.array.categories)));
 
         this.spinner.setAdapter(adapter);
+
+        return view;
     }
 
     @Override
@@ -303,17 +323,17 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
-                        if(v.getId() == ShareActivity.this.picButton.getId())
+                        if(v.getId() == picButton.getId())
                         {
-                            ShareActivity.this.setPicture(null);
+                            setPicture(null);
                         }
-                        else if (v.getId() == ShareActivity.this.micButton.getId())
+                        else if (v.getId() == micButton.getId())
                         {
-                            ShareActivity.this.setAudio(null);
+                            setAudio(null);
                         }
-                        else if (v.getId() == ShareActivity.this.vidButton.getId())
+                        else if (v.getId() == vidButton.getId())
                         {
-                            ShareActivity.this.setVideo(null);
+                            setVideo(null);
                         }
 
                         restoreAlpha(-1);
@@ -328,29 +348,29 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
         AlertDialog.Builder builder;
         AlertDialog dialog = null;
 
-        if(v.getId() == ShareActivity.this.micButton.getId())
+        if(v.getId() == micButton.getId())
         {
             if(this.audio == null) return true;
 
-            builder  = new AlertDialog.Builder(this);
+            builder  = new AlertDialog.Builder(getActivity());
             dialog = builder.setMessage("Discard recording?").setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener).show();
         }
 
-        else if(v.getId() == ShareActivity.this.picButton.getId())
+        else if(v.getId() == picButton.getId())
         {
             if(this.pic == null) return true;
 
-            builder  = new AlertDialog.Builder(this);
+            builder  = new AlertDialog.Builder(getActivity());
             dialog = builder.setMessage("Discard picture?").setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener).show();
         }
 
-        else if(v.getId() == ShareActivity.this.vidButton.getId())
+        else if(v.getId() == vidButton.getId())
         {
             if(this.video == null) return true;
 
-            builder  = new AlertDialog.Builder(this);
+            builder  = new AlertDialog.Builder(getActivity());
             dialog = builder.setMessage("Discard video?").setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener).show();
         }
@@ -487,7 +507,7 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
         uploader.upload(new FlagUploader.FlagUploaderCallbacks() {
             @Override
             public void onPercentage(int percentage, String text_to_show) {
-                ShareActivity.this.progressTextView.setText(text_to_show+' '+percentage+'%');
+                progressTextView.setText(text_to_show+' '+percentage+'%');
             }
 
             @Override
@@ -556,37 +576,36 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
         this.shareButton.setClickable(true);*/
         Intent returnIntent = new Intent();
         returnIntent.putExtra("result", toastText);
-        setResult(RESULT_OK,returnIntent);
-        this.finish();
+        getActivity().setResult(Activity.RESULT_OK, returnIntent);
+        getActivity().finish();
 
     }
 
 
     public void hideKeyboard()
     {
-        if(this.getCurrentFocus()!=null)
+        if(getActivity().getCurrentFocus()!=null)
         {
             InputMethodManager inputMethodManager = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
+            inputMethodManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
         }
     }
 
-
     public void takePic(View v)
     {
-        Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+        Vibrator vibrator = (Vibrator)mContext.getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
 
         restoreAlpha(PIC_CODE);
 
         Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if(takePicture.resolveActivity(this.getPackageManager()) != null){
+        if(takePicture.resolveActivity(mContext.getPackageManager()) != null){
             this.imageFile = null;
             try{
                 this.imageFile = Utils.createImageFile(ShareFragment.PICTURE_FORMAT);
             }
             catch (IOException e){
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_LONG).show();
             }
 
             if(this.imageFile != null){
@@ -599,14 +618,14 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
 
     public void shootVid(View v)
     {
-        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
 
         restoreAlpha(VIDEO_CODE);
 
-        Intent videoIntent = new Intent(this, VideoCaptureActivity.class);
+        Intent videoIntent = new Intent(mContext, VideoCaptureActivity.class);
 
-        if (videoIntent.resolveActivity(getPackageManager()) != null) {
+        if (videoIntent.resolveActivity(mContext.getPackageManager()) != null) {
             startActivityForResult(videoIntent, Utils.VID_SHOOT_REQUEST_CODE);
         }
 
@@ -614,15 +633,24 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
 
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    public void onPause()
+    {
+        super.onPause();
+
+        MenuItem item = ((MainActivity2)getActivity()).mMenu.findItem(R.id.action_add_flag);
+        item.setVisible(true);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
 
 
-        if(requestCode == Utils.PIC_CAPTURE_REQUEST_CODE && resultCode == RESULT_OK){
+        if(requestCode == Utils.PIC_CAPTURE_REQUEST_CODE && resultCode == Activity.RESULT_OK){
 
             if(this.imageFile == null || !this.imageFile.canRead()){
-                Toast.makeText(getApplicationContext(), "Error encountered while taking picture", Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, "Error encountered while taking picture", Toast.LENGTH_LONG).show();
                 Log.v(TAG, "Error encountered while taking picture");
                 this.imageFile = null;
                 return;
@@ -633,16 +661,16 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
 
             changeAlphaBasedOnSelection(PIC_CODE);
         }
-        else if(requestCode == Utils.PIC_CAPTURE_REQUEST_CODE && resultCode == RESULT_CANCELED){
+        else if(requestCode == Utils.PIC_CAPTURE_REQUEST_CODE && resultCode == Activity.RESULT_CANCELED){
             Log.v(TAG, "Camera Intent canceled");
         }
-        else if(requestCode ==  Utils.VID_SHOOT_REQUEST_CODE && resultCode == RESULT_OK){
+        else if(requestCode ==  Utils.VID_SHOOT_REQUEST_CODE && resultCode == Activity.RESULT_OK){
             String videoPath = data.getExtras().getString("result");
             this.setVideo(videoPath);
 
             changeAlphaBasedOnSelection(VIDEO_CODE);
         }
-        else if(requestCode == Utils.VID_SHOOT_REQUEST_CODE && resultCode == RESULT_CANCELED){
+        else if(requestCode == Utils.VID_SHOOT_REQUEST_CODE && resultCode == Activity.RESULT_CANCELED){
             Log.v(TAG, "Video Intent canceled");
         }
     }
@@ -701,4 +729,10 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
         if(media_code == -1 || media_code == VIDEO_CODE) this.vidButton.setAlpha(1f);
     }
 
+    @Override
+    public void onClick(View v)
+    {
+        if(v.getId() == R.id.vid_button) shootVid(v);
+        else if(v.getId() == R.id.pic_button) takePic(v);
+    }
 }
