@@ -23,6 +23,8 @@ import com.gcw.sapienza.places.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -33,11 +35,17 @@ import java.util.TimerTask;
 public class VideoCaptureActivity extends Activity implements View.OnClickListener, MediaRecorder.OnInfoListener{
 
     private static final String TAG = "VideoCaptureActivity";
+
     private static final int MAX_VIDEO_LENGTH = 60000;
+    private static final int MAX_VIDEO_LENGTH_HD = 20000;
+
+    private static final int VIDEO_FPS = 20;
+    private static final int VIDEO_FPS_HD = 24;
 
 
     private SurfaceHolder previewHolder;
     private ToggleButton toggleButton;
+    private ToggleButton hdButton;
     private TextView timeTextView;
     private MediaRecorder mediaRecorder;
     private Camera camera;
@@ -46,7 +54,8 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
     private long video_start_millis;
     private boolean cameraConfigured = false;
     private boolean inPreview=false;
-    private boolean isRecodring = false;
+    private boolean isRecording = false;
+    private boolean hdEnabled = false;
 
 
     @Override
@@ -65,7 +74,15 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
         //this.surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         this.toggleButton = (ToggleButton) this.findViewById(R.id.toggleRecordingButton);
         this.toggleButton.setOnClickListener(this);
+        this.toggleButton.setText("REC");
         this.toggleButton.setTextOff("REC");
+        this.toggleButton.setTextOn("STOP");
+        this.hdButton = (ToggleButton) this.findViewById(R.id.toggleHDButton);
+        this.hdButton.setOnClickListener(this);
+        this.hdButton.setText("HD");
+        this.hdButton.setTextOff("HD");
+        this.hdButton.setTextOn("HD");
+
 
     }
 
@@ -75,10 +92,28 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
 
         camera=Camera.open();
         startPreview();
-        if(this.isRecodring){
+        if(this.isRecording){
             this.finishVideoCapture();
         }
         Log.d(TAG, camera.getParameters().flatten());
+        if(!isHdAvailable()){
+            this.hdButton.setVisibility(View.GONE);
+        }
+    }
+
+    private boolean isHdAvailable() {
+        Log.d(TAG, Arrays.asList(camera.getParameters().getSupportedPreviewFpsRange()).toString());
+        return camera.getParameters().getSupportedVideoSizes().contains(camera.new Size(1280, 720))
+                && isSupportedFrameRate(VIDEO_FPS_HD);
+    }
+
+    private boolean isSupportedFrameRate(int videoFpsHd) {
+        List<int[]> supportedFps = camera.getParameters().getSupportedPreviewFpsRange();
+        for(int [] i: supportedFps){
+            if(i[1] >= videoFpsHd * 1000)
+                return true;
+        }
+        return false;
     }
 
     @Override
@@ -96,12 +131,36 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
 
     @Override
     public void onClick(View v){
-        if (((ToggleButton)v).isChecked()) {
-            this.startRecordingVideo();
+        if(v.equals(toggleButton)){
+            if (((ToggleButton)v).isChecked()) {
+                this.startRecordingVideo();
+                hdButton.setClickable(false);
+            }
+            else {
+                this.finishVideoCapture();
+                hdButton.setClickable(true);
+            }
+        }else if(v.equals(hdButton)){
+            if (((ToggleButton)v).isChecked()) {
+                enableHd();
+            }
+            else{
+                disableHd();
+            }
         }
-        else {
-            this.finishVideoCapture();
-        }
+
+    }
+
+    private boolean isHdEnabled(){
+        return hdEnabled;
+    }
+
+    private void enableHd() {
+        hdEnabled = true;
+    }
+
+    private void disableHd() {
+        hdEnabled = false;
     }
 
 
@@ -118,9 +177,8 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
 
 
     private void startRecordingVideo(){
-        this.isRecodring = true;
+        this.isRecording = true;
         this.setupRecorder();
-        this.toggleButton.setText("STOP");
         this.mediaRecorder.start();
         this.uiUpdateTimer = new Timer();
         this.video_start_millis = System.currentTimeMillis();
@@ -133,7 +191,7 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
                     public void run() {
 
                         long diff = System.currentTimeMillis() - VideoCaptureActivity.this.video_start_millis;
-                        long seconds = (MAX_VIDEO_LENGTH - diff) / 1000;
+                        long seconds = ((hdEnabled ? MAX_VIDEO_LENGTH_HD : MAX_VIDEO_LENGTH) - diff) / 1000;
                         VideoCaptureActivity.this.timeTextView.setText(Long.toString(seconds));
                     }
                 });
@@ -142,7 +200,7 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
     }
 
     private void finishVideoCapture(){
-        this.isRecodring = false;
+        this.isRecording = false;
         this.uiUpdateTimer.cancel();
         this.uiUpdateTimer.purge();
         this.mediaRecorder.stop();
@@ -191,7 +249,6 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
                         .show();
             }
             camera.unlock();
-
         }
 
 
@@ -208,7 +265,7 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
         this.mediaRecorder.setVideoEncodingBitRate(1229550); //1229.55kbps
 
 
-        this.mediaRecorder.setMaxDuration(MAX_VIDEO_LENGTH);
+        this.mediaRecorder.setMaxDuration(hdEnabled ? MAX_VIDEO_LENGTH_HD : MAX_VIDEO_LENGTH);
 
 
         try{
@@ -220,13 +277,14 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
         }
 
         this.mediaRecorder.setOutputFile(this.filePath.getAbsolutePath());
-        this.mediaRecorder.setVideoFrameRate(20);
+        this.mediaRecorder.setVideoFrameRate(hdEnabled ? VIDEO_FPS_HD : VIDEO_FPS);
         this.mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         this.mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 
-        this.mediaRecorder.setVideoSize(640, 480);
-
-
+        if(hdEnabled)
+            this.mediaRecorder.setVideoSize(1280,720);
+        else
+            this.mediaRecorder.setVideoSize(640, 480);
 
         this.mediaRecorder.setOrientationHint(camera_rotation);
 

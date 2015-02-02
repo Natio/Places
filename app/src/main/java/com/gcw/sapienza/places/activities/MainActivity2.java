@@ -92,6 +92,8 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
 
     private BroadcastReceiver receiver;
 
+    private static boolean isForeground = false;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -339,6 +341,21 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
     {
         super.onResume();
         PlacesApplication.getInstance().startLocationService();
+
+        isForeground = true;
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+
+        isForeground = false;
+
+    }
+
+    public static boolean isForeground(){
+        return isForeground;
     }
 
     @Override
