@@ -312,7 +312,7 @@ public class LocationService extends Service implements
                         .setSound(soundUri)
                         .setLights(0xff00ff00, 1000, 3000);
 
-        Intent targetIntent = new Intent(this, MainActivity.class);
+        Intent targetIntent = new Intent(this, MainActivity2.class);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(contentIntent);
         NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
