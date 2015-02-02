@@ -245,7 +245,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                 builder.include(latLng);
 
-
+                //25% size original icon
                 int marker_id = getIconForCategory(f.getCategory());
                 Bitmap marker = BitmapFactory.decodeResource(getResources(), marker_id);
                 Bitmap halfSizeMarker = Bitmap.createScaledBitmap
