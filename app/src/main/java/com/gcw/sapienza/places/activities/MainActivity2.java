@@ -5,9 +5,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.opengl.Visibility;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -23,12 +27,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
-import com.gcw.sapienza.places.SettingsActivity;
+import com.gcw.sapienza.places.SettingsFragment;
 import com.gcw.sapienza.places.ShareActivity;
+import com.gcw.sapienza.places.ShareFragment2;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.services.LocationService;
@@ -52,7 +59,9 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener, OnMapReadyCallback {
+public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener,
+                                                                OnMapReadyCallback,
+                                                                Preference.OnPreferenceChangeListener {
 
     public static String TAG = MainActivity2.class.getName();
     private DrawerLayout drawerLayout;
@@ -61,7 +70,12 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
     private static final String [] section_titles = {"Home", "Settings", "Logout"};
     private CharSequence current_title;
     private MSwipeRefreshLayout srl;
-    private int currentDrawerListItemIndex = -1;
+    // private int currentDrawerListItemIndex = -1;
+
+    private LinearLayout homeHolder;
+    private FrameLayout fragHolder;
+
+    public Menu mMenu;
 
     private static final int SHARE_ACTIVITY_REQUEST_CODE = 95;
 
@@ -71,7 +85,11 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
 
     private static final int MAP_BOUNDS = 70;
 
+    private static final String FRAG_TAG = "FRAG_TAG";
+
     private GoogleMap gMap;
+
+    private Toast radiusToast;
 
     private BroadcastReceiver receiver;
 
@@ -94,6 +112,9 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         this.current_title = this.getTitle();
         this.drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         this.drawerList = (ListView) findViewById(R.id.left_drawer);
+
+        this.homeHolder = (LinearLayout) findViewById(R.id.home_container);
+        this.fragHolder = (FrameLayout) findViewById(R.id.frag_container);
 
         // Set the adapter for the list view
         this.drawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, section_titles));
@@ -159,6 +180,9 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
                 return position != 0;
             }
         });
+
+        Fragment fragment = new FlagsListFragment();
+        this.getSupportFragmentManager().beginTransaction().replace(R.id.swipe_refresh, fragment).commit();
 
         SupportMapFragment mapFragment = new SupportMapFragment();
         this.getSupportFragmentManager().beginTransaction().replace(R.id.map_holder, mapFragment).commit();
@@ -303,14 +327,17 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         }
         else if(item.getItemId() == R.id.action_add_flag)
         {
-            startActivity(new Intent(this, ShareActivity.class));
+            // startActivity(new Intent(this, ShareActivity.class));
+            item.setVisible(false);
+            switchToShareFragment();
         }
 
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
         PlacesApplication.getInstance().startLocationService();
     }
@@ -319,6 +346,8 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main_drawer, menu);
+
+        mMenu = menu;
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -382,37 +411,41 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
 
 
     /** Swaps fragments in the main content view */
-    private void selectItem(int position){
-
-        if(this.currentDrawerListItemIndex == position){
+    private void selectItem(int position)
+    {
+        // TODO I have temporarily removed the block of code below for my implementation to work
+        /*
+        if(this.currentDrawerListItemIndex == position)
+        {
             this.drawerLayout.closeDrawers();
+
             return;
         }
-
+        */
 
         if(position == SETTINGS_POSITION)
         {
-            startActivityForResult(new Intent(this, SettingsActivity.class), SHARE_ACTIVITY_REQUEST_CODE);
-            this.drawerLayout.closeDrawers();
-            return;
+            // startActivityForResult(new Intent(this, SettingsActivity.class), SHARE_ACTIVITY_REQUEST_CODE);
+            switchToSettingsFrag();
         }
         else if(position == LOGOUT_POSITION)
         {
             logout();
-
-            this.drawerLayout.closeDrawers();
-            return;
         }
-        else if(position == FLAGS_LIST_POSITION){
-            Fragment fragment = new FlagsListFragment();
-            this.getSupportFragmentManager().beginTransaction().replace(R.id.swipe_refresh, fragment).commit();
+        else if(position == FLAGS_LIST_POSITION)
+        {
+            // Fragment fragment = new FlagsListFragment();
+            // this.getSupportFragmentManager().beginTransaction().replace(R.id.swipe_refresh, fragment).commit();
 
+            if(homeHolder.getVisibility() == View.INVISIBLE) switchToListMapFrags();
         }
 
-        this.currentDrawerListItemIndex = position;
+        // this.drawerList.setItemChecked(position, true);
+        this.drawerLayout.closeDrawers();
 
+        // this.currentDrawerListItemIndex = position;
 
-/*
+        /*
         // Highlight the selected item, update the title, and close the drawer
         this.drawerList.setItemChecked(position, true);
         this.setTitle(MainActivity2.section_titles[position]);
@@ -462,6 +495,112 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
                 }
                 break;
         }
+    }
+
+    private void switchToListMapFrags()
+    {
+        android.app.Fragment frag1 = this.getFragmentManager().findFragmentByTag(FRAG_TAG);
+        Fragment frag2 = this.getSupportFragmentManager().findFragmentByTag(FRAG_TAG);
+
+        // TODO We need to check if we need both lines since we got both "fragments" and "support fragments"
+        if(frag1 != null) this.getFragmentManager().beginTransaction().remove(frag1).commit();
+        else if(frag2!= null) this.getSupportFragmentManager().beginTransaction().remove(frag2).commit();
+
+        homeHolder.setVisibility(View.VISIBLE);
+        fragHolder.setVisibility(View.INVISIBLE);
+    }
+
+    private void switchToSettingsFrag()
+    {
+        homeHolder.setVisibility(View.INVISIBLE);
+        fragHolder.setVisibility(View.VISIBLE);
+
+        this.getFragmentManager().beginTransaction().replace(R.id.frag_container, new SettingsFragment(), FRAG_TAG).commit();
+    }
+
+    private void switchToShareFragment()
+    {
+        homeHolder.setVisibility(View.INVISIBLE);
+        fragHolder.setVisibility(View.VISIBLE);
+
+        this.getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new ShareFragment2(), FRAG_TAG).commit();
+    }
+
+    protected void switchToFlagFrag(Fragment frag)
+    {
+        homeHolder.setVisibility(View.INVISIBLE);
+        fragHolder.setVisibility(View.VISIBLE);
+
+        this.getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, frag, FRAG_TAG).commit();
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        if(homeHolder.getVisibility() == View.INVISIBLE)
+        {
+            switchToListMapFrags();
+        }
+    }
+
+    @Override
+    public boolean onPreferenceChange(Preference preference, Object newValue)
+    {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        SharedPreferences.Editor editor = preferences.edit();
+
+        if(preference.getKey().equals("meFilter") ||
+                preference.getKey().equals("flFilter") ||
+                preference.getKey().equals("strangersFilter") ||
+                preference.getKey().equals("timeFilter") ||
+                preference.getKey().equals("thoughtsCheck") ||
+                preference.getKey().equals("funCheck") ||
+                preference.getKey().equals("landscapeCheck") ||
+                preference.getKey().equals("foodCheck") ||
+                preference.getKey().equals("noneCheck"))
+
+        {
+            Log.d(TAG, "Called onPreferenceChange for: " + preference.getKey());
+            editor.putBoolean(preference.getKey(), (boolean)newValue);
+            editor.commit();
+        }
+        else if(preference.getKey().equals("seekBar"))
+        {
+            preference.setDefaultValue(newValue);
+
+            int value = (int)newValue + 1;
+
+            Utils.MAP_RADIUS = value / 10f;
+
+            showToast("Radius set to " + value * 100 + " meters.");
+
+            Log.d(TAG, "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
+        }
+        else if(preference.getKey().equals("maxFetch"))
+        {
+            preference.setDefaultValue(newValue);
+
+            int value = Utils.stepValues[(int)newValue];
+
+            Utils.MAX_PINS = value;
+
+            showToast("Max number of visible flags: " + value + '.');
+
+            Log.d(TAG, "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
+        }
+
+        Location currentLocation = PlacesApplication.getInstance().getLocation();
+        PlacesApplication.getInstance().getLocationService().queryParsewithLocation(currentLocation);
+
+        return true;
+    }
+
+    private void showToast(String text) {
+        if(radiusToast != null)
+            radiusToast.cancel();
+        radiusToast = Toast.makeText(getBaseContext(), text,
+                Toast.LENGTH_SHORT);
+        radiusToast.show();
     }
 
 }

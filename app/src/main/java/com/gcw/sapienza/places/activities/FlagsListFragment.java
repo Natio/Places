@@ -1,5 +1,6 @@
 package com.gcw.sapienza.places.activities;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gcw.sapienza.places.FlagActivity;
+import com.gcw.sapienza.places.FlagFragment;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.ShareFragment;
@@ -94,12 +96,12 @@ public class FlagsListFragment extends Fragment {
 class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
     private static final String TAG = "FlagsAdapter";
     private final List<Flag> flags;
-    private final Context context;
+    private final Activity mainActivity;
     private final Transformation transformation = new CropCircleTransformation();
 
-    public FlagsAdapter(List<Flag> list, Context ctx){
+    public FlagsAdapter(List<Flag> list, Activity ctx){
         this.flags = list;
-        this.context = ctx;
+        this.mainActivity = ctx;
     }
 
 
@@ -122,14 +124,14 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
         FacebookUtils.getInstance().getFbProfilePictureURL(user_id, FacebookUtils.PicSize.SMALL, new FacebookUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
-                Picasso.with(FlagsAdapter.this.context).load(result).transform(transformation).into(flagViewHolder.user_profile_pic);
+                Picasso.with(FlagsAdapter.this.mainActivity).load(result).transform(transformation).into(flagViewHolder.user_profile_pic);
             }
         });
 
         ParseFile pic = f.getPic();
         if(pic != null){
             String url = pic.getUrl();
-            Picasso.with(this.context).load(url).into(flagViewHolder.main_image);
+            Picasso.with(this.mainActivity).load(url).into(flagViewHolder.main_image);
             flagViewHolder.main_image.setVisibility(View.VISIBLE);
         }
         else{
@@ -158,7 +160,7 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
                 from(viewGroup.getContext()).
                 inflate(R.layout.card_layout, viewGroup, false);
 
-        return new FlagsViewHolder(itemView, this.flags.get(i), context);
+        return new FlagsViewHolder(itemView, this.flags.get(i), mainActivity);
     }
 
     public static class FlagsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -168,16 +170,16 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
         protected final ImageView user_profile_pic;
         protected final ImageView main_image;
 
-        private final Context mContext;
+        private final Activity mainActivity;
 
         private Flag mFlag;
 
-        public FlagsViewHolder(View v, Flag flag, Context context)
+        public FlagsViewHolder(View v, Flag flag, Activity context)
         {
             super(v);
 
             this.mFlag = flag;
-            this.mContext = context;
+            this.mainActivity = context;
 
             v.setOnClickListener(this);
 
@@ -190,7 +192,7 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
         @Override
         public void onClick(View v)
         {
-            Intent intent = new Intent(mContext, FlagActivity.class);
+            Intent intent = new Intent(mainActivity, FlagActivity.class);
 
             Date date = mFlag.getDate();
             DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
@@ -212,7 +214,7 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
             {
                 ParseFile pic_file;
                 if((pic_file = mFlag.getPic()) != null){
-                    File temp = File.createTempFile("places_temp_pic", ShareFragment.PICTURE_FORMAT, mContext.getCacheDir());
+                    File temp = File.createTempFile("places_temp_pic", ShareFragment.PICTURE_FORMAT, mainActivity.getCacheDir());
                     temp.deleteOnExit();
 
                     FileOutputStream outStream = new FileOutputStream(temp);
@@ -224,7 +226,7 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
 
                 ParseFile audio_file;
                 if((audio_file = mFlag.getAudio()) != null){
-                    File temp = File.createTempFile("places_temp_audio", ShareFragment.AUDIO_FORMAT, mContext.getCacheDir());
+                    File temp = File.createTempFile("places_temp_audio", ShareFragment.AUDIO_FORMAT, mainActivity.getCacheDir());
                     temp.deleteOnExit();
 
                     FileOutputStream outStream = new FileOutputStream(temp);
@@ -237,7 +239,7 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
                 ParseFile video_file;
                 if((video_file = mFlag.getVideo()) != null)
                 {
-                    File temp = File.createTempFile("places_temp_video", ShareFragment.VIDEO_FORMAT, mContext.getCacheDir());
+                    File temp = File.createTempFile("places_temp_video", ShareFragment.VIDEO_FORMAT, mainActivity.getCacheDir());
                     temp.deleteOnExit();
 
                     FileOutputStream outStream = new FileOutputStream(temp);
@@ -254,9 +256,14 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
                 pe.printStackTrace();
             }
 
-            intent.putExtras(bundle);
+            // intent.putExtras(bundle);
 
-            mContext.startActivity(intent);
+            // mContext.startActivity(intent);
+
+            FlagFragment frag = new FlagFragment();
+            frag.setArguments(bundle);
+
+            ((MainActivity2)mainActivity).switchToFlagFrag(frag);
         }
     }
 }
