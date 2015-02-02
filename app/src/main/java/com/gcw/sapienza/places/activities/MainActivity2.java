@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.opengl.Visibility;
@@ -243,22 +245,22 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                 builder.include(latLng);
 
-                /*
+                //25% size original icon
                 int marker_id = getIconForCategory(f.getCategory());
                 Bitmap marker = BitmapFactory.decodeResource(getResources(), marker_id);
                 Bitmap halfSizeMarker = Bitmap.createScaledBitmap
                                             (marker,
-                                            (int)(marker.getWidth() * 0.75f),
-                                            (int)(marker.getHeight() * 0.75f),
-                                            false); */
+                                            (int)(marker.getWidth() * 0.25f),
+                                            (int)(marker.getHeight() * 0.25f),
+                                            false);
 
                 this.gMap.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title(text)
-                        // .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
-                        // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
-                        .icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
-                        .alpha(0.9f));
+                        .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
+                                // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
+                                //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
+                        .alpha(0.8f));
             }
 
             if(pins.size() > 0)
