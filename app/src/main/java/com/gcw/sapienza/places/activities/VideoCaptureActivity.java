@@ -78,7 +78,7 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
         if(this.isRecodring){
             this.finishVideoCapture();
         }
-
+        Log.d(TAG, camera.getParameters().flatten());
     }
 
     @Override

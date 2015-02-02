@@ -34,7 +34,6 @@ import android.widget.Toast;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.SettingsFragment;
-import com.gcw.sapienza.places.ShareActivity;
 import com.gcw.sapienza.places.ShareFragment2;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.model.Flag;
