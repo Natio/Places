@@ -52,7 +52,7 @@ import java.util.Map;
 /**
  * Created by mic_head on 02/02/15.
  */
-public class ShareFragment2 extends Fragment implements View.OnLongClickListener {
+public class ShareFragment2 extends Fragment implements View.OnLongClickListener, View.OnClickListener {
 
     private static final String TAG = "ShareFragment2";
     public static final String PICTURE_FORMAT = ".jpg";
@@ -94,7 +94,7 @@ public class ShareFragment2 extends Fragment implements View.OnLongClickListener
 
     private static final String FLAG_PLACED_TEXT = "Flag has been placed!";
     private static final String FB_ID_NOT_FOUND_TEXT = "Couldn't retrieve your Facebook credentials\nPlease check your internet connection.";
-    private static final String EMPTY_FLAG_TEXT = "Please insert text or take a picture";
+    private static final String EMPTY_FLAG_TEXT = "You can do better than this";
     private static final String ENABLE_NETWORK_SERVICE_TEXT = "Please enable GPS/Network service";
     private static final String PIC_NOT_FOUND_TEXT = "Error encountered while retrieving picture\nFlag won't be stored";
     private static final String AUDIO_NOT_FOUND_TEXT = "Error encountered while retrieving recording\nFlag won't be stored";
@@ -206,6 +206,9 @@ public class ShareFragment2 extends Fragment implements View.OnLongClickListener
         this.setPicture(this.getPicPath());
         this.setVideo(this.getVideoPath());
         this.setAudio(this.getAudioPath());
+
+        this.picButton.setOnClickListener(this);
+        this.vidButton.setOnClickListener(this);
 
         this.picButton.setOnLongClickListener(this);
         this.micButton.setOnLongClickListener(this);
@@ -588,7 +591,6 @@ public class ShareFragment2 extends Fragment implements View.OnLongClickListener
         }
     }
 
-
     public void takePic(View v)
     {
         Vibrator vibrator = (Vibrator)mContext.getSystemService(Context.VIBRATOR_SERVICE);
@@ -727,4 +729,10 @@ public class ShareFragment2 extends Fragment implements View.OnLongClickListener
         if(media_code == -1 || media_code == VIDEO_CODE) this.vidButton.setAlpha(1f);
     }
 
+    @Override
+    public void onClick(View v)
+    {
+        if(v.getId() == R.id.vid_button) shootVid(v);
+        else if(v.getId() == R.id.pic_button) takePic(v);
+    }
 }

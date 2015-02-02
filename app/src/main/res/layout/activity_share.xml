@@ -71,7 +71,6 @@
             android:layout_centerHorizontal="true"
             android:src="@drawable/cam_selector"
             android:background="@android:color/transparent"
-            android:onClick="takePic"
             android:padding="30dp"
             android:clickable="true" />
 
@@ -93,7 +92,6 @@
             android:src="@drawable/videocam_selector"
             android:layout_alignParentRight="true"
             android:padding="30dp"
-            android:onClick="shootVid"
             android:clickable="true" />
 
     </RelativeLayout>
