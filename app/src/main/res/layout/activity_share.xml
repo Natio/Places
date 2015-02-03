@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/phone_button"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/cam_selector"
+            android:src="@drawable/attach_selector"
             android:background="@android:color/transparent"
             android:padding="30dp"
             android:layout_weight="0.25"
