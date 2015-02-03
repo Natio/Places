@@ -12,8 +12,8 @@
         android:layout_height="0dp"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="What's on your mind?"
+        android:layout_marginTop="10dp"
         android:textSize="20sp"
-        android:layout_marginTop="15dp"
         android:id="@+id/textView2"
         android:layout_gravity="center_horizontal"
         android:layout_weight="0.1" />
@@ -23,7 +23,7 @@
         android:layout_marginTop="5dp"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.45"
+        android:layout_weight="0.5"
         android:textSize="25sp"
         android:id="@+id/share_text_field"
         android:gravity="center_vertical|center_horizontal"
@@ -61,8 +61,10 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_weight="0.125"
-        android:clickable="true" >
+        android:layout_weight="0.15"
+        android:clickable="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -99,6 +101,7 @@
                 android:padding="30dp"
                 android:clickable="true"
                 android:layout_margin="0dp" />
+
         </LinearLayout>
 
     </RelativeLayout>
@@ -115,8 +118,7 @@
         android:layout_centerHorizontal="true"
         android:gravity="center_horizontal"
         android:textAlignment="gravity"
-        android:layout_weight="0.125"
-        android:layout_marginBottom="10dp" />
+        android:layout_weight="0.15" />
 
     <Button
         style="?android:attr/borderlessButtonStyle"
@@ -128,7 +130,8 @@
         android:text="Place"
         android:textSize="60sp"
         android:textColor="@color/white"
-        android:id="@+id/share_button" />
+        android:id="@+id/share_button"
+        android:layout_weight="0.05" />
 
     <RelativeLayout
         android:id="@+id/frame_layout"
