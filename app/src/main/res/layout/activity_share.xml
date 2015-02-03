@@ -39,42 +39,30 @@
         android:weightSum="1" >
 
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/phone_button"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/attach_selector"
-            android:background="@android:color/transparent"
-            android:padding="30dp"
-            android:layout_weight="0.25"
-            android:clickable="true"
-            android:scaleType="centerCrop" />
-
-        <ImageButton
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/pic_button"
             android:layout_centerHorizontal="true"
             android:src="@drawable/cam_selector"
             android:background="@android:color/transparent"
             android:padding="30dp"
-            android:layout_weight="0.25"
+            android:layout_weight="0.20"
             android:clickable="true"
             android:scaleType="centerCrop" />
 
         <ImageButton
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/mic_button"
             android:layout_alignParentLeft="true"
             android:padding="30dp"
             android:background="@android:color/transparent"
             android:src="@drawable/mic_selector"
-            android:layout_weight="0.25"
+            android:layout_weight="0.2"
             android:clickable="true" />
 
         <ImageButton
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/vid_button"
             android:background="@android:color/transparent"
@@ -82,6 +70,18 @@
             android:layout_alignParentRight="true"
             android:padding="30dp"
             android:layout_weight="0.25"
+            android:clickable="true"
+            android:scaleType="centerCrop" />
+
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/phone_button"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/attach_selector"
+            android:background="@android:color/transparent"
+            android:padding="30dp"
+            android:layout_weight="0.3"
             android:clickable="true"
             android:scaleType="centerCrop" />
 
