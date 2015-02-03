@@ -29,82 +29,60 @@
         android:gravity="center_vertical|center_horizontal"
         android:paddingBottom="20dp" />
 
-    <!-- <TableRow
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Category"
-            android:id="@+id/textView"
-            android:textSize="28sp"
-            android:layout_gravity="center_horizontal" /> -->
-
-    <!-- <Button
-        style="?android:attr/borderlessButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:text="Attach picture"
-        android:textColor="@color/grey"
-        android:layout_marginTop="20dp"
-        android:onClick="takePic"
-        android:textSize="16sp"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center_horizontal"
-        android:id="@+id/pic_button"
-        android:layout_weight="0.125" /> -->
-
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="0.15"
         android:clickable="true"
         android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dp">
+        android:layout_marginTop="5dp"
+        android:weightSum="1" >
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/phone_button"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/cam_selector"
+            android:background="@android:color/transparent"
+            android:padding="30dp"
+            android:layout_weight="0.25"
+            android:clickable="true" />
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/mic_button"
-                android:layout_alignParentLeft="true"
-                android:padding="30dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/mic_selector"
-                android:clickable="true" />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/pic_button"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/cam_selector"
+            android:background="@android:color/transparent"
+            android:padding="30dp"
+            android:layout_weight="0.25"
+            android:clickable="true" />
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/pic_button"
-                android:layout_centerHorizontal="true"
-                android:src="@drawable/cam_selector"
-                android:background="@android:color/transparent"
-                android:padding="30dp"
-                android:clickable="true" />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/mic_button"
+            android:layout_alignParentLeft="true"
+            android:padding="30dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/mic_selector"
+            android:layout_weight="0.25"
+            android:clickable="true" />
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/vid_button"
-                android:background="@android:color/transparent"
-                android:src="@drawable/videocam_selector"
-                android:layout_alignParentRight="true"
-                android:padding="30dp"
-                android:clickable="true"
-                android:layout_margin="0dp" />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/vid_button"
+            android:background="@android:color/transparent"
+            android:src="@drawable/videocam_selector"
+            android:layout_alignParentRight="true"
+            android:padding="30dp"
+            android:layout_weight="0.25"
+            android:clickable="true" />
 
-        </LinearLayout>
-
-    </RelativeLayout>
+    </LinearLayout>
 
     <View
         android:layout_width="fill_parent"
@@ -162,7 +140,5 @@
             android:text=""
             android:id="@+id/share_progress_text_view" />
     </RelativeLayout>
-
-    <!-- </TableRow> -->
 
 </LinearLayout>

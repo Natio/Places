@@ -61,6 +61,7 @@ public class FlagUploader {
     private static final String AUDIO_KEY = Flag.AUDIO_KEY;
     private static final String VIDEO_KEY = Flag.VIDEO_KEY;
     private static final String PICTURE_KEY = Flag.PICTURE_KEY;
+    private static final String PHONE_MEDIA_KEY = Flag.PHONE_MEDIA_KEY;
 
     private final Flag flag;
     private HashMap<String, File> files;
@@ -133,6 +134,17 @@ public class FlagUploader {
         this.files.put(PICTURE_KEY, picture);
     }
 
+    /**
+     * Sets the ParseFile representing a picture
+     * @throws java.lang.IllegalStateException if you call this method after having started uploading
+     * @param media file to upload as a phone media
+     */
+    public void setPhoneMediaFile(File media){
+        if(this.isUploading){
+            throw new IllegalStateException("Cannot set a file while uploading");
+        }
+        this.files.put(PHONE_MEDIA_KEY, media);
+    }
 
     /**
      *
@@ -272,6 +284,8 @@ public class FlagUploader {
                 return this.context.getString(R.string.upload_picture_progress);
             case VIDEO_KEY:
                 return this.context.getString(R.string.upload_video_progress);
+            case PHONE_MEDIA_KEY:
+                return this.context.getString(R.string.upload_phone_media_progress);
         }
 
         return null;
@@ -290,6 +304,9 @@ public class FlagUploader {
         }
         else if(this.files.containsKey(VIDEO_KEY)){
             return VIDEO_KEY;
+        }
+        else if(this.files.containsKey(PHONE_MEDIA_KEY)){
+            return PHONE_MEDIA_KEY;
         }
         return null;
     }
