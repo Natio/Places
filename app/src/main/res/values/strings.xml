@@ -12,6 +12,7 @@
     <string name="upload_picture_progress">Uploading Picture</string>
     <string name="upload_video_progress">Uploading Video</string>
     <string name="upload_audio_progress">Uploading Audio</string>
+    <string name="upload_phone_media_progress">Uploading Phone Media</string>
     <string name="my_flags">My Flags</string>
     <string name="filters">Filters</string>
     <string name="profile">Profile</string>

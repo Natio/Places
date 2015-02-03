@@ -16,6 +16,7 @@ public class Flag extends ParseObject{
     public static final String AUDIO_KEY = "audio";
     public static final String VIDEO_KEY = "video";
     public static final String PICTURE_KEY= "picture";
+    public static final String PHONE_MEDIA_KEY = "phone_media";
     public static final String WEATHER_KEY = "weather";
     public static final String FB_ID_KEY = "fbId";
     public static final String FB_NAME_KEY = "fbName";
