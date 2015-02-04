@@ -82,6 +82,9 @@
         <activity android:name=".activities.VideoCaptureActivity">
         </activity>
 
+        <activity android:name=".ShareActivity">
+        </activity>
+
         <activity android:name=".SettingsActivity"
             android:screenOrientation="portrait">
         </activity>

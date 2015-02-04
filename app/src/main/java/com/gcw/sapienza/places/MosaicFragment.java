@@ -237,7 +237,7 @@ public class MosaicFragment extends Fragment implements  AdapterView.OnItemClick
         {
             ParseFile pic_file;
             if((pic_file = ((Flag) parent.getItemAtPosition(position)).getPic()) != null){
-                File temp = File.createTempFile("places_temp_pic", ShareFragment.PICTURE_FORMAT, getActivity().getCacheDir());
+                File temp = File.createTempFile("places_temp_pic", ShareActivity.PICTURE_FORMAT, getActivity().getCacheDir());
                 temp.deleteOnExit();
 
                 FileOutputStream outStream = new FileOutputStream(temp);
@@ -249,7 +249,7 @@ public class MosaicFragment extends Fragment implements  AdapterView.OnItemClick
 
             ParseFile audio_file;
             if((audio_file = ((Flag) parent.getItemAtPosition(position)).getAudio()) != null){
-                File temp = File.createTempFile("places_temp_audio", ShareFragment.AUDIO_FORMAT, getActivity().getCacheDir());
+                File temp = File.createTempFile("places_temp_audio", ShareActivity.AUDIO_FORMAT, getActivity().getCacheDir());
                 temp.deleteOnExit();
 
                 FileOutputStream outStream = new FileOutputStream(temp);
@@ -262,7 +262,7 @@ public class MosaicFragment extends Fragment implements  AdapterView.OnItemClick
             ParseFile video_file;
             if((video_file = ((Flag) parent.getItemAtPosition(position)).getVideo()) != null)
             {
-                File temp = File.createTempFile("places_temp_video", ShareFragment.VIDEO_FORMAT, getActivity().getCacheDir());
+                File temp = File.createTempFile("places_temp_video", ShareActivity.VIDEO_FORMAT, getActivity().getCacheDir());
                 temp.deleteOnExit();
 
                 FileOutputStream outStream = new FileOutputStream(temp);

@@ -10,7 +10,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
@@ -36,7 +35,7 @@ import android.widget.Toast;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.SettingsFragment;
-import com.gcw.sapienza.places.ShareFragment2;
+import com.gcw.sapienza.places.ShareActivity;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.services.LocationService;
@@ -330,9 +329,10 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         }
         else if(item.getItemId() == R.id.action_add_flag)
         {
-            // startActivity(new Intent(this, ShareActivity.class));
+            Intent shareIntent = new Intent(this, ShareActivity.class);
+            startActivityForResult(shareIntent, MainActivity2.SHARE_ACTIVITY_REQUEST_CODE);
             // item.setVisible(false);
-            switchToShareFragment();
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -547,13 +547,6 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         this.getFragmentManager().beginTransaction().replace(R.id.frag_container, new SettingsFragment(), FRAG_TAG).commit();
     }
 
-    private void switchToShareFragment()
-    {
-        getRidOfUnusedFrag();
-        switchToFragOtherThanHome();
-
-        this.getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new ShareFragment2(), FRAG_TAG).commit();
-    }
 
     protected void switchToFlagFrag(Fragment frag)
     {

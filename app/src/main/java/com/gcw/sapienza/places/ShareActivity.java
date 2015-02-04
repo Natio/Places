@@ -1,7 +1,9 @@
 package com.gcw.sapienza.places;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,15 +11,17 @@ import android.database.Cursor;
 import android.location.Location;
 import android.media.MediaRecorder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Vibrator;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
@@ -29,7 +33,6 @@ import com.gcw.sapienza.places.activities.VideoCaptureActivity;
 import com.gcw.sapienza.places.adapters.MSpinnerAdapter;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.services.LocationService;
-import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.FlagUploader;
 import com.gcw.sapienza.places.utils.Utils;
@@ -44,7 +47,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class ShareActivity extends Activity implements View.OnLongClickListener {
+public class ShareActivity extends Activity implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
+{
 
     private static final String TAG = "ShareActivity";
     public static final String PICTURE_FORMAT = ".jpg";
@@ -54,6 +58,8 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
     private static final int PIC_CODE = 0;
     private static final int AUDIO_CODE = 1;
     private static final int VIDEO_CODE = 2;
+    private static final int PHONE_MEDIA_CODE = 3;
+
 
     private Spinner spinner;
     private TextView textView;
@@ -64,16 +70,20 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
     private ImageButton picButton;
     private ImageButton micButton;
     private ImageButton vidButton;
+    private ImageButton phoneButton;
 
     private Context mContext;
 
     private boolean isPicTaken = false;
     private boolean isVideoShoot = false;
     private boolean isSoundCaptured = false;
+    private boolean isPhoneMediaSelected = false;
+
 
     private File pic;
     private File video;
     private File audio;
+    private File phoneMedia;
 
     protected static MediaRecorder audioRec;
     protected static String audio_filename;
@@ -90,6 +100,8 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
     private static final String AUDIO_NOT_FOUND_TEXT = "Error encountered while retrieving recording\nFlag won't be stored";
     private static final String VIDEO_NOT_FOUND_TEXT = "Error encountered while retrieving video\nFlag won't be stored";
     private static final String ERROR_WHILE_RECORDING_TEXT = "Error encountered while recording";
+    private static final String PHONE_MEDIA_NOT_FOUND_TEXT = "Error encountered while retrieving phone media\nFlag won't be stored";
+
 
     public void setVideo(String video){
         this.video = null;
@@ -159,6 +171,28 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
 
     }
 
+    private void setPhoneMedia(String phoneMediaPath) {
+        this.phoneMedia = null;
+        if(phoneMediaPath != null)
+        {
+            File f = new File(phoneMediaPath);
+            this.phoneMedia = f.canRead() ? f : null;
+        }
+        this.isPhoneMediaSelected = this.phoneMedia != null;
+
+        if(this.phoneButton != null)
+        {
+            int res =R.drawable.cam_selector;
+            if(this.isPhoneMediaSelected)
+            {
+                res = R.drawable.camera_green_taken;
+            }
+
+            this.phoneButton.setImageDrawable( getResources().getDrawable(res));
+        }
+
+    }
+
     public String getPicPath() {
         return this.pic == null ? null : this.pic.getAbsolutePath();
     }
@@ -169,6 +203,10 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
 
     public String getAudioPath() {
         return this.video == null ? null : this.video.getAbsolutePath();
+    }
+
+    public String getPhoneMediaPath(){
+        return this.phoneMedia == null ? null : this.phoneMedia.getAbsolutePath();
     }
 
     @Override
@@ -186,87 +224,24 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
         this.picButton = (ImageButton)findViewById(R.id.pic_button);
         this.micButton = (ImageButton)findViewById(R.id.mic_button);
         this.vidButton = (ImageButton)findViewById(R.id.vid_button);
+        this.phoneButton = (ImageButton)findViewById(R.id.phone_button);
 
         //these lines are necessary for a correct visualization
         this.setPicture(this.getPicPath());
         this.setVideo(this.getVideoPath());
         this.setAudio(this.getAudioPath());
+        this.setPhoneMedia(this.getPhoneMediaPath());
 
         this.picButton.setOnLongClickListener(this);
         this.micButton.setOnLongClickListener(this);
         this.vidButton.setOnLongClickListener(this);
+        this.phoneButton.setOnLongClickListener(this);
 
-        micButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event)
-            {
-                if(ShareActivity.this.isSoundCaptured)
-                {
-                    return false;
-                }
+        this.phoneButton.setOnClickListener(this);
+        this.picButton.setOnClickListener(this);
+        this.vidButton.setOnClickListener(this);
 
-                Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
-                vibrator.vibrate(Utils.VIBRATION_DURATION);
-
-                if (event.getAction() == MotionEvent.ACTION_DOWN)
-                {
-
-                    restoreAlpha(AUDIO_CODE);
-
-                    try
-                    {
-                        audio_filename = Utils.createAudioFile(ShareFragment.AUDIO_FORMAT, ShareActivity.this).getAbsolutePath(); //Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + System.currentTimeMillis() + ".3gp";
-                        audioRec = new MediaRecorder();
-                        audioRec.setAudioSource(MediaRecorder.AudioSource.MIC);
-                        audioRec.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-                        audioRec.setOutputFile(audio_filename);
-                        audioRec.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-                        audioRec.prepare();
-                    } catch (IOException ioe)
-                    {
-                        ioe.printStackTrace();
-                        Toast.makeText(mContext, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
-                        Log.e(TAG, ERROR_WHILE_RECORDING_TEXT);
-                    }
-                    audioRec.start();
-                }
-                else if(event.getAction() == MotionEvent.ACTION_UP)
-                {
-                    if(audioRec == null)
-                    {
-                        Toast.makeText(mContext, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
-                        Log.v(TAG, ERROR_WHILE_RECORDING_TEXT);
-                        return true;
-                    }
-                    else try
-                    {
-                        audioRec.stop();
-                        audioRec.release();
-                        audioRec = null;
-                    }
-                    catch(RuntimeException re)
-                    {
-                        re.printStackTrace();
-                        Toast.makeText(mContext, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
-                        return true;
-                    }
-                    ((ImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.mic_green_taken));
-                    File audio_file = new File(audio_filename);
-                    try
-                    {
-                        FileInputStream inStream = new FileInputStream(audio_file);
-                        ShareActivity.this.setAudio(audio_filename);
-
-                        changeAlphaBasedOnSelection(AUDIO_CODE);
-
-                        inStream.close();
-                    } catch (IOException ioe) {
-                        ioe.printStackTrace();
-                    }
-                }
-                return true;
-            }
-        });
+        this.micButton.setOnTouchListener(this);
 
         this.textView = (TextView)findViewById(R.id.share_text_field);
         this.textView.setGravity(Gravity.CENTER);
@@ -292,6 +267,83 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
     }
 
     @Override
+    public boolean onTouch(View v, MotionEvent event){
+        if(ShareActivity.this.isSoundCaptured)
+        {
+            return false;
+        }
+
+        Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(Utils.VIBRATION_DURATION);
+
+        if (event.getAction() == MotionEvent.ACTION_DOWN)
+        {
+
+            restoreAlpha(AUDIO_CODE);
+
+            try
+            {
+                audio_filename = Utils.createAudioFile(ShareActivity.AUDIO_FORMAT, ShareActivity.this).getAbsolutePath(); //Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + System.currentTimeMillis() + ".3gp";
+                audioRec = new MediaRecorder();
+                audioRec.setAudioSource(MediaRecorder.AudioSource.MIC);
+                audioRec.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                audioRec.setOutputFile(audio_filename);
+                audioRec.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+                audioRec.prepare();
+            } catch (IOException ioe)
+            {
+                ioe.printStackTrace();
+                Toast.makeText(mContext, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
+                Log.e(TAG, ERROR_WHILE_RECORDING_TEXT);
+            }
+            audioRec.start();
+        }
+        else if(event.getAction() == MotionEvent.ACTION_UP)
+        {
+            if(audioRec == null)
+            {
+                Toast.makeText(mContext, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
+                Log.v(TAG, ERROR_WHILE_RECORDING_TEXT);
+                return true;
+            }
+            else try
+            {
+                audioRec.stop();
+                audioRec.release();
+                audioRec = null;
+            }
+            catch(RuntimeException re)
+            {
+                re.printStackTrace();
+                Toast.makeText(mContext, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
+                return true;
+            }
+            ((ImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.mic_green_taken));
+            File audio_file = new File(audio_filename);
+            try
+            {
+                FileInputStream inStream = new FileInputStream(audio_file);
+                ShareActivity.this.setAudio(audio_filename);
+
+                changeAlphaBasedOnSelection(AUDIO_CODE);
+
+                inStream.close();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        if(v.getId() == R.id.vid_button) shootVid(v);
+        else if(v.getId() == R.id.pic_button) takePic(v);
+        else if(v.getId() == R.id.phone_button) getMedia(v);
+    }
+
+    @Override
     public boolean onLongClick(final View v)
     {
 
@@ -314,6 +366,10 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
                         else if (v.getId() == ShareActivity.this.vidButton.getId())
                         {
                             ShareActivity.this.setVideo(null);
+                        }
+                        else if(v.getId() == ShareActivity.this.phoneButton.getId())
+                        {
+                            setPhoneMedia(null);
                         }
 
                         restoreAlpha(-1);
@@ -372,7 +428,8 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
 
     private boolean canShare(Location current_location){
         //if there is no content
-        if(this.textView.getText().toString().length() == 0 && !isPicTaken && !isVideoShoot && !isSoundCaptured)
+        if(this.textView.getText().toString().length() == 0 && !isPicTaken
+                && !isVideoShoot && !isSoundCaptured && !isPhoneMediaSelected)
         {
             Map<String, String> dimensions = new HashMap<>(1);
             dimensions.put("reason", "Share without any content");
@@ -425,12 +482,6 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
         final String category = spinner.getSelectedItem().toString();
 
         f.setFbId(FacebookUtils.getInstance().getCurrentUserId());
-        FacebookUtils.getInstance().getFacebookUsernameFromID(FacebookUtils.getInstance().getCurrentUserId(), new FacebookUtilCallback() {
-            @Override
-            public void onResult(String result, Exception e) {
-                f.setFbName(result);
-            }
-        });
         f.setCategory(category);
         f.setLocation(p);
         f.setText(this.textView.getText().toString());
@@ -470,6 +521,16 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
             }
             else if(isVideoShoot){
                 Toast.makeText(mContext, VIDEO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
+                return;
+            }
+            if( isPhoneMediaSelected && this.phoneMedia != null){
+                Log.v(TAG, "Successfully retrieved media.");
+                //ParseFile parse_pic = new ParseFile(this.pic.getName(), Utils.convertFileToByteArray(this.pic));
+                uploader.setPhoneMediaFile(this.phoneMedia);
+                //f.setPictureFile(parse_pic);
+            }
+            else if( isPhoneMediaSelected ){ // equals isPicTaken && pic == null)
+                Toast.makeText(mContext, PHONE_MEDIA_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
                 return;
             }
         }
@@ -561,7 +622,7 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
 
     }
 
-
+/*
     public void hideKeyboard()
     {
         if(this.getCurrentFocus()!=null)
@@ -570,7 +631,7 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
             inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
         }
     }
-
+*/
 
     public void takePic(View v)
     {
@@ -583,7 +644,7 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
         if(takePicture.resolveActivity(this.getPackageManager()) != null){
             this.imageFile = null;
             try{
-                this.imageFile = Utils.createImageFile(ShareFragment.PICTURE_FORMAT);
+                this.imageFile = Utils.createImageFile(ShareActivity.PICTURE_FORMAT);
             }
             catch (IOException e){
                 Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -610,6 +671,27 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
             startActivityForResult(videoIntent, Utils.VID_SHOOT_REQUEST_CODE);
         }
 
+    }
+
+    private void getMedia(View v) {
+        Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(Utils.VIBRATION_DURATION);
+
+        restoreAlpha(PHONE_MEDIA_CODE);
+
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        try {
+            startActivityForResult(
+                    Intent.createChooser(intent, "Select a File to Upload"),
+                    Utils.PHONE_MEDIA_REQUEST_CODE);
+        } catch (android.content.ActivityNotFoundException ex) {
+            // no file manager installed
+            Log.e(TAG, ex.getMessage());
+            Toast.makeText(mContext, "Please install a File Manager", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -645,22 +727,156 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
         else if(requestCode == Utils.VID_SHOOT_REQUEST_CODE && resultCode == RESULT_CANCELED){
             Log.v(TAG, "Video Intent canceled");
         }
-    }
+        else if(requestCode ==  Utils.PHONE_MEDIA_REQUEST_CODE && resultCode == Activity.RESULT_OK){
+            Uri mediaUri = data.getData();
+            String mediaPath = getPath(mContext, mediaUri);
+            if(new File(mediaPath) != null) {
 
-    @Deprecated
-    private static String getRealPathFromURI(Context context, Uri contentUri) {
-        Cursor cursor = null;
-        try {
-            String[] proj = { MediaStore.Video.Media.DATA };
-            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
-            cursor.moveToFirst();
-            return cursor.getString(column_index);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
+                this.setPhoneMedia(mediaPath);
+
+                changeAlphaBasedOnSelection(PHONE_MEDIA_CODE);
+
+                Log.d(TAG, "Media Path selected: " + mediaPath);
+                Log.d(TAG, "Media Path selected(Uri): " + mediaUri.getPath());
+
+            }else{
+                Toast.makeText(mContext, "Invalid Media Selected", Toast.LENGTH_SHORT).show();
             }
         }
+        else if(requestCode == Utils.PHONE_MEDIA_REQUEST_CODE && resultCode == Activity.RESULT_CANCELED){
+            Log.v(TAG, "Phone Media Intent canceled");
+        }
+    }
+
+    //from the open source library aFileChooser: https://github.com/iPaulPro/aFileChooser
+    /**
+     * Get a file path from a Uri. This will get the the path for Storage Access
+     * Framework Documents, as well as the _data field for the MediaStore and
+     * other file-based ContentProviders.
+     *
+     * @param context The context.
+     * @param uri The Uri to query.
+     * @author paulburke
+     */
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public static String getPath(final Context context, final Uri uri) {
+
+        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+
+        // DocumentProvider
+        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+            // ExternalStorageProvider
+            if (isExternalStorageDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                if ("primary".equalsIgnoreCase(type)) {
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+                }
+
+                // TODO handle non-primary volumes
+            }
+            // DownloadsProvider
+            else if (isDownloadsDocument(uri)) {
+
+                final String id = DocumentsContract.getDocumentId(uri);
+                final Uri contentUri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+
+                return getDataColumn(context, contentUri, null, null);
+            }
+            // MediaProvider
+            else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                Uri contentUri = null;
+                if ("image".equals(type)) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+
+                final String selection = "_id=?";
+                final String[] selectionArgs = new String[] {
+                        split[1]
+                };
+
+                return getDataColumn(context, contentUri, selection, selectionArgs);
+            }
+        }
+        // MediaStore (and general)
+        else if ("content".equalsIgnoreCase(uri.getScheme())) {
+            return getDataColumn(context, uri, null, null);
+        }
+        // File
+        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the value of the data column for this Uri. This is useful for
+     * MediaStore Uris, and other file-based ContentProviders.
+     *
+     * @param context The context.
+     * @param uri The Uri to query.
+     * @param selection (Optional) Filter used in the query.
+     * @param selectionArgs (Optional) Selection arguments used in the query.
+     * @return The value of the _data column, which is typically a file path.
+     */
+    public static String getDataColumn(Context context, Uri uri, String selection,
+                                       String[] selectionArgs) {
+
+        Cursor cursor = null;
+        final String column = "_data";
+        final String[] projection = {
+                column
+        };
+
+        try {
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                    null);
+            if (cursor != null && cursor.moveToFirst()) {
+                final int column_index = cursor.getColumnIndexOrThrow(column);
+                return cursor.getString(column_index);
+            }
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+        return null;
+    }
+
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is ExternalStorageProvider.
+     */
+    public static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is DownloadsProvider.
+     */
+    public static boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is MediaProvider.
+     */
+    public static boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 
     private void changeAlphaBasedOnSelection(int media_code)
@@ -670,35 +886,83 @@ public class ShareActivity extends Activity implements View.OnLongClickListener 
             case PIC_CODE:
                 this.setVideo(null);
                 this.setAudio(null);
+                this.setPhoneMedia(null);
 
                 this.vidButton.setAlpha(0.5f);
                 this.micButton.setAlpha(0.5f);
+                this.phoneButton.setAlpha(0.5f);
+
+                this.phoneButton.setEnabled(false);
+                this.vidButton.setEnabled(false);
+                this.micButton.setEnabled(false);
 
                 break;
 
             case AUDIO_CODE:
                 this.setPicture(null);
                 this.setVideo(null);
+                this.setPhoneMedia(null);
 
                 this.picButton.setAlpha(0.5f);
                 this.vidButton.setAlpha(0.5f);
+                this.phoneButton.setAlpha(0.5f);
+
+                this.phoneButton.setEnabled(false);
+                this.micButton.setEnabled(false);
+                this.vidButton.setEnabled(false);
 
                 break;
 
             case VIDEO_CODE:
                 this.setPicture(null);
                 this.setAudio(null);
+                this.setPhoneMedia(null);
 
                 this.picButton.setAlpha(0.5f);
                 this.micButton.setAlpha(0.5f);
+                this.phoneButton.setAlpha(0.5f);
+
+                this.phoneButton.setEnabled(false);
+                this.micButton.setEnabled(false);
+                this.micButton.setEnabled(false);
+
+                break;
+
+            case PHONE_MEDIA_CODE:
+                this.setPicture(null);
+                this.setAudio(null);
+                this.setVideo(null);
+
+                this.picButton.setAlpha(0.5f);
+                this.micButton.setAlpha(0.5f);
+                this.vidButton.setAlpha(0.5f);
+
+                this.micButton.setEnabled(false);
+                this.vidButton.setEnabled(false);
+                this.micButton.setEnabled(false);
+
+                break;
         }
     }
 
     private void restoreAlpha(int media_code)
     {
-        if(media_code == -1 || media_code == PIC_CODE) this.picButton.setAlpha(1f);
-        if(media_code == -1 || media_code == AUDIO_CODE) this.micButton.setAlpha(1f);
-        if(media_code == -1 || media_code == VIDEO_CODE) this.vidButton.setAlpha(1f);
+        if(media_code == -1 || media_code == PIC_CODE){
+            this.picButton.setAlpha(1f);
+            this.picButton.setEnabled(true);
+        }
+        if(media_code == -1 || media_code == AUDIO_CODE){
+            this.micButton.setAlpha(1f);
+            this.micButton.setEnabled(true);
+        }
+        if(media_code == -1 || media_code == VIDEO_CODE){
+            this.vidButton.setAlpha(1f);
+            this.vidButton.setEnabled(true);
+        }
+        if(media_code == -1 || media_code == PHONE_MEDIA_CODE){
+            this.phoneButton.setAlpha(1f);
+            this.phoneButton.setEnabled(true);
+        }
     }
 
 }

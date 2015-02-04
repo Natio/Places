@@ -62,9 +62,9 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     }
 
 
-    public ShareFragment getShareFragment(){
-        return (ShareFragment)this.fragments[0];
-    }
+    /*public ShareFragment2 getShareFragment(){
+        return (ShareFragment2)this.fragments[0];
+    }*/
 
     public MosaicFragment getMosaicFragment(){ return (MosaicFragment)this.fragments[1]; }
 
@@ -94,7 +94,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
             Log.d(TAG, savedInstanceState.toString());
             List<Fragment> fragments = this.getSupportFragmentManager().getFragments();
             for(Fragment f : fragments){
-                if(f.getClass() == ShareFragment.class){
+               /* if(f.getClass() == ShareFragment2.class){
                     this.fragments[0] = f;
                 }
                 else if(f.getClass() == MMapFragment.class){
@@ -102,11 +102,11 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                 }
                 else if(f.getClass() == MosaicFragment.class){
                     this.fragments[1] = f;
-                }
+                }*/
             }
         }
         else{
-            this.fragments = new Fragment[]{new ShareFragment(), new MosaicFragment(), new MMapFragment()};
+            //this.fragments = new Fragment[]{new ShareFragment2(), new MosaicFragment(), new MMapFragment()};
         }
 
 
@@ -121,7 +121,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         if(ParseFacebookUtils.getSession() != null && ParseFacebookUtils.getSession().isOpened()){
             this.startDownloadingFacebookInfo();
         }
-
+/*
         if(savedInstanceState != null && this.getShareFragment().isAdded())
         {
             this.getShareFragment().setPicture(savedInstanceState.getString("pic"));
@@ -129,7 +129,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
             this.getShareFragment().setVideo(savedInstanceState.getString("video"));
 
         }
-
+*/
 
 
 
@@ -174,9 +174,9 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
     {
         super.onSaveInstanceState(outState);
 
-        outState.putString("audio", this.getShareFragment().getAudioPath());
-        outState.putString("pic", this.getShareFragment().getPicPath());
-        outState.putString("video", this.getShareFragment().getVideoPath());
+        //outState.putString("audio", this.getShareFragment().getAudioPath());
+        //outState.putString("pic", this.getShareFragment().getPicPath());
+        //outState.putString("video", this.getShareFragment().getVideoPath());
     }
 
     @Override
@@ -382,7 +382,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
         if(takePicture.resolveActivity(this.getPackageManager()) != null){
             this.imageFile = null;
             try{
-                this.imageFile = Utils.createImageFile(ShareFragment.PICTURE_FORMAT);
+                this.imageFile = Utils.createImageFile(ShareActivity.PICTURE_FORMAT);
             }
             catch (IOException e){
                 Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -418,7 +418,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
                         this.getShareFragment().setPicture(stream.toByteArray());*/
-                        this.getShareFragment().setPicture(this.imageFile.getAbsolutePath());
+                        //this.getShareFragment().setPicture(this.imageFile.getAbsolutePath());
                         this.imageFile = null;
 
                        break;
@@ -445,7 +445,7 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                         //File file = new File(getRealPathFromURI(this, videoUri));
                         //FileInputStream inStream = new FileInputStream(file);
                         String videoPath = this.getRealPathFromURI(this, videoUri);
-                        this.getShareFragment().setVideo(videoPath);
+                        //this.getShareFragment().setVideo(videoPath);
 
                         break;
                     case RESULT_CANCELED:

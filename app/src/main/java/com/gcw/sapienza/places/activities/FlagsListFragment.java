@@ -26,7 +26,7 @@ import com.gcw.sapienza.places.FlagActivity;
 import com.gcw.sapienza.places.FlagFragment;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
-import com.gcw.sapienza.places.ShareFragment;
+import com.gcw.sapienza.places.ShareActivity;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.model.FlagReport;
 import com.gcw.sapienza.places.services.LocationService;
@@ -35,7 +35,6 @@ import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.DeleteCallback;
-import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -328,7 +327,6 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder> {
         @Override
         public void onClick(View v)
         {
-            Intent intent = new Intent(mainActivity, FlagActivity.class);
 
             Date date = mFlag.getDate();
             DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
@@ -350,7 +348,7 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder> {
             {
                 ParseFile pic_file;
                 if((pic_file = mFlag.getPic()) != null){
-                    File temp = File.createTempFile("places_temp_pic", ShareFragment.PICTURE_FORMAT, mainActivity.getCacheDir());
+                    File temp = File.createTempFile("places_temp_pic", ShareActivity.PICTURE_FORMAT, mainActivity.getCacheDir());
                     temp.deleteOnExit();
 
                     FileOutputStream outStream = new FileOutputStream(temp);
@@ -362,7 +360,7 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder> {
 
                 ParseFile audio_file;
                 if((audio_file = mFlag.getAudio()) != null){
-                    File temp = File.createTempFile("places_temp_audio", ShareFragment.AUDIO_FORMAT, mainActivity.getCacheDir());
+                    File temp = File.createTempFile("places_temp_audio", ShareActivity.AUDIO_FORMAT, mainActivity.getCacheDir());
                     temp.deleteOnExit();
 
                     FileOutputStream outStream = new FileOutputStream(temp);
@@ -375,7 +373,7 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder> {
                 ParseFile video_file;
                 if((video_file = mFlag.getVideo()) != null)
                 {
-                    File temp = File.createTempFile("places_temp_video", ShareFragment.VIDEO_FORMAT, mainActivity.getCacheDir());
+                    File temp = File.createTempFile("places_temp_video", ShareActivity.VIDEO_FORMAT, mainActivity.getCacheDir());
                     temp.deleteOnExit();
 
                     FileOutputStream outStream = new FileOutputStream(temp);
@@ -404,7 +402,6 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder> {
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 //            flagsAdapter.setSelectedFlagIndex(getPosition());
             menu.setHeaderTitle("Edit");
             flagAdapter.setSelectedFlagIndex(getPosition());
