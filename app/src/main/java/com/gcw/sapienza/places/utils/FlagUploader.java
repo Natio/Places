@@ -158,7 +158,15 @@ public class FlagUploader {
         this.callbacks = cbk;
         this.isUploading = true;
 
-        this.loadFileLoop();
+        FacebookUtils.getInstance().getFacebookUsernameFromID(FacebookUtils.getInstance().getCurrentUserId(), new FacebookUtilCallback() {
+            @Override
+            public void onResult(String result, Exception e) {
+                FlagUploader.this.flag.setFbName(result);
+                FlagUploader.this.loadFileLoop();
+            }
+        });
+
+
 
     }
 
