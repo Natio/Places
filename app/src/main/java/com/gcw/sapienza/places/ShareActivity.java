@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.media.MediaRecorder;
 import android.net.Uri;
@@ -17,6 +19,7 @@ import android.os.Environment;
 import android.os.Vibrator;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -47,7 +50,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class ShareActivity extends Activity implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
+public class ShareActivity extends ActionBarActivity implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 {
 
     private static final String TAG = "ShareActivity";
@@ -182,10 +185,10 @@ public class ShareActivity extends Activity implements View.OnLongClickListener,
 
         if(this.phoneButton != null)
         {
-            int res =R.drawable.cam_selector;
+            int res =R.drawable.attach_selector;
             if(this.isPhoneMediaSelected)
             {
-                res = R.drawable.camera_green_taken;
+                res = R.drawable.attach_taken;
             }
 
             this.phoneButton.setImageDrawable( getResources().getDrawable(res));
@@ -225,6 +228,7 @@ public class ShareActivity extends Activity implements View.OnLongClickListener,
         this.micButton = (ImageButton)findViewById(R.id.mic_button);
         this.vidButton = (ImageButton)findViewById(R.id.vid_button);
         this.phoneButton = (ImageButton)findViewById(R.id.phone_button);
+        this.getSupportActionBar().setTitle("Places");
 
         //these lines are necessary for a correct visualization
         this.setPicture(this.getPicPath());
@@ -264,6 +268,8 @@ public class ShareActivity extends Activity implements View.OnLongClickListener,
         MSpinnerAdapter adapter = new MSpinnerAdapter(mContext, Arrays.asList(getResources().getStringArray(R.array.categories)));
 
         this.spinner.setAdapter(adapter);
+
+        this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#00884a")));
     }
 
     @Override
