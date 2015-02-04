@@ -6,7 +6,11 @@
 //});
 
 Parse.Cloud.beforeSave("Posts", function(request, response) {
-  if (request.object.get("text").length < 5) {
+  if (request.object.get("text").length < 5 
+    && request.object.get("audio") == null
+    && request.object.get("picture") == null
+    && request.object.get("video") == null
+    && request.object.get("phone_media") == null) {
     response.error("Please, write something meaningful ;)");
   } else {
     response.success();

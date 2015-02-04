@@ -37,7 +37,7 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
     private static final String TAG = "VideoCaptureActivity";
 
     private static final int MAX_VIDEO_LENGTH = 60000;
-    private static final int MAX_VIDEO_LENGTH_HD = 20000;
+    private static final int MAX_VIDEO_LENGTH_HD = 24000;
 
     private static final int VIDEO_FPS = 20;
     private static final int VIDEO_FPS_HD = 24;
