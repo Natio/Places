@@ -46,8 +46,7 @@ Parse.Cloud.beforeDelete("Posts", function(request, response) {
     success: function(post){
         var Deleted_Posts = Parse.Object.extend("Deleted_Posts");
         var delpost = new Deleted_Posts();
-        delpost.set("previousObjectId", post[0].get("objectId"));
-        delpost.set("previousCreatedAt", post[0].get("createdAt"));
+        delpost.set("previousObjectId", post[0].id);
         delpost.set("category", post[0].get("category"));
         delpost.set("fbId", post[0].get("fbId"));
         delpost.set("fbName", post[0].get("fbName"));
@@ -75,4 +74,20 @@ Parse.Cloud.beforeDelete("Posts", function(request, response) {
       response.error("An error occurred while deleting the Flag");
     }
   });
+});
+
+Parse.Cloud.afterSave("Reported_Posts", function(request, status) {
+    var post = request.object.get("reported_flag");
+    query = new Parse.Query("Reported_Posts");
+    query.equalTo("reported_flag", post);
+    query.count({
+        success: function(count){
+            if(count >= 10){
+                alert("Post with id: " + post.id + " has been reported " + count + " times");
+            }
+        },
+        error: function(error){
+            console.error("Error while counting reports " + error.code + ": " + error.message);
+        }
+    });
 });
