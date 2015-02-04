@@ -12,11 +12,15 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gcw.sapienza.places.FlagActivity;
 import com.gcw.sapienza.places.FlagFragment;
@@ -24,11 +28,20 @@ import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.ShareFragment;
 import com.gcw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.model.FlagReport;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.CropCircleTransformation;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
+import com.gcw.sapienza.places.utils.Utils;
+import com.parse.DeleteCallback;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
@@ -47,6 +60,11 @@ import java.util.Locale;
 public class FlagsListFragment extends Fragment {
 
     private static final String TAG = "FlagsListFragment";
+    private static final String NO_VALID_FLAG_SELECTED = "No valid Flag selected";
+
+    private static final String FLAG_DELETED = "Flag deleted";
+    private static final String FLAG_REPORTED = "Flag reported";
+    private static final String FLAG_REPORT_REVOKED = "Flag report revoked";
 
     private RecyclerView recycleView;
 
@@ -79,6 +97,8 @@ public class FlagsListFragment extends Fragment {
 
         this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getFlags());
 
+        registerForContextMenu(recycleView);
+
         return view;
     }
 
@@ -89,25 +109,139 @@ public class FlagsListFragment extends Fragment {
     }
 
     public void updateRecycleViewWithNewContents(List<Flag> l){
-        this.recycleView.setAdapter(new FlagsAdapter(l, this.getActivity()));
+        this.recycleView.setAdapter(new FlagsAdapter(l, recycleView, getActivity()));
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        FlagsAdapter fa = (FlagsAdapter)recycleView.getAdapter();
+        Flag sel_usr = fa.getSelectedFlag();
+
+        if(sel_usr == null) Toast.makeText(getActivity(), NO_VALID_FLAG_SELECTED, Toast.LENGTH_SHORT).show();
+
+        switch (item.getItemId()) {
+
+            case Utils.DELETE_FLAG:
+                this.deleteFlag(sel_usr);
+                fa.setSelectedFlagIndex(-1);
+                return true;
+
+            case Utils.REPORT_FLAG:
+                this.reportFlag(sel_usr);
+                fa.setSelectedFlagIndex(-1);
+                return true;
+
+            case Utils.DELETE_REPORT_FLAG:
+                this.deleteReportFlag(sel_usr);
+                fa.setSelectedFlagIndex(-1);
+                return true;
+
+            default:
+                fa.setSelectedFlagIndex(-1);
+                return super.onContextItemSelected(item);
+        }
+    }
+
+    /**
+     * Deletes the Flag
+     * @param f flag to delete
+     */
+    private void deleteFlag(Flag f){
+        f.deleteInBackground(new DeleteCallback() {
+            @Override
+            public void done(com.parse.ParseException e) {
+                if(e == null) {
+                    Toast.makeText(recycleView.getContext(), FLAG_DELETED, Toast.LENGTH_SHORT).show();
+                    ((MainActivity2)getActivity()).refresh();
+                }else
+                    Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Reports a flag
+     * @param f flag to report
+     */
+    private void reportFlag(final Flag f){
+
+        FlagReport report = FlagReport.createFlagReportFromFlag(f);
+        report.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null) {
+                    Toast.makeText(recycleView.getContext(), FLAG_REPORTED, Toast.LENGTH_SHORT).show();
+                }else
+                    Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Deletes an entry from the Reported_Posts table
+     * @param f flag related to the entry to be deleted
+     */
+    private void deleteReportFlag(Flag f) {
+        ParseQuery<ParseObject> queryDelete = ParseQuery.getQuery("Reported_Posts");
+
+        queryDelete.whereEqualTo("reported_by", ParseUser.getCurrentUser());
+        queryDelete.whereEqualTo("reported_flag", f);
+
+        queryDelete.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> parseObjects, ParseException e) {
+                if(e == null) {
+                    for (ParseObject p : parseObjects) {
+                        p.deleteInBackground(new DeleteCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e == null) {
+                                    Toast.makeText(recycleView.getContext(), FLAG_REPORT_REVOKED, Toast.LENGTH_SHORT).show();
+                                } else
+                                    Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }else{
+                    Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }
 
-class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
+class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder> {
     private static final String TAG = "FlagsAdapter";
     private final List<Flag> flags;
+    private final View view;
     private final Activity mainActivity;
     private final Transformation transformation = new CropCircleTransformation();
 
-    public FlagsAdapter(List<Flag> list, Activity ctx){
+    private int selectedFlagIndex;
+
+    public FlagsAdapter(List<Flag> list, View v, Activity mainActivity){
         this.flags = list;
-        this.mainActivity = ctx;
+        this.view = v;
+        this.mainActivity = mainActivity;
     }
 
+    public Flag getSelectedFlag() {
+        try{
+            return flags.get(selectedFlagIndex);
+        }
+        catch (IndexOutOfBoundsException e){
+            Log.e(TAG, e.getMessage());
+            return null;
+        }
+    }
+    public void setSelectedFlagIndex(int i){ selectedFlagIndex = i;}
 
     @Override
     public void onBindViewHolder(final FlagsViewHolder flagViewHolder, int i) {
         Flag f = this.flags.get(i);
+
+        flagViewHolder.flagAdapter = this;
+
         flagViewHolder.main_text.setText(f.getText());
 
         String user_id = f.getFbId();
@@ -124,14 +258,14 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
         FacebookUtils.getInstance().getFbProfilePictureURL(user_id, FacebookUtils.PicSize.SMALL, new FacebookUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
-                Picasso.with(FlagsAdapter.this.mainActivity).load(result).transform(transformation).into(flagViewHolder.user_profile_pic);
+                Picasso.with(FlagsAdapter.this.view.getContext()).load(result).transform(transformation).into(flagViewHolder.user_profile_pic);
             }
         });
 
         ParseFile pic = f.getPic();
         if(pic != null){
             String url = pic.getUrl();
-            Picasso.with(this.mainActivity).load(url).into(flagViewHolder.main_image);
+            Picasso.with(this.view.getContext()).load(url).into(flagViewHolder.main_image);
             flagViewHolder.main_image.setVisibility(View.VISIBLE);
         }
         else{
@@ -163,14 +297,15 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
         return new FlagsViewHolder(itemView, this.flags.get(i), mainActivity);
     }
 
-    public static class FlagsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public static class FlagsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnCreateContextMenuListener{
 
         protected final TextView main_text;
         protected final TextView username;
         protected final ImageView user_profile_pic;
         protected final ImageView main_image;
-
         private final Activity mainActivity;
+
+        protected FlagsAdapter flagAdapter;
 
         private Flag mFlag;
 
@@ -187,6 +322,8 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
             this.user_profile_pic = (ImageView) v.findViewById(R.id.card_profile_pic);
             this.username = (TextView) v.findViewById(R.id.card_textView_username);
             this.main_text = (TextView) v.findViewById(R.id.card_textView_text);
+
+            v.setOnCreateContextMenuListener(this);
         }
 
         @Override
@@ -264,6 +401,45 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder>{
             frag.setArguments(bundle);
 
             ((MainActivity2)mainActivity).switchToFlagFrag(frag);
+        }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+//            flagsAdapter.setSelectedFlagIndex(getPosition());
+            menu.setHeaderTitle("Edit");
+            flagAdapter.setSelectedFlagIndex(getPosition());
+            Log.d(TAG, "Item position: " + getPosition());
+            String fb_id = mFlag.getFbId();
+            //        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+            //        Flag sel_usr = (Flag)(recycleView.getItemAtPosition(info.position));
+            //        String fb_id = sel_usr.getFbId();
+            //
+            if(FacebookUtils.getInstance().getCurrentUserId().equals(fb_id)) {
+                menu.add(0, Utils.DELETE_FLAG, 0, "Delete Flag");
+            }else {
+                Log.d(TAG, "Username: " + ParseUser.getCurrentUser().getUsername());
+                Log.d(TAG, "objectId: " + mFlag.getObjectId());
+
+                ParseQuery<ParseObject> queryDelete = ParseQuery.getQuery("Reported_Posts");
+                
+                queryDelete.whereEqualTo("reported_by", ParseUser.getCurrentUser());
+                queryDelete.whereEqualTo("reported_flag", mFlag);
+
+                try {
+                    if(queryDelete.count() == 0){
+                        menu.add(0, Utils.REPORT_FLAG, 0, "Report Flag as inappropriate");
+                    }else{
+                        menu.add(0, Utils.DELETE_REPORT_FLAG, 0, "Revoke Flag report");
+                    }
+                } catch (ParseException e) {
+                    Log.e(TAG, e.getMessage());
+                }
+            }/*else{
+                menu.add(0, Utils.DELETE_REPORT_FLAG, 0, "Revoke Flag report");
+
+            }*/
+            //        inflater.inflate(R.menu.context_menu, menu);
         }
     }
 }
