@@ -115,6 +115,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener {
         frameLayout = (RelativeLayout)view.findViewById(R.id.frame_layout);
 
         iw.setOnClickListener(this);
+        frameLayout.setOnClickListener(this);
 
         if(mediaType == MediaType.NONE || mediaType == MediaType.AUDIO)
         {
@@ -159,7 +160,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v)
     {
-        if(frameLayout.getVisibility() == View.VISIBLE)
+        if(v.getId() == R.id.frame_layout)
         {
             frameLayout.setVisibility(View.GONE);
         }
