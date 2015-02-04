@@ -195,6 +195,7 @@ public class ShareFragment2 extends Fragment implements View.OnLongClickListener
             int res =R.drawable.cam_selector;
             if(this.isPhoneMediaSelected)
             {
+                //metti attach taken
                 res = R.drawable.camera_green_taken;
             }
 

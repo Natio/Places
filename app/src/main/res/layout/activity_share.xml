@@ -110,7 +110,8 @@
         android:textSize="60sp"
         android:textColor="@color/white"
         android:id="@+id/share_button"
-        android:layout_weight="0.05" />
+        android:layout_weight="0.05"
+        android:fontFamily="No" />
 
     <RelativeLayout
         android:id="@+id/frame_layout"
