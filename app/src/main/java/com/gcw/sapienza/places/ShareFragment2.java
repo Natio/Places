@@ -192,11 +192,10 @@ public class ShareFragment2 extends Fragment implements View.OnLongClickListener
 
         if(this.phoneButton != null)
         {
-            int res =R.drawable.cam_selector;
+            int res =R.drawable.attach_selector;
             if(this.isPhoneMediaSelected)
             {
-                //metti attach taken
-                res = R.drawable.camera_green_taken;
+                res = R.drawable.attach_taken;
             }
 
             this.phoneButton.setImageDrawable( getResources().getDrawable(res));
