@@ -331,7 +331,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         else if(item.getItemId() == R.id.action_add_flag)
         {
             // startActivity(new Intent(this, ShareActivity.class));
-            item.setVisible(false);
+            // item.setVisible(false);
             switchToShareFragment();
         }
 
@@ -515,7 +515,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         }
     }
 
-    private void switchToListMapFrags()
+    private void getRidOfUnusedFrag()
     {
         android.app.Fragment frag1 = this.getFragmentManager().findFragmentByTag(FRAG_TAG);
         Fragment frag2 = this.getSupportFragmentManager().findFragmentByTag(FRAG_TAG);
@@ -523,6 +523,17 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         // TODO We need to check if we need both lines since we got both "fragments" and "support fragments"
         if(frag1 != null) this.getFragmentManager().beginTransaction().remove(frag1).commit();
         else if(frag2!= null) this.getSupportFragmentManager().beginTransaction().remove(frag2).commit();
+    }
+
+    private void switchToFragOtherThanHome()
+    {
+        homeHolder.setVisibility(View.INVISIBLE);
+        fragHolder.setVisibility(View.VISIBLE);
+    }
+
+    private void switchToListMapFrags()
+    {
+        getRidOfUnusedFrag();
 
         homeHolder.setVisibility(View.VISIBLE);
         fragHolder.setVisibility(View.INVISIBLE);
@@ -530,24 +541,24 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
 
     private void switchToSettingsFrag()
     {
-        homeHolder.setVisibility(View.INVISIBLE);
-        fragHolder.setVisibility(View.VISIBLE);
+        getRidOfUnusedFrag();
+        switchToFragOtherThanHome();
 
         this.getFragmentManager().beginTransaction().replace(R.id.frag_container, new SettingsFragment(), FRAG_TAG).commit();
     }
 
     private void switchToShareFragment()
     {
-        homeHolder.setVisibility(View.INVISIBLE);
-        fragHolder.setVisibility(View.VISIBLE);
+        getRidOfUnusedFrag();
+        switchToFragOtherThanHome();
 
         this.getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new ShareFragment2(), FRAG_TAG).commit();
     }
 
     protected void switchToFlagFrag(Fragment frag)
     {
-        homeHolder.setVisibility(View.INVISIBLE);
-        fragHolder.setVisibility(View.VISIBLE);
+        getRidOfUnusedFrag();
+        switchToFragOtherThanHome();
 
         this.getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, frag, FRAG_TAG).commit();
     }
