@@ -38,9 +38,9 @@ public class Utils
 
     public static final int VIBRATION_DURATION = 0; // I didn't like it that much
 
-    public static final int DELETE_POST = 0;
-    public static final int REPORT_POST = 1;
-    public static final int REMOVE_REPORT_POST = 2;
+    public static final int DELETE_FLAG = 0;
+    public static final int REPORT_FLAG = 1;
+    public static final int DELETE_REPORT_FLAG = 2;
 
     protected static final int CHUNK_SIZE = 4096;
 

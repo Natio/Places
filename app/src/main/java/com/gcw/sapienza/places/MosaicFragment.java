@@ -113,9 +113,9 @@ public class MosaicFragment extends Fragment implements  AdapterView.OnItemClick
         String fb_id = sel_usr.getFbId();
 
         if(FacebookUtils.getInstance().getCurrentUserId().equals(fb_id)) {
-            menu.add(0, Utils.DELETE_POST, 0, "Delete Flag");
+            menu.add(0, Utils.DELETE_FLAG, 0, "Delete Flag");
         }else {
-            menu.add(0, Utils.REPORT_POST, 0, "Report Flag as inappropriate");
+            menu.add(0, Utils.REPORT_FLAG, 0, "Report Flag as inappropriate");
         }/*else{
             menu.add(0, Utils.REMOVE_REPORT_POST, 0, "Revoke Flag report");
 
@@ -129,11 +129,11 @@ public class MosaicFragment extends Fragment implements  AdapterView.OnItemClick
         Flag sel_usr = (Flag)(listView.getItemAtPosition(info.position));
         switch (item.getItemId()) {
 
-            case Utils.DELETE_POST:
+            case Utils.DELETE_FLAG:
                 this.deleteFlag(sel_usr);
                 return true;
 
-            case Utils.REPORT_POST:
+            case Utils.REPORT_FLAG:
                 this.reportFlag(sel_usr);
                 return true;
             default:
