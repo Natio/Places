@@ -20,10 +20,9 @@
 
     <EditText
         android:inputType="textMultiLine|textNoSuggestions|textCapSentences"
-        android:layout_marginTop="5dp"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.55"
+        android:layout_weight="0.47"
         android:textSize="25sp"
         android:id="@+id/share_text_field"
         android:gravity="center_vertical|center_horizontal"
@@ -32,11 +31,10 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_weight="0.15"
+        android:layout_weight="0.2"
         android:clickable="true"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dp"
-        android:weightSum="1" >
+        android:weightSum="1"
+        android:paddingBottom="3dp" >
 
         <ImageButton
             android:layout_width="match_parent"
@@ -99,7 +97,7 @@
         android:layout_centerHorizontal="true"
         android:gravity="center_horizontal"
         android:textAlignment="gravity"
-        android:layout_weight="0.15" />
+        android:layout_weight="0.18" />
 
     <Button
         style="?android:attr/borderlessButtonStyle"
@@ -118,8 +116,7 @@
         android:id="@+id/frame_layout"
         android:animateLayoutChanges="true"
         android:visibility="gone"
-        android:alpha="0.5"
-        android:background="@color/green"
+        android:background="@color/transparent_green"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

@@ -8,11 +8,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -28,7 +33,7 @@ import java.net.URL;
 /**
  * Created by mic_head on 02/02/15.
  */
-public class FlagFragment extends Fragment {
+public class FlagFragment extends Fragment implements View.OnClickListener {
 
     private String text;
     private String id;
@@ -46,6 +51,12 @@ public class FlagFragment extends Fragment {
     private TextView authorTextView;
     private EditText flagText;
     private ImageView profilePicimageView;
+    private RelativeLayout frameLayout;
+
+    private ImageView focused_iw;
+
+    private enum MediaType{ PIC, AUDIO, VIDEO, NONE }
+    private MediaType mediaType;
 
     private View view;
 
@@ -64,9 +75,29 @@ public class FlagFragment extends Fragment {
         date = bundle.getString("date");
         weather = bundle.getString("weather");
         category = bundle.getString("category");
+
         pic_path = bundle.getString("picture");
+        if(pic_path != null )
+        {
+            mediaType = MediaType.PIC;
+            return;
+        }
+
         video_path = bundle.getString("video");
+        if(video_path != null )
+        {
+            mediaType = MediaType.VIDEO;
+            return;
+        }
+
         audio_path = bundle.getString("audio");
+        if(audio_path != null )
+        {
+            mediaType = MediaType.AUDIO;
+            return;
+        }
+
+        mediaType = MediaType.NONE;
     }
 
     @Override
@@ -81,35 +112,35 @@ public class FlagFragment extends Fragment {
         flagText = (EditText)view.findViewById(R.id.text);
         authorTextView = (TextView)view.findViewById(R.id.author);
         profilePicimageView = (ImageView)view.findViewById(R.id.profile_pic);
+        frameLayout = (RelativeLayout)view.findViewById(R.id.frame_layout);
 
-        flagText.setText(text);
+        iw.setOnClickListener(this);
+        frameLayout.setOnClickListener(this);
 
-        if(this.pic_path != null)
+        if(mediaType == MediaType.NONE || mediaType == MediaType.AUDIO)
         {
-            //pic = new byte[bundle.getByteArray("picture").length];
-            //System.arraycopy(bundle.getByteArray("picture"), 0, pic, 0, pic.length);
-            iw.setImageBitmap(BitmapFactory.decodeFile(this.pic_path));
+            iw.setVisibility(View.GONE);
+            vv.setVisibility(View.GONE);
 
+            if(mediaType == MediaType.AUDIO) playRecording(this.audio_path);
+        }
+        else if(mediaType == MediaType.PIC)
+        {
+            Bitmap bm = BitmapFactory.decodeFile(this.pic_path);
+
+            vv.setVisibility(View.GONE);
+            iw.setImageBitmap(bm);
+
+            focused_iw = (ImageView)view.findViewById(R.id.focused_pic);
+            focused_iw.setImageBitmap(bm);
         }
         else
         {
-            iw.setMaxHeight(0);
-            iw.setMaxWidth(0);
-        }
-
-        if(this.audio_path != null)
-        {
-            //audio = new byte[bundle.getByteArray("audio").length];
-            //System.arraycopy(bundle.getByteArray("audio"), 0, audio, 0, audio.length);
-
-            playRecording(this.audio_path);
-        }
-
-        if(this.video_path != null)
-        {
+            iw.setVisibility(View.GONE);
             playVideo(video_path);
         }
-        else vv.setVisibility(View.INVISIBLE);
+
+        flagText.setText(text);
 
         final String weatherString = (weather == null || weather.isEmpty()) ? "" : "\nWeather: " + weather;
         final String bottomLineText = date + weatherString + "\nCategory: " + category;
@@ -124,6 +155,19 @@ public class FlagFragment extends Fragment {
         FacebookUtils.getInstance().loadProfilePicIntoImageView(this.id, profilePicimageView, FacebookUtils.PicSize.LARGE);
 
         return view;
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        if(v.getId() == R.id.frame_layout)
+        {
+            frameLayout.setVisibility(View.GONE);
+        }
+        else if(v.getId() == R.id.pic)
+        {
+            frameLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     private void playRecording(String audio_path)
