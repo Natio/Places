@@ -116,8 +116,7 @@
         android:id="@+id/frame_layout"
         android:animateLayoutChanges="true"
         android:visibility="gone"
-        android:alpha="0.5"
-        android:background="@color/green"
+        android:background="@color/transparent_green"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
