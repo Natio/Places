@@ -35,7 +35,7 @@
         android:clickable="true"
         android:weightSum="1"
         android:paddingBottom="3dp"
-        android:id="@+id/">
+        android:id="@+id/linear_layout">
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -47,7 +47,7 @@
             android:clickable="true"
             android:scaleType="fitCenter"
             android:layout_weight="0.3"
-            android:layout_margin="22dp" />
+            android:layout_margin="20dp" />
 
         <ImageButton
             android:layout_width="wrap_content"
