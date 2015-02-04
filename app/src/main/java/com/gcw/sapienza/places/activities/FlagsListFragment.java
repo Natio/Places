@@ -36,6 +36,7 @@ import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -187,22 +188,20 @@ public class FlagsListFragment extends Fragment {
         queryDelete.whereEqualTo("reported_by", ParseUser.getCurrentUser());
         queryDelete.whereEqualTo("reported_flag", f);
 
-        queryDelete.findInBackground(new FindCallback<ParseObject>() {
+        queryDelete.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> parseObjects, ParseException e) {
-                if(e == null) {
-                    for (ParseObject p : parseObjects) {
-                        p.deleteInBackground(new DeleteCallback() {
-                            @Override
-                            public void done(ParseException e) {
-                                if (e == null) {
-                                    Toast.makeText(recycleView.getContext(), FLAG_REPORT_REVOKED, Toast.LENGTH_SHORT).show();
-                                } else
-                                    Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                }else{
+            public void done(ParseObject p, ParseException e) {
+                if (e == null) {
+                    p.deleteInBackground(new DeleteCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e == null) {
+                                Toast.makeText(recycleView.getContext(), FLAG_REPORT_REVOKED, Toast.LENGTH_SHORT).show();
+                            } else
+                                Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
                     Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -422,7 +421,7 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder> {
                 Log.d(TAG, "objectId: " + mFlag.getObjectId());
 
                 ParseQuery<ParseObject> queryDelete = ParseQuery.getQuery("Reported_Posts");
-                
+
                 queryDelete.whereEqualTo("reported_by", ParseUser.getCurrentUser());
                 queryDelete.whereEqualTo("reported_flag", mFlag);
 
