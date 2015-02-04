@@ -22,6 +22,7 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -606,7 +607,10 @@ public class ShareFragment2 extends Fragment implements View.OnLongClickListener
         this.setPicture(null);
         this.setVideo(null);
 
-        Log.v(TAG, "Media has been cleared!");
+        this.textView.setText("");
+        this.spinner.setSelection(0);
+
+        Log.v(TAG, "Media, text and category have been cleared!");
     }
 
     protected void onShareFailed(String toastText){
@@ -627,11 +631,12 @@ public class ShareFragment2 extends Fragment implements View.OnLongClickListener
         Toast.makeText(mContext, toastText, Toast.LENGTH_LONG).show();
 
         this.shareButton.setClickable(true);*/
-        Intent returnIntent = new Intent();
-        returnIntent.putExtra("result", toastText);
-        getActivity().setResult(Activity.RESULT_OK, returnIntent);
-        getActivity().finish();
+        // Intent returnIntent = new Intent();
+        // returnIntent.putExtra("result", toastText);
+        // getActivity().setResult(Activity.RESULT_OK, returnIntent);
+        // getActivity().finish();
 
+        Toast.makeText(getActivity(), toastText, Toast.LENGTH_SHORT).show();
     }
 
 
@@ -705,14 +710,32 @@ public class ShareFragment2 extends Fragment implements View.OnLongClickListener
         }
     }
 
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        Menu menu = ((MainActivity2)getActivity()).mMenu;
+
+        if(menu != null)
+        {
+            MenuItem item = ((MainActivity2) getActivity()).mMenu.findItem(R.id.action_add_flag);
+            item.setVisible(false);
+        }
+    }
 
     @Override
     public void onPause()
     {
         super.onPause();
 
-        MenuItem item = ((MainActivity2)getActivity()).mMenu.findItem(R.id.action_add_flag);
-        item.setVisible(true);
+        Menu menu = ((MainActivity2)getActivity()).mMenu;
+
+        if(menu != null)
+        {
+            MenuItem item = ((MainActivity2) getActivity()).mMenu.findItem(R.id.action_add_flag);
+            item.setVisible(true);
+        }
     }
 
     @Override
