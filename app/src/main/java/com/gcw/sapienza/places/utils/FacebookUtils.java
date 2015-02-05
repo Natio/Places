@@ -1,5 +1,8 @@
 package com.gcw.sapienza.places.utils;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
@@ -13,6 +16,7 @@ import com.facebook.model.GraphObject;
 import com.facebook.model.GraphUser;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.parse.ParseFacebookUtils;
+import com.parse.ui.ParseLoginBuilder;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -21,6 +25,7 @@ import org.json.JSONObject;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -54,8 +59,7 @@ public final class FacebookUtils {
 
     private static final FacebookUtils shared_instance = new FacebookUtils();
 
-    private FacebookUtils() {
-    }
+    private FacebookUtils() {}
 
     /**
      * This is a singleton class. This method returns the ONLY instance
@@ -85,12 +89,6 @@ public final class FacebookUtils {
         return this.fbId;
     }
 
-    /**
-     * @return current user's fb name
-     */
-    public String getCurrentUserName() {
-        return this.userIdMap.get(this.fbId);
-    }
 
 
     /**
@@ -426,6 +424,56 @@ public final class FacebookUtils {
         );
 
         req.executeAsync();
+    }
+
+
+    /**
+     *
+     * @return true if the current user is ready
+     */
+    public static boolean isFacebookSessionOpened(){
+        return ParseFacebookUtils.getSession() != null && ParseFacebookUtils.getSession().isOpened();
+    }
+
+
+    public static void downloadFacebookInfo(Context ctx){
+        final ProgressDialog progress = new ProgressDialog(ctx);
+        progress.setTitle("Loading");
+        progress.setMessage("Wait while loading...");
+        progress.show();
+        FacebookUtils.getInstance().makeMeRequest(new FacebookUtilCallback() {
+            @Override
+            public void onResult(String result, Exception e) {
+                if(e != null){
+                    Log.d(TAG, e.getMessage());
+                    progress.setMessage(e.getMessage());
+                }
+                else{
+                    progress.dismiss();
+                    Log.d(TAG, result);
+                }
+            }
+        });
+    }
+
+    /**
+     *
+     * @param activity the activity where to start the intent
+     */
+    public static void startLoginActivity(Activity activity){
+        if(FacebookUtils.isFacebookSessionOpened())
+        {
+            ParseLoginBuilder builder = new ParseLoginBuilder(activity);
+
+            builder.setParseLoginEnabled(false);
+
+            builder.setFacebookLoginEnabled(true);
+            builder.setFacebookLoginPermissions(Arrays.asList("public_profile", "user_friends"/*, "user_relationships", "user_birthday", "user_location"*/));
+
+            // builder.setAppLogo(R.drawable.app_logo);
+
+            activity.startActivityForResult(builder.build(), Utils.LOGIN_REQUEST_CODE);
+        }
     }
 
 }

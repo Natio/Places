@@ -13,6 +13,8 @@ import java.util.Date;
 @ParseClassName("Posts")
 public class Flag extends ParseObject{
 
+    public static final long MAX_FILE_SIZE_BYTES = 10000000;
+
     public static final String AUDIO_KEY = "audio";
     public static final String VIDEO_KEY = "video";
     public static final String PICTURE_KEY= "picture";

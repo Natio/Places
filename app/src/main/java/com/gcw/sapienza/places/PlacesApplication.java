@@ -172,6 +172,9 @@ public class PlacesApplication extends Application{
         ParsePush.subscribeInBackground("Developers"); //TODO developers channel, remove for user version
         subscribeToParseBroadcast();
 
+
+        PlacesApplication.getInstance().startLocationService();
+
     }
 
     private static void subscribeToParseBroadcast() {

@@ -39,7 +39,6 @@ import com.gcw.sapienza.places.ShareActivity;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.services.LocationService;
-import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.maps.GoogleMap;
@@ -50,12 +49,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.parse.ParseFacebookUtils;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
-import com.parse.ui.ParseLoginBuilder;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -100,16 +96,15 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(ParseFacebookUtils.getSession() != null && ParseFacebookUtils.getSession().isOpened())
+        if(FacebookUtils.isFacebookSessionOpened())
         {
-            this.startDownloadingFacebookInfo();
+            FacebookUtils.downloadFacebookInfo(this);
         }
         else
         {
-            this.startLoginActivity();
+            FacebookUtils.startLoginActivity(this);
         }
 
-        PlacesApplication.getInstance().startLocationService();
         setContentView(R.layout.activity_main_drawer_layout);
         this.current_title = this.getTitle();
         this.drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -379,23 +374,6 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         return super.onPrepareOptionsMenu(menu);
     }
 
-    private void startLoginActivity()
-    {
-        if(ParseFacebookUtils.getSession() == null || ParseFacebookUtils.getSession().isClosed())
-        {
-            ParseLoginBuilder builder = new ParseLoginBuilder(this);
-
-            builder.setParseLoginEnabled(false);
-
-            builder.setFacebookLoginEnabled(true);
-            builder.setFacebookLoginPermissions(Arrays.asList("public_profile", "user_friends"/*, "user_relationships", "user_birthday", "user_location"*/));
-
-            // builder.setAppLogo(R.drawable.app_logo);
-
-            startActivityForResult(builder.build(), Utils.LOGIN_REQUEST_CODE);
-        }
-    }
-
     private void logout()
     {
         // Log the user out
@@ -404,28 +382,9 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         FacebookUtils.getInstance().clearUserData();
 
         // Go to the login view
-        startLoginActivity();
+        FacebookUtils.startLoginActivity(this);
     }
 
-    private void startDownloadingFacebookInfo(){
-        final ProgressDialog progress = new ProgressDialog(this);
-        progress.setTitle("Loading");
-        progress.setMessage("Wait while loading...");
-        progress.show();
-        FacebookUtils.getInstance().makeMeRequest(new FacebookUtilCallback() {
-            @Override
-            public void onResult(String result, Exception e) {
-                if(e != null){
-                    Log.d(TAG, e.getMessage());
-                    progress.setMessage(e.getMessage());
-                }
-                else{
-                    progress.dismiss();
-                    Log.d(TAG, result);
-                }
-            }
-        }); // retrieve user's Facebook ID
-    }
 
 
     /** Swaps fragments in the main content view */
@@ -503,7 +462,8 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
             case Utils.LOGIN_REQUEST_CODE:
 
                 if(resultCode == RESULT_OK){
-                    this.startDownloadingFacebookInfo();
+                    //this.startDownloadingFacebookInfo();
+                    FacebookUtils.downloadFacebookInfo(this);
                 }
                 break;
             case SHARE_ACTIVITY_REQUEST_CODE:

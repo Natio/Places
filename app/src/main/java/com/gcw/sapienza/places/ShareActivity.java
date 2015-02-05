@@ -75,8 +75,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     private ImageButton vidButton;
     private ImageButton phoneButton;
 
-    private Context mContext;
-
     private boolean isPicTaken = false;
     private boolean isVideoShoot = false;
     private boolean isSoundCaptured = false;
@@ -212,12 +210,81 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         return this.phoneMedia == null ? null : this.phoneMedia.getAbsolutePath();
     }
 
+    private void handleIntent(){
+        Intent intent = this.getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if ("text/plain".equals(type)) {
+                this.handleShareText(intent);
+            }
+            else if (type.startsWith("image/")) {
+                this.handleShareImage(intent);
+            }
+            else if(type.startsWith("video/")){
+                this.handleShareVideo(intent);
+            }
+
+
+            if(FacebookUtils.isFacebookSessionOpened()){
+                FacebookUtils.downloadFacebookInfo(this);
+            }
+            else{
+                FacebookUtils.startLoginActivity(this);
+            }
+
+        }
+
+
+    }
+
+
+    private void handleShareImage(Intent intent){
+        Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (imageUri != null) {
+            File imageFile = new File(Utils.getImageRealPathFromURI(this, imageUri));
+            if(imageFile.length() >= Flag.MAX_FILE_SIZE_BYTES){
+                AlertDialog.Builder builder  = new AlertDialog.Builder(this);
+                builder.setMessage("Cannot share this picture :(\nPlease, choose a smaller one").setNegativeButton("No", null).show();
+            }
+            else{
+                this.setPicture(imageFile.getAbsolutePath());
+                this.changeAlphaBasedOnSelection(PIC_CODE);
+            }
+
+        }
+    }
+
+    private void handleShareText(Intent intent){
+        String text = intent.getStringExtra(Intent.EXTRA_TEXT);
+        if(text != null){
+            this.textView.setText(text);
+
+        }
+
+    }
+
+    private void handleShareVideo(Intent intent){
+        Uri videoUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (videoUri != null) {
+            File videoFile = new File(Utils.getVideoRealPathFromURI(this, videoUri));
+            if(videoFile.length() >= Flag.MAX_FILE_SIZE_BYTES){
+                AlertDialog.Builder builder  = new AlertDialog.Builder(this);
+                builder.setMessage("Cannot share this video :(\nPlease, choose a smaller one").setNegativeButton("No", null).show();
+            }
+            else{
+                this.setVideo(videoFile.getAbsolutePath());
+                this.changeAlphaBasedOnSelection(VIDEO_CODE);
+            }
+        }
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
-        mContext = getApplicationContext();
 
         setContentView(R.layout.activity_share);
 
@@ -265,11 +332,13 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         // ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.categories, R.layout.custom_spinner);
         // adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        MSpinnerAdapter adapter = new MSpinnerAdapter(mContext, Arrays.asList(getResources().getStringArray(R.array.categories)));
+        MSpinnerAdapter adapter = new MSpinnerAdapter(this, Arrays.asList(getResources().getStringArray(R.array.categories)));
 
         this.spinner.setAdapter(adapter);
 
         this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#00884a")));
+
+        this.handleIntent();
     }
 
     @Override
@@ -279,7 +348,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             return false;
         }
 
-        Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+        Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
 
         if (event.getAction() == MotionEvent.ACTION_DOWN)
@@ -299,7 +368,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             } catch (IOException ioe)
             {
                 ioe.printStackTrace();
-                Toast.makeText(mContext, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
                 Log.e(TAG, ERROR_WHILE_RECORDING_TEXT);
             }
             audioRec.start();
@@ -308,7 +377,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         {
             if(audioRec == null)
             {
-                Toast.makeText(mContext, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
                 Log.v(TAG, ERROR_WHILE_RECORDING_TEXT);
                 return true;
             }
@@ -321,7 +390,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             catch(RuntimeException re)
             {
                 re.printStackTrace();
-                Toast.makeText(mContext, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
                 return true;
             }
             ((ImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.mic_green_taken));
@@ -353,7 +422,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     public boolean onLongClick(final View v)
     {
 
-        Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+        Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -482,7 +551,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
         ParseGeoPoint p = new ParseGeoPoint(current_location.getLatitude(), current_location.getLongitude());
 
-        Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+        Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
 
         final String category = spinner.getSelectedItem().toString();
@@ -493,7 +562,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         f.setText(this.textView.getText().toString());
         f.setWeather(PlacesApplication.getInstance().getWeather());
 
-        FlagUploader uploader = new FlagUploader(f, mContext);
+        FlagUploader uploader = new FlagUploader(f, this);
         //uploader.setDeletesFilesOnFinish(true);
 
         try{
@@ -504,7 +573,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 //f.setPictureFile(parse_pic);
             }
             else if( isPicTaken ){ // equals isPicTaken && pic == null)
-                Toast.makeText(mContext, PIC_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, PIC_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -515,7 +584,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 //f.setAudioFile(parse_audio);
             }
             else if(isSoundCaptured){ //equals isSoundCaptured && audio == null
-                Toast.makeText(mContext, AUDIO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, AUDIO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -526,7 +595,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 //f.setVideoFile(parse_video);
             }
             else if(isVideoShoot){
-                Toast.makeText(mContext, VIDEO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, VIDEO_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
                 return;
             }
             if( isPhoneMediaSelected && this.phoneMedia != null){
@@ -536,7 +605,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 //f.setPictureFile(parse_pic);
             }
             else if( isPhoneMediaSelected ){ // equals isPicTaken && pic == null)
-                Toast.makeText(mContext, PHONE_MEDIA_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, PHONE_MEDIA_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
                 return;
             }
         }
@@ -604,7 +673,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     }
 
     protected void onShareFailed(String toastText){
-        Toast.makeText(mContext, toastText, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, toastText, Toast.LENGTH_LONG).show();
         this.shareButton.setClickable(true);
     }
 
@@ -680,7 +749,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     }
 
     private void getMedia(View v) {
-        Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+        Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
 
         restoreAlpha(PHONE_MEDIA_CODE);
@@ -696,7 +765,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         } catch (android.content.ActivityNotFoundException ex) {
             // no file manager installed
             Log.e(TAG, ex.getMessage());
-            Toast.makeText(mContext, "Please install a File Manager", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please install a File Manager", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -706,8 +775,10 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-
-        if(requestCode == Utils.PIC_CAPTURE_REQUEST_CODE && resultCode == RESULT_OK){
+        if(requestCode == Utils.LOGIN_REQUEST_CODE && resultCode == RESULT_OK){
+            FacebookUtils.downloadFacebookInfo(this);
+        }
+        else if(requestCode == Utils.PIC_CAPTURE_REQUEST_CODE && resultCode == RESULT_OK){
 
             if(this.imageFile == null || !this.imageFile.canRead()){
                 Toast.makeText(getApplicationContext(), "Error encountered while taking picture", Toast.LENGTH_LONG).show();
@@ -735,7 +806,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         }
         else if(requestCode ==  Utils.PHONE_MEDIA_REQUEST_CODE && resultCode == Activity.RESULT_OK){
             Uri mediaUri = data.getData();
-            String mediaPath = getPath(mContext, mediaUri);
+            String mediaPath = getPath(this, mediaUri);
             if(new File(mediaPath) != null) {
 
                 this.setPhoneMedia(mediaPath);
@@ -746,7 +817,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 Log.d(TAG, "Media Path selected(Uri): " + mediaUri.getPath());
 
             }else{
-                Toast.makeText(mContext, "Invalid Media Selected", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Invalid Media Selected", Toast.LENGTH_SHORT).show();
             }
         }
         else if(requestCode == Utils.PHONE_MEDIA_REQUEST_CODE && resultCode == Activity.RESULT_CANCELED){
@@ -970,5 +1041,8 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             this.phoneButton.setEnabled(true);
         }
     }
+
+
+
 
 }
