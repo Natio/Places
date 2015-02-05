@@ -47,7 +47,7 @@
             android:clickable="true"
             android:scaleType="centerInside"
             android:layout_weight="0.25"
-            android:padding="10dp" />
+            android:padding="18dp" />
 
         <ImageButton
             android:layout_width="100dp"
@@ -59,7 +59,7 @@
             android:clickable="true"
             android:scaleType="centerInside"
             android:layout_weight="0.25"
-            android:padding="10dp" />
+            android:padding="18dp" />
 
         <ImageButton
             android:layout_width="100dp"
@@ -70,7 +70,7 @@
             android:layout_alignParentRight="true"
             android:clickable="true"
             android:scaleType="centerInside"
-            android:padding="10dp" />
+            android:padding="18dp" />
 
         <ImageButton
             android:layout_width="100dp"
@@ -82,7 +82,7 @@
             android:clickable="true"
             android:scaleType="centerInside"
             android:layout_weight="0.25"
-            android:padding="10dp" />
+            android:padding="18dp" />
 
     </LinearLayout>
 
