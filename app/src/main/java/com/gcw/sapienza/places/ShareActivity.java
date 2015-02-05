@@ -249,8 +249,8 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 builder.setMessage("Cannot share this picture :(\nPlease, choose a smaller one").setNegativeButton("No", null).show();
             }
             else{
-                this.setPicture(imageFile.getAbsolutePath());
-                this.changeAlphaBasedOnSelection(PIC_CODE);
+                this.setPhoneMedia(imageFile.getAbsolutePath());
+                this.changeAlphaBasedOnSelection(PHONE_MEDIA_CODE);
             }
 
         }
@@ -274,8 +274,8 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 builder.setMessage("Cannot share this video :(\nPlease, choose a smaller one").setNegativeButton("No", null).show();
             }
             else{
-                this.setVideo(videoFile.getAbsolutePath());
-                this.changeAlphaBasedOnSelection(VIDEO_CODE);
+                this.setPhoneMedia(videoFile.getAbsolutePath());
+                this.changeAlphaBasedOnSelection(PHONE_MEDIA_CODE);
             }
         }
     }
