@@ -102,9 +102,14 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
     }
 
     private boolean isHdAvailable() {
-        Log.d(TAG, Arrays.asList(camera.getParameters().getSupportedPreviewFpsRange()).toString());
-        return camera.getParameters().getSupportedVideoSizes().contains(camera.new Size(1280, 720))
-                && isSupportedFrameRate(VIDEO_FPS_HD);
+        try {
+            Log.d(TAG, Arrays.asList(camera.getParameters().getSupportedPreviewFpsRange()).toString());
+            return camera.getParameters().getSupportedVideoSizes().contains(camera.new Size(1280, 720))
+                    && isSupportedFrameRate(VIDEO_FPS_HD);
+        }catch(NullPointerException e){
+            Log.e(TAG, e.getMessage());
+            return false;
+        }
     }
 
     private boolean isSupportedFrameRate(int videoFpsHd) {
