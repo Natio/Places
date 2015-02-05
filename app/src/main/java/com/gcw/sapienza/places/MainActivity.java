@@ -303,7 +303,8 @@ public class MainActivity extends ActionBarActivity implements ViewPager.OnPageC
                 case 0:
                     return getString(R.string.share);
                 case 1:
-                    return getString(R.string.mosaic);
+//                    return getString(R.string.mosaic);
+                    return "Home";
                 case 2:
                     return getString(R.string.map);
             }
