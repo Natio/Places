@@ -107,7 +107,8 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
             return camera.getParameters().getSupportedVideoSizes().contains(camera.new Size(1280, 720))
                     && isSupportedFrameRate(VIDEO_FPS_HD);
         }catch(NullPointerException e){
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, "camera is null");
+            e.printStackTrace();
             return false;
         }
     }
