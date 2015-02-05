@@ -38,52 +38,51 @@
         android:id="@+id/linear_layout">
 
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/pic_button"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/cam_selector"
-            android:background="@android:color/transparent"
-            android:clickable="true"
-            android:scaleType="fitCenter"
-            android:layout_weight="0.3"
-            android:layout_margin="20dp" />
-
-        <ImageButton
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:id="@+id/mic_button"
             android:layout_alignParentLeft="true"
             android:background="@android:color/transparent"
             android:src="@drawable/mic_selector"
             android:clickable="true"
-            android:scaleType="fitCenter"
-            android:layout_margin="15dp"
-            android:layout_weight="0.2" />
+            android:scaleType="centerInside"
+            android:layout_weight="0.25"
+            android:padding="10dp" />
 
         <ImageButton
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/pic_button"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/cam_selector"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:scaleType="centerInside"
+            android:layout_weight="0.25"
+            android:padding="10dp" />
+
+        <ImageButton
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:id="@+id/vid_button"
             android:background="@android:color/transparent"
             android:src="@drawable/videocam_selector"
             android:layout_alignParentRight="true"
             android:clickable="true"
-            android:layout_margin="15dp"
-            android:layout_weight="0.5"
-            android:scaleType="fitCenter" />
+            android:scaleType="centerInside"
+            android:padding="10dp" />
 
         <ImageButton
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:id="@+id/phone_button"
             android:layout_centerHorizontal="true"
             android:src="@drawable/attach_selector"
             android:background="@android:color/transparent"
             android:clickable="true"
-            android:scaleType="fitCenter"
-            android:layout_margin="20dp"
-            android:layout_weight="0.5" />
+            android:scaleType="centerInside"
+            android:layout_weight="0.25"
+            android:padding="10dp" />
 
     </LinearLayout>
 
