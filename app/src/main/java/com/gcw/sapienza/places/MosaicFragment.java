@@ -150,7 +150,7 @@ public class MosaicFragment extends Fragment implements  AdapterView.OnItemClick
             @Override
             public void done(com.parse.ParseException e) {
                 if(e == null)
-                    Toast.makeText(getActivity(), "Flag deleted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), R.string.deleted, Toast.LENGTH_SHORT).show();
                 else
                     Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 Utils.mainActivity.refresh();
@@ -171,7 +171,7 @@ public class MosaicFragment extends Fragment implements  AdapterView.OnItemClick
                 if (e != null) {
                     Log.d(TAG, e.getMessage());
                 } else {
-                    Toast.makeText(getActivity(), "Flag Reported", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), R.string.reported, Toast.LENGTH_SHORT).show();
                 }
             }
         });

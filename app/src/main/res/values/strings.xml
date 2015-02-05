@@ -6,18 +6,19 @@
     <string name="action_logout">Log out</string>
     <string name="action_refresh">Refresh</string>
     <string name="app_id">883622278337228</string>
-    <string name="mosaic">Flags nearby</string>
     <string name="map">Map</string>
     <string name="share">Place a flag</string>
     <string name="upload_picture_progress">Uploading Picture</string>
     <string name="upload_video_progress">Uploading Video</string>
     <string name="upload_audio_progress">Uploading Audio</string>
-    <string name="upload_phone_media_progress">Uploading Phone Media</string>
+    <string name="upload_phone_media_progress">Uploading Attachment</string>
     <string name="my_flags">My Flags</string>
     <string name="filters">Filters</string>
     <string name="profile">Profile</string>
-    <string name="settings">Settings</string>
     <string name="about">About Us</string>
     <string name="addText">Add your text</string>
+    <string name="deleted">Flag Deleted</string>
+    <string name="reported">Flag Reported</string>
+
 
 </resources>
