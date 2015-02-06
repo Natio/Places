@@ -22,6 +22,9 @@ import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -66,7 +69,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
     private Spinner spinner;
     private TextView textView;
-    private Button shareButton;
     private RelativeLayout progressBarHolder;
     private TextView progressTextView;
 
@@ -317,28 +319,35 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         this.textView = (TextView)findViewById(R.id.share_text_field);
         this.textView.setGravity(Gravity.CENTER);
 
-        this.shareButton = (Button)findViewById(R.id.share_button);
-        this.shareButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.setClickable(false);
-                ShareActivity.this.share();
-
-            }
-        });
-
         this.spinner = (Spinner)findViewById(R.id.spinner);
 
         // ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.categories, R.layout.custom_spinner);
         // adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         MSpinnerAdapter adapter = new MSpinnerAdapter(this, Arrays.asList(getResources().getStringArray(R.array.categories)));
-
         this.spinner.setAdapter(adapter);
 
-        this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#00884a")));
+        // this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#00884a")));
+        this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.green)));
 
         this.handleIntent();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_share, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if(item.getItemId() == R.id.action_confirm_flag) share();
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -672,9 +681,9 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         Log.v(TAG, "Media has been cleared!");
     }
 
-    protected void onShareFailed(String toastText){
+    protected void onShareFailed(String toastText)
+    {
         Toast.makeText(this, toastText, Toast.LENGTH_LONG).show();
-        this.shareButton.setClickable(true);
     }
 
     protected void onShareSucceeded(String toastText)

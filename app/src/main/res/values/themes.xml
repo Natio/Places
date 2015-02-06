@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <style name="SpinnerStyle" parent="android:style/Widget.ListView.DropDown">
+        <item name="android:divider">@color/light_grey</item>
+        <item name="android:dividerHeight">1dp</item>
+    </style>
+
     <style name="CustomActionBarTheme"
         parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/MyActionBar</item>
         <item name="android:activatedBackgroundIndicator">@drawable/my_background</item>
+        <item name="android:dropDownListViewStyle">@style/SpinnerStyle</item>
     </style>
 
     <style name="MyActionBar"
         parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
     </style>
+
 </resources>

@@ -16,9 +16,9 @@
     <string name="filters">Filters</string>
     <string name="profile">Profile</string>
     <string name="about">About Us</string>
-    <string name="addText">Add your text</string>
     <string name="deleted">Flag Deleted</string>
     <string name="reported">Flag Reported</string>
+    <string name="hint_text">What\'s on your mind?</string>
 
 
 </resources>

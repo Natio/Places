@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
 
 project.group = 'com.facebook.android'
@@ -47,12 +47,12 @@ task setVersion {
     sdkVersionFile.eachLine{
         def matcher = (it =~ /(?:.*BUILD = \")(.*)(?:\".*)/)
         if (matcher.matches()) {
-          project.version = matcher[0][1]
-          return
+            project.version = matcher[0][1]
+            return
         }
     }
     if (project.version.is('unspecified')) {
-      throw new GradleScriptException('Version could not be found.', null)
+        throw new GradleScriptException('Version could not be found.', null)
     }
 }
 

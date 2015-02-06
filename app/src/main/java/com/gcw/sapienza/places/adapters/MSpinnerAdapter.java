@@ -42,6 +42,7 @@ public class MSpinnerAdapter extends ArrayAdapter implements SpinnerAdapter{
 
         TextView tv=(TextView) v.findViewById(android.R.id.text1);
 
+        /*
         switch (position) {
             case 0:
                 tv.setTextColor(mContext.getResources().getColor(R.color.red));
@@ -58,10 +59,24 @@ public class MSpinnerAdapter extends ArrayAdapter implements SpinnerAdapter{
             case 4:
                 tv.setTextColor(mContext.getResources().getColor(R.color.magenta));
         }
+        */
 
+        switch (position)
+        {
+            case 0:
+                tv.setTextColor(mContext.getResources().getColor(R.color.grey));
+                break;
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                tv.setTextColor(mContext.getResources().getColor(R.color.black));
+        }
+
+        tv.setBackgroundResource(R.drawable.spinner_selector);
         tv.setPadding(0, 15, 0, 15);
         tv.setGravity(Gravity.CENTER);
-        tv.setTextSize(20);
+        tv.setTextSize(22);
         tv.setText(values.get(position));
 
         return v;
