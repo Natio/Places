@@ -274,8 +274,10 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder> {
     }
 
     @Override
-    public int getItemCount() {
-        return this.flags.size();
+    public int getItemCount()
+    {
+        if(this.flags == null) return 0;
+        else return this.flags.size();
     }
 
     @Override
