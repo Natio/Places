@@ -24,7 +24,6 @@ import com.gcw.sapienza.places.Notifications;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.model.Flag;
-import com.gcw.sapienza.places.model.TimedFlag;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.common.ConnectionResult;
@@ -59,6 +58,8 @@ public class LocationService extends Service implements
 
     private static final long ONE_MIN = 1000 * 60;
 
+    private static final long ONE_HOUR = ONE_MIN * 60;
+
     private static final int KM_TO_M = 1000;
 
     private static final long INTERVAL = ONE_MIN * 5;
@@ -66,12 +67,12 @@ public class LocationService extends Service implements
 
     private static final int NOTIFICATION_ID = 12345;
 
-    private static final long UPDATE_CACHE_MIN_INTERVAL = ONE_MIN * 5;
+    private static final long UPDATE_CACHE_MIN_INTERVAL = ONE_MIN * 15;
 
-    private static final long FLAG_IN_CACHE_MIN = ONE_MIN * 30;
+    private static final long FLAG_IN_CACHE_MIN = ONE_HOUR * 2;
 
 
-    private HashMap<String, TimedFlag> cachedFlags = new HashMap<>();
+    private HashMap<String, Long> cachedFlags = new HashMap<>();
 
     private static LocationRequest locationRequest;
     private static GoogleApiClient googleApiClient;
@@ -353,7 +354,7 @@ public class LocationService extends Service implements
                 nonCachedFlags--;
             }else{
                 //Not cached yet. Being cached now.
-                this.cachedFlags.put(f.getObjectId(), new TimedFlag(f, newTimestamp));
+                this.cachedFlags.put(f.getObjectId(), newTimestamp);
             }
         }
         
@@ -363,7 +364,7 @@ public class LocationService extends Service implements
     private void removeCachedPosts() {
         this.lastCacheUpdate = new java.util.Date().getTime();
         for(String tf: this.cachedFlags.keySet()){
-            if(this.lastCacheUpdate - cachedFlags.get(tf).getTimestamp() > FLAG_IN_CACHE_MIN){
+            if(this.lastCacheUpdate - cachedFlags.get(tf) > FLAG_IN_CACHE_MIN){
                 this.cachedFlags.remove(tf);
             }
         }
