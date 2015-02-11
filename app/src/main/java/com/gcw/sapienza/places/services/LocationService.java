@@ -37,9 +37,13 @@ import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 
+import java.security.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 public class LocationService extends Service implements
         GoogleApiClient.ConnectionCallbacks,
@@ -54,6 +58,8 @@ public class LocationService extends Service implements
 
     private static final long ONE_MIN = 1000 * 60;
 
+    private static final long ONE_HOUR = ONE_MIN * 60;
+
     private static final int KM_TO_M = 1000;
 
     private static final long INTERVAL = ONE_MIN * 5;
@@ -61,7 +67,12 @@ public class LocationService extends Service implements
 
     private static final int NOTIFICATION_ID = 12345;
 
+    private static final long UPDATE_CACHE_MIN_INTERVAL = ONE_MIN * 15;
 
+    private static final long FLAG_IN_CACHE_MIN = ONE_HOUR * 2;
+
+
+    private HashMap<String, Long> cachedFlags = new HashMap<>();
 
     private static LocationRequest locationRequest;
     private static GoogleApiClient googleApiClient;
@@ -73,6 +84,8 @@ public class LocationService extends Service implements
     private List<Flag> parseObjects;
 
     private Location notificationLocation;
+
+    private long lastCacheUpdate;
 
 
     @Override
@@ -298,25 +311,63 @@ public class LocationService extends Service implements
     }
 
     private void notifyUser() {
-        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        int numFlags = this.parseObjects.size();
-        String textIfOne = "A flag for you!";
-        String textMoreThanOne = "Hey, " + this.parseObjects.size() + " Flags around!";
+        int newFlags = updateCachedPostsAndRet();
+        if(newFlags > 0) {
+            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            int numFlags = this.parseObjects.size();
+            String textIfOne = "A flag for you!";
+            String textMoreThanOne = "Hey, " + this.parseObjects.size() + " new Flags around!";
 
-                NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(this)
-                        .setAutoCancel(true)
-                        .setSmallIcon(R.drawable.app_logo_small)
-                        .setContentTitle(Notifications.notifications[(int) (Math.random() * Notifications.notifications.length)])
-                        .setContentText(numFlags > 1 ? textMoreThanOne : textIfOne)
-                        .setSound(soundUri)
-                        .setLights(0xff00ff00, 1000, 3000);
+            NotificationCompat.Builder builder =
+                    new NotificationCompat.Builder(this)
+                            .setAutoCancel(true)
+                            .setSmallIcon(R.drawable.app_logo_small)
+                            .setContentTitle(Notifications.notifications[(int) (Math.random() * Notifications.notifications.length)])
+                            .setContentText(numFlags > 1 ? textMoreThanOne : textIfOne)
+                            .setSound(soundUri)
+                            .setLights(0xff00ff00, 1000, 3000);
 
-        Intent targetIntent = new Intent(this, MainActivity2.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(contentIntent);
-        NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        nManager.notify(NOTIFICATION_ID, builder.build());
+            Intent targetIntent = new Intent(this, MainActivity2.class);
+            PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            builder.setContentIntent(contentIntent);
+            NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            nManager.notify(NOTIFICATION_ID, builder.build());
+        }else{
+            Log.w(TAG, "Notification to user aborted: no new Flags found: " + newFlags);
+        }
+    }
+
+    private int updateCachedPostsAndRet() {
+        long newTimestamp = new java.util.Date().getTime();
+
+        if(newTimestamp - this.lastCacheUpdate > UPDATE_CACHE_MIN_INTERVAL){
+            removeCachedPosts();
+        }
+
+        int nonCachedFlags = parseObjects.size();
+
+        Set<String> cachedKeys = this.cachedFlags.keySet();
+
+        for(Flag f: parseObjects){
+            if(cachedKeys.contains(f.getObjectId())){
+                //Flag already cached.
+                nonCachedFlags--;
+            }else{
+                //Not cached yet. Being cached now.
+                this.cachedFlags.put(f.getObjectId(), newTimestamp);
+            }
+        }
+        
+        return nonCachedFlags;
+    }
+
+    private void removeCachedPosts() {
+        this.lastCacheUpdate = new java.util.Date().getTime();
+        for(String tf: this.cachedFlags.keySet()){
+            if(this.lastCacheUpdate - cachedFlags.get(tf) > FLAG_IN_CACHE_MIN){
+                this.cachedFlags.remove(tf);
+            }
+        }
     }
 
     private void updateApplication(){
