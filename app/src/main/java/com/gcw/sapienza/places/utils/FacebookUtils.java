@@ -460,20 +460,17 @@ public final class FacebookUtils {
      *
      * @param activity the activity where to start the intent
      */
-    public static void startLoginActivity(Activity activity){
-        if(FacebookUtils.isFacebookSessionOpened())
-        {
-            ParseLoginBuilder builder = new ParseLoginBuilder(activity);
+    public static void startLoginActivity(Activity activity)
+    {
+        ParseLoginBuilder builder = new ParseLoginBuilder(activity);
 
-            builder.setParseLoginEnabled(false);
+        builder.setParseLoginEnabled(false);
 
-            builder.setFacebookLoginEnabled(true);
-            builder.setFacebookLoginPermissions(Arrays.asList("public_profile", "user_friends"/*, "user_relationships", "user_birthday", "user_location"*/));
+        builder.setFacebookLoginEnabled(true);
+        builder.setFacebookLoginPermissions(Arrays.asList("public_profile", "user_friends"/*, "user_relationships", "user_birthday", "user_location"*/));
 
-            // builder.setAppLogo(R.drawable.app_logo);
+        // builder.setAppLogo(R.drawable.app_logo);
 
-            activity.startActivityForResult(builder.build(), Utils.LOGIN_REQUEST_CODE);
-        }
+        activity.startActivityForResult(builder.build(), Utils.LOGIN_REQUEST_CODE);
     }
-
 }
