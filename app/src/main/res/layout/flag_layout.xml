@@ -55,18 +55,46 @@
         android:layout_below="@+id/text"
         android:layout_centerHorizontal="true" />
 
-    <VideoView
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+    <ImageView
+        android:layout_marginTop="70dp"
+        android:layout_marginBottom="30dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxHeight="325dp"
-        android:maxWidth="325dp"
-        android:adjustViewBounds="true"
-        android:background="@drawable/my_border"
-        android:id="@+id/vid"
+        android:src="@drawable/play_button"
+        android:id="@+id/audio"
         android:layout_below="@+id/text"
         android:layout_centerHorizontal="true" />
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_below="@+id/text"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/video_holder" >
+
+        <VideoView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxHeight="325dp"
+            android:maxWidth="325dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/my_border"
+            android:id="@+id/vid"
+            android:layout_gravity="center_vertical|center_horizontal" />
+
+        <ImageButton
+            android:id="@+id/play_video_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:src="@drawable/play_video_button"
+            android:background="@android:color/transparent"
+            android:visibility="gone"
+            android:clickable="false" />
+
+    </FrameLayout>
 
     <RelativeLayout
         android:layout_width="fill_parent"
