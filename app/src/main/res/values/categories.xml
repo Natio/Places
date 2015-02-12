@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="categories">
-        <item name="none">None</item>
-        <item name="thoughts">Thoughts</item>
-        <item name="fun">Fun</item>
-        <item name="landscape">Landscape</item>
-        <item name="food">Food</item>
+        <item name="none">none</item>
+        <item name="thoughts">thoughts</item>
+        <item name="fun">fun</item>
+        <item name="fun">music</item>
+        <item name="landscape">landscape</item>
+        <item name="food">food</item>
     </string-array>
 
 </resources>
