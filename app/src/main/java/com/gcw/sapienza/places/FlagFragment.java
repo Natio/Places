@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -131,6 +132,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         iw.setOnClickListener(this);
         vv.setOnTouchListener(this);
         audioHolder.setOnClickListener(this);
+        frameLayout.setOnClickListener(this);
         // playVideoButton.setOnClickListener(this);
 
         if(mediaType == MediaType.NONE)
@@ -212,6 +214,23 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         });
 
         FacebookUtils.getInstance().loadProfilePicIntoImageView(this.id, profilePicimageView, FacebookUtils.PicSize.LARGE);
+
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        view.setOnKeyListener(new View.OnKeyListener()
+        {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event)
+            {
+                if (keyCode == KeyEvent.KEYCODE_BACK && frameLayout.getVisibility() == View.VISIBLE)
+                {
+                    frameLayout.setVisibility(View.GONE);
+
+                    return true;
+                }
+                return false;
+            }
+        });
 
         return view;
     }

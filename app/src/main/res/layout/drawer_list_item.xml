@@ -20,10 +20,10 @@
     android:layout_height="fill_parent"
     android:textAppearance="?android:attr/textAppearanceListItemSmall"
     android:gravity="center_vertical"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:textColor="@color/dark_green"
-    android:background="@color/light_grey"
+    android:paddingLeft="18dp"
+    android:paddingRight="18dp"
+    android:textColor="@color/white"
+    android:background="?android:attr/activatedBackgroundIndicator"
     android:minHeight="?android:attr/listPreferredItemHeightSmall"/>
 
     <!--
