@@ -162,7 +162,8 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
 
                 for(int i = 0; i < frags.size(); i++)
                 {
-                    if (frags.get(i) instanceof FlagsListFragment) {
+                    if (frags.get(i) instanceof FlagsListFragment)
+                    {
                         rv = ((FlagsListFragment) frags.get(i)).getRV();
                         break;
                     }
@@ -173,6 +174,8 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
                 RecyclerView.LayoutManager layoutManager = rv.getLayoutManager();
 
                 int position = ((LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
+
+                // Log.d(TAG, "First completely visible item position: " + position);
 
                 return position != 0;
             }

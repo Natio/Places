@@ -3,13 +3,20 @@ package com.gcw.sapienza.places;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.widget.Toast;
+
+import com.gcw.sapienza.places.utils.FacebookUtils;
 
 /**
  * Created by Simone on 12/30/2014.
  */
-public class SettingsFragment extends PreferenceFragment {
+public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceClickListener {
     @SuppressWarnings("unused")
     private static final String TAG = "SettingsFragment";
+
+    private int easterCount;
+    private boolean eggEnabled;
+    private final int EASTER_THRESHOLD = 10;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,5 +56,39 @@ public class SettingsFragment extends PreferenceFragment {
         food_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
         none_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
 
+        version_label.setOnPreferenceClickListener(this);
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        this.easterCount = 0;
+        this.eggEnabled = true;
+    }
+
+    @Override
+    public boolean onPreferenceClick(Preference preference)
+    {
+        if(preference.getKey().equals("version") && eggEnabled)
+        {
+            easterCount++;
+
+            if(easterCount >= EASTER_THRESHOLD)
+            {
+                showEasterEgg();
+                eggEnabled = false;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private void showEasterEgg()
+    {
+        Toast.makeText(getActivity(), "Hey! What did you expect?", Toast.LENGTH_SHORT).show();
     }
 }

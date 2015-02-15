@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.media.MediaRecorder;
@@ -28,13 +27,11 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.gcw.sapienza.places.activities.VideoCaptureActivity;
 import com.gcw.sapienza.places.adapters.MSpinnerAdapter;
 import com.gcw.sapienza.places.model.Flag;
@@ -44,7 +41,6 @@ import com.gcw.sapienza.places.utils.FlagUploader;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseAnalytics;
 import com.parse.ParseGeoPoint;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -609,9 +605,9 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             }
             if( isPhoneMediaSelected && this.phoneMedia != null){
                 Log.v(TAG, "Successfully retrieved media.");
-                //ParseFile parse_pic = new ParseFile(this.pic.getName(), Utils.convertFileToByteArray(this.pic));
-                uploader.setPhoneMediaFile(this.phoneMedia);
-                //f.setPictureFile(parse_pic);
+                // FIXME temporarily handling attachments as pictures
+                // uploader.setPhoneMediaFile(this.phoneMedia);
+                uploader.setPictureFile(this.phoneMedia);
             }
             else if( isPhoneMediaSelected ){ // equals isPicTaken && pic == null)
                 Toast.makeText(this, PHONE_MEDIA_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();

@@ -440,11 +440,15 @@ public final class FacebookUtils {
         final ProgressDialog progress = new ProgressDialog(ctx);
         progress.setTitle("Loading");
         progress.setMessage("Wait while loading...");
+        progress.setCancelable(false);
         progress.show();
         FacebookUtils.getInstance().makeMeRequest(new FacebookUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
-                if(e != null){
+                if(e != null)
+                {
+                    // FIXME result not being used?
+
                     Log.d(TAG, e.getMessage());
                     progress.setMessage(e.getMessage());
                 }
