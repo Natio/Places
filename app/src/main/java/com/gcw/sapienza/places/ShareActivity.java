@@ -89,6 +89,8 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
     private File imageFile;
 
+    private FlagUploader uploader;
+
     private static final int ANIMATION_DURATION = 300;
 
     private static final String FLAG_PLACED_TEXT = "Flag has been placed!";
@@ -341,7 +343,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        if(item.getItemId() == R.id.action_confirm_flag) share();
+        if(item.getItemId() == R.id.action_confirm_flag && (uploader == null || !uploader.isUploading())) share();
 
         return super.onOptionsItemSelected(item);
     }
@@ -567,7 +569,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         f.setText(this.textView.getText().toString());
         f.setWeather(PlacesApplication.getInstance().getWeather());
 
-        FlagUploader uploader = new FlagUploader(f, this);
+        uploader = new FlagUploader(f, this);
         //uploader.setDeletesFilesOnFinish(true);
 
         try{
@@ -628,7 +630,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         uploader.upload(new FlagUploader.FlagUploaderCallbacks() {
             @Override
             public void onPercentage(int percentage, String text_to_show) {
-                ShareActivity.this.progressTextView.setText(text_to_show+' '+percentage+'%');
+                ShareActivity.this.progressTextView.setText(text_to_show/*+' '+percentage+'%'*/);
             }
 
             @Override

@@ -177,7 +177,6 @@ public class FlagUploader {
      *  there will be nothing to upload. If there is nothing to upload the Flag will be saved
      */
     private void loadFileLoop(){
-        Log.d(TAG, "CIAo");
         if(BuildConfig.DEBUG && Looper.getMainLooper().getThread() != Thread.currentThread()){
             throw new RuntimeException("Something went wrong with threads");
         }
@@ -246,7 +245,7 @@ public class FlagUploader {
      * When all files are uploaded ti uploads the flag
      */
     private void loadFlag(){
-        FlagUploader.this.callbacks.onPercentage(100, "Loading last bits :)");
+        // FlagUploader.this.callbacks.onPercentage(100, "Loading last bits :)");
         this.flag.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
