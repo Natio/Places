@@ -253,6 +253,8 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder> {
             flagViewHolder.username.setText(fb_username);
         }
 
+        Picasso.with(this.view.getContext()).setIndicatorsEnabled(false);
+
         FacebookUtils.getInstance().getFbProfilePictureURL(user_id, FacebookUtils.PicSize.SMALL, new FacebookUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
@@ -265,6 +267,7 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder> {
             String url = pic.getUrl();
             Picasso.with(this.view.getContext()).load(url).into(flagViewHolder.main_image);
             flagViewHolder.main_image.setVisibility(View.VISIBLE);
+            flagViewHolder.main_image.setClickable(false);
         }
         else{
             flagViewHolder.main_image.setVisibility(View.GONE);

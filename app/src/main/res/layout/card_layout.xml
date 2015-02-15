@@ -53,11 +53,11 @@
 
         <ImageView
             android:layout_width="fill_parent"
-            android:layout_height="200dp"
+            android:layout_height="175dp"
             android:id="@+id/card_imageView_image"
             android:layout_below="@+id/card_textView_text"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="5dp"
-            android:layout_marginBottom="2dp" />
+            android:layout_marginBottom="5dp" />
     </RelativeLayout>
 </android.support.v7.widget.CardView>
