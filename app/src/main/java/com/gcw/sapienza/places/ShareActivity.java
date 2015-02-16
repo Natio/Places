@@ -782,7 +782,8 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             }
             else
             {
-                Toast.makeText(this, "Error encountered while retrieving recording", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "No recording found");
+                // Toast.makeText(this, "Error encountered while retrieving recording", Toast.LENGTH_SHORT).show();
             }
         }
     }
