@@ -177,7 +177,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
 
                 // Log.d(TAG, "First completely visible item position: " + position);
 
-                return position != 0;
+                return position != 0 && rv.getAdapter().getItemCount() != 0;
             }
         });
 
