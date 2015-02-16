@@ -1,8 +1,10 @@
 package com.gcw.sapienza.places.activities;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -10,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
@@ -340,7 +343,14 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
     protected void onResume()
     {
         super.onResume();
-        PlacesApplication.getInstance().startLocationService();
+
+        LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                &&!locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            promptForLocationServices();
+        }else {
+            PlacesApplication.getInstance().startLocationService();
+        }
 
         isForeground = true;
     }
@@ -356,6 +366,26 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
 
     public static boolean isForeground(){
         return isForeground;
+    }
+
+    private void promptForLocationServices() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Location Services disabled");
+        builder.setCancelable(false);
+        builder.setMessage("Places requires Location Services to be turned on in order to work properly.\n" +
+                "Edit Location Settings?");
+        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogInterface, int i) {
+                startActivityForResult(new Intent
+                        (android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), Utils.GPS_ENABLE_REQUEST_CODE);
+            }
+        });
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogInterface, int i) {
+                finish();
+            }
+        });
+        builder.create().show();
     }
 
     @Override

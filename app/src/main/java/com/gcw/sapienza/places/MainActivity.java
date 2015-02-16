@@ -40,7 +40,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-
+@Deprecated
 public class MainActivity extends ActionBarActivity implements ViewPager.OnPageChangeListener, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "MainActivity";
