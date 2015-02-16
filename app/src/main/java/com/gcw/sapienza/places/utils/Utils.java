@@ -25,7 +25,12 @@ public class Utils
     private static final String TAG = "Utils";
 
     public static final int UPDATE_DELAY = 200;
-    public static float MAP_RADIUS = 0.5f;
+
+    /**
+     * as the radius settings have been deleted,
+     * the static map radius is now set to 150 meters
+     */
+    public static float MAP_RADIUS = 0.15f;
     public static int MAX_PINS = 10;
 
     public static int[] stepValues = {1, 5, 10, 15, 20};
@@ -35,7 +40,7 @@ public class Utils
     public static final int PHONE_MEDIA_REQUEST_CODE = 92;
     public static final int RECORD_AUDIO_REQUEST_CODE = 95;
 
-
+    @SuppressWarnings("unused")
     public static final int SETTINGS_REQUEST_CODE = 92;
     public static final int GPS_ENABLE_REQUEST_CODE = 93;
     public static final int LOGIN_REQUEST_CODE = 94;
@@ -50,6 +55,10 @@ public class Utils
 
     public static String[] categories;
 
+    /**
+     * being kept here just to avoid breaking legacy code.
+     * eventually, these links to MainActivity will need some clean up
+     */
     public static MainActivity mainActivity;
 
 /*

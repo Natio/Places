@@ -1,7 +1,6 @@
 package com.gcw.sapienza.places;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -17,9 +16,9 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     @SuppressWarnings("unused")
     private static final String TAG = "SettingsFragment";
 
-    private int easterCount;
-    private boolean eggEnabled;
-    private final int EASTER_THRESHOLD = 10;
+    private int ar_sensor;
+    private boolean sensorEnabled;
+    private final int AR_THRESHOLD = 10;
     private boolean firstClick;
 
     private AlertDialog dialog;
@@ -28,8 +27,6 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        firstClick = true;
-
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.layout.settings_layout);
 
@@ -37,29 +34,28 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         Preference fl_filter = findPreference("flFilter");
         Preference strangers_filter = findPreference("strangersFilter");
         Preference time_filter = findPreference("timeFilter");
-        Preference seek_bar = findPreference("seekBar");
+//        Preference seek_bar = findPreference("seekBar");
         Preference max_fetch = findPreference("maxFetch");
         Preference version_label = findPreference("version");
 
         Preference thoughts_check =  findPreference("thoughtsCheck");
         Preference fun_check =  findPreference("funCheck");
+        Preference music_check =  findPreference("musicCheck");
         Preference landscape_check =  findPreference("landscapeCheck");
         Preference food_check =  findPreference("foodCheck");
         Preference none_check =  findPreference("noneCheck");
 
-        String version_name = BuildConfig.VERSION_NAME;
-        int version_code = BuildConfig.VERSION_CODE;
-
-        version_label.setSummary(version_name + " ("+version_code+")");
+        version_label.setSummary(BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")");
         loneWolf_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
         fl_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
         strangers_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
         time_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
-        seek_bar.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
+//        seek_bar.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
         max_fetch.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
 
         thoughts_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
         fun_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
+        music_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
         landscape_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
         food_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
         none_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
@@ -72,21 +68,22 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     {
         super.onResume();
 
-        this.easterCount = 0;
-        this.eggEnabled = true;
+        this.firstClick = true;
+        this.ar_sensor = 0;
+        this.sensorEnabled = true;
     }
 
     @Override
     public boolean onPreferenceClick(Preference preference)
     {
-        if(preference.getKey().equals("version") && eggEnabled)
+        if(preference.getKey().equals("version") && sensorEnabled)
         {
-            easterCount++;
+            ar_sensor++;
 
-            if(easterCount >= EASTER_THRESHOLD)
+            if(ar_sensor >= AR_THRESHOLD)
             {
-                showEasterEgg();
-                eggEnabled = false;
+                showAR();
+                sensorEnabled = false;
             }
 
             return true;
@@ -95,7 +92,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         return false;
     }
 
-    private void showEasterEgg()
+    private void showAR()
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();

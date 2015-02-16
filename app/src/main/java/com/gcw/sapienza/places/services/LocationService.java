@@ -54,6 +54,8 @@ public class LocationService extends Service implements
 
     public static final String FOUND_NEW_FLAGS_NOTIFICATION = "FOUND_NEW_FLAGS_NOTIFICATION";
 
+    public static final String NO_FLAGS_VISIBLE = "you won't be able to see any flags with these settings";
+
     private final IBinder mBinder = new LocalBinder();
 
     private static final long ONE_MIN = 1000 * 60;
@@ -184,7 +186,8 @@ public class LocationService extends Service implements
 
         if(!thoughts_check && !fun_check && !landscape_check
                 && ! food_check && ! none_check){
-            Toast.makeText(getApplicationContext(), "You won't be able to see any flags with these settings", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "No category selected: "
+                    + NO_FLAGS_VISIBLE, Toast.LENGTH_LONG).show();
 
             if(parseObjects == null){
                 parseObjects = new ArrayList<>(0);
@@ -221,7 +224,8 @@ public class LocationService extends Service implements
             else if(with_friends_surrounded) query.whereContainedIn("fbId", FacebookUtils.getInstance().getFriends());
             else
             {
-                Toast.makeText(getApplicationContext(), "No filterYou won't be able to see any flags with these settings", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "No filter selected: "
+                        + NO_FLAGS_VISIBLE, Toast.LENGTH_LONG).show();
 
                 if(parseObjects == null){
                     parseObjects = new ArrayList<>(0);

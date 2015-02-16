@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Locale;
 
 
+@Deprecated
 public class MosaicFragment extends Fragment implements  AdapterView.OnItemClickListener{
 
     private static final String TAG = "MosaicFragment";

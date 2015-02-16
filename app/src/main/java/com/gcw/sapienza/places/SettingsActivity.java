@@ -40,6 +40,7 @@ Toast radiusToast;
                 preference.getKey().equals("timeFilter") ||
                 preference.getKey().equals("thoughtsCheck") ||
                 preference.getKey().equals("funCheck") ||
+                preference.getKey().equals("musicCheck") ||
                 preference.getKey().equals("landscapeCheck") ||
                 preference.getKey().equals("foodCheck") ||
                 preference.getKey().equals("noneCheck"))
@@ -49,19 +50,19 @@ Toast radiusToast;
             editor.putBoolean(preference.getKey(), (boolean)newValue);
             editor.commit();
         }
-        else if(preference.getKey().equals("seekBar"))
-        {
-            preference.setDefaultValue(newValue);
-
-            int value = (int)newValue + 1;
-
-            Utils.MAP_RADIUS = value / 10f;
-            Utils.mainActivity.getMosaicFragment().updateHeaderText();
-
-            showToast("Radius set to " + value * 100 + " meters.");
-
-            Log.d(TAG, "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
-        }
+//        else if(preference.getKey().equals("seekBar"))
+//        {
+//            preference.setDefaultValue(newValue);
+//
+//            int value = (int)newValue + 1;
+//
+//            Utils.MAP_RADIUS = value / 10f;
+//            Utils.mainActivity.getMosaicFragment().updateHeaderText();
+//
+//            showToast("Radius set to " + value * 100 + " meters.");
+//
+//            Log.d(TAG, "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
+//        }
         else if(preference.getKey().equals("maxFetch"))
         {
             preference.setDefaultValue(newValue);
@@ -71,7 +72,7 @@ Toast radiusToast;
             Utils.MAX_PINS = value;
             Utils.mainActivity.getMosaicFragment().updateHeaderText();
 
-            showToast("Max number of visible flags: " + value + '.');
+            showToast("Max number of visible flags: " + value);
 
             Log.d(TAG, "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
         }

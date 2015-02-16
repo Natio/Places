@@ -83,6 +83,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
     private static final int LOGOUT_POSITION = 2;
 
     private static final int MAP_BOUNDS = 70;
+    private static final float ZOOM_LVL = 16f;
 
     private static final String FRAG_TAG = "FRAG_TAG";
 
@@ -267,6 +268,14 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
             {
                 LatLngBounds bounds = builder.build();
                 this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, MAP_BOUNDS));
+            }else{
+                Location currentLocation = gMap.getMyLocation();
+                if(currentLocation != null){
+                    LatLng currentLocationLatLng = new LatLng(currentLocation.getLatitude(),
+                            currentLocation.getLongitude());
+                    this.gMap.animateCamera(CameraUpdateFactory
+                            .newLatLngZoom(currentLocationLatLng, ZOOM_LVL));
+                }
             }
 
         }

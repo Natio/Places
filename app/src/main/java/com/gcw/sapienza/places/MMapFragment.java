@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.Location;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -34,6 +35,8 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
     private static final String TAG = "MMapFragment";
 
     private GoogleMap gMap;
+
+    private final float zoom_lvl = 16f;
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -111,12 +114,18 @@ public class MMapFragment extends Fragment implements OnMapReadyCallback {
                         .icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
                         .alpha(0.8f));
             }
-
             if(pins.size() > 0){
                 LatLngBounds bounds = builder.build();
-                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 70));
+                this.gMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 70));
+            }else {
+                Location currentLocation = gMap.getMyLocation();
+                if(currentLocation != null){
+                    LatLng currentLocationLatLng = new LatLng(currentLocation.getLatitude(),
+                            currentLocation.getLongitude());
+                    this.gMap.animateCamera(CameraUpdateFactory
+                            .newLatLngZoom(currentLocationLatLng, this.zoom_lvl));
+                }
             }
-
         }
     }
 
