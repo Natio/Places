@@ -110,6 +110,10 @@
             android:screenOrientation="portrait">
         </activity>
 
+        <activity android:name=".AudioRecordingActivity"
+            android:screenOrientation="portrait">
+        </activity>
+
         <activity
             android:name="com.parse.ui.ParseLoginActivity"
             android:label="@string/app_name"

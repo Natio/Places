@@ -39,7 +39,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.15"
-        android:clickable="true"
         android:weightSum="1"
         android:id="@+id/linear_layout">
 
@@ -50,7 +49,6 @@
             android:layout_alignParentLeft="true"
             android:background="@android:color/transparent"
             android:src="@drawable/mic_selector"
-            android:clickable="true"
             android:scaleType="centerInside"
             android:layout_weight="0.25"
             android:padding="18dp" />
@@ -62,7 +60,6 @@
             android:layout_centerHorizontal="true"
             android:src="@drawable/cam_selector"
             android:background="@android:color/transparent"
-            android:clickable="true"
             android:scaleType="centerInside"
             android:layout_weight="0.25"
             android:padding="18dp" />
@@ -74,7 +71,6 @@
             android:background="@android:color/transparent"
             android:src="@drawable/videocam_selector"
             android:layout_alignParentRight="true"
-            android:clickable="true"
             android:scaleType="centerInside"
             android:padding="18dp" />
 
@@ -85,7 +81,6 @@
             android:layout_centerHorizontal="true"
             android:src="@drawable/attach_selector"
             android:background="@android:color/transparent"
-            android:clickable="true"
             android:scaleType="centerInside"
             android:layout_weight="0.25"
             android:padding="18dp" />

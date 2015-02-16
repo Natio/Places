@@ -33,6 +33,7 @@ public class Utils
     public static final int VID_SHOOT_REQUEST_CODE = 90;
     public static final int PIC_CAPTURE_REQUEST_CODE = 91;
     public static final int PHONE_MEDIA_REQUEST_CODE = 92;
+    public static final int RECORD_AUDIO_REQUEST_CODE = 95;
 
 
     public static final int SETTINGS_REQUEST_CODE = 92;

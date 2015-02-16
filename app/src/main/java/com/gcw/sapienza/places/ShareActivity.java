@@ -49,7 +49,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class ShareActivity extends ActionBarActivity implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
+public class ShareActivity extends ActionBarActivity implements View.OnLongClickListener, View.OnClickListener
 {
 
     private static final String TAG = "ShareActivity";
@@ -84,9 +84,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     private File audio;
     private File phoneMedia;
 
-    protected static MediaRecorder audioRec;
-    protected static String audio_filename;
-
     private File imageFile;
 
     private FlagUploader uploader;
@@ -100,7 +97,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     private static final String PIC_NOT_FOUND_TEXT = "Error encountered while retrieving picture\nFlag won't be stored";
     private static final String AUDIO_NOT_FOUND_TEXT = "Error encountered while retrieving recording\nFlag won't be stored";
     private static final String VIDEO_NOT_FOUND_TEXT = "Error encountered while retrieving video\nFlag won't be stored";
-    private static final String ERROR_WHILE_RECORDING_TEXT = "Error encountered while recording";
     private static final String PHONE_MEDIA_NOT_FOUND_TEXT = "Error encountered while retrieving phone media\nFlag won't be stored";
 
 
@@ -303,6 +299,16 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         this.setAudio(this.getAudioPath());
         this.setPhoneMedia(this.getPhoneMediaPath());
 
+        this.picButton.setClickable(true);
+        this.micButton.setClickable(true);
+        this.vidButton.setClickable(true);
+        this.phoneButton.setClickable(true);
+
+        this.picButton.setLongClickable(true);
+        this.micButton.setLongClickable(true);
+        this.vidButton.setLongClickable(true);
+        this.phoneButton.setLongClickable(true);
+
         this.picButton.setOnLongClickListener(this);
         this.micButton.setOnLongClickListener(this);
         this.vidButton.setOnLongClickListener(this);
@@ -311,8 +317,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         this.phoneButton.setOnClickListener(this);
         this.picButton.setOnClickListener(this);
         this.vidButton.setOnClickListener(this);
-
-        this.micButton.setOnTouchListener(this);
+        this.micButton.setOnClickListener(this);
 
         this.textView = (TextView)findViewById(R.id.share_text_field);
         this.textView.setGravity(Gravity.CENTER);
@@ -349,86 +354,17 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     }
 
     @Override
-    public boolean onTouch(View v, MotionEvent event){
-        if(ShareActivity.this.isSoundCaptured)
-        {
-            return false;
-        }
-
-        Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
-        vibrator.vibrate(Utils.VIBRATION_DURATION);
-
-        if (event.getAction() == MotionEvent.ACTION_DOWN)
-        {
-
-            restoreAlpha(AUDIO_CODE);
-
-            try
-            {
-                audio_filename = Utils.createAudioFile(ShareActivity.AUDIO_FORMAT, ShareActivity.this).getAbsolutePath(); //Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + System.currentTimeMillis() + ".3gp";
-                audioRec = new MediaRecorder();
-                audioRec.setAudioSource(MediaRecorder.AudioSource.MIC);
-                audioRec.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-                audioRec.setOutputFile(audio_filename);
-                audioRec.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-                audioRec.prepare();
-            } catch (IOException ioe)
-            {
-                ioe.printStackTrace();
-                Toast.makeText(this, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
-                Log.e(TAG, ERROR_WHILE_RECORDING_TEXT);
-            }
-            audioRec.start();
-        }
-        else if(event.getAction() == MotionEvent.ACTION_UP)
-        {
-            if(audioRec == null)
-            {
-                Toast.makeText(this, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
-                Log.v(TAG, ERROR_WHILE_RECORDING_TEXT);
-                return true;
-            }
-            else try
-            {
-                audioRec.stop();
-                audioRec.release();
-                audioRec = null;
-            }
-            catch(RuntimeException re)
-            {
-                re.printStackTrace();
-                Toast.makeText(this, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
-                return true;
-            }
-            ((ImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.mic_green_taken));
-            File audio_file = new File(audio_filename);
-            try
-            {
-                FileInputStream inStream = new FileInputStream(audio_file);
-                ShareActivity.this.setAudio(audio_filename);
-
-                changeAlphaBasedOnSelection(AUDIO_CODE);
-
-                inStream.close();
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
-        }
-        return true;
-    }
-
-    @Override
     public void onClick(View v)
     {
         if(v.getId() == R.id.vid_button) shootVid(v);
         else if(v.getId() == R.id.pic_button) takePic(v);
         else if(v.getId() == R.id.phone_button) getMedia(v);
+        else if(v.getId() == R.id.mic_button) recordAudio();
     }
 
     @Override
     public boolean onLongClick(final View v)
     {
-
         Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
 
@@ -668,8 +604,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
     }
 
-
-
     protected void resetMedia()
     {
         this.setAudio(null);
@@ -737,6 +671,12 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 this.startActivityForResult(takePicture, Utils.PIC_CAPTURE_REQUEST_CODE);
             }
         }
+    }
+
+    private void recordAudio()
+    {
+        Intent recordAudio = new Intent(this, AudioRecordingActivity.class);
+        this.startActivityForResult(recordAudio, Utils.RECORD_AUDIO_REQUEST_CODE);
     }
 
 
@@ -829,6 +769,21 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         }
         else if(requestCode == Utils.PHONE_MEDIA_REQUEST_CODE && resultCode == Activity.RESULT_CANCELED){
             Log.v(TAG, "Phone Media Intent canceled");
+        }
+        else if(requestCode == Utils.RECORD_AUDIO_REQUEST_CODE)
+        {
+            if(resultCode == Activity.RESULT_OK)
+            {
+                String audioPath = data.getExtras().getString("result");
+
+                this.setAudio(audioPath);
+
+                changeAlphaBasedOnSelection(AUDIO_CODE);
+            }
+            else
+            {
+                Toast.makeText(this, "Error encountered while retrieving recording", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -992,7 +947,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 this.phoneButton.setAlpha(0.5f);
 
                 this.phoneButton.setEnabled(false);
-                this.micButton.setEnabled(false);
+                this.picButton.setEnabled(false);
                 this.vidButton.setEnabled(false);
 
                 break;
@@ -1008,7 +963,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
                 this.phoneButton.setEnabled(false);
                 this.micButton.setEnabled(false);
-                this.micButton.setEnabled(false);
+                this.picButton.setEnabled(false);
 
                 break;
 
@@ -1021,7 +976,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 this.micButton.setAlpha(0.5f);
                 this.vidButton.setAlpha(0.5f);
 
-                this.micButton.setEnabled(false);
+                this.picButton.setEnabled(false);
                 this.vidButton.setEnabled(false);
                 this.micButton.setEnabled(false);
 

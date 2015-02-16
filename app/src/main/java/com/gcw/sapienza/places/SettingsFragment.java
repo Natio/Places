@@ -1,11 +1,14 @@
 package com.gcw.sapienza.places;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
-
-import com.gcw.sapienza.places.utils.FacebookUtils;
 
 /**
  * Created by Simone on 12/30/2014.
@@ -17,10 +20,15 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     private int easterCount;
     private boolean eggEnabled;
     private final int EASTER_THRESHOLD = 10;
+    private boolean firstClick;
+
+    private AlertDialog dialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        firstClick = true;
 
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.layout.settings_layout);
@@ -89,6 +97,53 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
 
     private void showEasterEgg()
     {
-        Toast.makeText(getActivity(), "Hey! What did you expect?", Toast.LENGTH_SHORT).show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+
+        builder.setView(inflater.inflate(R.layout.custom_dialog_layout, null))
+                .setTitle("Is this the man of the year?")
+                .setPositiveButton("Yes", null)
+                .setNegativeButton("No", null)
+                .setCancelable(false);
+
+        dialog = builder.create();
+            dialog.show();
+
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(new CustomListener(dialog));
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new CustomListener(dialog));
+    }
+
+    class CustomListener implements View.OnClickListener
+    {
+        private final AlertDialog dialog;
+
+        public CustomListener(AlertDialog dialog)
+        {
+            this.dialog = dialog;
+        }
+        @Override
+        public void onClick(View v)
+        {
+            Button b = (Button)v;
+
+            if(b.getText().equals("No"))
+            {
+                if (firstClick)
+                {
+                    b.setText("Yes");
+
+                    firstClick = false;
+                }
+                else getRidOfDialogAndShowToast();
+            }
+            else getRidOfDialogAndShowToast();
+        }
+    }
+
+    private void getRidOfDialogAndShowToast()
+    {
+        Toast.makeText(getActivity(), "Simone likes this.", Toast.LENGTH_LONG).show();
+
+        dialog.dismiss();
     }
 }
