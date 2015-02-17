@@ -17,16 +17,13 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gcw.sapienza.places.FlagActivity;
 import com.gcw.sapienza.places.FlagFragment;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
-import com.gcw.sapienza.places.ShareActivity;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.model.FlagReport;
 import com.gcw.sapienza.places.services.LocationService;
@@ -45,9 +42,6 @@ import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -253,8 +247,6 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder> {
             flagViewHolder.username.setText(fb_username);
         }
 
-        Picasso.with(this.view.getContext()).setIndicatorsEnabled(false);
-
         FacebookUtils.getInstance().getFbProfilePictureURL(user_id, FacebookUtils.PicSize.SMALL, new FacebookUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
@@ -348,7 +340,7 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder> {
             bundle.putString("date", sDate);
             bundle.putString("weather", mFlag.getWeather());
             bundle.putString("category", mFlag.getCategory());
-
+/*
             try
             {
                 ParseFile pic_file;
@@ -394,12 +386,25 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder> {
                 Log.v(TAG, "Parse file(s) couldn't be retrieved");
                 pe.printStackTrace();
             }
-
+*/
             // intent.putExtras(bundle);
 
             // mContext.startActivity(intent);
 
+            ParseFile file;
+            FlagFragment.MediaType mediaType = FlagFragment.MediaType.NONE;
+            if((file = this.mFlag.getPic()) != null){
+                mediaType = FlagFragment.MediaType.PIC;
+            }
+            else if((file = this.mFlag.getVideo()) != null){
+                mediaType = FlagFragment.MediaType.VIDEO;
+            }
+            else if((file = this.mFlag.getAudio()) != null){
+                mediaType = FlagFragment.MediaType.AUDIO;
+            }
+
             FlagFragment frag = new FlagFragment();
+            frag.setMedia(file, mediaType);
             frag.setArguments(bundle);
 
             ((MainActivity2)mainActivity).switchToFlagFrag(frag);

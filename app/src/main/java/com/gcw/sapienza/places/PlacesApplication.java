@@ -145,7 +145,7 @@ public class PlacesApplication extends Application{
         PlacesApplication.placesApplication = this;
 
         if(BuildConfig.DEBUG){
-            Picasso.with(this).setIndicatorsEnabled(true); // if in debug show color indicators on pictures
+            Picasso.with(this).setIndicatorsEnabled(false); // if in debug show color indicators on pictures
         }
 
 

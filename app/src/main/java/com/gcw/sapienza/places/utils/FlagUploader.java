@@ -246,6 +246,7 @@ public class FlagUploader {
      */
     private void loadFlag(){
         // FlagUploader.this.callbacks.onPercentage(100, "Loading last bits :)");
+        System.gc();
         this.flag.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
