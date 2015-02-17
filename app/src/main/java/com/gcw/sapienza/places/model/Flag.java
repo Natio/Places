@@ -59,6 +59,8 @@ public class Flag extends ParseObject{
         return (String)this.get(FB_NAME_KEY);
     }
 
+    public boolean getInPlace() { return this.getBoolean(IN_PLACE_KEY); }
+
     @SuppressWarnings({"UnusedDeclaration"})
     public void setPictureFile(ParseFile pic){
         this.put(PICTURE_KEY, pic);

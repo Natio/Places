@@ -340,6 +340,7 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder> {
             bundle.putString("date", sDate);
             bundle.putString("weather", mFlag.getWeather());
             bundle.putString("category", mFlag.getCategory());
+            bundle.putBoolean("inPlace", mFlag.getInPlace());
 /*
             try
             {

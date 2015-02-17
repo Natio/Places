@@ -86,6 +86,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         date = bundle.getString("date");
         weather = bundle.getString("weather");
         category = bundle.getString("category");
+        inPlace = bundle.getBoolean("inPlace");
+
+        Log.d(TAG, "In Place media? " + inPlace);
     }
 
     @Override
