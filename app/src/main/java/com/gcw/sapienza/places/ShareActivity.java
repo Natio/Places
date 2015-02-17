@@ -57,6 +57,8 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     public static final String AUDIO_FORMAT = ".3gp";
     public static final String VIDEO_FORMAT = ".mp4";
 
+    private static final String BUNDLED_IMG_PATH = "image path";
+
     private static final int PIC_CODE = 0;
     private static final int AUDIO_CODE = 1;
     private static final int VIDEO_CODE = 2;
@@ -84,7 +86,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     private File audio;
     private File phoneMedia;
 
-    private File imageFile;
+    private static File imageFile;
 
     private FlagUploader uploader;
 
@@ -439,6 +441,16 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle  outState){
+        outState.putString(BUNDLED_IMG_PATH, this.imageFile.getAbsolutePath());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle  outState){
+        this.imageFile = new File(outState.getString(BUNDLED_IMG_PATH));
+    }
+
     /**
      * Checks if all sharing constraints are satisfied. This method also shows Toasts if constraints are not satisfied
      * @return true if it is possible to share
@@ -729,7 +741,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
             if(this.imageFile == null || !this.imageFile.canRead()){
                 Toast.makeText(getApplicationContext(), "Error encountered while taking picture", Toast.LENGTH_LONG).show();
-                Log.v(TAG, "Error encountered while taking picture");
+                Log.e(TAG, "Error encountered while taking picture");
                 this.imageFile = null;
                 return;
             }

@@ -34,7 +34,10 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import com.gcw.sapienza.places.NoFlagsFragment;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.SettingsFragment;
@@ -52,6 +55,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.plus.model.people.Person;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -59,8 +63,7 @@ import java.util.List;
 
 
 public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener,
-                                                                OnMapReadyCallback,
-                                                                Preference.OnPreferenceChangeListener {
+                                                                OnMapReadyCallback{
 
     public static String TAG = MainActivity2.class.getName();
     private DrawerLayout drawerLayout;
@@ -197,10 +200,23 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
             @Override
             public void onReceive(Context context, Intent intent)
             {
-                if(intent.getAction().equals(LocationService.FOUND_NEW_FLAGS_NOTIFICATION))
-                {
-                    updateMarkersOnMap();
+                switch(intent.getAction()) {
+//                    TODO first work towards implementing a fragment switch when flaglist is empty
+                    case LocationService.FOUND_NEW_FLAGS_NOTIFICATION:
+//                        Fragment listFragment = new FlagsListFragment();
+//                        MainActivity2.this.getSupportFragmentManager().beginTransaction()
+//                                .replace(R.id.swipe_refresh, listFragment).commit();
+                        break;
+
+                    case LocationService.FOUND_NO_FLAGS_NOTIFICATION:
+//                        NoFlagsFragment noFlagsFragment = new NoFlagsFragment();
+//                        MainActivity2.this.getSupportFragmentManager().beginTransaction()
+//                                .replace(R.id.swipe_refresh, noFlagsFragment).commit();
+                        break;
+
+                    default:
                 }
+                updateMarkersOnMap();
             }
         };
     }
@@ -223,6 +239,8 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         this.gMap.setMyLocationEnabled(true);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
+        LocalBroadcastManager.getInstance(this).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
+
 
         this.updateMarkersOnMap();
     }
@@ -267,7 +285,8 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
             if(pins.size() > 0)
             {
                 LatLngBounds bounds = builder.build();
-                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, MAP_BOUNDS));
+//                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, MAP_BOUNDS));
+                this.gMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, MAP_BOUNDS));
             }else{
                 Location currentLocation = gMap.getMyLocation();
                 if(currentLocation != null){
@@ -565,58 +584,6 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         {
             switchToListMapFrags();
         }
-    }
-
-    @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue)
-    {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        SharedPreferences.Editor editor = preferences.edit();
-
-        if(preference.getKey().equals("meFilter") ||
-                preference.getKey().equals("flFilter") ||
-                preference.getKey().equals("strangersFilter") ||
-                preference.getKey().equals("timeFilter") ||
-                preference.getKey().equals("thoughtsCheck") ||
-                preference.getKey().equals("funCheck") ||
-                preference.getKey().equals("landscapeCheck") ||
-                preference.getKey().equals("foodCheck") ||
-                preference.getKey().equals("noneCheck"))
-
-        {
-            Log.d(TAG, "Called onPreferenceChange for: " + preference.getKey());
-            editor.putBoolean(preference.getKey(), (boolean)newValue);
-            editor.commit();
-        }
-        else if(preference.getKey().equals("seekBar"))
-        {
-            preference.setDefaultValue(newValue);
-
-            int value = (int)newValue + 1;
-
-            Utils.MAP_RADIUS = value / 10f;
-
-            showToast("Radius set to " + value * 100 + " meters.");
-
-            Log.d(TAG, "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
-        }
-        else if(preference.getKey().equals("maxFetch"))
-        {
-            preference.setDefaultValue(newValue);
-
-            int value = Utils.stepValues[(int)newValue];
-
-            Utils.MAX_PINS = value;
-
-            showToast("Max number of visible flags: " + value + '.');
-
-            Log.d(TAG, "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
-        }
-
-        Location currentLocation = PlacesApplication.getInstance().getLocation();
-        PlacesApplication.getInstance().getLocationService().queryParsewithLocation(currentLocation);
-
-        return true;
     }
 
     private void showToast(String text) {

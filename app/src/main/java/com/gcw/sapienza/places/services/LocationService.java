@@ -54,6 +54,8 @@ public class LocationService extends Service implements
 
     public static final String FOUND_NEW_FLAGS_NOTIFICATION = "FOUND_NEW_FLAGS_NOTIFICATION";
 
+    public static final String FOUND_NO_FLAGS_NOTIFICATION = "FOUND_NO_FLAGS_NOTIFICATION";
+
     public static final String NO_FLAGS_VISIBLE = "you won't be able to see any flags with these settings";
 
     private final IBinder mBinder = new LocalBinder();
@@ -267,8 +269,11 @@ public class LocationService extends Service implements
                         " pins within " + Utils.MAP_RADIUS + " km");
                 updateApplication();
 
-
-                LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
+                if(parseObjects.size() > 0) {
+                    LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
+                }else{
+                    LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
+                }
 
             }
         });
