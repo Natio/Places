@@ -74,12 +74,10 @@
         android:layout_centerHorizontal="true"
         android:id="@+id/video_holder" >
 
+        <!-- hard-coded dimensions, must be changed -->
         <VideoView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:maxHeight="270dp"
-            android:maxWidth="270dp"
-            android:adjustViewBounds="true"
+            android:layout_height="275dp"
             android:background="@drawable/my_border"
             android:id="@+id/vid"
             android:layout_gravity="center_vertical|center_horizontal" />
