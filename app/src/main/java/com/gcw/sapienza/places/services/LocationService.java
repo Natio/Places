@@ -120,6 +120,10 @@ public class LocationService extends Service implements
         }
     }
 
+    /**
+     * given location, we fetch the Flags nearby we are interested in
+     * @param location the location we want to find Flags nearby to
+     */
     public void queryParsewithLocation(Location location)
     {
         //creates a fake location for testing if it is running on simulator
@@ -322,6 +326,10 @@ public class LocationService extends Service implements
         updateApplication();
     }
 
+    /**
+     * takes care of handling the user notifications.
+     * Called when new Flags are found
+     */
     private void notifyUser() {
         int newFlags = updateCachedPostsAndRet();
         if(newFlags > 0) {
@@ -349,6 +357,12 @@ public class LocationService extends Service implements
         }
     }
 
+    /**
+     * update the cache containing the Flags we have met already
+     * in the close past. Returns the number of new Flags met and
+     * puts them into cache
+     * @return the number of Flags met that are not stored in cache
+     */
     private int updateCachedPostsAndRet() {
         long newTimestamp = new java.util.Date().getTime();
 
@@ -373,6 +387,9 @@ public class LocationService extends Service implements
         return nonCachedFlags;
     }
 
+    /**
+     * removes the Flags from cache whose cache timer is expired
+     */
     private void removeCachedPosts() {
         this.lastCacheUpdate = new java.util.Date().getTime();
         for(String tf: this.cachedFlags.keySet()){
@@ -382,6 +399,9 @@ public class LocationService extends Service implements
         }
     }
 
+    /**
+     * updates the user location and the Flags that appear in to the user
+     */
     private void updateApplication(){
         if(listener != null) {
             listener.setLocation(location);
@@ -397,6 +417,10 @@ public class LocationService extends Service implements
         connectToGoogleAPI();
     }
 
+    /**
+     * exploit the Google Play Services for fetching data
+     * related to user location
+     */
     private void connectToGoogleAPI() {
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);

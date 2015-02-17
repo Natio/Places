@@ -206,6 +206,9 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         return this.phoneMedia == null ? null : this.phoneMedia.getAbsolutePath();
     }
 
+    /**
+     * handle Flag posting from outside the application
+     */
     private void handleIntent(){
         Intent intent = this.getIntent();
         String action = intent.getAction();
@@ -439,6 +442,14 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
     }
 
+    /**
+     * in case process gets killed while producing media,
+     * make sure the state of the program we are interested in
+     * gets saved
+     * @param outState the bundle we use to store the interesting
+     *                 data of the current state of the application
+     *                 before the process gets killed and restarted
+     */
     @Override
     protected void onSaveInstanceState(Bundle  outState){
         if(this.imageFile != null){
@@ -447,6 +458,11 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
     }
 
+    /**
+     * restore the state of the program
+     * @param outState the bundle we restore the state
+     *                 of the application from
+     */
     @Override
     protected void onRestoreInstanceState(Bundle outState){
         String imageFilePath = outState.getString(BUNDLED_IMG_PATH);
@@ -460,7 +476,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
      * Checks if all sharing constraints are satisfied. This method also shows Toasts if constraints are not satisfied
      * @return true if it is possible to share
      */
-
     private boolean canShare(Location current_location){
         //if there is no content
         if(this.textView.getText().toString().length() == 0 && !isPicTaken
@@ -495,6 +510,11 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     }
 
 
+    /**
+     * build up a Flag with the relevant metadata and media
+     * and shoot upload. Show toast to notify user about
+     * success/fail of the upload
+     */
     private void share()
     {
         Location current_location =  PlacesApplication.getInstance().getLocation();
@@ -561,7 +581,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             }
             if( isPhoneMediaSelected && this.phoneMedia != null){
                 Log.v(TAG, "Successfully retrieved media.");
-                // FIXME temporarily handling attachments as pictures
                 // uploader.setPhoneMediaFile(this.phoneMedia);
                 if(isImage(this.phoneMedia))
                 {
@@ -628,6 +647,9 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
     }
 
+    /**
+     * clear media to be shared
+     */
     protected void resetMedia()
     {
         this.setAudio(null);
@@ -637,11 +659,20 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         Log.v(TAG, "Media has been cleared!");
     }
 
+    /**
+     * if sharing fails, print reason via Toast
+     * @param toastText reason for failed sharing
+     */
     protected void onShareFailed(String toastText)
     {
         Toast.makeText(this, toastText, Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * if sharing succeeds, mark the result activity as OK
+     * and finish it
+     * @param toastText the text indicating that sharing succeeded
+     */
     protected void onShareSucceeded(String toastText)
     {
         /*
@@ -813,6 +844,11 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         }
     }
 
+    /**
+     * check if the file is an image
+     * @param file the file to be checked
+     * @return true if the file is an image
+     */
     public static boolean isImage(File file) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
@@ -1017,6 +1053,10 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         }
     }
 
+    /**
+     * restore the media icons
+     * @param media_code the code of button we are interested in restoring
+     */
     private void restoreAlpha(int media_code)
     {
         if(media_code == -1 || media_code == PIC_CODE){
