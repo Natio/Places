@@ -59,6 +59,7 @@ public class Utils
      * being kept here just to avoid breaking legacy code.
      * eventually, these links to MainActivity will need some clean up
      */
+    @Deprecated
     public static MainActivity mainActivity;
 
 /*

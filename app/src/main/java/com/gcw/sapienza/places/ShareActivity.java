@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
-import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,7 +23,6 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.ImageButton;
@@ -42,7 +40,6 @@ import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseAnalytics;
 import com.parse.ParseGeoPoint;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -86,7 +83,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     private File audio;
     private File phoneMedia;
 
-    private static File imageFile;
+    private File imageFile;
 
     private FlagUploader uploader;
 
@@ -443,12 +440,19 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
     @Override
     protected void onSaveInstanceState(Bundle  outState){
-        outState.putString(BUNDLED_IMG_PATH, this.imageFile.getAbsolutePath());
+        if(this.imageFile != null){
+            outState.putString(BUNDLED_IMG_PATH, this.imageFile.getAbsolutePath());
+        }
+
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle  outState){
-        this.imageFile = new File(outState.getString(BUNDLED_IMG_PATH));
+    protected void onRestoreInstanceState(Bundle outState){
+        String imageFilePath = outState.getString(BUNDLED_IMG_PATH);
+        if(imageFilePath != null){
+            this.imageFile = new File(imageFilePath);
+        }
+
     }
 
     /**
