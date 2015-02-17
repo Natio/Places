@@ -1,7 +1,6 @@
 package com.gcw.sapienza.places;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -9,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -18,19 +16,22 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
+import com.parse.GetDataCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 
 /**
  * Created by mic_head on 02/02/15.
@@ -44,29 +45,34 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private String category;
     private boolean inPlace;
 
-    private String pic_path;
-    private String audio_path;
-    private String video_path;
 
     private MediaPlayer mediaPlayer;
     private VideoView vv;
     private ImageView iw;
     private TextView authorTextView;
-    private EditText flagText;
-    private ImageView profilePicimageView;
     private RelativeLayout frameLayout;
-    private ImageView focused_iw;
     private ImageView playVideoButton;
     private FrameLayout videoHolder;
     private ImageView audioHolder;
 
-    private enum MediaType{ PIC, AUDIO, VIDEO, NONE }
+    public static enum MediaType{ PIC, AUDIO, VIDEO, NONE }
     private MediaType mediaType;
+    private ParseFile mediaFile;
 
     private View view;
 
     @SuppressWarnings("UnusedDeclaration")
     private static final String TAG = "FlagFragment";
+
+    /**
+     *  Must be called BEFORE adding the fragment to the
+     * @param mediaFile the file to display
+     * @param type the type of the file
+     */
+    public void setMedia(ParseFile mediaFile, MediaType type){
+        this.mediaType = type;
+        this.mediaFile = mediaFile;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -80,30 +86,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         date = bundle.getString("date");
         weather = bundle.getString("weather");
         category = bundle.getString("category");
-        inPlace = bundle.getBoolean("inPlace");
-
-        pic_path = bundle.getString("picture");
-        if(pic_path != null )
-        {
-            mediaType = MediaType.PIC;
-            return;
-        }
-
-        video_path = bundle.getString("video");
-        if(video_path != null )
-        {
-            mediaType = MediaType.VIDEO;
-            return;
-        }
-
-        audio_path = bundle.getString("audio");
-        if(audio_path != null )
-        {
-            mediaType = MediaType.AUDIO;
-            return;
-        }
-
-        mediaType = MediaType.NONE;
     }
 
     @Override
@@ -123,9 +105,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         iw = (ImageView)view.findViewById(R.id.pic);
         vv = (VideoView)view.findViewById(R.id.vid);
-        flagText = (EditText)view.findViewById(R.id.text);
+        EditText flagText = (EditText)view.findViewById(R.id.text);
         authorTextView = (TextView)view.findViewById(R.id.author);
-        profilePicimageView = (ImageView)view.findViewById(R.id.profile_pic);
+        ImageView profilePicimageView = (ImageView)view.findViewById(R.id.profile_pic);
         frameLayout = (RelativeLayout)view.findViewById(R.id.frame_layout);
         playVideoButton = (ImageView)view.findViewById(R.id.play_video_button);
         videoHolder = (FrameLayout)view.findViewById(R.id.video_holder);
@@ -137,71 +119,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         frameLayout.setOnClickListener(this);
         // playVideoButton.setOnClickListener(this);
 
-        if(mediaType == MediaType.NONE)
-        {
-            audioHolder.setVisibility(View.GONE);
-            iw.setVisibility(View.GONE);
-            videoHolder.setVisibility(View.GONE);
-        }
-        else if(mediaType == MediaType.AUDIO)
-        {
-            iw.setVisibility(View.GONE);
-            videoHolder.setVisibility(View.GONE);
-
-            try {
-                File temp = new File(audio_path);
-
-                mediaPlayer = new MediaPlayer();
-
-                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp)
-                    {
-                        audioHolder.setImageResource(R.drawable.play_button);
-                    }
-                });
-
-                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-                FileInputStream inStream = new FileInputStream(temp);
-                mediaPlayer.setDataSource(inStream.getFD());
-
-                mediaPlayer.prepare();
-            }
-            catch (IOException ioe)
-            {
-                ioe.printStackTrace();
-            }
-        }
-        else if(mediaType == MediaType.PIC)
-        {
-            Bitmap bm = BitmapFactory.decodeFile(this.pic_path);
-
-            audioHolder.setVisibility(View.GONE);
-            videoHolder.setVisibility(View.GONE);
-            iw.setImageBitmap(bm);
-
-            focused_iw = (ImageView)view.findViewById(R.id.focused_pic);
-            focused_iw.setImageBitmap(bm);
-        }
-        else
-        {
-            audioHolder.setVisibility(View.GONE);
-            iw.setVisibility(View.GONE);
-
-            Uri videoUri = Uri.parse(video_path);
-            vv.setVideoURI(videoUri);
-            playVideoButton.setVisibility(View.VISIBLE);
-            // playVideo();
-
-            vv.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
-            {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    playVideoButton.setVisibility(View.VISIBLE);
-                }
-            });
-        }
+        this.changeLayoutAccordingToMediaType();
 
         flagText.setText(text);
 
@@ -249,7 +167,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     @Override
     public boolean onTouch(View v, MotionEvent event)
     {
-        if(v.getId() == vv.getId() && event.getAction() == MotionEvent.ACTION_DOWN) return playVideo();
+        if(v.getId() == vv.getId() && event.getAction() == MotionEvent.ACTION_DOWN){
+            return playVideo();
+        }
 
         return false;
     }
@@ -285,32 +205,163 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         return true;
     }
 
-    @Deprecated
-    private void loadProfilePictureFromUrl(String url){
-        Picasso.with(getActivity().getApplicationContext()).load(url).into((ImageView)view.findViewById(R.id.profile_pic));
-    }
 
-    @Deprecated //use loadProfilePictureFromUrl
-    protected void streamProfilePic(final String image_url){
-        new Thread(new Runnable()
-        {
+    private void onVideoDownloaded(String videoPath){
+        Uri videoUri = Uri.parse(videoPath);
+        vv.setVideoURI(videoUri);
+        playVideoButton.setVisibility(View.VISIBLE);
+        // playVideo();
+
+        vv.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
-            public void run()
-            {
-                try
-                {
-                    final Bitmap bitmap = BitmapFactory.decodeStream(new URL(image_url).openConnection().getInputStream());
-
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ((ImageView) view.findViewById(R.id.profile_pic)).setImageBitmap(bitmap);
-                        }
-                    });
-                }
-                catch (IOException ioe){ ioe.printStackTrace(); }
+            public void onCompletion(MediaPlayer mp) {
+                playVideoButton.setVisibility(View.VISIBLE);
             }
-        }).start();
+        });
     }
+
+    private void onAudioDownloaded(String audioPath){
+        try {
+            audioHolder.setVisibility(View.VISIBLE);
+            File temp = new File(audioPath);
+
+            mediaPlayer = new MediaPlayer();
+
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp)
+                {
+                    audioHolder.setImageResource(R.drawable.play_button);
+                }
+            });
+
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+            FileInputStream inStream = new FileInputStream(temp);
+            mediaPlayer.setDataSource(inStream.getFD());
+
+            mediaPlayer.prepare();
+        }
+        catch (IOException ioe)
+        {
+            ioe.printStackTrace();
+        }
+    }
+
+    private void changeLayoutAccordingToMediaType(){
+        if(mediaType == MediaType.NONE)
+        {
+            audioHolder.setVisibility(View.GONE);
+            iw.setVisibility(View.GONE);
+            videoHolder.setVisibility(View.GONE);
+        }
+        else if(mediaType == MediaType.AUDIO)
+        {
+            iw.setVisibility(View.GONE);
+            videoHolder.setVisibility(View.GONE);
+            audioHolder.setVisibility(View.GONE);
+        }
+        else if(mediaType == MediaType.PIC)
+        {
+            audioHolder.setVisibility(View.GONE);
+            videoHolder.setVisibility(View.GONE);
+            Picasso.with(this.getActivity()).load(this.mediaFile.getUrl()).into(this.iw);
+
+            /*Bitmap bm = BitmapFactory.decodeFile(picPath);
+            iw.setImageBitmap(bm);
+            focused_iw = (ImageView)view.findViewById(R.id.focused_pic);
+            focused_iw.setImageBitmap(bm);*/
+
+            ImageView focused_imageView = (ImageView)this.view.findViewById(R.id.focused_pic);
+            Picasso.with(this.getActivity()).load(this.mediaFile.getUrl()).into(focused_imageView);
+
+        }
+        else
+        {
+            audioHolder.setVisibility(View.GONE);
+            iw.setVisibility(View.GONE);
+        }
+
+
+        if(this.mediaType != MediaType.NONE && this.mediaType != MediaType.PIC){
+            System.gc();
+
+            this.mediaFile.getDataInBackground(new GetDataCallback() {
+                @Override
+                public void done(byte[] bytes, ParseException e) {
+                    if(!FlagFragment.this.isAdded()){
+                        //orrible hack to prevent a crash when the Fragment is detached from an activity.
+                        return;
+                    }
+                    if(e == null){
+                        try {
+
+                            MediaType mediaType = FlagFragment.this.mediaType;
+                            File tempFile = FlagFragment.this.tempFileForMediaType(mediaType);
+                            FileOutputStream outputStream = new FileOutputStream(tempFile);
+                            outputStream.write(bytes);
+                            outputStream.flush();
+                            outputStream.close();
+
+                            if(mediaType == MediaType.AUDIO){
+                                FlagFragment.this.onAudioDownloaded(tempFile.getAbsolutePath());
+                            }
+                            else if(mediaType == MediaType.VIDEO){
+                                FlagFragment.this.onVideoDownloaded(tempFile.getAbsolutePath());
+                            }
+                            FlagFragment.this.mediaFile = null;
+
+                        }
+                        catch(IOException io){
+                            Log.d(TAG, "IO Error", io);
+                            Toast.makeText(FlagFragment.this.getActivity(), "Error downloading file", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                    else{
+                        Log.d(TAG, "Download Error", e);
+                        Toast.makeText(FlagFragment.this.getActivity(), "Error downloading file", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
+
+
+    }
+
+
+
+
+
+    private  File tempFileForMediaType(MediaType type){
+        String fileName;
+        String fileFormat;
+        switch (type){
+            case AUDIO:
+                fileFormat = ShareActivity.AUDIO_FORMAT;
+                fileName = "places_temp_audio";
+                break;
+            case VIDEO:
+                fileFormat = ShareActivity.VIDEO_FORMAT;
+                fileName = "places_temp_video";
+                break;
+            case PIC:
+                fileFormat = ShareActivity.PICTURE_FORMAT;
+                fileName = "places_temp_pic";
+                break;
+            default: return null;
+        }
+
+        try{
+            Log.d(TAG, "name "+fileName);
+            Log.d(TAG, "format "+fileFormat);
+            return File.createTempFile( fileName, fileFormat, this.getActivity().getCacheDir());
+        }
+        catch(IOException e){
+            Log.d(TAG, "Cannot create temp file", e);
+            return null;
+        }
+
+    }
+
 }
 
