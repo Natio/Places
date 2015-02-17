@@ -42,6 +42,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private String date;
     private String weather;
     private String category;
+    private boolean inPlace;
 
     private String pic_path;
     private String audio_path;
@@ -79,6 +80,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         date = bundle.getString("date");
         weather = bundle.getString("weather");
         category = bundle.getString("category");
+        inPlace = bundle.getBoolean("inPlace");
 
         pic_path = bundle.getString("picture");
         if(pic_path != null )

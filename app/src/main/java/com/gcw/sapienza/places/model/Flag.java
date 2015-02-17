@@ -25,6 +25,7 @@ public class Flag extends ParseObject{
     public static final String CATEGORY_KEY = "category";
     public static final String TEXT_KEY = "text";
     public static final String LOCATION_KEY = "location";
+    public static final String IN_PLACE_KEY = "inPlace";
 
     /**
      *
@@ -94,4 +95,6 @@ public class Flag extends ParseObject{
     }
 
     public void setFbName(String name) { this.put(FB_NAME_KEY, name); }
+
+    public void setInPlace(boolean inPlace) { this.put(IN_PLACE_KEY, inPlace); }
 }

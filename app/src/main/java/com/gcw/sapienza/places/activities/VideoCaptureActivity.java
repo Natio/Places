@@ -56,6 +56,7 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
     private boolean inPreview=false;
     private boolean isRecording = false;
     private boolean hdEnabled = false;
+    private int supportedFPS;
 
 
     @Override
@@ -99,6 +100,7 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
         if(!isHdAvailable()){
             this.hdButton.setVisibility(View.GONE);
         }
+        this.supportedFPS = getSupportedFPSAround(VIDEO_FPS);
     }
 
     private boolean isHdAvailable() {
@@ -157,10 +159,6 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
 
     }
 
-    private boolean isHdEnabled(){
-        return hdEnabled;
-    }
-
     private void enableHd() {
         hdEnabled = true;
     }
@@ -177,10 +175,6 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
         }
         Log.d(TAG,"W: "+what);
     }
-
-
-
-
 
     private void startRecordingVideo(){
         this.isRecording = true;
@@ -283,7 +277,7 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
         }
 
         this.mediaRecorder.setOutputFile(this.filePath.getAbsolutePath());
-        this.mediaRecorder.setVideoFrameRate(hdEnabled ? VIDEO_FPS_HD : VIDEO_FPS);
+        this.mediaRecorder.setVideoFrameRate(hdEnabled ? VIDEO_FPS_HD : supportedFPS);
         this.mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         this.mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 
@@ -303,6 +297,17 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
             e.printStackTrace();
         }
 
+    }
+
+    private int getSupportedFPSAround(int videoFps) {
+        List<int[]> supportedFps = camera.getParameters().getSupportedPreviewFpsRange();
+        int currFPS = 0;
+        for(int [] i: supportedFps){
+            if(i[1] >= videoFps * 1000)
+                return videoFps;
+            currFPS = i[1]/1000;
+        }
+        return currFPS;
     }
 
     private int lockAndReturnRightCameraRotation(boolean lock){

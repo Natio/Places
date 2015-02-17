@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
@@ -499,7 +500,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         Location current_location =  PlacesApplication.getInstance().getLocation();
         if(PlacesApplication.isRunningOnEmulator){
             current_location = LocationService.getRandomLocation(current_location, 100);
-            Log.d(TAG, "Generata Posizione casuale per simulatore: "+current_location);
+            Log.d(TAG, "Casual location generated: "+current_location);
         }
 
         if(!this.canShare(current_location)){
@@ -520,6 +521,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         f.setLocation(p);
         f.setText(this.textView.getText().toString());
         f.setWeather(PlacesApplication.getInstance().getWeather());
+        f.setInPlace(!isPhoneMediaSelected);
 
         uploader = new FlagUploader(f, this);
         //uploader.setDeletesFilesOnFinish(true);
@@ -561,7 +563,13 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 Log.v(TAG, "Successfully retrieved media.");
                 // FIXME temporarily handling attachments as pictures
                 // uploader.setPhoneMediaFile(this.phoneMedia);
-                uploader.setPictureFile(this.phoneMedia);
+                if(isImage(this.phoneMedia))
+                {
+                    uploader.setPictureFile(this.phoneMedia);
+                }else
+                {
+                   uploader.setVideoFile(this.phoneMedia);
+                }
             }
             else if( isPhoneMediaSelected ){ // equals isPicTaken && pic == null)
                 Toast.makeText(this, PHONE_MEDIA_NOT_FOUND_TEXT, Toast.LENGTH_LONG).show();
@@ -718,7 +726,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         restoreAlpha(PHONE_MEDIA_CODE);
 
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
+        intent.setType("image/*, video/*");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
         try {
@@ -770,7 +778,8 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         else if(requestCode ==  Utils.PHONE_MEDIA_REQUEST_CODE && resultCode == Activity.RESULT_OK){
             Uri mediaUri = data.getData();
             String mediaPath = getPath(this, mediaUri);
-            if(new File(mediaPath) != null) {
+            File mediaFile = new File(mediaPath);
+            if(mediaFile != null && mediaFile.exists()) {
 
                 this.setPhoneMedia(mediaPath);
 
@@ -802,6 +811,13 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 // Toast.makeText(this, "Error encountered while retrieving recording", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public static boolean isImage(File file) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getPath(), options);
+        return options.outWidth != -1 && options.outHeight != -1;
     }
 
     //from the open source library aFileChooser: https://github.com/iPaulPro/aFileChooser
