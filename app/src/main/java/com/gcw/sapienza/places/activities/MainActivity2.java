@@ -63,7 +63,8 @@ import java.util.List;
 
 
 public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener,
-                                                                OnMapReadyCallback{
+                                                                OnMapReadyCallback,
+                                                                Preference.OnPreferenceChangeListener {
 
     public static String TAG = MainActivity2.class.getName();
     private DrawerLayout drawerLayout;
@@ -584,6 +585,51 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         {
             switchToListMapFrags();
         }
+    }
+
+    @Override
+    public boolean onPreferenceChange(Preference preference, Object newValue)
+    {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        SharedPreferences.Editor editor = preferences.edit();
+        if(preference.getKey().equals("meFilter") ||
+                preference.getKey().equals("flFilter") ||
+                preference.getKey().equals("strangersFilter") ||
+                preference.getKey().equals("timeFilter") ||
+                preference.getKey().equals("thoughtsCheck") ||
+                preference.getKey().equals("funCheck") ||
+                preference.getKey().equals("musicCheck") ||
+                preference.getKey().equals("landscapeCheck") ||
+                preference.getKey().equals("foodCheck") ||
+                preference.getKey().equals("noneCheck"))
+        {
+            Log.d(TAG, "Called onPreferenceChange for: " + preference.getKey());
+            editor.putBoolean(preference.getKey(), (boolean)newValue);
+            editor.commit();
+        }
+        /*
+        else if(preference.getKey().equals("seekBar"))
+        {
+            preference.setDefaultValue(newValue);
+            int value = (int)newValue + 1;
+            Utils.MAP_RADIUS = value / 10f;
+            showToast("Radius set to " + value * 100 + " meters.");
+            Log.d(TAG, "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
+        }
+        */
+        else if(preference.getKey().equals("maxFetch"))
+        {
+            preference.setDefaultValue(newValue);
+            int value = Utils.stepValues[(int)newValue];
+            Utils.MAX_PINS = value;
+            showToast("Max number of visible flags: " + value + '.');
+            Log.d(TAG, "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
+        }
+
+        Location currentLocation = PlacesApplication.getInstance().getLocation();
+        PlacesApplication.getInstance().getLocationService().queryParsewithLocation(currentLocation);
+
+        return true;
     }
 
     private void showToast(String text) {

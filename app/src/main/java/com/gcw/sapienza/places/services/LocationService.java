@@ -157,6 +157,7 @@ public class LocationService extends Service implements
         boolean landscape_check = preferences.getBoolean("landscapeCheck", true);
         boolean food_check = preferences.getBoolean("foodCheck", true);
         boolean none_check = preferences.getBoolean("noneCheck", true);
+        boolean music_check = preferences.getBoolean("musicCheck", true);
 
         Log.v(TAG, "Lone Wolf enabled: " + lone_wolf);
         Log.v(TAG, "With Friends Surrounded enabled: " + with_friends_surrounded);
@@ -168,6 +169,7 @@ public class LocationService extends Service implements
         Log.v(TAG, "Landscape: " + landscape_check);
         Log.v(TAG, "Food: " + food_check);
         Log.v(TAG, "None: " + none_check);
+        Log.v(TAG, "Music: " + music_check);
 
         if(FacebookUtils.getInstance().hasCurrentUserId() == false)
         {
@@ -210,6 +212,7 @@ public class LocationService extends Service implements
         if(landscape_check) selectedCategories.add("Landscape");
         if(food_check) selectedCategories.add("Food");
         if(none_check) selectedCategories.add("None");
+        if(music_check) selectedCategories.add("Music");
         query.whereContainedIn("category", selectedCategories);
 
         if(!storytellers_in_the_dark)

@@ -52,7 +52,7 @@
             android:layout_marginRight="2dp" />
 
         <ImageView
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="175dp"
             android:id="@+id/card_imageView_image"
             android:layout_below="@+id/card_textView_text"
