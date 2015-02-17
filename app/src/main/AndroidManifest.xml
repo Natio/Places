@@ -42,8 +42,8 @@
         android:label="@string/app_name"
         android:theme="@style/CustomActionBarTheme"
         android:name="com.gcw.sapienza.places.PlacesApplication"
-        android:versionCode="6"
-        android:versionName="1.4">
+        android:versionCode="7"
+        android:versionName="1.5">
 
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/app_id"/>
 
