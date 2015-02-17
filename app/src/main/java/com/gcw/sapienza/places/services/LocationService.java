@@ -19,7 +19,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.gcw.sapienza.places.activities.MainActivity2;
-import com.gcw.sapienza.places.MainActivity;
 import com.gcw.sapienza.places.Notifications;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
@@ -37,11 +36,9 @@ import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 
-import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -259,7 +256,7 @@ public class LocationService extends Service implements
         if(archaeologist) query.orderByAscending("createdAt");
         else query.orderByDescending("createdAt");
 
-        query.setLimit(Utils.MAX_PINS);
+        query.setLimit(Utils.MAX_FLAGS);
         if(PlacesApplication.isRunningOnEmulator){
             query.setLimit(50);
         }
@@ -273,7 +270,7 @@ public class LocationService extends Service implements
                 }
                 LocationService.this.parseObjects = parseObjects;
                 Log.d(TAG, "Found " + parseObjects.size() +
-                        " pins within " + Utils.MAP_RADIUS + " km");
+                        " flags within " + Utils.MAP_RADIUS + " km");
                 updateApplication();
 
                 if(parseObjects.size() > 0) {
@@ -319,7 +316,7 @@ public class LocationService extends Service implements
         if(this.parseObjects != null && this.parseObjects.size() > 0
                 && !MainActivity2.isForeground() && FacebookUtils.getInstance().hasCurrentUserId()) {
             Log.d(TAG, "Notifying user..." +
-                    this.parseObjects.size() + " pins found");
+                    this.parseObjects.size() + " flags found");
             notifyUser();
             this.notificationLocation = this.location;
         }
@@ -405,7 +402,7 @@ public class LocationService extends Service implements
     private void updateApplication(){
         if(listener != null) {
             listener.setLocation(location);
-            listener.setPinsNearby(parseObjects);
+            listener.setFlagsNearby(parseObjects);
         }
     }
 

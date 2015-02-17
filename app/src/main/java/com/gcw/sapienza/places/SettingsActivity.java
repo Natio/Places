@@ -69,7 +69,7 @@ Toast radiusToast;
 
             int value = Utils.stepValues[(int)newValue];
 
-            Utils.MAX_PINS = value;
+            Utils.MAX_FLAGS = value;
             Utils.mainActivity.getMosaicFragment().updateHeaderText();
 
             showToast("Max number of visible flags: " + value);

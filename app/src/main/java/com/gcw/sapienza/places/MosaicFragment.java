@@ -185,8 +185,8 @@ public class MosaicFragment extends Fragment implements  AdapterView.OnItemClick
         int range = prefs.getInt("seekBar", 1) + 1;
         Utils.MAP_RADIUS = range / 10f;
         Log.d(TAG, "Updated map radius to " + Utils.MAP_RADIUS);
-        Utils.MAX_PINS = Utils.stepValues[prefs.getInt("maxFetch", 1)];
-        Log.d(TAG, "Updated max pins to " + Utils.MAX_PINS);
+        Utils.MAX_FLAGS = Utils.stepValues[prefs.getInt("maxFetch", 1)];
+        Log.d(TAG, "Updated max pins to " + Utils.MAX_FLAGS);
         updateHeaderText();
     }
 

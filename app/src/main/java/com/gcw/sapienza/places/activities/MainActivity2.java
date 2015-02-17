@@ -1,7 +1,6 @@
 package com.gcw.sapienza.places.activities;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -34,10 +33,8 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.gcw.sapienza.places.NoFlagsFragment;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.SettingsFragment;
@@ -55,7 +52,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.plus.model.people.Person;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -248,16 +244,16 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
 
     public void updateMarkersOnMap()
     {
-        List<Flag> pins= PlacesApplication.getInstance().getFlags();
+        List<Flag> flags= PlacesApplication.getInstance().getFlags();
 
-        if(pins != null && this.gMap != null)
+        if(flags != null && this.gMap != null)
         {
             this.gMap.clear();
 
             //zooms around all the Flags
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
-            for (ParseObject p : pins)
+            for (ParseObject p : flags)
             {
                 Flag f = (Flag) p;
                 ParseGeoPoint location = f.getLocation();
@@ -283,7 +279,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
                         .alpha(0.8f));
             }
 
-            if(pins.size() > 0)
+            if(flags.size() > 0)
             {
                 LatLngBounds bounds = builder.build();
 //                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, MAP_BOUNDS));
@@ -621,7 +617,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         {
             preference.setDefaultValue(newValue);
             int value = Utils.stepValues[(int)newValue];
-            Utils.MAX_PINS = value;
+            Utils.MAX_FLAGS = value;
             showToast("Max number of visible flags: " + value + '.');
             Log.d(TAG, "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
         }

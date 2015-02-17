@@ -31,7 +31,7 @@ public class Utils
      * the static map radius is now set to 150 meters
      */
     public static float MAP_RADIUS = 0.15f;
-    public static int MAX_PINS = 10;
+    public static int MAX_FLAGS = 10;
 
     public static int[] stepValues = {1, 5, 10, 15, 20};
 

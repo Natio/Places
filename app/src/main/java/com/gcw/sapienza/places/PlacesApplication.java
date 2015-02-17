@@ -230,7 +230,7 @@ public class PlacesApplication extends Application{
             PlacesApplication.this.updateWeatherInfo();
         }
         @Override
-        public void setPinsNearby(List<Flag> l){
+        public void setFlagsNearby(List<Flag> l){
             PlacesApplication.this.pinsNearby = l;
         }
     };

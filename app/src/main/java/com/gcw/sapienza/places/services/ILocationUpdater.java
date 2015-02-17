@@ -13,6 +13,6 @@ public interface ILocationUpdater {
 
     public void setLocation(Location l);
 
-    public void setPinsNearby(List<Flag> l);
+    public void setFlagsNearby(List<Flag> l);
 
 }
