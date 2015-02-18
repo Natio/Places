@@ -103,18 +103,30 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
         this.supportedFPS = getSupportedFPSAround(VIDEO_FPS);
     }
 
+    /**
+     * check HD recording availability
+     * @return true if HD recording is available
+     */
     private boolean isHdAvailable() {
         try {
+            if(camera.getParameters() == null){
+                Log.e(TAG, "Camera parameters not available!"); //for debugging on Nexus camera
+            }
             Log.d(TAG, Arrays.asList(camera.getParameters().getSupportedPreviewFpsRange()).toString());
             return camera.getParameters().getSupportedVideoSizes().contains(camera.new Size(1280, 720))
                     && isSupportedFrameRate(VIDEO_FPS_HD);
         }catch(NullPointerException e){
-            Log.e(TAG, "camera is null");
             e.printStackTrace();
             return false;
         }
     }
 
+    /**
+     * check if the frame rate we are interested in
+     * is supported by the device
+     * @param videoFpsHd the frame rate we are interested in
+     * @return
+     */
     private boolean isSupportedFrameRate(int videoFpsHd) {
         List<int[]> supportedFps = camera.getParameters().getSupportedPreviewFpsRange();
         for(int [] i: supportedFps){
