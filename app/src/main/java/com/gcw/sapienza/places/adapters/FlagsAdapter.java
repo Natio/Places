@@ -113,7 +113,10 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
     public int getItemViewType(int position)
     {
         // This is brilliant, I can explain
-        return position;
+        //return position;
+
+        //This must be the same value for each view otherwise the RecyclerView will perform badly.
+        return 0;
     }
 
     @Override

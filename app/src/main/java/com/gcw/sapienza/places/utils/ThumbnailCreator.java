@@ -18,10 +18,24 @@ import java.io.IOException;
 public  class ThumbnailCreator {
     private static final String TAG = "ThumbnailCreator";
     private static final String THUMB_FORMAT_EXTENSION = ".jpg";
-    private static final int DEFAULT_WIDTH = 500;
-    private static final int DEFAULT_HEIGHT = 500;
+    private static final int THUMBNAIL_SIZE = 500;
+    private static final int PIC_MAX_SIZE = 2024;
 
     private ThumbnailCreator(){}
+
+
+
+    public static void scaleImageToMaxSupportedSize(File imageFile){
+        Bitmap src = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+        if(src.getHeight() > PIC_MAX_SIZE || src.getWidth() > PIC_MAX_SIZE){
+            Bitmap scaled = ThumbnailCreator.createThumbnailForImage(src, PIC_MAX_SIZE, PIC_MAX_SIZE);
+            writeBitmapToFile(scaled, imageFile);
+            scaled.recycle();
+        }
+        src.recycle();
+
+    }
+
 
     /**
      * Scales an image maintaining aspect ratio
@@ -65,7 +79,7 @@ public  class ThumbnailCreator {
      */
     @SuppressWarnings("UnusedDeclaration")
     public static Bitmap createThumbnailForImageRespectingProportions(Bitmap original){
-        return ThumbnailCreator.createThumbnailForImage(original, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        return ThumbnailCreator.createThumbnailForImage(original, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
     }
 
 
@@ -82,6 +96,8 @@ public  class ThumbnailCreator {
 
         File thumbFile = ThumbnailCreator.generateThumbnailFileForFile(original, false);
         boolean result = writeBitmapToFile(thumbnail, thumbFile);
+        src.recycle();
+        thumbnail.recycle();
 
         return result ? thumbFile : null;
     }
@@ -93,7 +109,7 @@ public  class ThumbnailCreator {
      * @return a File containing the thumbnail
      */
     public static File createThumbnailForImageRespectingProportions(File original){
-        return ThumbnailCreator.createThumbnailForImageRespectingProportions(original, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        return ThumbnailCreator.createThumbnailForImageRespectingProportions(original, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
     }
 
 
@@ -106,6 +122,7 @@ public  class ThumbnailCreator {
         Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(video.getAbsolutePath(), MediaStore.Images.Thumbnails.MINI_KIND);
         File thumbFile = ThumbnailCreator.generateThumbnailFileForFile(video, true);
         boolean result = writeBitmapToFile(thumbnail, thumbFile);
+        thumbnail.recycle();
         return result ? thumbFile : null;
     }
 

@@ -143,7 +143,6 @@ public class FlagUploader {
             this.thumbnail = ThumbnailCreator.createThumbnailForImageRespectingProportions(picture);
         }
 
-
         this.files.put(PICTURE_KEY, picture);
     }
 
@@ -224,9 +223,14 @@ public class FlagUploader {
         File current_file = this.files.remove(key);
         this.usedFiled.put(key,  current_file);
 
-        new FileLoaderTask().execute(current_file);
-
-
+        //horrible hack to support image scaling
+        //in order to remove scaling from main thread
+        if(this.currentFileKey.equals(AUDIO_KEY)){
+            new PictureFileLoaderTask().execute(current_file);
+        }
+        else{
+            new FileLoaderTask().execute(current_file);
+        }
     }
 
     /**
@@ -427,6 +431,18 @@ public class FlagUploader {
         @Override
         protected void onPostExecute(ParseFile file) {
             FlagUploader.this.onParseFileInMemoryLoadDone(file);
+        }
+    }
+
+    private class PictureFileLoaderTask extends FileLoaderTask{
+        @Override
+        protected ParseFile doInBackground(File... params) {
+            if(params.length == 0){
+                return null;
+            }
+            File file = params[0];
+            ThumbnailCreator.scaleImageToMaxSupportedSize(file);
+            return super.doInBackground(params);
         }
     }
 
