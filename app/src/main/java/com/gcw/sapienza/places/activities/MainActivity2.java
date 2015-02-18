@@ -400,12 +400,14 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         builder.setMessage("Places requires Location Services to be turned on in order to work properly.\n" +
                 "Edit Location Settings?");
         builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 startActivityForResult(new Intent
                         (android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), Utils.GPS_ENABLE_REQUEST_CODE);
             }
         });
         builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 finish();
             }
@@ -566,7 +568,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
     }
 
 
-    protected void switchToFlagFrag(Fragment frag)
+    public void switchToFlagFrag(Fragment frag)
     {
         getRidOfUnusedFrag();
         switchToFragOtherThanHome();
