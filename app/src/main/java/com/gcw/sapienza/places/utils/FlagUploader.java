@@ -64,6 +64,7 @@ public class FlagUploader {
     private static final String PHONE_MEDIA_KEY = Flag.PHONE_MEDIA_KEY;
 
     private final Flag flag;
+    private File thumbnail;
     private HashMap<String, File> files;
     private HashMap<String, File> usedFiled;
     private boolean isUploading;
@@ -87,6 +88,7 @@ public class FlagUploader {
         this.files = new HashMap<>(3);
         this.usedFiled = new HashMap<>(3);
         this.context = ctx;
+        this.thumbnail = null;
     }
 
     /**
@@ -102,10 +104,14 @@ public class FlagUploader {
      * Sets the ParseFile representing a video
      * @throws java.lang.IllegalStateException if you call this method after having started uploading
      * @param video file to upload as a video
+     * @param generateThumbnail if true a thumbnail is added to the flag
      */
-    public void setVideoFile(File video){
+    public void setVideoFile(File video, boolean generateThumbnail){
         if(this.isUploading){
             throw new IllegalStateException("Cannot set a file while uploading");
+        }
+        if(generateThumbnail){
+            this.thumbnail = ThumbnailCreator.createTumbnailForVideo(video);
         }
         this.files.put(VIDEO_KEY, video);
     }
@@ -126,11 +132,18 @@ public class FlagUploader {
      * Sets the ParseFile representing a picture
      * @throws java.lang.IllegalStateException if you call this method after having started uploading
      * @param picture file to upload as a picture
+     * @param generateThumbnail if true a thumbnail is added to the flag
      */
-    public void setPictureFile(File picture){
+    public void setPictureFile(File picture, boolean generateThumbnail){
         if(this.isUploading){
             throw new IllegalStateException("Cannot set a file while uploading");
         }
+
+        if(generateThumbnail){
+            this.thumbnail = ThumbnailCreator.createThumbnailForImageRespectingProportions(picture);
+        }
+
+
         this.files.put(PICTURE_KEY, picture);
     }
 
@@ -139,11 +152,25 @@ public class FlagUploader {
      * @throws java.lang.IllegalStateException if you call this method after having started uploading
      * @param media file to upload as a phone media
      */
+    @SuppressWarnings("UnusedDeclaration")
     public void setPhoneMediaFile(File media){
         if(this.isUploading){
             throw new IllegalStateException("Cannot set a file while uploading");
         }
         this.files.put(PHONE_MEDIA_KEY, media);
+    }
+
+    /**
+     * Adds a thumbnail
+     * @throws java.lang.IllegalStateException if you call this method after having started uploading
+     * @param thumbnail file containing the thumbnail picture
+     */
+    @SuppressWarnings("UnusedDeclaration")
+    public void setThumbnail(File thumbnail){
+        if(this.isUploading){
+            throw new IllegalStateException("Cannot set a file while uploading");
+        }
+        this.thumbnail = thumbnail;
     }
 
     /**
@@ -179,6 +206,12 @@ public class FlagUploader {
     private void loadFileLoop(){
         if(BuildConfig.DEBUG && Looper.getMainLooper().getThread() != Thread.currentThread()){
             throw new RuntimeException("Something went wrong with threads");
+        }
+
+        if(this.thumbnail != null){
+            new ThumbFileLoaderTask().execute(this.thumbnail);
+            this.thumbnail = null;
+            return;
         }
 
         if(this.files.isEmpty()){
@@ -238,7 +271,26 @@ public class FlagUploader {
         });
     }
 
+    private void onThumbInMemoryLoadDone(ParseFile parseFile){
+        this.flag.setThumbnailFile(parseFile);
 
+        parseFile.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e != null){
+                    FlagUploader.this.onError(e);
+                }
+                else{
+                    FlagUploader.this.loadFileLoop();
+                }
+            }
+        }, new ProgressCallback() {
+            @Override
+            public void done(Integer integer) {
+                FlagUploader.this.callbacks.onPercentage(integer, "Uploading Thumbnail");
+            }
+        });
+    }
 
 
     /**
@@ -375,6 +427,14 @@ public class FlagUploader {
         @Override
         protected void onPostExecute(ParseFile file) {
             FlagUploader.this.onParseFileInMemoryLoadDone(file);
+        }
+    }
+
+    private class ThumbFileLoaderTask extends FileLoaderTask{
+
+        @Override
+        protected void onPostExecute(ParseFile file){
+            FlagUploader.this.onThumbInMemoryLoadDone(file);
         }
     }
 

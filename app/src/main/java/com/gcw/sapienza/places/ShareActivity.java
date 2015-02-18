@@ -18,6 +18,7 @@ import android.os.Environment;
 import android.os.Vibrator;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -233,7 +234,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 this.handleShareAudio(intent);
             }
             else{
-                Toast.makeText(this, "Unsupported media type", Toast.LENGTH_SHORT);
+                Toast.makeText(this, "Unsupported media type", Toast.LENGTH_SHORT).show();
             }
 
 
@@ -523,7 +524,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
      *                 of the application from
      */
     @Override
-    protected void onRestoreInstanceState(Bundle outState){
+    protected void onRestoreInstanceState(@NonNull Bundle outState){
         String imageFilePath = outState.getString(BUNDLED_IMG_PATH);
         if(imageFilePath != null){
             this.imageFile = new File(imageFilePath);
@@ -609,7 +610,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             if( isPicTaken && this.pic != null){
                 Log.v(TAG, "Successfully retrieved pic.");
                 //ParseFile parse_pic = new ParseFile(this.pic.getName(), Utils.convertFileToByteArray(this.pic));
-                uploader.setPictureFile(this.pic);
+                uploader.setPictureFile(this.pic, true);
                 //f.setPictureFile(parse_pic);
             }
             else if( isPicTaken ){ // equals isPicTaken && pic == null)
@@ -631,7 +632,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             if (isVideoShoot && video != null){
                 Log.v(TAG, "Successfully retrieved video.");
                 //ParseFile parse_video = new ParseFile(this.video.getName(), Utils.convertFileToByteArray(this.video));
-                uploader.setVideoFile(this.video);
+                uploader.setVideoFile(this.video, true);
                 //f.setVideoFile(parse_video);
             }
             else if(isVideoShoot){
@@ -646,10 +647,10 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                         uploader.setAudioFile(this.phoneMedia);
                         break;
                     case Utils.PHONE_IMAGE_REQUEST_CODE:
-                        uploader.setPictureFile(this.phoneMedia);
+                        uploader.setPictureFile(this.phoneMedia, true);
                         break;
                     case Utils.PHONE_VIDEO_REQUEST_CODE:
-                        uploader.setVideoFile(this.phoneMedia);
+                        uploader.setVideoFile(this.phoneMedia, true);
                         break;
                     default:
                         throw new UnsupportedOperationException("Invalid media type");
@@ -894,7 +895,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             Uri mediaUri = data.getData();
             String mediaPath = getPath(this, mediaUri);
             File mediaFile = new File(mediaPath);
-            if(mediaFile != null && mediaFile.exists()) {
+            if(mediaFile.exists()) {
 
                 this.setPhoneMedia(mediaPath);
                 this.requestedPhoneMediaType = requestCode;
@@ -937,6 +938,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
      * @param file the file to be checked
      * @return true if the file is an image
      */
+    @SuppressWarnings("UnusedDeclaration")
     public static boolean isImage(File file) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
@@ -952,7 +954,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
      *
      * @param context The context.
      * @param uri The Uri to query.
-     * @author paulburke
      */
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public static String getPath(final Context context, final Uri uri) {

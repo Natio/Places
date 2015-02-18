@@ -26,6 +26,7 @@ public class Flag extends ParseObject{
     public static final String TEXT_KEY = "text";
     public static final String LOCATION_KEY = "location";
     public static final String IN_PLACE_KEY = "inPlace";
+    public static final String THUMBNAIL_KEY = "thumbnail";
 
     /**
      *
@@ -55,12 +56,18 @@ public class Flag extends ParseObject{
 
     public ParseFile getVideo() { return (ParseFile)this.get(VIDEO_KEY);  }
 
+    public ParseFile getThumbnail() { return (ParseFile)this.get(THUMBNAIL_KEY);  }
+
     public String getFbName(){
         return (String)this.get(FB_NAME_KEY);
     }
 
     public boolean getInPlace() { return this.getBoolean(IN_PLACE_KEY); }
 
+
+    public void setThumbnailFile(ParseFile pic){
+        this.put(THUMBNAIL_KEY, pic);
+    }
     @SuppressWarnings({"UnusedDeclaration"})
     public void setPictureFile(ParseFile pic){
         this.put(PICTURE_KEY, pic);

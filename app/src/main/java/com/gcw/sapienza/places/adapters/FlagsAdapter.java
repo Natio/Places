@@ -88,7 +88,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
             }
         });
 
-        ParseFile pic = f.getPic();
+        ParseFile pic = f.getThumbnail();
         if(pic != null){
             String url = pic.getUrl();
             Picasso.with(this.view.getContext()).load(url).into(flagViewHolder.main_image);
