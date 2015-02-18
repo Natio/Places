@@ -65,7 +65,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
     @Override
     public void onBindViewHolder(final FlagsAdapter.FlagsViewHolder flagViewHolder, int i) {
         Flag f = this.flags.get(i);
-
+        flagViewHolder.setCurrentFlag(f);
         flagViewHolder.flagAdapter = this;
 
         flagViewHolder.main_text.setText(f.getText());
@@ -126,7 +126,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
                 from(viewGroup.getContext()).
                 inflate(R.layout.card_layout, viewGroup, false);
 
-        return new FlagsAdapter.FlagsViewHolder(itemView, this.flags.get(i), mainActivity);
+        return new FlagsAdapter.FlagsViewHolder(itemView, mainActivity);
     }
 
     public static class FlagsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnCreateContextMenuListener{
@@ -141,11 +141,15 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
 
         private Flag mFlag;
 
-        public FlagsViewHolder(View v, Flag flag, Activity context)
+        public void setCurrentFlag(Flag flag){
+            this.mFlag = flag;
+        }
+
+
+        public FlagsViewHolder(View v,  Activity context)
         {
             super(v);
 
-            this.mFlag = flag;
             this.mainActivity = context;
 
             v.setOnClickListener(this);
