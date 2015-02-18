@@ -408,11 +408,15 @@ public class FlagUploader {
             File file = params[0];
 
             try{
-                return new ParseFile(file.getName(), this.loadFileInMemory(file));
+                return new ParseFile(this.getNameFromFile(file), this.loadFileInMemory(file));
             } catch (IOException e) {
                 e.printStackTrace();
                 return null;
             }
+        }
+
+        protected String getNameFromFile(File f){
+            return f.getName();
         }
 
 
@@ -444,9 +448,17 @@ public class FlagUploader {
             ThumbnailCreator.scaleImageToMaxSupportedSize(file);
             return super.doInBackground(params);
         }
+
     }
 
     private class ThumbFileLoaderTask extends FileLoaderTask{
+
+        @Override
+        protected String getNameFromFile(File f) {
+            String filenameArray[] = f.getName().split("\\.");
+            String extension = filenameArray[filenameArray.length-1];
+            return "thumb."+extension;
+        }
 
         @Override
         protected void onPostExecute(ParseFile file){
