@@ -229,6 +229,12 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             else if(type.startsWith("video/")){
                 this.handleShareVideo(intent);
             }
+            else if(type.startsWith("audio/")){
+                this.handleShareAudio(intent);
+            }
+            else{
+                Toast.makeText(this, "Unsupported media type", Toast.LENGTH_SHORT);
+            }
 
 
             if(FacebookUtils.isFacebookSessionOpened()){
