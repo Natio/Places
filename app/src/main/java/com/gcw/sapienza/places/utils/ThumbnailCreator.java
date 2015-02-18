@@ -58,6 +58,15 @@ public  class ThumbnailCreator {
     }
 
 
+    /**
+     * Scales an image maintaining aspect ratio.
+     * @param original image
+     * @return a Bitmap containing the thumbnail
+     */
+    @SuppressWarnings("UnusedDeclaration")
+    public static Bitmap createThumbnailForImageRespectingProportions(Bitmap original){
+        return ThumbnailCreator.createThumbnailForImage(original, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    }
 
 
     /**

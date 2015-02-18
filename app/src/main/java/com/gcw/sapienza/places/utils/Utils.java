@@ -7,9 +7,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 
@@ -62,7 +60,7 @@ public class Utils
 
 
 
-    private static String generateRandomName(){
+    public static String generateRandomName(){
         return "_" + System.currentTimeMillis();
     }
 

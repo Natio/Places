@@ -174,7 +174,6 @@ public class PlacesApplication extends Application{
 
 
         PlacesApplication.getInstance().startLocationService();
-
     }
 
     private static void subscribeToParseBroadcast() {
@@ -254,4 +253,70 @@ public class PlacesApplication extends Application{
         }
     }
 
+
+
+
+/*
+
+    ALERT ALERT ALERT ALERT
+    DO NOT CALL THE FOLLOWING METHOD UNLESS YOU REALLY WANT TO GENERATE ALL THE THUMBNAILS
+
+
+
+    private void generateThumbnails(){
+        ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
+        query.setLimit(1000);
+        query.whereDoesNotExist(Flag.THUMBNAIL_KEY);
+        query.whereExists(Flag.PICTURE_KEY);
+        query.findInBackground(new FindCallback<Flag>() {
+            @Override
+            public void done(final List<Flag> flags, ParseException e) {
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try{
+                            for(int i = 0; i < flags.size(); i++){
+                                System.gc();
+                                final int index = i;
+                                final Flag f = flags.get(i);
+                                Log.d(TAG, "Processing "+i + " over"+ flags.size());
+                                //if(f.getThumbnail() == null) continue;
+
+                                ParseFile pic = f.getPic();
+                                if(pic != null){
+                                    byte[] data = pic.getData();
+                                    Bitmap bmp;
+                                    bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                    Bitmap result = ThumbnailCreator.createThumbnailForImageRespectingProportions(bmp);
+                                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                                    result.compress(Bitmap.CompressFormat.JPEG, 80, stream);
+                                    byte[] byteArray = stream.toByteArray();
+                                    final ParseFile thumb_f = new ParseFile("thumb"+Utils.generateRandomName()+".jpg", byteArray);
+                                    thumb_f.save();
+                                    bmp.recycle();;
+                                    bmp = null;
+                                    result.recycle();
+                                    result = null;
+                                    f.setThumbnailFile(thumb_f);
+                                    f.save();
+                                    Log.d(TAG, "Saved "+index + " over"+ flags.size());
+                                    byteArray = null;
+                                }
+
+
+                            }
+                        }catch(ParseException e){
+                            Log.d(TAG, e.toString(),e);
+                        }
+
+
+                    }
+                }).start();
+
+
+            }
+        });
+    }
+*/
 }
