@@ -7,13 +7,10 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 
-import com.gcw.sapienza.places.MainActivity;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
 
 
 /**
@@ -63,75 +60,7 @@ public class Utils
 
     protected static final int CHUNK_SIZE = 4096;
 
-    public static String[] categories;
 
-    /**
-     * being kept here just to avoid breaking legacy code.
-     * eventually, these links to MainActivity will need some clean up
-     */
-    @Deprecated
-    public static MainActivity mainActivity;
-
-/*
-    @Deprecated // Daniele says its 'getLocation' is much better than mine, that's why it's deprecated.
-    @SuppressWarnings("unused")
-    public static Location getLocation(Context context)
-    {
-        Location location;
-        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-
-        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-        if (isGPSEnabled || isNetworkEnabled)
-        {
-            if (isNetworkEnabled)
-            {
-                if (locationManager != null)
-                {
-                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                    return location;
-                }
-            }
-            if (isGPSEnabled)
-            {
-                if (locationManager != null)
-                {
-                    location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    return location;
-                }
-            }
-        }
-        else{
-            Toast.makeText(context, "Please enable GPS data", Toast.LENGTH_LONG).show();
-        }
-
-        return null;
-    }
-*/
-
-    @SuppressWarnings({"UnusedDeclaration"})
-    public static byte[] convertFileToByteArray(File f) throws IOException{
-        FileInputStream stream = new FileInputStream(f);
-        byte [] res = Utils.convertStreamToByteArray(stream);
-        stream.close();
-        return res;
-    }
-
-    public static byte[] convertStreamToByteArray(FileInputStream is) throws IOException
-    {
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-
-        byte[] buff = new byte[CHUNK_SIZE];
-        int i;
-
-        while ((i = is.read(buff, 0, buff.length)) > 0)
-        {
-            outStream.write(buff, 0, i);
-        }
-
-        return outStream.toByteArray();
-    }
 
     private static String generateRandomName(){
         return "_" + System.currentTimeMillis();
