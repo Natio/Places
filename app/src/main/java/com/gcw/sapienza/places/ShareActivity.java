@@ -20,6 +20,7 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -47,7 +48,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class ShareActivity extends ActionBarActivity implements View.OnLongClickListener, View.OnClickListener
+public class ShareActivity extends ActionBarActivity implements View.OnLongClickListener,
+        View.OnClickListener, View.OnCreateContextMenuListener
 {
 
     private static final String TAG = "ShareActivity";
@@ -84,6 +86,8 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     private File audio;
     private File phoneMedia;
 
+    private int requestedPhoneMediaType;
+
     private File imageFile;
 
     private FlagUploader uploader;
@@ -98,6 +102,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     private static final String AUDIO_NOT_FOUND_TEXT = "Error encountered while retrieving recording\nFlag won't be stored";
     private static final String VIDEO_NOT_FOUND_TEXT = "Error encountered while retrieving video\nFlag won't be stored";
     private static final String PHONE_MEDIA_NOT_FOUND_TEXT = "Error encountered while retrieving phone media\nFlag won't be stored";
+
 
 
     public void setVideo(String video){
@@ -249,19 +254,32 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             }
             else{
                 this.setPhoneMedia(imageFile.getAbsolutePath());
+                this.requestedPhoneMediaType = Utils.PHONE_IMAGE_REQUEST_CODE;
                 this.changeAlphaBasedOnSelection(PHONE_MEDIA_CODE);
             }
 
+        }else{
+            Toast.makeText(this, "Cannot find the requested file", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void handleShareText(Intent intent){
-        String text = intent.getStringExtra(Intent.EXTRA_TEXT);
-        if(text != null){
-            this.textView.setText(text);
+    private void handleShareAudio(Intent intent){
+        Uri audioUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (audioUri != null) {
+            File audioFile = new File(Utils.getImageRealPathFromURI(this, audioUri));
+            if(audioFile.length() >= Flag.MAX_FILE_SIZE_BYTES){
+                AlertDialog.Builder builder  = new AlertDialog.Builder(this);
+                builder.setMessage("Cannot share this audio file :(\nPlease, choose a smaller one").setNegativeButton("No", null).show();
+            }
+            else{
+                this.setPhoneMedia(audioFile.getAbsolutePath());
+                this.requestedPhoneMediaType = Utils.PHONE_AUDIO_REQUEST_CODE;
+                this.changeAlphaBasedOnSelection(PHONE_MEDIA_CODE);
+            }
 
+        }else{
+            Toast.makeText(this, "Cannot find the requested file", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     private void handleShareVideo(Intent intent){
@@ -274,9 +292,21 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             }
             else{
                 this.setPhoneMedia(videoFile.getAbsolutePath());
+                this.requestedPhoneMediaType = Utils.PHONE_VIDEO_REQUEST_CODE;
                 this.changeAlphaBasedOnSelection(PHONE_MEDIA_CODE);
             }
+        }else{
+            Toast.makeText(this, "Cannot find the requested file", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void handleShareText(Intent intent){
+        String text = intent.getStringExtra(Intent.EXTRA_TEXT);
+        if(text != null){
+            this.textView.setText(text);
+
+        }
+
     }
 
     @Override
@@ -322,6 +352,9 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         this.vidButton.setOnClickListener(this);
         this.micButton.setOnClickListener(this);
 
+//        registerForContextMenu(this.phoneButton);
+//        this.phoneButton.setOnCreateContextMenuListener(this);
+
         this.textView = (TextView)findViewById(R.id.share_text_field);
         this.textView.setGravity(Gravity.CENTER);
 
@@ -359,9 +392,13 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     @Override
     public void onClick(View v)
     {
-        if(v.getId() == R.id.vid_button) shootVid(v);
-        else if(v.getId() == R.id.pic_button) takePic(v);
-        else if(v.getId() == R.id.phone_button) getMedia(v);
+        if(v.getId() == R.id.vid_button) shootVid();
+        else if(v.getId() == R.id.pic_button) takePic();
+        else if(v.getId() == R.id.phone_button) {
+            registerForContextMenu(v);
+            openContextMenu(v);
+            unregisterForContextMenu(v);
+        }
         else if(v.getId() == R.id.mic_button) recordAudio();
     }
 
@@ -440,6 +477,22 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
         return true;
 
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+
+        menu.setHeaderTitle("File Type");
+
+        menu.add(Utils.PHONE_MEDIA_GROUP, Utils.PHONE_AUDIO, 0, "Audio");
+        menu.add(Utils.PHONE_MEDIA_GROUP, Utils.PHONE_IMAGE, 0, "Image");
+        menu.add(Utils.PHONE_MEDIA_GROUP, Utils.PHONE_VIDEO, 0, "Video");
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        getMedia(item.getItemId());
+        return true;
     }
 
     /**
@@ -582,12 +635,18 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             if( isPhoneMediaSelected && this.phoneMedia != null){
                 Log.v(TAG, "Successfully retrieved media.");
                 // uploader.setPhoneMediaFile(this.phoneMedia);
-                if(isImage(this.phoneMedia))
-                {
-                    uploader.setPictureFile(this.phoneMedia);
-                }else
-                {
-                   uploader.setVideoFile(this.phoneMedia);
+                switch(this.requestedPhoneMediaType) {
+                    case Utils.PHONE_AUDIO_REQUEST_CODE:
+                        uploader.setAudioFile(this.phoneMedia);
+                        break;
+                    case Utils.PHONE_IMAGE_REQUEST_CODE:
+                        uploader.setPictureFile(this.phoneMedia);
+                        break;
+                    case Utils.PHONE_VIDEO_REQUEST_CODE:
+                        uploader.setVideoFile(this.phoneMedia);
+                        break;
+                    default:
+                        throw new UnsupportedOperationException("Invalid media type");
                 }
             }
             else if( isPhoneMediaSelected ){ // equals isPicTaken && pic == null)
@@ -704,7 +763,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     }
 */
 
-    public void takePic(View v)
+    public void takePic()
     {
         Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
@@ -735,7 +794,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     }
 
 
-    public void shootVid(View v)
+    public void shootVid()
     {
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
@@ -750,20 +809,35 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
     }
 
-    private void getMedia(View v) {
+    private void getMedia(int mediaType) {
         Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
 
         restoreAlpha(PHONE_MEDIA_CODE);
 
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*, video/*");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
         try {
-            startActivityForResult(
-                    Intent.createChooser(intent, "Select a File to Upload"),
-                    Utils.PHONE_MEDIA_REQUEST_CODE);
+            switch(mediaType){
+                case Utils.PHONE_AUDIO:
+                    intent.setType("audio/*");
+                    startActivityForResult(
+                            Intent.createChooser(intent, "Select a File to Upload"),
+                            Utils.PHONE_AUDIO_REQUEST_CODE);
+                    break;
+                case Utils.PHONE_IMAGE:
+                    intent.setType("image/*");
+                    startActivityForResult(
+                            Intent.createChooser(intent, "Select a File to Upload"),
+                            Utils.PHONE_IMAGE_REQUEST_CODE);
+                    break;
+                case Utils.PHONE_VIDEO:
+                    intent.setType("video/*");
+                    startActivityForResult(
+                            Intent.createChooser(intent, "Select a File to Upload"),
+                            Utils.PHONE_VIDEO_REQUEST_CODE);
+            }
         } catch (android.content.ActivityNotFoundException ex) {
             // no file manager installed
             Log.e(TAG, ex.getMessage());
@@ -806,14 +880,18 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         else if(requestCode == Utils.VID_SHOOT_REQUEST_CODE && resultCode == RESULT_CANCELED){
             Log.v(TAG, "Video Intent canceled");
         }
-        else if(requestCode ==  Utils.PHONE_MEDIA_REQUEST_CODE && resultCode == Activity.RESULT_OK){
+        else if((requestCode ==  Utils.PHONE_AUDIO_REQUEST_CODE ||
+                requestCode ==  Utils.PHONE_IMAGE_REQUEST_CODE ||
+                requestCode ==  Utils.PHONE_VIDEO_REQUEST_CODE)
+                && resultCode == Activity.RESULT_OK){
+
             Uri mediaUri = data.getData();
             String mediaPath = getPath(this, mediaUri);
             File mediaFile = new File(mediaPath);
             if(mediaFile != null && mediaFile.exists()) {
 
                 this.setPhoneMedia(mediaPath);
-
+                this.requestedPhoneMediaType = requestCode;
                 changeAlphaBasedOnSelection(PHONE_MEDIA_CODE);
 
                 Log.d(TAG, "Media Path selected: " + mediaPath);
@@ -822,8 +900,12 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             }else{
                 Toast.makeText(this, "Invalid Media Selected", Toast.LENGTH_SHORT).show();
             }
+
         }
-        else if(requestCode == Utils.PHONE_MEDIA_REQUEST_CODE && resultCode == Activity.RESULT_CANCELED){
+        else if((requestCode ==  Utils.PHONE_AUDIO_REQUEST_CODE ||
+                requestCode ==  Utils.PHONE_IMAGE_REQUEST_CODE ||
+                requestCode ==  Utils.PHONE_VIDEO_REQUEST_CODE)
+                && resultCode == Activity.RESULT_CANCELED){
             Log.v(TAG, "Phone Media Intent canceled");
         }
         else if(requestCode == Utils.RECORD_AUDIO_REQUEST_CODE)
@@ -1076,8 +1158,4 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             this.phoneButton.setEnabled(true);
         }
     }
-
-
-
-
 }

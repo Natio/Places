@@ -37,15 +37,25 @@ public class Utils
 
     public static final int VID_SHOOT_REQUEST_CODE = 90;
     public static final int PIC_CAPTURE_REQUEST_CODE = 91;
-    public static final int PHONE_MEDIA_REQUEST_CODE = 92;
-    public static final int RECORD_AUDIO_REQUEST_CODE = 95;
+    public static final int RECORD_AUDIO_REQUEST_CODE = 92;
+
+    public static final int PHONE_AUDIO_REQUEST_CODE = 93;
+    public static final int PHONE_IMAGE_REQUEST_CODE = 94;
+    public static final int PHONE_VIDEO_REQUEST_CODE = 95;
+
+    public static final int PHONE_AUDIO = 0;
+    public static final int PHONE_IMAGE = 1;
+    public static final int PHONE_VIDEO = 2;
 
     @SuppressWarnings("unused")
-    public static final int SETTINGS_REQUEST_CODE = 92;
-    public static final int GPS_ENABLE_REQUEST_CODE = 93;
-    public static final int LOGIN_REQUEST_CODE = 94;
+    public static final int SETTINGS_REQUEST_CODE = 70;
+    public static final int GPS_ENABLE_REQUEST_CODE = 71;
+    public static final int LOGIN_REQUEST_CODE = 72;
 
     public static final int VIBRATION_DURATION = 0; // I didn't like it that much
+
+    public static final int FLAG_LIST_GROUP = 0;
+    public static final int PHONE_MEDIA_GROUP = 1;
 
     public static final int DELETE_FLAG = 0;
     public static final int REPORT_FLAG = 1;

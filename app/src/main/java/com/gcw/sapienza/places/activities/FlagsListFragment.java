@@ -423,7 +423,7 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder> {
             //        String fb_id = sel_usr.getFbId();
             //
             if(FacebookUtils.getInstance().getCurrentUserId().equals(fb_id)) {
-                menu.add(0, Utils.DELETE_FLAG, 0, "Delete Flag");
+                menu.add(Utils.FLAG_LIST_GROUP, Utils.DELETE_FLAG, 0, "Delete Flag");
             }else {
                 Log.d(TAG, "Username: " + ParseUser.getCurrentUser().getUsername());
                 Log.d(TAG, "objectId: " + mFlag.getObjectId());
@@ -435,15 +435,15 @@ class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder> {
 
                 try {
                     if(queryDelete.count() == 0){
-                        menu.add(0, Utils.REPORT_FLAG, 0, "Report Flag as inappropriate");
+                        menu.add(Utils.FLAG_LIST_GROUP, Utils.REPORT_FLAG, 0, "Report Flag as inappropriate");
                     }else{
-                        menu.add(0, Utils.DELETE_REPORT_FLAG, 0, "Revoke Flag report");
+                        menu.add(Utils.FLAG_LIST_GROUP, Utils.DELETE_REPORT_FLAG, 0, "Revoke Flag report");
                     }
                 } catch (ParseException e) {
                     Log.e(TAG, e.getMessage());
                 }
             }/*else{
-                menu.add(0, Utils.DELETE_REPORT_FLAG, 0, "Revoke Flag report");
+                menu.add(Utils.FLAG_LIST_GROUP, Utils.DELETE_REPORT_FLAG, 0, "Revoke Flag report");
 
             }*/
             //        inflater.inflate(R.menu.context_menu, menu);

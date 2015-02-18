@@ -55,7 +55,7 @@ public class PlacesApplication extends Application{
 
 
 
-    private List<Flag> pinsNearby = new ArrayList<>(0);
+    private List<Flag> flagsNearby = new ArrayList<>(0);
 
 
     private LocationService mService;
@@ -123,7 +123,7 @@ public class PlacesApplication extends Application{
      * @return returns the list of flags around user's location, filtered according to settings
      */
     public List<Flag> getFlags(){
-        return this.pinsNearby;
+        return this.flagsNearby;
     }
 
     /**
@@ -231,7 +231,7 @@ public class PlacesApplication extends Application{
         }
         @Override
         public void setFlagsNearby(List<Flag> l){
-            PlacesApplication.this.pinsNearby = l;
+            PlacesApplication.this.flagsNearby = l;
         }
     };
 
