@@ -225,7 +225,7 @@ public class FlagUploader {
 
         //horrible hack to support image scaling
         //in order to remove scaling from main thread
-        if(this.currentFileKey.equals(AUDIO_KEY)){
+        if(this.currentFileKey.equals(PICTURE_KEY)){
             new PictureFileLoaderTask().execute(current_file);
         }
         else{
@@ -291,7 +291,7 @@ public class FlagUploader {
         }, new ProgressCallback() {
             @Override
             public void done(Integer integer) {
-                FlagUploader.this.callbacks.onPercentage(integer, "Uploading Thumbnail");
+                FlagUploader.this.callbacks.onPercentage(integer, FlagUploader.this.getUserMessageForKey(PICTURE_KEY));
             }
         });
     }
@@ -445,8 +445,14 @@ public class FlagUploader {
                 return null;
             }
             File file = params[0];
-            ThumbnailCreator.scaleImageToMaxSupportedSize(file);
+            File scaledImage = ThumbnailCreator.scaleImageToMaxSupportedSize(file);
+            params[0] = scaledImage;
             return super.doInBackground(params);
+        }
+
+        @Override
+        protected String getNameFromFile(File f) {
+            return "image."+Utils.getExtensionFromFile(f);
         }
 
     }
@@ -455,9 +461,7 @@ public class FlagUploader {
 
         @Override
         protected String getNameFromFile(File f) {
-            String filenameArray[] = f.getName().split("\\.");
-            String extension = filenameArray[filenameArray.length-1];
-            return "thumb."+extension;
+            return "thumb."+Utils.getExtensionFromFile(f);
         }
 
         @Override

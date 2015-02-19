@@ -59,6 +59,29 @@ public class Utils
     protected static final int CHUNK_SIZE = 4096;
 
 
+    /**
+     * Returns a string containing the name of the file without the extension
+     * @param f file
+     * @return the name W/o extension of the file
+     */
+    @SuppressWarnings("UnusedDeclaration")
+    protected static String getNameFromFile(File f) {
+        String filenameArray[] = f.getName().split("\\.");
+        if(filenameArray.length == 1) return "";
+        return filenameArray[filenameArray.length-2];
+
+    }
+
+    /**
+     * Returns a string containing the extension of the file
+     * @param f file
+     * @return the extension of the file
+     */
+    protected static String getExtensionFromFile(File f){
+        String filenameArray[] = f.getName().split("\\.");
+        if(filenameArray.length == 0) return "";
+        return  filenameArray[filenameArray.length-1];
+    }
 
     public static String generateRandomName(){
         return "_" + System.currentTimeMillis();

@@ -7,6 +7,8 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.gcw.sapienza.places.PlacesApplication;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,14 +27,20 @@ public  class ThumbnailCreator {
 
 
 
-    public static void scaleImageToMaxSupportedSize(File imageFile){
+    public static File scaleImageToMaxSupportedSize(File imageFile){
         Bitmap src = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+        File result = null;
+        Log.d(TAG, "W "+ src.getWidth() + " H "+ src.getHeight());
         if(src.getHeight() > PIC_MAX_SIZE || src.getWidth() > PIC_MAX_SIZE){
+
             Bitmap scaled = ThumbnailCreator.createThumbnailForImage(src, PIC_MAX_SIZE, PIC_MAX_SIZE);
-            writeBitmapToFile(scaled, imageFile);
+            Log.d(TAG, scaled.toString());
+            result = generateTemporaryPictureFileFromFile(imageFile);
+            writeBitmapToFile(scaled, result);
             scaled.recycle();
         }
         src.recycle();
+        return result == null ? imageFile : result;
 
     }
 
@@ -155,6 +163,28 @@ public  class ThumbnailCreator {
 
 
     /**
+     * Generates a temporary file used to store the scaled image
+     * @param original original image file
+     * @return a temporary file
+     */
+    private static File generateTemporaryPictureFileFromFile(File original){
+        try{
+            File f =  File.createTempFile("image",
+                                          ".jpg",
+                                          PlacesApplication.getPlacesAppContext().getCacheDir());
+            f.deleteOnExit();
+            return f;
+        }
+        catch(IOException e){
+            Log.d(TAG, "Error Creating file", e);
+            //if file creation failed try following method
+            return generateThumbnailFileForFile(original, false);
+        }
+
+    }
+
+
+    /**
      * Writes an image to file
      * @param src the image to write
      * @param file the destination file
@@ -167,6 +197,7 @@ public  class ThumbnailCreator {
             src.compress(Bitmap.CompressFormat.JPEG, 70, out); // bmp is your Bitmap instance
             return true;
         } catch (Exception e) {
+            Log.d(TAG, "Error writing image", e);
             e.printStackTrace();
         } finally {
             try {
@@ -174,7 +205,7 @@ public  class ThumbnailCreator {
                     out.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.d(TAG, "Error writing image", e);
             }
         }
         return false;
