@@ -111,7 +111,7 @@ public class FlagUploader {
             throw new IllegalStateException("Cannot set a file while uploading");
         }
         if(generateThumbnail){
-            this.thumbnail = ThumbnailCreator.createTumbnailForVideo(video);
+            this.thumbnail = BitmapUtils.createTumbnailForVideo(video);
         }
         this.files.put(VIDEO_KEY, video);
     }
@@ -140,7 +140,7 @@ public class FlagUploader {
         }
 
         if(generateThumbnail){
-            this.thumbnail = ThumbnailCreator.createThumbnailForImageRespectingProportions(picture);
+            this.thumbnail = BitmapUtils.createThumbnailForImageRespectingProportions(picture);
         }
 
         this.files.put(PICTURE_KEY, picture);
@@ -445,7 +445,7 @@ public class FlagUploader {
                 return null;
             }
             File file = params[0];
-            File scaledImage = ThumbnailCreator.scaleImageToMaxSupportedSize(file);
+            File scaledImage = BitmapUtils.scaleImageToMaxSupportedSize(file);
             params[0] = scaledImage;
             return super.doInBackground(params);
         }

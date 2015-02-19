@@ -288,7 +288,7 @@ public class PlacesApplication extends Application{
                                     byte[] data = pic.getData();
                                     Bitmap bmp;
                                     bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                    Bitmap result = ThumbnailCreator.createThumbnailForImageRespectingProportions(bmp);
+                                    Bitmap result = BitmapUtils.createThumbnailForImageRespectingProportions(bmp);
                                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                                     result.compress(Bitmap.CompressFormat.JPEG, 80, stream);
                                     byte[] byteArray = stream.toByteArray();
