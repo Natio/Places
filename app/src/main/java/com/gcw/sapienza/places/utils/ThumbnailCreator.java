@@ -21,7 +21,9 @@ public  class ThumbnailCreator {
     private static final String TAG = "ThumbnailCreator";
     private static final String THUMB_FORMAT_EXTENSION = ".jpg";
     private static final int THUMBNAIL_SIZE = 500;
-    private static final int PIC_MAX_SIZE = 2024;
+    //download is very low with 4MP picture 2024*2024
+    //try with 3.2 MP so 1800*1800
+    private static final int PIC_MAX_SIZE = 1800;
 
     private ThumbnailCreator(){}
 
