@@ -18,7 +18,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.gcw.sapienza.places.activities.MainActivity2;
+import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.Notifications;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
@@ -50,8 +50,9 @@ public class LocationService extends Service implements
     private static final String TAG = "LocationService";
 
     public static final String FOUND_NEW_FLAGS_NOTIFICATION = "FOUND_NEW_FLAGS_NOTIFICATION";
-
     public static final String FOUND_NO_FLAGS_NOTIFICATION = "FOUND_NO_FLAGS_NOTIFICATION";
+    public static final String FOUND_MY_FLAGS_NOTIFICATION = "FOUND_MY_FLAGS_NOTIFICATION";
+    public static final String FOUND_NO_MY_FLAGS_NOTIFICATION = "FOUND_NO_MY_FLAGS_NOTIFICATION";
 
     public static final String NO_FLAGS_VISIBLE = "you won't be able to see any flags with these settings";
 
@@ -84,6 +85,8 @@ public class LocationService extends Service implements
 
     private List<Flag> parseObjects;
 
+    private List<Flag> myFlags;
+
     private Location notificationLocation;
 
     private long lastCacheUpdate;
@@ -106,6 +109,8 @@ public class LocationService extends Service implements
         return this.location;
     }
 
+    public List<Flag> getMyFlags(){ return this.myFlags; }
+
     public void setListener(ILocationUpdater app) {
         this.listener = app;
     }
@@ -115,6 +120,33 @@ public class LocationService extends Service implements
             // Return this instance of LocalService so clients can call public methods
             return LocationService.this;
         }
+    }
+
+    public void queryParsewithCurrentUser(){
+        ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
+        query.whereEqualTo("fbId", FacebookUtils.getInstance().getCurrentUserId());
+        query.orderByDescending("createdAt");
+        query.findInBackground(new FindCallback<Flag>() {
+            @Override
+            public void done(List<Flag> flags, ParseException e) {
+                if(e!= null){
+                    Log.e(TAG, e.getMessage());
+                    Toast.makeText(getBaseContext(), "Cannot fetch your Flags at the moment,\ntry again later", Toast.LENGTH_SHORT);
+                }
+                if(flags == null){
+                    flags = new ArrayList<Flag>();
+                }
+                LocationService.this.myFlags = flags;
+                if(flags.size() > 0){
+                    LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_MY_FLAGS_NOTIFICATION));
+                }
+                else
+                {
+                    LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION));
+                }
+            }
+        });
+
     }
 
     /**
@@ -314,7 +346,7 @@ public class LocationService extends Service implements
         this.location = location;
         queryParsewithLocation(location);
         if(this.parseObjects != null && this.parseObjects.size() > 0
-                && !MainActivity2.isForeground() && FacebookUtils.getInstance().hasCurrentUserId()) {
+                && !MainActivity.isForeground() && FacebookUtils.getInstance().hasCurrentUserId()) {
             Log.d(TAG, "Notifying user..." +
                     this.parseObjects.size() + " flags found");
             notifyUser();
@@ -344,7 +376,7 @@ public class LocationService extends Service implements
                             .setSound(soundUri)
                             .setLights(0xff00ff00, 1000, 3000);
 
-            Intent targetIntent = new Intent(this, MainActivity2.class);
+            Intent targetIntent = new Intent(this, MainActivity.class);
             PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             builder.setContentIntent(contentIntent);
             NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

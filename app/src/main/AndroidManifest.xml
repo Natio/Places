@@ -59,7 +59,7 @@
         <!-- **** END REQUIRED ****  -->
 
         <activity
-            android:name=".activities.MainActivity2"
+            android:name=".activities.MainActivity"
             android:launchMode="singleTask"
             android:label="@string/app_name"
             android:theme="@style/CustomActionBarTheme"

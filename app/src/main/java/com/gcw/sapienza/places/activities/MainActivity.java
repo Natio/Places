@@ -35,6 +35,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.gcw.sapienza.places.MyFlagsFragment;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.SettingsFragment;
@@ -58,15 +59,15 @@ import com.parse.ParseUser;
 import java.util.List;
 
 
-public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener,
+public class MainActivity extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener,
                                                                 OnMapReadyCallback,
                                                                 Preference.OnPreferenceChangeListener {
 
-    public static String TAG = MainActivity2.class.getName();
+    public static String TAG = MainActivity.class.getName();
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private ActionBarDrawerToggle drawerToggle;
-    private static final String [] section_titles = {"Home", "Settings", "Logout"};
+    private static final String [] section_titles = {"Home", "Settings", "My Flags", "Logout"};
     private CharSequence current_title;
     private MSwipeRefreshLayout srl;
     // private int currentDrawerListItemIndex = -1;
@@ -80,10 +81,8 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
 
     private static final int FLAGS_LIST_POSITION = 0;
     private static final int SETTINGS_POSITION = 1;
-    private static final int LOGOUT_POSITION = 2;
-
-    private static final int MAP_BOUNDS = 70;
-    private static final float ZOOM_LVL = 16f;
+    private static final int MY_FLAGS_POSITION = 2;
+    private static final int LOGOUT_POSITION = 3;
 
     private static final String FRAG_TAG = "FRAG_TAG";
 
@@ -127,7 +126,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
             public void onDrawerClosed(View view)
             {
                 super.onDrawerClosed(view);
-                MainActivity2.this.getSupportActionBar().setTitle(MainActivity2.this.current_title);
+                MainActivity.this.getSupportActionBar().setTitle(MainActivity.this.current_title);
                 unHighlightSelection();
             }
 
@@ -136,7 +135,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
             public void onDrawerOpened(View drawerView)
             {
                 super.onDrawerOpened(drawerView);
-                // MainActivity2.this.getSupportActionBar().setTitle("To_find_a_title");//TODO find a better title!!!!!
+                // MainActivity.this.getSupportActionBar().setTitle("To_find_a_title");//TODO find a better title!!!!!
             }
         };
 
@@ -201,13 +200,13 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
 //                    TODO first work towards implementing a fragment switch when flaglist is empty
                     case LocationService.FOUND_NEW_FLAGS_NOTIFICATION:
 //                        Fragment listFragment = new FlagsListFragment();
-//                        MainActivity2.this.getSupportFragmentManager().beginTransaction()
+//                        MainActivity.this.getSupportFragmentManager().beginTransaction()
 //                                .replace(R.id.swipe_refresh, listFragment).commit();
                         break;
 
                     case LocationService.FOUND_NO_FLAGS_NOTIFICATION:
 //                        NoFlagsFragment noFlagsFragment = new NoFlagsFragment();
-//                        MainActivity2.this.getSupportFragmentManager().beginTransaction()
+//                        MainActivity.this.getSupportFragmentManager().beginTransaction()
 //                                .replace(R.id.swipe_refresh, noFlagsFragment).commit();
                         break;
 
@@ -262,7 +261,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
                 builder.include(latLng);
 
                 //25% size original icon
-                int marker_id = getIconForCategory(f.getCategory());
+                int marker_id = Utils.getIconForCategory(f.getCategory(), this);
                 Bitmap marker = BitmapFactory.decodeResource(getResources(), marker_id);
                 Bitmap halfSizeMarker = Bitmap.createScaledBitmap
                                             (marker,
@@ -274,8 +273,8 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
                         .position(latLng)
                         .title(text)
                         .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
-                                // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
-                                //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
+                                // .icon(BitmapDescriptorFactory.fromResource(Utils.getIconForCategory(f.getCategory(), this)))
+                                //.icon(BitmapDescriptorFactory.defaultMarker(Utils.getCategoryColor(f.getCategory(), this)))
                         .alpha(0.8f));
             }
 
@@ -283,14 +282,14 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
             {
                 LatLngBounds bounds = builder.build();
 //                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, MAP_BOUNDS));
-                this.gMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, MAP_BOUNDS));
+                this.gMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
             }else{
                 Location currentLocation = gMap.getMyLocation();
                 if(currentLocation != null){
                     LatLng currentLocationLatLng = new LatLng(currentLocation.getLatitude(),
                             currentLocation.getLongitude());
                     this.gMap.animateCamera(CameraUpdateFactory
-                            .newLatLngZoom(currentLocationLatLng, ZOOM_LVL));
+                            .newLatLngZoom(currentLocationLatLng, Utils.ZOOM_LVL));
                 }
             }
 
@@ -356,7 +355,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         else if(item.getItemId() == R.id.action_add_flag)
         {
             Intent shareIntent = new Intent(this, ShareActivity.class);
-            startActivityForResult(shareIntent, MainActivity2.SHARE_ACTIVITY_REQUEST_CODE);
+            startActivityForResult(shareIntent, MainActivity.SHARE_ACTIVITY_REQUEST_CODE);
             // item.setVisible(false);
 
         }
@@ -459,37 +458,29 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
             return;
         }
         */
+        switch(position){
 
-        if(position == SETTINGS_POSITION)
-        {
-            // startActivityForResult(new Intent(this, SettingsActivity.class), SHARE_ACTIVITY_REQUEST_CODE);
-            switchToSettingsFrag();
-        }
-        else if(position == LOGOUT_POSITION)
-        {
-            logout();
-        }
-        else if(position == FLAGS_LIST_POSITION)
-        {
-            // Fragment fragment = new FlagsListFragment();
-            // this.getSupportFragmentManager().beginTransaction().replace(R.id.swipe_refresh, fragment).commit();
+            case SETTINGS_POSITION:
+                switchToSettingsFrag();
+                break;
 
-            if(homeHolder.getVisibility() == View.INVISIBLE) switchToListMapFrags();
-        }
+            case LOGOUT_POSITION:
+                logout();
+                break;
 
-        // this.drawerList.setItemChecked(position, true);
+            case FLAGS_LIST_POSITION:
+                if(homeHolder.getVisibility() == View.INVISIBLE) switchToListMapFrags();
+                break;
+
+            case MY_FLAGS_POSITION:
+                switchToOtherFrag(new MyFlagsFragment());
+                break;
+
+            default:
+                Log.w(TAG, "Selected item not found in drawer");
+
+        }
         this.drawerLayout.closeDrawers();
-
-        // this.currentDrawerListItemIndex = position;
-
-        /*
-        // Highlight the selected item, update the title, and close the drawer
-        this.drawerList.setItemChecked(position, true);
-        this.setTitle(MainActivity2.section_titles[position]);
-        this.drawerLayout.closeDrawer(this.drawerList);
-
-        this.selected_item_index = position;
-        */
     }
 
     private void unHighlightSelection()
@@ -506,12 +497,12 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
+
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
-            MainActivity2.this.selectItem(position);
+            MainActivity.this.selectItem(position);
         }
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -567,8 +558,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         this.getFragmentManager().beginTransaction().replace(R.id.frag_container, new SettingsFragment(), FRAG_TAG).commit();
     }
 
-
-    public void switchToFlagFrag(Fragment frag)
+    public void switchToOtherFrag(Fragment frag)
     {
         getRidOfUnusedFrag();
         switchToFragOtherThanHome();
@@ -620,8 +610,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
             preference.setDefaultValue(newValue);
             int value = Utils.stepValues[(int)newValue];
             Utils.MAX_FLAGS = value;
-            showToast("Max number of visible flags: " + value + '.');
-            Log.d(TAG, "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
+            showToast("Max number of visible flags: " + value);
         }
 
         Location currentLocation = PlacesApplication.getInstance().getLocation();

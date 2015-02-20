@@ -29,7 +29,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        tools:context="com.gcw.sapienza.places.MainActivity2"
+        tools:context="com.gcw.sapienza.places.activities.MainActivity"
         android:id="@+id/swipe_refresh"
         android:layout_weight="0.6" />
 

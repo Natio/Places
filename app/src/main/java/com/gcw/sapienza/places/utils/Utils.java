@@ -7,6 +7,8 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 
+import com.gcw.sapienza.places.R;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -20,6 +22,10 @@ public class Utils
     private static final String TAG = "Utils";
 
     public static final int UPDATE_DELAY = 200;
+    public static final int ANIMATION_DURATION = 300;
+
+    public static final int MAP_BOUNDS = 70;
+    public static final float ZOOM_LVL = 16f;
 
     /**
      * as the radius settings have been deleted,
@@ -139,6 +145,17 @@ public class Utils
             }
         }
 
+    }
+
+    public static int getIconForCategory(String category, Context context)
+    {
+        String[] category_array = context.getResources().getStringArray(R.array.categories);
+
+        if (category == null || category.equals(category_array[0])) return R.drawable.flag_red;
+        else if (category.equals(category_array[1])) return R.drawable.flag_green;
+        else if (category.equals(category_array[2])) return R.drawable.flag_yellow;
+        else if (category.equals(category_array[3])) return R.drawable.flag_blue;
+        else return R.drawable.flag_purple; // 'Food' category
     }
 
     public static String getImageRealPathFromURI(Context context, Uri uri){

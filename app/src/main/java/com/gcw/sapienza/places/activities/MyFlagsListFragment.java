@@ -37,9 +37,9 @@ import java.util.List;
 /**
  * Created by paolo  on 10/01/15.
  */
-public class FlagsListFragment extends Fragment {
+public class MyFlagsListFragment extends Fragment {
 
-    private static final String TAG = "FlagsListFragment";
+    private static final String TAG = "MyFlagsListFragment";
     private static final String NO_VALID_FLAG_SELECTED = "No valid Flag selected";
 
     private static final String FLAG_DELETED = "Flag deleted";
@@ -51,11 +51,19 @@ public class FlagsListFragment extends Fragment {
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals(LocationService.FOUND_NEW_FLAGS_NOTIFICATION)){
-                FlagsListFragment.this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getFlags());
+            switch (intent.getAction()){
 
+                case LocationService.FOUND_MY_FLAGS_NOTIFICATION:
+                    MyFlagsListFragment.this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getLocationService().getMyFlags());
+                    break;
+
+                case LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION:
+                    MyFlagsListFragment.this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getLocationService().getMyFlags());
+                    break;
+
+                default:
+                    Log.w(TAG, intent.getAction() + ": cannot identify the received notification");
             }
-            Log.d(TAG, intent.getAction());
         }
     };
 
@@ -73,9 +81,10 @@ public class FlagsListFragment extends Fragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         this.recycleView.setLayoutManager(llm);
 
-        LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
+        LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_MY_FLAGS_NOTIFICATION));
+        LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION));
 
-        this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getFlags());
+        this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getLocationService().getMyFlags());
 
         registerForContextMenu(recycleView);
 
@@ -106,16 +115,6 @@ public class FlagsListFragment extends Fragment {
                 fa.setSelectedFlagIndex(-1);
                 return true;
 
-            case Utils.REPORT_FLAG:
-                this.reportFlag(sel_usr);
-                fa.setSelectedFlagIndex(-1);
-                return true;
-
-            case Utils.DELETE_REPORT_FLAG:
-                this.deleteReportFlag(sel_usr);
-                fa.setSelectedFlagIndex(-1);
-                return true;
-
             default:
                 fa.setSelectedFlagIndex(-1);
                 return super.onContextItemSelected(item);
@@ -135,54 +134,6 @@ public class FlagsListFragment extends Fragment {
                     ((MainActivity)getActivity()).refresh();
                 }else
                     Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    /**
-     * Reports a flag
-     * @param f flag to report
-     */
-    private void reportFlag(final Flag f){
-
-        FlagReport report = FlagReport.createFlagReportFromFlag(f);
-        report.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if(e == null) {
-                    Toast.makeText(recycleView.getContext(), FLAG_REPORTED, Toast.LENGTH_SHORT).show();
-                }else
-                    Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    /**
-     * Deletes an entry from the Reported_Posts table
-     * @param f flag related to the entry to be deleted
-     */
-    private void deleteReportFlag(Flag f) {
-        ParseQuery<ParseObject> queryDelete = ParseQuery.getQuery("Reported_Posts");
-
-        queryDelete.whereEqualTo("reported_by", ParseUser.getCurrentUser());
-        queryDelete.whereEqualTo("reported_flag", f);
-
-        queryDelete.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject p, ParseException e) {
-                if (e == null) {
-                    p.deleteInBackground(new DeleteCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (e == null) {
-                                Toast.makeText(recycleView.getContext(), FLAG_REPORT_REVOKED, Toast.LENGTH_SHORT).show();
-                            } else
-                                Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                } else {
-                    Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
             }
         });
     }
