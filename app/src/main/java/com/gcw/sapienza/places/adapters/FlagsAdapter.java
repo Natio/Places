@@ -2,6 +2,7 @@ package com.gcw.sapienza.places.adapters;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -13,7 +14,7 @@ import android.widget.TextView;
 
 import com.gcw.sapienza.places.fragments.FlagFragment;
 import com.gcw.sapienza.places.R;
-import com.gcw.sapienza.places.activities.MainActivity2;
+import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.utils.CropCircleTransformation;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
@@ -200,7 +201,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
             frag.setMedia(file, mediaType);
             frag.setArguments(bundle);
 
-            ((MainActivity2)mainActivity).switchToFlagFrag(frag);
+            ((MainActivity)mainActivity).switchToOtherFrag(frag);
         }
 
         @Override

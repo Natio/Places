@@ -7,6 +7,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -65,7 +67,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
     private View view;
 
-    @SuppressWarnings("UnusedDeclaration")
     private static final String TAG = "FlagFragment";
 
     /**
@@ -153,11 +154,13 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event)
             {
-                if (keyCode == KeyEvent.KEYCODE_BACK && frameLayout.getVisibility() == View.VISIBLE)
+                if (keyCode == KeyEvent.KEYCODE_BACK)
                 {
-                    frameLayout.setVisibility(View.GONE);
-
-                    return true;
+                    if(frameLayout.getVisibility() == View.VISIBLE)
+                    {
+                        frameLayout.setVisibility(View.GONE);
+                        return true;
+                    }
                 }
                 return false;
             }

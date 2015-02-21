@@ -7,6 +7,8 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.gcw.sapienza.places.PlacesApplication;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,24 +17,32 @@ import java.io.IOException;
  * Helps in the creation of thumbnail images
  * Created by paolo on 18/02/15.
  */
-public  class ThumbnailCreator {
-    private static final String TAG = "ThumbnailCreator";
+public  class BitmapUtils {
+    private static final String TAG = "BitmapUtils";
     private static final String THUMB_FORMAT_EXTENSION = ".jpg";
     private static final int THUMBNAIL_SIZE = 500;
-    private static final int PIC_MAX_SIZE = 2024;
+    //download is very low with 4MP picture 2024*2024
+    //try with 3.2 MP so 1800*1800
+    private static final int PIC_MAX_SIZE = 1800;
 
-    private ThumbnailCreator(){}
+    private BitmapUtils(){}
 
 
 
-    public static void scaleImageToMaxSupportedSize(File imageFile){
+    public static File scaleImageToMaxSupportedSize(File imageFile){
         Bitmap src = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+        File result = null;
+        Log.d(TAG, "W "+ src.getWidth() + " H "+ src.getHeight());
         if(src.getHeight() > PIC_MAX_SIZE || src.getWidth() > PIC_MAX_SIZE){
-            Bitmap scaled = ThumbnailCreator.createThumbnailForImage(src, PIC_MAX_SIZE, PIC_MAX_SIZE);
-            writeBitmapToFile(scaled, imageFile);
+
+            Bitmap scaled = BitmapUtils.createThumbnailForImage(src, PIC_MAX_SIZE, PIC_MAX_SIZE);
+            Log.d(TAG, scaled.toString());
+            result = generateTemporaryPictureFileFromFile(imageFile);
+            writeBitmapToFile(scaled, result);
             scaled.recycle();
         }
         src.recycle();
+        return result == null ? imageFile : result;
 
     }
 
@@ -79,7 +89,7 @@ public  class ThumbnailCreator {
      */
     @SuppressWarnings("UnusedDeclaration")
     public static Bitmap createThumbnailForImageRespectingProportions(Bitmap original){
-        return ThumbnailCreator.createThumbnailForImage(original, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+        return BitmapUtils.createThumbnailForImage(original, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
     }
 
 
@@ -92,9 +102,9 @@ public  class ThumbnailCreator {
      */
     public static File createThumbnailForImageRespectingProportions(File original, int maxWidth, int maxHeight){
         Bitmap src = BitmapFactory.decodeFile(original.getAbsolutePath());
-        Bitmap thumbnail = ThumbnailCreator.createThumbnailForImage(src, maxWidth, maxHeight);
+        Bitmap thumbnail = BitmapUtils.createThumbnailForImage(src, maxWidth, maxHeight);
 
-        File thumbFile = ThumbnailCreator.generateThumbnailFileForFile(original, false);
+        File thumbFile = BitmapUtils.generateThumbnailFileForFile(original, false);
         boolean result = writeBitmapToFile(thumbnail, thumbFile);
         src.recycle();
         thumbnail.recycle();
@@ -109,7 +119,7 @@ public  class ThumbnailCreator {
      * @return a File containing the thumbnail
      */
     public static File createThumbnailForImageRespectingProportions(File original){
-        return ThumbnailCreator.createThumbnailForImageRespectingProportions(original, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+        return BitmapUtils.createThumbnailForImageRespectingProportions(original, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
     }
 
 
@@ -120,7 +130,7 @@ public  class ThumbnailCreator {
      */
     public static File createTumbnailForVideo(File video){
         Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(video.getAbsolutePath(), MediaStore.Images.Thumbnails.MINI_KIND);
-        File thumbFile = ThumbnailCreator.generateThumbnailFileForFile(video, true);
+        File thumbFile = BitmapUtils.generateThumbnailFileForFile(video, true);
         boolean result = writeBitmapToFile(thumbnail, thumbFile);
         thumbnail.recycle();
         return result ? thumbFile : null;
@@ -155,6 +165,28 @@ public  class ThumbnailCreator {
 
 
     /**
+     * Generates a temporary file used to store the scaled image
+     * @param original original image file
+     * @return a temporary file
+     */
+    private static File generateTemporaryPictureFileFromFile(File original){
+        try{
+            File f =  File.createTempFile("image",
+                                          ".jpg",
+                                          PlacesApplication.getPlacesAppContext().getCacheDir());
+            f.deleteOnExit();
+            return f;
+        }
+        catch(IOException e){
+            Log.d(TAG, "Error Creating file", e);
+            //if file creation failed try following method
+            return generateThumbnailFileForFile(original, false);
+        }
+
+    }
+
+
+    /**
      * Writes an image to file
      * @param src the image to write
      * @param file the destination file
@@ -167,6 +199,7 @@ public  class ThumbnailCreator {
             src.compress(Bitmap.CompressFormat.JPEG, 70, out); // bmp is your Bitmap instance
             return true;
         } catch (Exception e) {
+            Log.d(TAG, "Error writing image", e);
             e.printStackTrace();
         } finally {
             try {
@@ -174,7 +207,7 @@ public  class ThumbnailCreator {
                     out.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.d(TAG, "Error writing image", e);
             }
         }
         return false;

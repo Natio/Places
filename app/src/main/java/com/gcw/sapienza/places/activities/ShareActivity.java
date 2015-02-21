@@ -97,8 +97,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
     private FlagUploader uploader;
 
-    private static final int ANIMATION_DURATION = 300;
-
     private static final String FLAG_PLACED_TEXT = "Flag has been placed!";
     private static final String FB_ID_NOT_FOUND_TEXT = "Couldn't retrieve your Facebook credentials\nPlease check your internet connection.";
     private static final String EMPTY_FLAG_TEXT = "Please insert text or take a picture";
@@ -674,7 +672,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
 
         AlphaAnimation inAnim = new AlphaAnimation(0, 1);
-        inAnim.setDuration(ANIMATION_DURATION);
+        inAnim.setDuration(Utils.ANIMATION_DURATION);
         progressBarHolder.setAnimation(inAnim);
         progressBarHolder.setVisibility(View.VISIBLE);
 
@@ -715,7 +713,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
             void dismissProgressBar(){
                 AlphaAnimation outAnim = new AlphaAnimation(1, 0);
-                outAnim.setDuration(ANIMATION_DURATION);
+                outAnim.setDuration(Utils.ANIMATION_DURATION);
                 progressBarHolder.setAnimation(outAnim);
                 progressBarHolder.setVisibility(View.GONE);
             }
