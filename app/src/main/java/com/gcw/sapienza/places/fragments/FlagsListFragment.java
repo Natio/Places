@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
-import com.gcw.sapienza.places.activities.MainActivity2;
+import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.adapters.FlagsAdapter;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.model.FlagReport;

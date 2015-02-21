@@ -5,6 +5,8 @@ import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -27,11 +29,14 @@ public class Flag extends ParseObject{
     public static final String LOCATION_KEY = "location";
     public static final String IN_PLACE_KEY = "inPlace";
     public static final String THUMBNAIL_KEY = "thumbnail";
+    public static final String WOW_KEY = "wowIds";
 
     /**
      *
      * @return the text content of the post
      */
+
+    public String getFlagId() { return this.getObjectId(); }
 
     public String getText(){ return (String)this.get(TEXT_KEY); }
 
@@ -63,6 +68,8 @@ public class Flag extends ParseObject{
     }
 
     public boolean getInPlace() { return this.getBoolean(IN_PLACE_KEY); }
+
+    public ArrayList<String> getWowIds() { return (ArrayList<String>)this.get(WOW_KEY); }
 
 
     public void setThumbnailFile(ParseFile pic){
@@ -106,4 +113,14 @@ public class Flag extends ParseObject{
     public void setFbName(String name) { this.put(FB_NAME_KEY, name); }
 
     public void setInPlace(boolean inPlace) { this.put(IN_PLACE_KEY, inPlace); }
+
+    public void addWowId(String wowId) { this.add(WOW_KEY, wowId); }
+
+    public void deleteWowId(String wowId)
+    {
+        ArrayList<String> idToDelete = new ArrayList();
+        idToDelete.add(wowId);
+
+        this.removeAll(WOW_KEY, idToDelete);
+    }
 }

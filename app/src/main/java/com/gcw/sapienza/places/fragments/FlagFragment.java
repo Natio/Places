@@ -1,6 +1,7 @@
 package com.gcw.sapienza.places.fragments;
 
 
+import android.app.DownloadManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -26,17 +27,27 @@ import android.widget.VideoView;
 
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.ShareActivity;
+import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
+import com.parse.FindCallback;
 import com.parse.GetDataCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by mic_head on 02/02/15.
@@ -49,7 +60,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private String weather;
     private String category;
     private boolean inPlace;
-
+    private String flagId;
+    private ArrayList<String> wowIds;
 
     private MediaPlayer mediaPlayer;
     private VideoView vv;
@@ -66,6 +78,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private ParseFile mediaFile;
 
     private View view;
+
+    private boolean wowed;
+    private int wowCount;
 
     private static final String TAG = "FlagFragment";
 
@@ -92,8 +107,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         weather = bundle.getString("weather");
         category = bundle.getString("category");
         inPlace = bundle.getBoolean("inPlace");
-
-        Log.d(TAG, "In Place media? " + inPlace);
+        flagId = bundle.getString("flagId");
+        wowIds = bundle.getStringArrayList("wowIds");
     }
 
     @Override
@@ -129,7 +144,18 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         wowButton.setOnClickListener(this);
         // playVideoButton.setOnClickListener(this);
 
+        wowCount = 0;
 
+        if(wowIds != null)
+        {
+            wowCount = wowIds.size();
+
+            for (int i = 0; i < wowCount; i++)
+                if (wowIds.get(i).equals(FacebookUtils.getInstance().getCurrentUserId())) wowed = true;
+        }
+        else wowed = false;
+
+        updateWowButtonText();
 
         this.changeLayoutAccordingToMediaType();
 
@@ -265,7 +291,94 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
     private void wowFlag()
     {
+        ParseQuery<Flag> queryPosts = ParseQuery.getQuery("Posts");
+        queryPosts.whereEqualTo("objectId", flagId);
 
+        // TODO query user by facebook id
+        // ParseQuery<ParseUser> queryUser = ParseQuery.getQuery("User");
+        // queryUser.whereEqualTo("authData", FacebookUtils.getInstance().getCurrentUserId());
+
+        if(!wowed)
+        {
+            queryPosts.findInBackground(new FindCallback<Flag>() {
+                public void done(List<Flag> markers, ParseException e) {
+                    if (e == null) {
+                        Flag flag = markers.get(0);
+                        flag.addWowId(FacebookUtils.getInstance().getCurrentUserId());
+                        flag.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                wowCount++;
+                                wowed = true;
+                                updateWowButtonText();
+                            }
+                        });
+                    } else {
+                        Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
+                    }
+                }
+            });
+            /*
+            queryUser.findInBackground(new FindCallback<ParseObject>() {
+                public void done(List<ParseObject> markers, ParseException e) {
+                    if (e == null) {
+                        ParseObject user = markers.get(0);
+                        user.put("wows", flagId);
+                        user.saveInBackground();
+                    } else {
+                        Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
+                    }
+                }
+            });
+            */
+        }
+        else
+        {
+            queryPosts.findInBackground(new FindCallback<Flag>() {
+                public void done(List<Flag> markers, ParseException e) {
+                    if (e == null) {
+                        Flag flag = markers.get(0);
+                        flag.deleteWowId(FacebookUtils.getInstance().getCurrentUserId());
+                        flag.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                wowed=false;
+                                wowCount--;
+                                updateWowButtonText();
+                            }
+                        });
+                    } else {
+                        Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
+                    }
+                }
+            });
+            /*
+            queryUser.findInBackground(new FindCallback<ParseObject>() {
+                public void done(List<ParseObject> markers, ParseException e) {
+                    if (e == null) {
+                        ParseObject user = markers.get(0);
+                        ArrayList<String> posts = new ArrayList<String>();
+                        posts = (ArrayList<String>)user.get("wows");
+                        posts.remove(flagId);
+                        user.put("wows", posts);
+                        user.saveInBackground();
+                    } else {
+                        Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
+                    }
+                }
+            });
+            */
+        }
+    }
+
+    private void updateWowButtonText()
+    {
+        if(wowed) wowButton.setText("You wow this. (" + wowCount + ")");
+        else wowButton.setText("WOW (" + wowCount + ")");
     }
 
     private void changeLayoutAccordingToMediaType(){
