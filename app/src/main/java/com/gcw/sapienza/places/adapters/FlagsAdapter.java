@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gcw.sapienza.places.FlagFragment;
+import com.gcw.sapienza.places.fragments.FlagFragment;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity2;
 import com.gcw.sapienza.places.model.Flag;

@@ -37,8 +37,8 @@ import android.widget.Toast;
 
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
-import com.gcw.sapienza.places.SettingsFragment;
-import com.gcw.sapienza.places.ShareActivity;
+import com.gcw.sapienza.places.fragments.SettingsFragment;
+import com.gcw.sapienza.places.fragments.FlagsListFragment;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.services.LocationService;
@@ -326,7 +326,7 @@ public class MainActivity2 extends ActionBarActivity implements SwipeRefreshLayo
         srl.setRefreshing(false);
     }
 
-    protected void refresh()
+    public void refresh()
     {
         Location currentLocation = PlacesApplication.getInstance().getLocation();
         if(currentLocation != null){

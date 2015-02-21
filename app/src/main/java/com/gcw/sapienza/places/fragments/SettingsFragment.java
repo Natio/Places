@@ -1,4 +1,4 @@
-package com.gcw.sapienza.places;
+package com.gcw.sapienza.places.fragments;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
@@ -8,6 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.gcw.sapienza.places.BuildConfig;
+import com.gcw.sapienza.places.R;
 
 /**
  * Created by Simone on 12/30/2014.

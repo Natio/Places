@@ -76,7 +76,7 @@
         <activity android:name=".activities.VideoCaptureActivity">
         </activity>
 
-        <activity android:name=".ShareActivity"
+        <activity android:name=".activities.ShareActivity"
                   android:label="@string/app_name"
                 android:screenOrientation="portrait"
                   android:theme="@style/CustomActionBarTheme">
@@ -103,7 +103,7 @@
         </activity>
 
 
-        <activity android:name=".AudioRecordingActivity"
+        <activity android:name=".activities.AudioRecordingActivity"
             android:screenOrientation="portrait">
         </activity>
 

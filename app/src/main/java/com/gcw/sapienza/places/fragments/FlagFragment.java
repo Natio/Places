@@ -1,4 +1,4 @@
-package com.gcw.sapienza.places;
+package com.gcw.sapienza.places.fragments;
 
 
 import android.media.AudioManager;
@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -21,6 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.activities.ShareActivity;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.parse.GetDataCallback;
@@ -54,6 +57,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private ImageView playVideoButton;
     private FrameLayout videoHolder;
     private ImageView audioHolder;
+    private Button wowButton;
 
     public static enum MediaType{ PIC, AUDIO, VIDEO, NONE }
     private MediaType mediaType;
@@ -115,12 +119,16 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         playVideoButton = (ImageView)view.findViewById(R.id.play_video_button);
         videoHolder = (FrameLayout)view.findViewById(R.id.video_holder);
         audioHolder = (ImageView) view.findViewById(R.id.audio);
+        wowButton = (Button)view.findViewById(R.id.wow_button);
 
         iw.setOnClickListener(this);
         vv.setOnTouchListener(this);
         audioHolder.setOnClickListener(this);
         frameLayout.setOnClickListener(this);
+        wowButton.setOnClickListener(this);
         // playVideoButton.setOnClickListener(this);
+
+
 
         this.changeLayoutAccordingToMediaType();
 
@@ -165,6 +173,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         else if(v.getId() == R.id.pic) frameLayout.setVisibility(View.VISIBLE);
         // else if(v.getId() == playVideoButton.getId()) playVideo();
         else if(v.getId() == R.id.audio) playRecording();
+        else if(v.getId() == R.id.wow_button) wowFlag();
     }
 
     @Override
@@ -251,6 +260,11 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         }
     }
 
+    private void wowFlag()
+    {
+
+    }
+
     private void changeLayoutAccordingToMediaType(){
         if(mediaType == MediaType.NONE)
         {
@@ -330,10 +344,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
 
     }
-
-
-
-
 
     private  File tempFileForMediaType(MediaType type){
         String fileName;
