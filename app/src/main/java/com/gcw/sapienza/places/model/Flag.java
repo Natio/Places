@@ -30,6 +30,8 @@ public class Flag extends ParseObject{
     public static final String IN_PLACE_KEY = "inPlace";
     public static final String THUMBNAIL_KEY = "thumbnail";
     public static final String WOW_COUNT_KEY = "wowCount";
+    public static final String LOL_COUNT_KEY = "lolCount";
+    public static final String BOO_COUNT_KEY = "booCount";
     public static final String OWNER_KEY = "owner";
 
 
@@ -76,6 +78,10 @@ public class Flag extends ParseObject{
 
     public int getWowCount() { return this.getInt(WOW_COUNT_KEY); }
 
+    public int getLolCount() { return this.getInt(LOL_COUNT_KEY); }
+
+    public int getBooCount() { return this.getInt(BOO_COUNT_KEY); }
+
     public void setThumbnailFile(ParseFile pic){
         this.put(THUMBNAIL_KEY, pic);
     }
@@ -121,4 +127,12 @@ public class Flag extends ParseObject{
     public void incrementWowCount() { this.increment(WOW_COUNT_KEY); }
 
     public void decrementWowCount() { this.increment(WOW_COUNT_KEY, -1); }
+
+    public void incrementLolCount() { this.increment(LOL_COUNT_KEY); }
+
+    public void decrementLolCount() { this.increment(LOL_COUNT_KEY, -1); }
+
+    public void incrementBooCount() { this.increment(BOO_COUNT_KEY); }
+
+    public void decrementBooCount() { this.increment(BOO_COUNT_KEY, -1); }
 }

@@ -184,8 +184,10 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
             bundle.putString("category", mFlag.getCategory());
             bundle.putBoolean("inPlace", mFlag.getInPlace());
             bundle.putString("flagId", mFlag.getFlagId());
-            bundle.putInt("wowCount", mFlag.getWowCount());
 
+            bundle.putInt("wowCount", mFlag.getWowCount());
+            bundle.putInt("lolCount", mFlag.getLolCount());
+            bundle.putInt("booCount", mFlag.getBooCount());
 
             ParseFile file;
             FlagFragment.MediaType mediaType = FlagFragment.MediaType.NONE;

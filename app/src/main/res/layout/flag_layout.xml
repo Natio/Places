@@ -8,13 +8,39 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/divider"
         android:text="WOW"
+        android:textSize="14sp"
         android:background="@drawable/my_border_2"
         android:layout_centerHorizontal="true"
         android:id="@+id/wow_button"
         android:layout_marginBottom="10dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/divider"
+        android:text="LOL"
+        android:textSize="14sp"
+        android:background="@drawable/my_border_2"
+        android:layout_toLeftOf="@+id/wow_button"
+        android:id="@+id/lol_button"
+        android:layout_marginBottom="10dp"
         android:layout_marginRight="5dp"
-        android:layout_marginLeft="5dp"
-        android:padding="5dp" />
+        android:layout_marginLeft="5dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/divider"
+        android:text="BOO"
+        android:textSize="14sp"
+        android:background="@drawable/my_border_2"
+        android:layout_toRightOf="@+id/wow_button"
+        android:id="@+id/boo_button"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp" />
 
     <!-- <TextView
         android:layout_width="wrap_content"
