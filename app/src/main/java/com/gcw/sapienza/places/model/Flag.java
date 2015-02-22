@@ -4,8 +4,8 @@ import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -30,6 +30,16 @@ public class Flag extends ParseObject{
     public static final String IN_PLACE_KEY = "inPlace";
     public static final String THUMBNAIL_KEY = "thumbnail";
     public static final String WOW_COUNT_KEY = "wowCount";
+    public static final String OWNER_KEY = "owner";
+
+
+    public void setOwner(ParseUser owner){
+        this.put(OWNER_KEY, owner);
+    }
+
+    public ParseUser getOnwer(){
+        return (ParseUser)this.get(OWNER_KEY);
+    }
 
     public String getFlagId() { return this.getObjectId(); }
 
