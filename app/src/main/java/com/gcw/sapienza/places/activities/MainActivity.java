@@ -548,6 +548,8 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
 
         homeHolder.setVisibility(View.VISIBLE);
         fragHolder.setVisibility(View.INVISIBLE);
+
+        refresh();
     }
 
     private void switchToSettingsFrag()

@@ -145,19 +145,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         wowButton.setOnClickListener(this);
         // playVideoButton.setOnClickListener(this);
 
-        wowCount = 0;
-
-        if(wowIds != null)
-        {
-            wowCount = wowIds.size();
-
-            for (int i = 0; i < wowCount; i++)
-                if (wowIds.get(i).equals(FacebookUtils.getInstance().getCurrentUserId())) wowed = true;
-        }
-        else wowed = false;
-
-        updateWowButtonText();
-
         this.changeLayoutAccordingToMediaType();
 
         flagText.setText(text);
@@ -194,6 +181,25 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         });
 
         return view;
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        wowCount = 0;
+
+        if(wowIds != null)
+        {
+            wowCount = wowIds.size();
+
+            for (int i = 0; i < wowCount; i++)
+                if (wowIds.get(i).equals(FacebookUtils.getInstance().getCurrentUserId())) wowed = true;
+        }
+        else wowed = false;
+
+        updateWowButtonText();
     }
 
     @Override
@@ -298,6 +304,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         ParseQuery<CustomUser> queryUser = ParseQuery.getQuery("Wow_Lol_Boo");
         queryUser.whereEqualTo("fbId", FacebookUtils.getInstance().getCurrentUserId());
 
+        wowButton.setClickable(false);
+
         if(!wowed)
         {
             queryPosts.findInBackground(new FindCallback<Flag>()
@@ -324,6 +332,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                         Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
                     }
+
+                    wowButton.setClickable(true);
                 }
             });
 
@@ -349,6 +359,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                         Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
                     }
+
+                    wowButton.setClickable(true);
                 }
             });
         }
@@ -377,6 +389,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                         Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
                     }
+
+                    wowButton.setClickable(true);
                 }
             });
 
@@ -395,6 +409,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                         Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
                     }
+
+                    wowButton.setClickable(true);
                 }
             });
         }
