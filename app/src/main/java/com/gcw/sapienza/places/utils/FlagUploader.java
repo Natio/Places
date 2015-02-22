@@ -10,6 +10,7 @@ import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.model.Flag;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseUser;
 import com.parse.ProgressCallback;
 import com.parse.SaveCallback;
 
@@ -89,6 +90,8 @@ public class FlagUploader {
         this.usedFiled = new HashMap<>(3);
         this.context = ctx;
         this.thumbnail = null;
+        this.flag.setOwner(ParseUser.getCurrentUser());
+
     }
 
     /**

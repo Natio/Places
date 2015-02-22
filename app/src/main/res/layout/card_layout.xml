@@ -41,6 +41,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Small Text"
+            android:maxLines="1"
             android:id="@+id/card_textView_text"
             android:layout_below="@+id/linearLayout"
             android:layout_alignParentRight="true"
