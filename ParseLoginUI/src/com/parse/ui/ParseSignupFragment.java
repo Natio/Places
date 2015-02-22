@@ -57,6 +57,7 @@ public class ParseSignupFragment extends ParseLoginFragmentBase implements OnCli
   private static final String LOG_TAG = "ParseSignupFragment";
   private static final int DEFAULT_MIN_PASSWORD_LENGTH = 6;
   private static final String USER_OBJECT_NAME_FIELD = "name";
+  private static final String FACEBOOK_ID_FIELD = "fbId";
 
   public static ParseSignupFragment newInstance(Bundle configOptions, String username, String password) {
     ParseSignupFragment signupFragment = new ParseSignupFragment();
@@ -179,7 +180,8 @@ public class ParseSignupFragment extends ParseLoginFragmentBase implements OnCli
       user.setEmail(email);
 
       // Set additional custom fields only if the user filled it out
-      if (name.length() != 0) {
+      if (name.length() != 0)
+      {
         user.put(USER_OBJECT_NAME_FIELD, name);
       }
 

@@ -27,6 +27,7 @@ import android.widget.VideoView;
 
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.ShareActivity;
+import com.gcw.sapienza.places.model.CustomUser;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
@@ -294,84 +295,108 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         ParseQuery<Flag> queryPosts = ParseQuery.getQuery("Posts");
         queryPosts.whereEqualTo("objectId", flagId);
 
-        // TODO query user by facebook id
-        // ParseQuery<ParseUser> queryUser = ParseQuery.getQuery("User");
-        // queryUser.whereEqualTo("authData", FacebookUtils.getInstance().getCurrentUserId());
+        ParseQuery<CustomUser> queryUser = ParseQuery.getQuery("Wow_Lol_Boo");
+        queryUser.whereEqualTo("fbId", FacebookUtils.getInstance().getCurrentUserId());
 
         if(!wowed)
         {
-            queryPosts.findInBackground(new FindCallback<Flag>() {
-                public void done(List<Flag> markers, ParseException e) {
-                    if (e == null) {
+            queryPosts.findInBackground(new FindCallback<Flag>()
+            {
+                public void done(List<Flag> markers, ParseException e)
+                {
+                    if (e == null && markers.size() != 0)
+                    {
                         Flag flag = markers.get(0);
                         flag.addWowId(FacebookUtils.getInstance().getCurrentUserId());
-                        flag.saveInBackground(new SaveCallback() {
+                        flag.saveInBackground(new SaveCallback()
+                        {
                             @Override
-                            public void done(ParseException e) {
+                            public void done(ParseException e)
+                            {
                                 wowCount++;
                                 wowed = true;
                                 updateWowButtonText();
                             }
                         });
-                    } else {
+                    }
+                    else
+                    {
                         Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
                     }
                 }
             });
-            /*
-            queryUser.findInBackground(new FindCallback<ParseObject>() {
-                public void done(List<ParseObject> markers, ParseException e) {
-                    if (e == null) {
-                        ParseObject user = markers.get(0);
-                        user.put("wows", flagId);
+
+            queryUser.findInBackground(new FindCallback<CustomUser>()
+            {
+                public void done(List<CustomUser> markers, ParseException e)
+                {
+                    if (e == null && markers.size() != 0)
+                    {
+                        CustomUser user = markers.get(0);
+                        user.addWow(flagId);
                         user.saveInBackground();
-                    } else {
+                    }
+                    else if (markers.size() == 0)
+                    {
+                        CustomUser user = new CustomUser();
+                        user.addWow(flagId);
+                        user.setFacebookId(FacebookUtils.getInstance().getCurrentUserId());
+                        user.saveInBackground();
+                    }
+                    else
+                    {
                         Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
                     }
                 }
             });
-            */
         }
         else
         {
-            queryPosts.findInBackground(new FindCallback<Flag>() {
-                public void done(List<Flag> markers, ParseException e) {
-                    if (e == null) {
+            queryPosts.findInBackground(new FindCallback<Flag>()
+            {
+                public void done(List<Flag> markers, ParseException e)
+                {
+                    if (e == null && markers.size() != 0)
+                    {
                         Flag flag = markers.get(0);
                         flag.deleteWowId(FacebookUtils.getInstance().getCurrentUserId());
-                        flag.saveInBackground(new SaveCallback() {
+                        flag.saveInBackground(new SaveCallback()
+                        {
                             @Override
-                            public void done(ParseException e) {
+                            public void done(ParseException e)
+                            {
                                 wowed=false;
                                 wowCount--;
                                 updateWowButtonText();
                             }
                         });
-                    } else {
+                    } else
+                    {
                         Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
                     }
                 }
             });
-            /*
-            queryUser.findInBackground(new FindCallback<ParseObject>() {
-                public void done(List<ParseObject> markers, ParseException e) {
-                    if (e == null) {
-                        ParseObject user = markers.get(0);
-                        ArrayList<String> posts = new ArrayList<String>();
-                        posts = (ArrayList<String>)user.get("wows");
-                        posts.remove(flagId);
-                        user.put("wows", posts);
+
+            queryUser.findInBackground(new FindCallback<CustomUser>()
+            {
+                public void done(List<CustomUser> markers, ParseException e)
+                {
+                    if (e == null && markers.size() != 0)
+                    {
+                        CustomUser user = markers.get(0);
+                        user.deleteWow(flagId);
                         user.saveInBackground();
-                    } else {
+                    }
+                    else
+                    {
                         Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
                     }
                 }
             });
-            */
         }
     }
 

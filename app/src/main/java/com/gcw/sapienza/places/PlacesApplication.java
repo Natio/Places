@@ -12,7 +12,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
-
+import com.gcw.sapienza.places.model.CustomUser;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.model.FlagReport;
 import com.gcw.sapienza.places.services.ILocationUpdater;
@@ -24,11 +24,9 @@ import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParseException;
 import com.gcw.sapienza.places.services.LocationService.LocalBinder;
-//Parse push notifications
 import com.parse.ParsePush;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -152,6 +150,7 @@ public class PlacesApplication extends Application{
         // initialize Parse.com
         ParseObject.registerSubclass(Flag.class);
         ParseObject.registerSubclass(FlagReport.class);
+        ParseObject.registerSubclass(CustomUser.class);
         Parse.initialize(this, PARSE_COM_APP_KEY , PARSE_COM_CLIENT_KEY);
         ParseFacebookUtils.initialize(getString(R.string.app_id));
         ParseConfig.getInBackground(new ConfigCallback() {
