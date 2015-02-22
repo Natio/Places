@@ -2,6 +2,8 @@ package com.gcw.sapienza.places.model;
 
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
+
 import java.util.ArrayList;
 
 /**
@@ -15,6 +17,15 @@ public class CustomParseObject extends ParseObject {
     public static final String WOW_KEY = "boolWow";
     public static final String LOL_KEY = "boolLol";
     public static final String BOO_KEY = "boolBoo";
+    public static final String USER_KEY = "user";
+
+    public void setUser(ParseUser user){
+        this.put(USER_KEY, user);
+    }
+
+    public ParseUser getuser(){
+        return (ParseUser)this.get(USER_KEY);
+    }
 
 
     public String getFacebookId() { return (String)this.get(FACEBOOK_ID_KEY); }
