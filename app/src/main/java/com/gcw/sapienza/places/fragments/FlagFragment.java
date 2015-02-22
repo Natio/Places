@@ -1,15 +1,12 @@
 package com.gcw.sapienza.places.fragments;
 
 
-import android.app.DownloadManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -24,29 +21,23 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
-
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.ShareActivity;
-import com.gcw.sapienza.places.model.CustomUser;
+import com.gcw.sapienza.places.model.CustomParseObject;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.parse.FindCallback;
 import com.parse.GetDataCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +53,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private String category;
     private boolean inPlace;
     private String flagId;
-    private ArrayList<String> wowIds;
+    private int wowCount;
+    private int lolCount;
+    private int booCount;
 
     private MediaPlayer mediaPlayer;
     private VideoView vv;
@@ -78,9 +71,15 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private MediaType mediaType;
     private ParseFile mediaFile;
 
+    protected String userId;
+
     private View view;
 
     private static final String TAG = "FlagFragment";
+
+    private static final int WOW_CODE = 0;
+    private static final int LOL_CODE = 1;
+    private static final int BOO_CODE = 2;
 
     /**
      *  Must be called BEFORE adding the fragment to the
@@ -106,7 +105,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         category = bundle.getString("category");
         inPlace = bundle.getBoolean("inPlace");
         flagId = bundle.getString("flagId");
-        wowIds = bundle.getStringArrayList("wowIds");
+        wowCount = bundle.getInt("wowCount");
+
+        userId = FacebookUtils.getInstance().getCurrentUserId();
     }
 
     @Override
@@ -185,18 +186,39 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     {
         super.onResume();
 
-        boolean wowed = true;
-        int wowCount = 0;
+        ParseQuery<Flag> queryPosts = ParseQuery.getQuery("Posts");
+        queryPosts.whereEqualTo("objectId", flagId);
 
-        if(wowIds != null)
+        queryPosts.findInBackground(new FindCallback<Flag>()
         {
-            wowCount = wowIds.size();
+            public void done(List<Flag> markers, ParseException e)
+            {
+                if (e == null && markers.size() != 0)
+                {
+                    Flag flag = markers.get(0);
 
-            for (int i = 0; i < wowCount; i++)
-                if (wowIds.get(i).equals(FacebookUtils.getInstance().getCurrentUserId())) wowed = true;
-        }
+                    wowCount = flag.getInt("wowCount");
+                }
+            }
+        });
 
-        updateWowButtonText(wowed, wowCount);
+        wowButton.setText(wowButton.getText() + " (" + wowCount + ")");
+
+        ParseQuery<CustomParseObject> queryWLB = ParseQuery.getQuery("Wow_Lol_Boo");
+        queryWLB.whereEqualTo("fbId", userId);
+        queryWLB.whereEqualTo("flagId", flagId);
+        queryWLB.whereEqualTo("boolWow", true);
+
+        queryWLB.findInBackground(new FindCallback<CustomParseObject>()
+        {
+            public void done(List<CustomParseObject> markers, ParseException e)
+            {
+                if (e == null && markers.size() != 0)
+                {
+                    wowButton.setText("You already wow this." + " (" + wowCount + ")");
+                }
+            }
+        });
     }
 
     @Override
@@ -295,15 +317,76 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
     private void wowFlag()
     {
-        final String userId = FacebookUtils.getInstance().getCurrentUserId();
+        ParseQuery<CustomParseObject> queryWLB = ParseQuery.getQuery("Wow_Lol_Boo");
+        queryWLB.whereEqualTo("fbId", userId);
+        queryWLB.whereEqualTo("flagId", flagId);
+
+        wowButton.setClickable(false);
+
+        queryWLB.findInBackground(new FindCallback<CustomParseObject>()
+        {
+            public void done(List<CustomParseObject> markers, ParseException e)
+            {
+                if (e == null && markers.size() != 0)
+                {
+                    CustomParseObject obj = markers.get(0);
+
+                    boolean boolWow = obj.getBoolean("boolWow");
+
+                    if(!boolWow)
+                    {
+                        obj.setWowBoolean(true);
+                        obj.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e)
+                            {
+                                updateWLBCount(WOW_CODE, true);
+                            }
+                        });
+                    }
+                    else
+                    {
+                        obj.setWowBoolean(false);
+                        obj.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e)
+                            {
+                                updateWLBCount(WOW_CODE, false);
+                            }
+                        });
+                    }
+                }
+                else if (markers.size() == 0)
+                {
+                    CustomParseObject obj = new CustomParseObject();
+                    obj.setFlagId(flagId);
+                    obj.setFacebookId(FacebookUtils.getInstance().getCurrentUserId());
+                    obj.setWowBoolean(true);
+                    obj.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e)
+                        {
+                            updateWLBCount(WOW_CODE, true);
+                        }
+                    });
+                }
+                else
+                {
+                    Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
+
+                    wowButton.setClickable(true);
+                }
+            }
+        });
+    }
+
+    private void updateWLBCount(int code, final boolean increment)
+    {
+        //TODO parameter code will be used to differentiate wow, lol and boo
 
         ParseQuery<Flag> queryPosts = ParseQuery.getQuery("Posts");
         queryPosts.whereEqualTo("objectId", flagId);
-
-        ParseQuery<CustomUser> queryUser = ParseQuery.getQuery("Wow_Lol_Boo");
-        queryUser.whereEqualTo("fbId", userId);
-
-        wowButton.setClickable(false);
 
         queryPosts.findInBackground(new FindCallback<Flag>()
         {
@@ -313,14 +396,11 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 {
                     Flag flag = markers.get(0);
 
-                    ArrayList<String> wowIds = new ArrayList<String>();
-                    wowIds = flag.getWowIds();
+                    final int wowCount = flag.getInt("wowCount");
 
-                    final int wowCount = wowIds.size();
-
-                    if(!wowIds.contains(userId))
+                    if(increment)
                     {
-                        flag.addWowId(userId);
+                        flag.increment("wowCount");
 
                         flag.saveInBackground(new SaveCallback()
                         {
@@ -335,7 +415,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                     }
                     else
                     {
-                        flag.deleteWowId(userId);
+                        flag.increment("wowCount", -1);
 
                         flag.saveInBackground(new SaveCallback()
                         {
@@ -358,114 +438,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 }
             }
         });
-
-        queryUser.findInBackground(new FindCallback<CustomUser>()
-        {
-            public void done(List<CustomUser> markers, ParseException e)
-            {
-                if (e == null && markers.size() != 0)
-                {
-                    CustomUser user = markers.get(0);
-
-                    ArrayList<String> wows = new ArrayList<String>();
-                    wows = user.getWows();
-
-                    if(!wows.contains(flagId))
-                    {
-                        user.addWow(flagId);
-                        user.saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(ParseException e)
-                            {
-                                wowButton.setClickable(true);
-                            }
-                        });
-                    }
-                    else
-                    {
-                        user.deleteWow(flagId);
-                        user.saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(ParseException e)
-                            {
-                                wowButton.setClickable(true);
-                            }
-                        });
-                    }
-                }
-                else if (markers.size() == 0)
-                {
-                    CustomUser user = new CustomUser();
-                    user.addWow(flagId);
-                    user.setFacebookId(FacebookUtils.getInstance().getCurrentUserId());
-                    user.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e)
-                        {
-                            wowButton.setClickable(true);
-                        }
-                    });
-                }
-                else
-                {
-                    Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
-
-                    wowButton.setClickable(true);
-                }
-            }
-        });
-        /*
-        else
-        {
-            queryPosts.findInBackground(new FindCallback<Flag>()
-            {
-                public void done(List<Flag> markers, ParseException e)
-                {
-                    if (e == null && markers.size() != 0)
-                    {
-                        Flag flag = markers.get(0);
-                        flag.deleteWowId(FacebookUtils.getInstance().getCurrentUserId());
-                        flag.saveInBackground(new SaveCallback()
-                        {
-                            @Override
-                            public void done(ParseException e)
-                            {
-                                wowed=false;
-                                wowCount--;
-                                updateWowButtonText();
-                            }
-                        });
-                    } else
-                    {
-                        Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
-                        Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
-                    }
-
-                    wowButton.setClickable(true);
-                }
-            });
-
-            queryUser.findInBackground(new FindCallback<CustomUser>()
-            {
-                public void done(List<CustomUser> markers, ParseException e)
-                {
-                    if (e == null && markers.size() != 0)
-                    {
-                        CustomUser user = markers.get(0);
-                        user.deleteWow(flagId);
-                        user.saveInBackground();
-                    }
-                    else
-                    {
-                        Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
-                        Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
-                    }
-
-                    wowButton.setClickable(true);
-                }
-            });
-        }*/
     }
 
     private void updateWowButtonText(boolean wowed, int wowCount)

@@ -184,7 +184,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
             bundle.putString("category", mFlag.getCategory());
             bundle.putBoolean("inPlace", mFlag.getInPlace());
             bundle.putString("flagId", mFlag.getFlagId());
-            bundle.putStringArrayList("wowIds", mFlag.getWowIds());
+            bundle.putInt("wowCount", mFlag.getWowCount());
 
 
             ParseFile file;

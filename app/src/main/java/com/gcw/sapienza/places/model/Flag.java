@@ -29,12 +29,7 @@ public class Flag extends ParseObject{
     public static final String LOCATION_KEY = "location";
     public static final String IN_PLACE_KEY = "inPlace";
     public static final String THUMBNAIL_KEY = "thumbnail";
-    public static final String WOW_KEY = "wowIds";
-
-    /**
-     *
-     * @return the text content of the post
-     */
+    public static final String WOW_COUNT_KEY = "wowCount";
 
     public String getFlagId() { return this.getObjectId(); }
 
@@ -69,8 +64,7 @@ public class Flag extends ParseObject{
 
     public boolean getInPlace() { return this.getBoolean(IN_PLACE_KEY); }
 
-    public ArrayList<String> getWowIds() { return (ArrayList<String>)this.get(WOW_KEY); }
-
+    public int getWowCount() { return this.getInt(WOW_COUNT_KEY); }
 
     public void setThumbnailFile(ParseFile pic){
         this.put(THUMBNAIL_KEY, pic);
@@ -114,13 +108,7 @@ public class Flag extends ParseObject{
 
     public void setInPlace(boolean inPlace) { this.put(IN_PLACE_KEY, inPlace); }
 
-    public void addWowId(String wowId) { this.add(WOW_KEY, wowId); }
+    public void incrementWowCount() { this.increment(WOW_COUNT_KEY); }
 
-    public void deleteWowId(String wowId)
-    {
-        ArrayList<String> idToDelete = new ArrayList();
-        idToDelete.add(wowId);
-
-        this.removeAll(WOW_KEY, idToDelete);
-    }
+    public void decrementWowCount() { this.increment(WOW_COUNT_KEY, -1); }
 }
