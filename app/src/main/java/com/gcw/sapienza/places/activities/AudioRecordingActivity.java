@@ -1,4 +1,4 @@
-package com.gcw.sapienza.places;
+package com.gcw.sapienza.places.activities;
 
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.utils.Utils;
 
 import java.io.File;

@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gcw.sapienza.places.FlagFragment;
+import com.gcw.sapienza.places.fragments.FlagFragment;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.model.Flag;
@@ -183,6 +183,8 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
             bundle.putString("weather", mFlag.getWeather());
             bundle.putString("category", mFlag.getCategory());
             bundle.putBoolean("inPlace", mFlag.getInPlace());
+            bundle.putString("flagId", mFlag.getFlagId());
+            bundle.putStringArrayList("wowIds", mFlag.getWowIds());
 
 
             ParseFile file;

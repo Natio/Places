@@ -1,4 +1,4 @@
-package com.gcw.sapienza.places;
+package com.gcw.sapienza.places.activities;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -33,7 +33,9 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.gcw.sapienza.places.activities.VideoCaptureActivity;
+
+import com.gcw.sapienza.places.PlacesApplication;
+import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.adapters.MSpinnerAdapter;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.services.LocationService;
@@ -87,6 +89,8 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     private File audio;
     private File phoneMedia;
 
+    private MenuItem confirmButton;
+
     private int requestedPhoneMediaType;
 
     private File imageFile;
@@ -115,7 +119,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
         if(this.vidButton != null)
         {
-            int res =R.drawable.videocam_selector;
+            int res = R.drawable.videocam_selector;
             if(this.isVideoShoot)
             {
                 res = R.drawable.videocam_green_taken;
@@ -382,6 +386,8 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_share, menu);
+
+        confirmButton = menu.findItem(R.id.action_confirm_flag);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -670,6 +676,8 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         progressBarHolder.setAnimation(inAnim);
         progressBarHolder.setVisibility(View.VISIBLE);
 
+        confirmButton.setVisible(false);
+
         uploader.upload(new FlagUploader.FlagUploaderCallbacks() {
             @Override
             public void onPercentage(int percentage, String text_to_show) {
@@ -684,6 +692,8 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
                 onShareSucceeded(e.getMessage());
                 this.dismissProgressBar();
+
+                confirmButton.setVisible(true);
             }
 
             @Override
@@ -697,6 +707,8 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
                 onShareSucceeded(FLAG_PLACED_TEXT);
                 this.dismissProgressBar();
+
+                confirmButton.setVisible(true);
             }
 
             void dismissProgressBar(){
@@ -754,7 +766,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         returnIntent.putExtra("result", toastText);
         setResult(RESULT_OK,returnIntent);
         this.finish();
-
     }
 
 /*
@@ -811,7 +822,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         if (videoIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(videoIntent, Utils.VID_SHOOT_REQUEST_CODE);
         }
-
     }
 
     private void getMedia(int mediaType) {

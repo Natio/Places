@@ -38,8 +38,8 @@ import android.widget.Toast;
 import com.gcw.sapienza.places.MyFlagsFragment;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
-import com.gcw.sapienza.places.SettingsFragment;
-import com.gcw.sapienza.places.ShareActivity;
+import com.gcw.sapienza.places.fragments.SettingsFragment;
+import com.gcw.sapienza.places.fragments.FlagsListFragment;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.services.LocationService;
@@ -135,7 +135,7 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
             public void onDrawerOpened(View drawerView)
             {
                 super.onDrawerOpened(drawerView);
-                // MainActivity.this.getSupportActionBar().setTitle("To_find_a_title");//TODO find a better title!!!!!
+                // MainActivity.this.getSupportActionBar().setTitle("To_find_a_title");
             }
         };
 
@@ -177,8 +177,6 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
                 RecyclerView.LayoutManager layoutManager = rv.getLayoutManager();
 
                 int position = ((LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
-
-                // Log.d(TAG, "First completely visible item position: " + position);
 
                 return position != 0 && rv.getAdapter().getItemCount() != 0;
             }
@@ -296,6 +294,7 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
         }
     }
 
+    @Deprecated
     private int getIconForCategory(String category)
     {
         String[] category_array = this.getResources().getStringArray(R.array.categories);
@@ -307,6 +306,7 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
         else return R.drawable.flag_purple; // 'Food' category
     }
 
+    @Deprecated
     private float getCategoryColor(String category)
     {
         String[] category_array = this.getResources().getStringArray(R.array.categories);
@@ -325,7 +325,7 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
         srl.setRefreshing(false);
     }
 
-    protected void refresh()
+    public void refresh()
     {
         Location currentLocation = PlacesApplication.getInstance().getLocation();
         if(currentLocation != null){
