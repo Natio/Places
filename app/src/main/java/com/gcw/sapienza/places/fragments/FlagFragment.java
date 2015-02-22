@@ -32,6 +32,7 @@ import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 import java.io.File;
@@ -403,6 +404,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                             }
                         } else if (markers.size() == 0) {
                             CustomParseObject obj = new CustomParseObject();
+                            obj.setUser(ParseUser.getCurrentUser());
                             obj.setFlagId(flagId);
                             obj.setFacebookId(FacebookUtils.getInstance().getCurrentUserId());
                             obj.setWowBoolean(true);
@@ -452,6 +454,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                             }
                         } else if (markers.size() == 0) {
                             CustomParseObject obj = new CustomParseObject();
+                            obj.setUser(ParseUser.getCurrentUser());
                             obj.setFlagId(flagId);
                             obj.setFacebookId(FacebookUtils.getInstance().getCurrentUserId());
                             obj.setLolBoolean(true);
@@ -501,6 +504,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                             }
                         } else if (markers.size() == 0) {
                             CustomParseObject obj = new CustomParseObject();
+                            obj.setUser(ParseUser.getCurrentUser());
                             obj.setFlagId(flagId);
                             obj.setFacebookId(FacebookUtils.getInstance().getCurrentUserId());
                             obj.setBooBoolean(true);
@@ -518,6 +522,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                         }
                     }
                 });
+
         }
     }
 
