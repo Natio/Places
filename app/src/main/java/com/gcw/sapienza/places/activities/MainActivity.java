@@ -544,12 +544,21 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
 
     private void switchToListMapFrags()
     {
-        getRidOfUnusedFrag();
+//        getRidOfUnusedFrag();
+//
+//        homeHolder.setVisibility(View.VISIBLE);
+//        fragHolder.setVisibility(View.INVISIBLE);
 
-        homeHolder.setVisibility(View.VISIBLE);
-        fragHolder.setVisibility(View.INVISIBLE);
+//        Fragment fragment = new FlagsListFragment();
+//        this.getSupportFragmentManager().beginTransaction().replace(R.id.swipe_refresh, fragment).commit();
+//
+//        SupportMapFragment mapFragment = new SupportMapFragment();
+//        this.getSupportFragmentManager().beginTransaction().replace(R.id.map_holder, mapFragment).commit();
+//        mapFragment.getMapAsync(this);
 
-        refresh();
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
     }
 
     private void switchToSettingsFrag()
