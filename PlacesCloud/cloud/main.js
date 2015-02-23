@@ -5,16 +5,79 @@
 //  response.success("Hello world!");
 //});
 
+Parse.Cloud.job("userMigration", function(request, status) {
+  // Set up to modify user data
+  Parse.Cloud.useMasterKey();
+  var User = Parse.Object.extend("_User");
+  var query = new Parse.Query(User);
+  query.limit(100);
+  query.find({success:function(results){
+	  
+	  var map = [];
+	  
+	  for (var i = 0; i < results.length; i++) { 
+	        var object = results[i];
+	        var data = object.get('authData');
+			//console.log(data["facebook"]["id"]);
+			map[data["facebook"]["id"]] = object;
+	  }
+	  
+	  
+	  var Posts = Parse.Object.extend("Posts");
+	  var query_p = new Parse.Query(Posts);
+	  query_p.limit(1000);
+	  query_p.doesNotExist("owner");
+	  query_p.find({error: function(error){status.error(error);}, 
+	  success: function(results){
+		  console.log("Migrating "+results.length+" records");
+		  for(var k = 0; k < results.length; k++){
+			  var obj = results[k];
+			  var owner = map[obj.get("fbId")];
+			  obj.set("owner", owner);
+		  }
+		  
+		  Parse.Object.saveAll(results , {
+		      success: function(list) {
+		        status.success("Migration completed successfully");
+		      },
+		      error: function(error) {
+		        status.error(error.message);
+		      },
+		    });
+		  
+	  }
+  		
+  
+  	});
+ 
+  	
+  },
+	error: function(error){status.error(error.message);}});
+  
+  
+});
+
 Parse.Cloud.beforeSave("Posts", function(request, response) {
-  if (request.object.get("text").length < 5 
-    && request.object.get("audio") == null
-    && request.object.get("picture") == null
-    && request.object.get("video") == null
-    && request.object.get("phone_media") == null) {
-    response.error("Please, write something meaningful ;)");
-  } else {
-    response.success();
-  }
+	
+	//If owner is not present it is automatically added
+	//in this way old version of the app will continue generating valid falgs
+	
+	if(request.object.get("owner") == null){
+		request.object.set("owner", Parse.User.current());
+	}
+	
+	if (request.object.get("text").length < 5 
+    	&& request.object.get("audio") == null
+    	&& request.object.get("picture") == null
+    	&& request.object.get("video") == null
+    	&& request.object.get("phone_media") == null) {
+			
+    	response.error("Please, write something meaningful ;)");
+		
+		}
+ 	   else {
+    	   response.success();
+  	 	}
 });
 
 Parse.Cloud.beforeSave(Parse.Installation, function(request, response) {
