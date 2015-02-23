@@ -1,6 +1,7 @@
 package com.gcw.sapienza.places.activities;
 
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -146,7 +147,7 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
         this.getSupportActionBar().setHomeButtonEnabled(true);
         this.getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
 
-        this.selectItem(0);
+//        this.selectItem(0);
 
         this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.green)));
 
@@ -280,13 +281,13 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
             {
                 LatLngBounds bounds = builder.build();
 //                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, MAP_BOUNDS));
-                this.gMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
+                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
             }else{
                 Location currentLocation = gMap.getMyLocation();
                 if(currentLocation != null){
                     LatLng currentLocationLatLng = new LatLng(currentLocation.getLatitude(),
                             currentLocation.getLongitude());
-                    this.gMap.animateCamera(CameraUpdateFactory
+                    this.gMap.moveCamera(CameraUpdateFactory
                             .newLatLngZoom(currentLocationLatLng, Utils.ZOOM_LVL));
                 }
             }
@@ -469,7 +470,8 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
                 break;
 
             case FLAGS_LIST_POSITION:
-                if(homeHolder.getVisibility() == View.INVISIBLE) switchToListMapFrags();
+//                if(homeHolder.getVisibility() == View.INVISIBLE)
+                switchToListMapFrags();
                 break;
 
             case MY_FLAGS_POSITION:
@@ -549,6 +551,8 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
 //        homeHolder.setVisibility(View.VISIBLE);
 //        fragHolder.setVisibility(View.INVISIBLE);
 
+//        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new Fragment()).commit();
+//
 //        Fragment fragment = new FlagsListFragment();
 //        this.getSupportFragmentManager().beginTransaction().replace(R.id.swipe_refresh, fragment).commit();
 //
@@ -563,26 +567,43 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
 
     private void switchToSettingsFrag()
     {
-        getRidOfUnusedFrag();
-        switchToFragOtherThanHome();
+        Log.d(TAG, "Switching to SettingsFragment");
+//        getRidOfUnusedFrag();
+//        switchToFragOtherThanHome();
 
-        this.getFragmentManager().beginTransaction().replace(R.id.frag_container, new SettingsFragment(), FRAG_TAG).commit();
+        this.getFragmentManager().beginTransaction().replace(R.id.home_container, new SettingsFragment()).addToBackStack(null).commit();
     }
 
     public void switchToOtherFrag(Fragment frag)
     {
-        getRidOfUnusedFrag();
-        switchToFragOtherThanHome();
+        Log.d(TAG, "Switching to other fragment: " + frag.getClass());
+//        getRidOfUnusedFrag();
+//        switchToFragOtherThanHome();
 
-        this.getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, frag, FRAG_TAG).commit();
+        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, frag).addToBackStack(null).commit();
     }
 
+//    @Override
+//    public void onBackPressed()
+//    {
+//        if(homeHolder.getVisibility() == View.INVISIBLE)
+//        {
+//            switchToListMapFrags();
+//        }
+//    }
+
     @Override
-    public void onBackPressed()
-    {
-        if(homeHolder.getVisibility() == View.INVISIBLE)
-        {
-            switchToListMapFrags();
+    public void onBackPressed(){
+        FragmentManager fm = getFragmentManager();
+        if(getSupportFragmentManager().getBackStackEntryCount() > 0){
+            getSupportFragmentManager().popBackStack();
+        }
+        else if (fm.getBackStackEntryCount() > 0) {
+            Log.i("MainActivity", "popping backstack");
+            fm.popBackStack();
+        } else {
+            Log.i("MainActivity", "nothing on backstack, calling super");
+            super.onBackPressed();
         }
     }
 
