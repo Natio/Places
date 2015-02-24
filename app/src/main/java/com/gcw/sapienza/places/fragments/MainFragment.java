@@ -246,7 +246,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                         .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
                                 // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
                                 //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
-                        .alpha(0.8f));
+                        .alpha(0.85f));
             }
 
             if(flags.size() > 0)

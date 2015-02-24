@@ -90,30 +90,18 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
                     case LocationService.FOUND_MY_FLAGS_NOTIFICATION:
 
                         Log.d(TAG, "My flags found");
-                        this.dismissProgressBar();
+//                        MyFlagsFragment.this.dismissProgressBar();
                         break;
 
                     case LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION:
 
                         Log.d(TAG, "No my flags found");
-                        this.dismissProgressBar();
+//                        MyFlagsFragment.this.dismissProgressBar();
                         break;
 
                     default:
                 }
                 updateMarkersOnMap();
-            }
-
-            void dismissProgressBar(){
-
-                AlphaAnimation outAnim = new AlphaAnimation(1, 0);
-                outAnim.setDuration(Utils.ANIMATION_DURATION);
-                progressBarHolder.setAnimation(outAnim);
-                progressBarHolder.setVisibility(View.GONE);
-
-//                MyFlagsFragment.this.homeHolder.setVisibility(View.VISIBLE);
-//                MyFlagsFragment.this.fragHolder.setVisibility(View.VISIBLE);
-//                MyFlagsFragment.this.srl.setVisibility(View.VISIBLE);
             }
         };
 
@@ -194,6 +182,18 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
         return view;
     }
 
+    void dismissProgressBar(){
+
+        AlphaAnimation outAnim = new AlphaAnimation(1, 0);
+        outAnim.setDuration(Utils.ANIMATION_DURATION);
+        progressBarHolder.setAnimation(outAnim);
+        progressBarHolder.setVisibility(View.GONE);
+
+//                MyFlagsFragment.this.homeHolder.setVisibility(View.VISIBLE);
+//                MyFlagsFragment.this.fragHolder.setVisibility(View.VISIBLE);
+//                MyFlagsFragment.this.srl.setVisibility(View.VISIBLE);
+    }
+
     @Override
     public void onDestroy()
     {
@@ -248,7 +248,7 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
                         .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
                                 // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
                                 //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
-                        .alpha(0.8f));
+                        .alpha(0.85f));
             }
 
             if(this.flags.size() > 0)
@@ -267,6 +267,7 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
             }
 
         }
+        this.dismissProgressBar();
     }
 
     @Override

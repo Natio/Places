@@ -151,11 +151,12 @@ public class Utils
     {
         String[] category_array = context.getResources().getStringArray(R.array.categories);
 
-        if (category == null || category.equals(category_array[0])) return R.drawable.flag_red;
-        else if (category.equals(category_array[1])) return R.drawable.flag_green;
-        else if (category.equals(category_array[2])) return R.drawable.flag_yellow;
-        else if (category.equals(category_array[3])) return R.drawable.flag_blue;
-        else return R.drawable.flag_purple; // 'Food' category
+        if (category == null || category.equals(category_array[0])) return R.drawable.flag_red; //None
+        else if (category.equals(category_array[1])) return R.drawable.flag_green; //Thoughts
+        else if (category.equals(category_array[2])) return R.drawable.flag_yellow; //Fun
+        else if (category.equals(category_array[3])) return R.drawable.flag_blue; //Music
+        else if (category.equals(category_array[4])) return R.drawable.flag_grey; //Landscape
+        else return R.drawable.flag_purple; //Food
     }
 
     public static String getImageRealPathFromURI(Context context, Uri uri){

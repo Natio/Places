@@ -1,7 +1,10 @@
 package com.gcw.sapienza.places.adapters;
 
 import android.app.Activity;
+import android.app.Application;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -11,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.fragments.FlagFragment;
@@ -100,6 +104,24 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
             flagViewHolder.main_image.setImageDrawable(null);
         }
 
+        ((CardView)flagViewHolder.itemView).setRadius(20);
+        ((CardView)flagViewHolder.itemView).setShadowPadding(10, 10, 10, 10);
+
+        String[] category_array = PlacesApplication.getInstance().getResources().getStringArray(R.array.categories);
+
+        if (flagViewHolder.mFlag.getCategory().equals(category_array[0])){ //None
+            ((CardView)flagViewHolder.itemView).setCardBackgroundColor(Color.argb(20, 255, 0, 0));
+        }else if (flagViewHolder.mFlag.getCategory().equals(category_array[1])){ //Thoughts
+            ((CardView)flagViewHolder.itemView).setCardBackgroundColor(Color.argb(20, 0, 255, 0));
+        }else if (flagViewHolder.mFlag.getCategory().equals(category_array[2])){ //Fun
+            ((CardView)flagViewHolder.itemView).setCardBackgroundColor(Color.argb(20, 255, 255, 0));
+        }else if (flagViewHolder.mFlag.getCategory().equals(category_array[3])){ //Music
+            ((CardView)flagViewHolder.itemView).setCardBackgroundColor(Color.argb(20, 0, 0, 255));
+        }else if (flagViewHolder.mFlag.getCategory().equals(category_array[4])){ //Landscape
+            ((CardView)flagViewHolder.itemView).setCardBackgroundColor(Color.argb(20, 204, 204, 204));
+        }else{ //Food
+            ((CardView)flagViewHolder.itemView).setCardBackgroundColor(Color.argb(20, 128, 0, 128));
+        }
     }
 
     @Override
