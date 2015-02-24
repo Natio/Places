@@ -329,6 +329,13 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private void onVideoDownloaded(String videoPath){
         Uri videoUri = Uri.parse(videoPath);
         vv.setVideoURI(videoUri);
+
+        try
+        {
+            vv.seekTo(10);
+        }
+        catch(RuntimeException re){ Log.d(TAG, "Video is too short to show preview"); }
+
         playVideoButton.setVisibility(View.VISIBLE);
         // playVideo();
 

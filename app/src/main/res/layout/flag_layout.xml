@@ -18,13 +18,21 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true" />
 
+        <!-- <View
+            android:layout_width="1dp"
+            android:layout_height="fill_parent"
+            android:background="@color/grey"
+            android:layout_toLeftOf="@+id/profile_pic"
+            android:id="@+id/profile_pic_divider" /> -->
+
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/profile_pic"
             android:layout_gravity="center_vertical"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"
+            android:background="@drawable/my_border_2" />
 
     </RelativeLayout>
 
@@ -42,6 +50,7 @@
         android:ems="@integer/max_text_size"
         android:background="@android:color/transparent"
         android:id="@+id/text"
+        android:maxWidth="250dp"
         android:maxHeight="220dp"
         android:focusable="false"
         android:focusableInTouchMode="false"
@@ -57,7 +66,7 @@
         android:layout_alignParentBottom="true"
         android:text="WOW"
         android:textSize="14sp"
-        android:background="@drawable/my_border_2"
+        android:background="@drawable/my_border_3"
         android:layout_centerHorizontal="true"
         android:id="@+id/wow_button"
         android:layout_marginBottom="10dp"
@@ -70,7 +79,7 @@
         android:layout_alignParentBottom="true"
         android:text="LOL"
         android:textSize="14sp"
-        android:background="@drawable/my_border_2"
+        android:background="@drawable/my_border_3"
         android:layout_toLeftOf="@+id/wow_button"
         android:id="@+id/lol_button"
         android:layout_marginBottom="10dp"
@@ -83,7 +92,7 @@
         android:layout_alignParentBottom="true"
         android:text="BOO"
         android:textSize="14sp"
-        android:background="@drawable/my_border_2"
+        android:background="@drawable/my_border_3"
         android:layout_toRightOf="@+id/wow_button"
         android:id="@+id/boo_button"
         android:layout_marginBottom="10dp"
