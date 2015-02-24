@@ -691,7 +691,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 Map<String, String> dimensions = new HashMap<>(1);
                 dimensions.put("reason", e.getMessage());
                 ParseAnalytics.trackEventInBackground("sharing_failed", dimensions);
-                onShareSucceeded(e.getMessage());
+                onShareFailed(e.getMessage());
                 this.dismissProgressBar();
 
                 confirmButton.setVisible(true);
