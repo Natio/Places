@@ -150,9 +150,9 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
 
                 for(int i = 0; i < frags.size(); i++)
                 {
-                    if (frags.get(i) instanceof FlagsListFragment)
+                    if (frags.get(i) instanceof MyFlagsListFragment)
                     {
-                        rv = ((FlagsListFragment) frags.get(i)).getRV();
+                        rv = ((MyFlagsListFragment) frags.get(i)).getRV();
                         break;
                     }
                 }
@@ -169,10 +169,7 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
             }
         });
 
-        AlphaAnimation inAnim = new AlphaAnimation(0, 1);
-        inAnim.setDuration(Utils.ANIMATION_DURATION);
-        progressBarHolder.setAnimation(inAnim);
-        progressBarHolder.setVisibility(View.VISIBLE);
+//        showProgressBar();
 
         Fragment fragment = new MyFlagsListFragment();
         myContext.getSupportFragmentManager().beginTransaction().replace(R.id.my_swipe_refresh, fragment).commit();
@@ -184,7 +181,14 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
         return view;
     }
 
-    void dismissProgressBar(){
+    private void showProgressBar() {
+        AlphaAnimation inAnim = new AlphaAnimation(0, 1);
+        inAnim.setDuration(Utils.ANIMATION_DURATION);
+        progressBarHolder.setAnimation(inAnim);
+        progressBarHolder.setVisibility(View.VISIBLE);
+    }
+
+    private void dismissProgressBar(){
 
         AlphaAnimation outAnim = new AlphaAnimation(1, 0);
         outAnim.setDuration(Utils.ANIMATION_DURATION);
@@ -296,9 +300,7 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
                             .newLatLngZoom(currentLocationLatLng, Utils.ZOOM_LVL));
                 }
             }
-
         }
-        this.dismissProgressBar();
     }
 
     @Override
