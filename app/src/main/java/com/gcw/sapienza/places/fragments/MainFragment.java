@@ -40,6 +40,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
@@ -49,7 +50,7 @@ import java.util.List;
 /**
  * Created by snowblack on 2/19/15.
  */
-public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener {
+public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener, GoogleMap.OnMarkerClickListener {
 
     private static final String TAG = "MainFragment";
 
@@ -58,13 +59,6 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
     private GoogleMap gMap;
 
     private BroadcastReceiver receiver;
-
-    private RelativeLayout progressBarHolder;
-    private TextView progressTextView;
-
-    private DrawerLayout drawerLayout;
-    private LinearLayout homeHolder;
-    private FrameLayout fragHolder;
     private MSwipeRefreshLayout srl;
 
     private FragmentActivity myContext;
@@ -135,9 +129,6 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 //        this.progressBarHolder = (RelativeLayout)view.findViewById(R.id.frame_layout);
 //        this.progressTextView = (TextView)view.findViewById(R.id.share_progress_text_view);
 
-        this.homeHolder = (LinearLayout) view.findViewById(R.id.my_home_container);
-        this.fragHolder = (FrameLayout) view.findViewById(R.id.my_frag_container);
-
         srl = (MSwipeRefreshLayout)view.findViewById(R.id.my_swipe_refresh);
         srl.setOnRefreshListener(this);
 
@@ -207,6 +198,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
         this.gMap.getUiSettings().setScrollGesturesEnabled(false);
         this.gMap.getUiSettings().setZoomGesturesEnabled(false);
+        this.gMap.setOnMarkerClickListener(this);
         this.gMap.setMyLocationEnabled(true);
 
         this.updateMarkersOnMap();
@@ -222,6 +214,8 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
             //zooms around all the Flags
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+            int index = 0;
 
             for (ParseObject p : flags)
             {
@@ -243,10 +237,12 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                 this.gMap.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title(text)
+                        .snippet(index + "")
                         .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
                                 // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
                                 //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
                         .alpha(0.85f));
+                index++;
             }
 
             if(flags.size() > 0)
@@ -265,6 +261,29 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
             }
 
         }
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        int index = Integer.parseInt(marker.getSnippet());
+
+        List<Fragment> frags = getActivity().getSupportFragmentManager().getFragments();
+
+        if (frags.size() < 1) return false;
+
+        for (int i = 0; i < frags.size(); i++) {
+            if (frags.get(i) instanceof FlagsListFragment) {
+                FlagsListFragment flf = ((FlagsListFragment) frags.get(i));
+                flf.getRV().smoothScrollToPosition(index);
+                // TODO item highlight on flag clicked on map?
+
+                break;
+            }
+        }
+
+        // by returning false we can show text on flag in the map
+        // return false;
+        return true;
     }
 
     @Override

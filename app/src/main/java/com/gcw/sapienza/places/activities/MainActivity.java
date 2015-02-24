@@ -27,7 +27,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.fragments.MainFragment;
@@ -40,6 +39,7 @@ import com.parse.ParseUser;
 
 
 public class MainActivity extends ActionBarActivity implements Preference.OnPreferenceChangeListener {
+
 
     public static String TAG = MainActivity.class.getName();
     private DrawerLayout drawerLayout;
@@ -125,12 +125,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.green)));
 
         this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
-    }
-
-    @Override
-    protected void onDestroy()
-    {
-        super.onDestroy();
     }
 
     @Deprecated
