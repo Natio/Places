@@ -61,6 +61,11 @@ Parse.Cloud.beforeSave("Posts", function(request, response) {
 	
 	//If owner is not present it is automatically added
 	//in this way old version of the app will continue generating valid falgs
+	if(!request.object.isNew()){
+		response.success();
+		return;
+	}
+	
 	
 	if(request.object.get("owner") == null){
 		request.object.set("owner", Parse.User.current());
