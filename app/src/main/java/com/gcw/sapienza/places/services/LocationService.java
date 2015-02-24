@@ -100,6 +100,7 @@ public class LocationService extends Service implements
         if (currentLocation != null) {
             this.location = currentLocation;
             queryParsewithLocation(currentLocation);
+            queryParsewithCurrentUser();
             updateApplication();
         }
         fusedLocationProviderApi.requestLocationUpdates(googleApiClient, locationRequest, this);
@@ -435,6 +436,7 @@ public class LocationService extends Service implements
         if(listener != null) {
             listener.setLocation(location);
             listener.setFlagsNearby(parseObjects);
+            listener.setMyFlags(myFlags);
         }
     }
 

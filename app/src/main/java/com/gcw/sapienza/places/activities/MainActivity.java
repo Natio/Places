@@ -36,7 +36,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.gcw.sapienza.places.MyFlagsFragment;
+import com.gcw.sapienza.places.fragments.MainFragment;
+import com.gcw.sapienza.places.fragments.MyFlagsFragment;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.fragments.SettingsFragment;
@@ -183,12 +184,7 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
             }
         });
 
-        Fragment fragment = new FlagsListFragment();
-        this.getSupportFragmentManager().beginTransaction().replace(R.id.swipe_refresh, fragment).commit();
 
-        SupportMapFragment mapFragment = new SupportMapFragment();
-        this.getSupportFragmentManager().beginTransaction().replace(R.id.map_holder, mapFragment).commit();
-        mapFragment.getMapAsync(this);
 
         this.receiver = new BroadcastReceiver()
         {
@@ -214,6 +210,7 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
                 updateMarkersOnMap();
             }
         };
+        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
     }
 
     @Override
@@ -471,7 +468,7 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
 
             case FLAGS_LIST_POSITION:
 //                if(homeHolder.getVisibility() == View.INVISIBLE)
-                switchToListMapFrags();
+                switchToOtherFrag(new MainFragment());
                 break;
 
             case MY_FLAGS_POSITION:
@@ -538,14 +535,20 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
         else if(frag2!= null) this.getSupportFragmentManager().beginTransaction().remove(frag2).commit();
     }
 
-    private void switchToFragOtherThanHome()
+    private void switchToSupportFrag()
+    {
+        fragHolder.setVisibility(View.INVISIBLE);
+        homeHolder.setVisibility(View.VISIBLE);
+    }
+
+    private void switchToNonSupportFrag()
     {
         homeHolder.setVisibility(View.INVISIBLE);
         fragHolder.setVisibility(View.VISIBLE);
     }
 
-    private void switchToListMapFrags()
-    {
+//    private void switchToListMapFrags()
+//    {
 //        getRidOfUnusedFrag();
 //
 //        homeHolder.setVisibility(View.VISIBLE);
@@ -559,19 +562,18 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
 //        SupportMapFragment mapFragment = new SupportMapFragment();
 //        this.getSupportFragmentManager().beginTransaction().replace(R.id.map_holder, mapFragment).commit();
 //        mapFragment.getMapAsync(this);
-
-        Intent intent = getIntent();
-        finish();
-        startActivity(intent);
-    }
+//        switchToSupportFrag();
+//
+//        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).addToBackStack(null).commit();
+//    }
 
     private void switchToSettingsFrag()
     {
         Log.d(TAG, "Switching to SettingsFragment");
 //        getRidOfUnusedFrag();
-//        switchToFragOtherThanHome();
+        switchToNonSupportFrag();
 
-        this.getFragmentManager().beginTransaction().replace(R.id.home_container, new SettingsFragment()).addToBackStack(null).commit();
+        this.getFragmentManager().beginTransaction().replace(R.id.frag_container, new SettingsFragment()).commit();
     }
 
     public void switchToOtherFrag(Fragment frag)
@@ -579,6 +581,13 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
         Log.d(TAG, "Switching to other fragment: " + frag.getClass());
 //        getRidOfUnusedFrag();
 //        switchToFragOtherThanHome();
+        Fragment f = this.getSupportFragmentManager().findFragmentById(R.id.home_container);
+        if(!isNonSupportFragmentVisible() && f != null && f.getClass() == frag.getClass()){
+            Log.w(TAG, "Switching to the same fragment: " + f.getClass());
+            return;
+        }
+
+        switchToSupportFrag();
 
         this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, frag).addToBackStack(null).commit();
     }
@@ -592,16 +601,37 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
 //        }
 //    }
 
+    private boolean isNonSupportFragmentVisible(){
+       return fragHolder.getVisibility() == View.VISIBLE;
+    }
+
     @Override
     public void onBackPressed(){
+        Fragment f = this.getSupportFragmentManager().findFragmentById(R.id.home_container);
+        if(!isNonSupportFragmentVisible() && f != null && f.getClass() == MainFragment.class){
+            Log.d(TAG, "Pressed back button on MainFragment: finishing...");
+            this.getSupportFragmentManager().popBackStack(null, android.support.v4.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            finish();
+            return;
+        }
         FragmentManager fm = getFragmentManager();
-        if(getSupportFragmentManager().getBackStackEntryCount() > 0){
+//        if (fm.getBackStackEntryCount() > 0) {
+//            Log.i("MainActivity", "popping backstack: " +
+//                    fm.getBackStackEntryCount() + ", while support: " +
+//                    getSupportFragmentManager().getBackStackEntryCount());
+//            fm.popBackStack();
+//        }
+//        else
+        if(isNonSupportFragmentVisible()){
+            switchToSupportFrag();
+        }
+        else if(getSupportFragmentManager().getBackStackEntryCount() > 0){
+            Log.i("MainActivity", "popping support: " +
+                    getSupportFragmentManager().getBackStackEntryCount() + ", while backstack: " +
+                    fm.getBackStackEntryCount());
             getSupportFragmentManager().popBackStack();
         }
-        else if (fm.getBackStackEntryCount() > 0) {
-            Log.i("MainActivity", "popping backstack");
-            fm.popBackStack();
-        } else {
+        else {
             Log.i("MainActivity", "nothing on backstack, calling super");
             super.onBackPressed();
         }

@@ -1,4 +1,4 @@
-package com.gcw.sapienza.places;
+package com.gcw.sapienza.places.fragments;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -26,7 +26,10 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.gcw.sapienza.places.fragments.FlagsListFragment;
+import android.widget.Toast;
+
+import com.gcw.sapienza.places.PlacesApplication;
+import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MyFlagsListFragment;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.model.Flag;
@@ -47,9 +50,9 @@ import java.util.List;
 /**
  * Created by snowblack on 2/19/15.
  */
-public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener {
+public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener {
 
-    private static final String TAG = "MyFlagsFragment";
+    private static final String TAG = "MainFragment";
 
     private View view;
 
@@ -83,16 +86,16 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
                  */
                 switch(intent.getAction()) {
 
-                    case LocationService.FOUND_MY_FLAGS_NOTIFICATION:
+                    case LocationService.FOUND_NEW_FLAGS_NOTIFICATION:
 
                         Log.d(TAG, "My flags found");
-                        this.dismissProgressBar();
+//                        this.dismissProgressBar();
                         break;
 
                     case LocationService.FOUND_NO_FLAGS_NOTIFICATION:
 
                         Log.d(TAG, "No my flags found");
-                        this.dismissProgressBar();
+//                        this.dismissProgressBar();
                         break;
 
                     default:
@@ -100,23 +103,21 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
                 updateMarkersOnMap();
             }
 
-            void dismissProgressBar(){
-
-                AlphaAnimation outAnim = new AlphaAnimation(1, 0);
-                outAnim.setDuration(Utils.ANIMATION_DURATION);
-                progressBarHolder.setAnimation(outAnim);
-                progressBarHolder.setVisibility(View.GONE);
-
+//            void dismissProgressBar(){
+//
+//                AlphaAnimation outAnim = new AlphaAnimation(1, 0);
+//                outAnim.setDuration(Utils.ANIMATION_DURATION);
+//                progressBarHolder.setAnimation(outAnim);
+//                progressBarHolder.setVisibility(View.GONE);
+//
 //                MyFlagsFragment.this.homeHolder.setVisibility(View.VISIBLE);
 //                MyFlagsFragment.this.fragHolder.setVisibility(View.VISIBLE);
 //                MyFlagsFragment.this.srl.setVisibility(View.VISIBLE);
-            }
+//            }
         };
 
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_MY_FLAGS_NOTIFICATION));
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION));
-
-        PlacesApplication.getInstance().getLocationService().queryParsewithCurrentUser();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
     }
 
     @Override
@@ -132,8 +133,8 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
 
         view = inflater.inflate(R.layout.my_flags_layout, container, false);
 
-        this.progressBarHolder = (RelativeLayout)view.findViewById(R.id.frame_layout);
-        this.progressTextView = (TextView)view.findViewById(R.id.share_progress_text_view);
+//        this.progressBarHolder = (RelativeLayout)view.findViewById(R.id.frame_layout);
+//        this.progressTextView = (TextView)view.findViewById(R.id.share_progress_text_view);
 
         this.homeHolder = (LinearLayout) view.findViewById(R.id.my_home_container);
         this.fragHolder = (FrameLayout) view.findViewById(R.id.my_frag_container);
@@ -177,17 +178,17 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
             }
         });
 
-        AlphaAnimation inAnim = new AlphaAnimation(0, 1);
-        inAnim.setDuration(Utils.ANIMATION_DURATION);
-        progressBarHolder.setAnimation(inAnim);
-        progressBarHolder.setVisibility(View.VISIBLE);
+//        AlphaAnimation inAnim = new AlphaAnimation(0, 1);
+//        inAnim.setDuration(Utils.ANIMATION_DURATION);
+//        progressBarHolder.setAnimation(inAnim);
+//        progressBarHolder.setVisibility(View.VISIBLE);
 
-        Fragment fragment = new MyFlagsListFragment();
+        Fragment fragment = new FlagsListFragment();
         myContext.getSupportFragmentManager().beginTransaction().replace(R.id.my_swipe_refresh, fragment).commit();
 
         SupportMapFragment mapFragment = new SupportMapFragment();
         myContext.getSupportFragmentManager().beginTransaction().replace(R.id.my_map_holder, mapFragment).commit();
-        mapFragment.getMapAsync(MyFlagsFragment.this);
+        mapFragment.getMapAsync(MainFragment.this);
 
         return view;
     }
@@ -214,7 +215,7 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
 
     private void updateMarkersOnMap() {
 
-        List<Flag> flags= PlacesApplication.getInstance().getLocationService().getMyFlags();
+        List<Flag> flags= PlacesApplication.getInstance().getFlags();
 
         if(flags != null && this.gMap != null)
         {
@@ -274,8 +275,14 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
         srl.setRefreshing(false);
     }
 
-    protected void refresh()
+    public void refresh()
     {
-        PlacesApplication.getInstance().getLocationService().queryParsewithCurrentUser();
+        Location currentLocation = PlacesApplication.getInstance().getLocation();
+        if(currentLocation != null){
+            PlacesApplication.getInstance().getLocationService().queryParsewithLocation(currentLocation);
+        }
+        else
+            Toast.makeText(getActivity(), "No location data available\n" +
+                    "Are Location Services enabled?", Toast.LENGTH_LONG).show();
     }
 }

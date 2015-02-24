@@ -15,4 +15,5 @@ public interface ILocationUpdater {
 
     public void setFlagsNearby(List<Flag> l);
 
+    public void setMyFlags(List<Flag> myFlags);
 }
