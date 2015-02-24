@@ -21,16 +21,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
-import com.gcw.sapienza.places.activities.MyFlagsListFragment;
+import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.services.LocationService;
@@ -45,6 +43,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
+
 import java.util.List;
 
 /**
@@ -271,18 +270,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
     @Override
     public void onRefresh()
     {
-        refresh();
+        ((MainActivity)getActivity()).refresh();
         srl.setRefreshing(false);
-    }
-
-    public void refresh()
-    {
-        Location currentLocation = PlacesApplication.getInstance().getLocation();
-        if(currentLocation != null){
-            PlacesApplication.getInstance().getLocationService().queryParsewithLocation(currentLocation);
-        }
-        else
-            Toast.makeText(getActivity(), "No location data available\n" +
-                    "Are Location Services enabled?", Toast.LENGTH_LONG).show();
     }
 }

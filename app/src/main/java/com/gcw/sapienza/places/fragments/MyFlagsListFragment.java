@@ -1,4 +1,4 @@
-package com.gcw.sapienza.places.activities;
+package com.gcw.sapienza.places.fragments;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,18 +19,12 @@ import android.widget.Toast;
 
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.adapters.FlagsAdapter;
 import com.gcw.sapienza.places.model.Flag;
-import com.gcw.sapienza.places.model.FlagReport;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.DeleteCallback;
-import com.parse.GetCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.util.List;
 

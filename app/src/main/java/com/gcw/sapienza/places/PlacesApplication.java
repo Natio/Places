@@ -12,21 +12,23 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+
 import com.gcw.sapienza.places.model.CustomParseObject;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.model.FlagReport;
 import com.gcw.sapienza.places.services.ILocationUpdater;
 import com.gcw.sapienza.places.services.LocationService;
+import com.gcw.sapienza.places.services.LocationService.LocalBinder;
 import com.parse.ConfigCallback;
 import com.parse.Parse;
 import com.parse.ParseConfig;
+import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
-import com.parse.ParseException;
-import com.gcw.sapienza.places.services.LocationService.LocalBinder;
 import com.parse.ParsePush;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

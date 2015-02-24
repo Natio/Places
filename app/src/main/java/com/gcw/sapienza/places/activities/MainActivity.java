@@ -2,14 +2,10 @@ package com.gcw.sapienza.places.activities;
 
 import android.app.AlertDialog;
 import android.app.FragmentManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationManager;
@@ -17,13 +13,9 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,34 +28,18 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.gcw.sapienza.places.fragments.MainFragment;
-import com.gcw.sapienza.places.fragments.MyFlagsFragment;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.fragments.MainFragment;
+import com.gcw.sapienza.places.fragments.MyFlagsFragment;
 import com.gcw.sapienza.places.fragments.SettingsFragment;
-import com.gcw.sapienza.places.fragments.FlagsListFragment;
-import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
-import com.gcw.sapienza.places.model.Flag;
-import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
 import com.parse.ParseUser;
-import java.util.List;
 
 
-public class MainActivity extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener,
-                                                                OnMapReadyCallback,
-                                                                Preference.OnPreferenceChangeListener {
+public class MainActivity extends ActionBarActivity implements Preference.OnPreferenceChangeListener {
 
     public static String TAG = MainActivity.class.getName();
     private DrawerLayout drawerLayout;
@@ -71,7 +47,7 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
     private ActionBarDrawerToggle drawerToggle;
     private static final String [] section_titles = {"Home", "Settings", "My Flags", "Logout"};
     private CharSequence current_title;
-    private MSwipeRefreshLayout srl;
+
     // private int currentDrawerListItemIndex = -1;
 
     private LinearLayout homeHolder;
@@ -88,11 +64,7 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
 
     private static final String FRAG_TAG = "FRAG_TAG";
 
-    private GoogleMap gMap;
-
     private Toast radiusToast;
-
-    private BroadcastReceiver receiver;
 
     private static boolean isForeground = false;
 
@@ -152,64 +124,6 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
 
         this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.green)));
 
-        srl = (MSwipeRefreshLayout)findViewById(R.id.swipe_refresh);
-        srl.setOnRefreshListener(this);
-        srl.setOnChildScrollUpListener(new MSwipeRefreshLayout.OnChildScrollUpListener()
-        {
-            @Override
-            public boolean canChildScrollUp()
-            {
-                List<Fragment> frags = getSupportFragmentManager().getFragments();
-
-                if(frags.size() < 1) return false;
-
-                RecyclerView rv = null;
-
-                for(int i = 0; i < frags.size(); i++)
-                {
-                    if (frags.get(i) instanceof FlagsListFragment)
-                    {
-                        rv = ((FlagsListFragment) frags.get(i)).getRV();
-                        break;
-                    }
-                }
-
-                if(rv == null) return false;
-
-                RecyclerView.LayoutManager layoutManager = rv.getLayoutManager();
-
-                int position = ((LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
-
-                return position != 0 && rv.getAdapter().getItemCount() != 0;
-            }
-        });
-
-
-
-        this.receiver = new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive(Context context, Intent intent)
-            {
-                switch(intent.getAction()) {
-//                    TODO first work towards implementing a fragment switch when flaglist is empty
-                    case LocationService.FOUND_NEW_FLAGS_NOTIFICATION:
-//                        Fragment listFragment = new FlagsListFragment();
-//                        MainActivity.this.getSupportFragmentManager().beginTransaction()
-//                                .replace(R.id.swipe_refresh, listFragment).commit();
-                        break;
-
-                    case LocationService.FOUND_NO_FLAGS_NOTIFICATION:
-//                        NoFlagsFragment noFlagsFragment = new NoFlagsFragment();
-//                        MainActivity.this.getSupportFragmentManager().beginTransaction()
-//                                .replace(R.id.swipe_refresh, noFlagsFragment).commit();
-                        break;
-
-                    default:
-                }
-                updateMarkersOnMap();
-            }
-        };
         this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
     }
 
@@ -217,79 +131,6 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
     protected void onDestroy()
     {
         super.onDestroy();
-
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(this.receiver);
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap)
-    {
-        this.gMap = googleMap;
-
-        this.gMap.getUiSettings().setScrollGesturesEnabled(false);
-        this.gMap.getUiSettings().setZoomGesturesEnabled(false);
-        this.gMap.setMyLocationEnabled(true);
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
-        LocalBroadcastManager.getInstance(this).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
-
-
-        this.updateMarkersOnMap();
-    }
-
-    public void updateMarkersOnMap()
-    {
-        List<Flag> flags= PlacesApplication.getInstance().getFlags();
-
-        if(flags != null && this.gMap != null)
-        {
-            this.gMap.clear();
-
-            //zooms around all the Flags
-            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
-            for (ParseObject p : flags)
-            {
-                Flag f = (Flag) p;
-                ParseGeoPoint location = f.getLocation();
-                String text = f.getText();
-                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                builder.include(latLng);
-
-                //25% size original icon
-                int marker_id = Utils.getIconForCategory(f.getCategory(), this);
-                Bitmap marker = BitmapFactory.decodeResource(getResources(), marker_id);
-                Bitmap halfSizeMarker = Bitmap.createScaledBitmap
-                                            (marker,
-                                            (int)(marker.getWidth() * 0.25f),
-                                            (int)(marker.getHeight() * 0.25f),
-                                            false);
-
-                this.gMap.addMarker(new MarkerOptions()
-                        .position(latLng)
-                        .title(text)
-                        .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
-                                // .icon(BitmapDescriptorFactory.fromResource(Utils.getIconForCategory(f.getCategory(), this)))
-                                //.icon(BitmapDescriptorFactory.defaultMarker(Utils.getCategoryColor(f.getCategory(), this)))
-                        .alpha(0.8f));
-            }
-
-            if(flags.size() > 0)
-            {
-                LatLngBounds bounds = builder.build();
-//                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, MAP_BOUNDS));
-                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
-            }else{
-                Location currentLocation = gMap.getMyLocation();
-                if(currentLocation != null){
-                    LatLng currentLocationLatLng = new LatLng(currentLocation.getLatitude(),
-                            currentLocation.getLongitude());
-                    this.gMap.moveCamera(CameraUpdateFactory
-                            .newLatLngZoom(currentLocationLatLng, Utils.ZOOM_LVL));
-                }
-            }
-
-        }
     }
 
     @Deprecated
@@ -314,13 +155,6 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
         else if (category.equals(category_array[2])) return BitmapDescriptorFactory.HUE_ORANGE;
         else if (category.equals(category_array[3])) return BitmapDescriptorFactory.HUE_BLUE;
         else return BitmapDescriptorFactory.HUE_MAGENTA; // 'Food' category
-    }
-
-    @Override
-    public void onRefresh()
-    {
-        refresh();
-        srl.setRefreshing(false);
     }
 
     public void refresh()
