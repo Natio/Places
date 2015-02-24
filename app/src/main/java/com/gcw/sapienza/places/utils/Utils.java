@@ -44,6 +44,8 @@ public class Utils
     public static final int PHONE_IMAGE_REQUEST_CODE = 94;
     public static final int PHONE_VIDEO_REQUEST_CODE = 95;
 
+    public static final int SHARE_SOCIAL_REQUEST_CODE = 1001;
+
     public static final int PHONE_AUDIO = 0;
     public static final int PHONE_IMAGE = 1;
     public static final int PHONE_VIDEO = 2;

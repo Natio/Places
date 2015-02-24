@@ -742,7 +742,10 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
      */
     protected void onShareFailed(String toastText)
     {
-        Toast.makeText(this, toastText, Toast.LENGTH_LONG).show();
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("result", toastText);
+        setResult(RESULT_OK,returnIntent);
+        ShareActivity.this.finish();
     }
 
     /**
@@ -750,23 +753,47 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
      * and finish it
      * @param toastText the text indicating that sharing succeeded
      */
-    protected void onShareSucceeded(String toastText)
+    protected void onShareSucceeded(final String toastText)
     {
-        /*
-        this.textView.setText("");
 
-        this.spinner.setSelection(0);
 
-        this.resetMedia();
-        this.hideKeyboard();
 
-        Toast.makeText(mContext, toastText, Toast.LENGTH_LONG).show();
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
 
-        this.shareButton.setClickable(true);*/
-        Intent returnIntent = new Intent();
-        returnIntent.putExtra("result", toastText);
-        setResult(RESULT_OK,returnIntent);
-        this.finish();
+                        Location current_location =  PlacesApplication.getInstance().getLocation();
+                        String flag_marker_url = "http://maps.google.com/maps?q=" + current_location.getLatitude() + ',' + current_location.getLongitude();
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, "I've just left my mark in history!! Check it out on Places (" + flag_marker_url + ')');
+                        sendIntent.setType("text/plain");
+                        startActivityForResult(sendIntent, Utils.SHARE_SOCIAL_REQUEST_CODE);
+
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        Intent returnIntent = new Intent();
+                        returnIntent.putExtra("result", toastText);
+                        setResult(RESULT_OK,returnIntent);
+                        ShareActivity.this.finish();
+
+                }
+            }
+        };
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog dialog = builder.setMessage("Share on Social?")
+                                    .setPositiveButton("Yes", dialogClickListener)
+                                    .setNegativeButton("No", dialogClickListener).show();
+
+        dialog.show();
+
+
+
     }
 
 /*
@@ -867,7 +894,13 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == Utils.LOGIN_REQUEST_CODE && resultCode == RESULT_OK){
+        if(requestCode == Utils.SHARE_SOCIAL_REQUEST_CODE){
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("result", "Flag placed!");
+            setResult(RESULT_OK,returnIntent);
+            ShareActivity.this.finish();
+        }
+        else if(requestCode == Utils.LOGIN_REQUEST_CODE && resultCode == RESULT_OK){
             FacebookUtils.downloadFacebookInfo(this);
         }
         else if(requestCode == Utils.PIC_CAPTURE_REQUEST_CODE && resultCode == RESULT_OK){
