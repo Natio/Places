@@ -1,4 +1,4 @@
-package com.gcw.sapienza.places;
+package com.gcw.sapienza.places.fragments;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -21,13 +21,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.gcw.sapienza.places.fragments.FlagsListFragment;
-import com.gcw.sapienza.places.activities.MyFlagsListFragment;
+
+import com.gcw.sapienza.places.PlacesApplication;
+import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.services.LocationService;
@@ -39,30 +40,25 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
+
 import java.util.List;
 
 /**
  * Created by snowblack on 2/19/15.
  */
-public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener {
+public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener, GoogleMap.OnMarkerClickListener {
 
-    private static final String TAG = "MyFlagsFragment";
+    private static final String TAG = "MainFragment";
 
     private View view;
 
     private GoogleMap gMap;
 
     private BroadcastReceiver receiver;
-
-    private RelativeLayout progressBarHolder;
-    private TextView progressTextView;
-
-    private DrawerLayout drawerLayout;
-    private LinearLayout homeHolder;
-    private FrameLayout fragHolder;
     private MSwipeRefreshLayout srl;
 
     private FragmentActivity myContext;
@@ -83,16 +79,16 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
                  */
                 switch(intent.getAction()) {
 
-                    case LocationService.FOUND_MY_FLAGS_NOTIFICATION:
+                    case LocationService.FOUND_NEW_FLAGS_NOTIFICATION:
 
                         Log.d(TAG, "My flags found");
-                        this.dismissProgressBar();
+//                        this.dismissProgressBar();
                         break;
 
                     case LocationService.FOUND_NO_FLAGS_NOTIFICATION:
 
                         Log.d(TAG, "No my flags found");
-                        this.dismissProgressBar();
+//                        this.dismissProgressBar();
                         break;
 
                     default:
@@ -100,23 +96,21 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
                 updateMarkersOnMap();
             }
 
-            void dismissProgressBar(){
-
-                AlphaAnimation outAnim = new AlphaAnimation(1, 0);
-                outAnim.setDuration(Utils.ANIMATION_DURATION);
-                progressBarHolder.setAnimation(outAnim);
-                progressBarHolder.setVisibility(View.GONE);
-
+//            void dismissProgressBar(){
+//
+//                AlphaAnimation outAnim = new AlphaAnimation(1, 0);
+//                outAnim.setDuration(Utils.ANIMATION_DURATION);
+//                progressBarHolder.setAnimation(outAnim);
+//                progressBarHolder.setVisibility(View.GONE);
+//
 //                MyFlagsFragment.this.homeHolder.setVisibility(View.VISIBLE);
 //                MyFlagsFragment.this.fragHolder.setVisibility(View.VISIBLE);
 //                MyFlagsFragment.this.srl.setVisibility(View.VISIBLE);
-            }
+//            }
         };
 
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_MY_FLAGS_NOTIFICATION));
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION));
-
-        PlacesApplication.getInstance().getLocationService().queryParsewithCurrentUser();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
     }
 
     @Override
@@ -132,11 +126,8 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
 
         view = inflater.inflate(R.layout.my_flags_layout, container, false);
 
-        this.progressBarHolder = (RelativeLayout)view.findViewById(R.id.frame_layout);
-        this.progressTextView = (TextView)view.findViewById(R.id.share_progress_text_view);
-
-        this.homeHolder = (LinearLayout) view.findViewById(R.id.my_home_container);
-        this.fragHolder = (FrameLayout) view.findViewById(R.id.my_frag_container);
+//        this.progressBarHolder = (RelativeLayout)view.findViewById(R.id.frame_layout);
+//        this.progressTextView = (TextView)view.findViewById(R.id.share_progress_text_view);
 
         srl = (MSwipeRefreshLayout)view.findViewById(R.id.my_swipe_refresh);
         srl.setOnRefreshListener(this);
@@ -177,17 +168,17 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
             }
         });
 
-        AlphaAnimation inAnim = new AlphaAnimation(0, 1);
-        inAnim.setDuration(Utils.ANIMATION_DURATION);
-        progressBarHolder.setAnimation(inAnim);
-        progressBarHolder.setVisibility(View.VISIBLE);
+//        AlphaAnimation inAnim = new AlphaAnimation(0, 1);
+//        inAnim.setDuration(Utils.ANIMATION_DURATION);
+//        progressBarHolder.setAnimation(inAnim);
+//        progressBarHolder.setVisibility(View.VISIBLE);
 
-        Fragment fragment = new MyFlagsListFragment();
+        Fragment fragment = new FlagsListFragment();
         myContext.getSupportFragmentManager().beginTransaction().replace(R.id.my_swipe_refresh, fragment).commit();
 
         SupportMapFragment mapFragment = new SupportMapFragment();
         myContext.getSupportFragmentManager().beginTransaction().replace(R.id.my_map_holder, mapFragment).commit();
-        mapFragment.getMapAsync(MyFlagsFragment.this);
+        mapFragment.getMapAsync(MainFragment.this);
 
         return view;
     }
@@ -214,7 +205,7 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
 
     private void updateMarkersOnMap() {
 
-        List<Flag> flags= PlacesApplication.getInstance().getLocationService().getMyFlags();
+        List<Flag> flags= PlacesApplication.getInstance().getFlags();
 
         if(flags != null && this.gMap != null)
         {
@@ -268,14 +259,32 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
     }
 
     @Override
-    public void onRefresh()
-    {
-        refresh();
-        srl.setRefreshing(false);
+    public boolean onMarkerClick(Marker marker) {
+        int index = Integer.parseInt(marker.getSnippet());
+
+        List<Fragment> frags = getActivity().getSupportFragmentManager().getFragments();
+
+        if (frags.size() < 1) return false;
+
+        for (int i = 0; i < frags.size(); i++) {
+            if (frags.get(i) instanceof FlagsListFragment) {
+                FlagsListFragment flf = ((FlagsListFragment) frags.get(i));
+                flf.getRV().smoothScrollToPosition(index);
+                // TODO item highlight on flag clicked on map?
+
+                break;
+            }
+        }
+
+        // by returning false we can show text on flag in the map
+        // return false;
+        return true;
     }
 
-    protected void refresh()
+    @Override
+    public void onRefresh()
     {
-        PlacesApplication.getInstance().getLocationService().queryParsewithCurrentUser();
+        ((MainActivity)getActivity()).refresh();
+        srl.setRefreshing(false);
     }
 }

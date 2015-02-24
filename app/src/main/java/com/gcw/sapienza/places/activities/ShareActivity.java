@@ -44,6 +44,7 @@ import com.gcw.sapienza.places.utils.FlagUploader;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseAnalytics;
 import com.parse.ParseGeoPoint;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;

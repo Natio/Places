@@ -3,6 +3,7 @@ package com.gcw.sapienza.places.utils;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
@@ -15,6 +16,7 @@ import com.facebook.Session;
 import com.facebook.model.GraphObject;
 import com.facebook.model.GraphUser;
 import com.gcw.sapienza.places.PlacesApplication;
+import com.gcw.sapienza.places.activities.PlacesLoginActivity;
 import com.parse.ParseFacebookUtils;
 import com.parse.ui.ParseLoginBuilder;
 import com.squareup.picasso.Picasso;
@@ -474,7 +476,9 @@ public final class FacebookUtils {
         builder.setFacebookLoginPermissions(Arrays.asList("public_profile", "user_friends"/*, "user_relationships", "user_birthday", "user_location"*/));
 
         // builder.setAppLogo(R.drawable.app_logo);
+        Intent loginIntent = builder.build();
+        loginIntent.setClass(activity, PlacesLoginActivity.class);
 
-        activity.startActivityForResult(builder.build(), Utils.LOGIN_REQUEST_CODE);
+        activity.startActivityForResult(loginIntent, Utils.LOGIN_REQUEST_CODE);
     }
 }

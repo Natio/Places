@@ -12,21 +12,23 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+
 import com.gcw.sapienza.places.model.CustomParseObject;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.model.FlagReport;
 import com.gcw.sapienza.places.services.ILocationUpdater;
 import com.gcw.sapienza.places.services.LocationService;
+import com.gcw.sapienza.places.services.LocationService.LocalBinder;
 import com.parse.ConfigCallback;
 import com.parse.Parse;
 import com.parse.ParseConfig;
+import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
-import com.parse.ParseException;
-import com.gcw.sapienza.places.services.LocationService.LocalBinder;
 import com.parse.ParsePush;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,10 +53,8 @@ public class PlacesApplication extends Application{
 
     public static final boolean isRunningOnEmulator = Build.BRAND.toLowerCase().startsWith("generic");
 
-
-
     private List<Flag> flagsNearby = new ArrayList<>(0);
-
+    private List<Flag> myFlags = new ArrayList<>(0);
 
     private LocationService mService;
 
@@ -74,6 +74,7 @@ public class PlacesApplication extends Application{
         return PlacesApplication.placesApplication;
     }
 
+
     /**
      *
      * @return returns LocationService instance
@@ -81,7 +82,6 @@ public class PlacesApplication extends Application{
     public LocationService getLocationService(){
         return this.mService;
     }
-
 
     /**
      *
@@ -122,6 +122,14 @@ public class PlacesApplication extends Application{
      */
     public List<Flag> getFlags(){
         return this.flagsNearby;
+    }
+
+    /**
+     *
+     * @return returns the list of all the Flags the user has posted
+     */
+    public List<Flag> getMyFlags(){
+        return this.myFlags;
     }
 
     /**
@@ -220,7 +228,6 @@ public class PlacesApplication extends Application{
             PlacesApplication.this.mBound = false;
         }
     };
-
     private ILocationUpdater listener = new ILocationUpdater() {
         @Override
         public void setLocation(Location l){
@@ -231,6 +238,9 @@ public class PlacesApplication extends Application{
         public void setFlagsNearby(List<Flag> l){
             PlacesApplication.this.flagsNearby = l;
         }
+
+        @Override
+        public void setMyFlags(List<Flag> myFlags) { PlacesApplication.this.myFlags = myFlags; }
     };
 
     private void updateWeatherInfo() {

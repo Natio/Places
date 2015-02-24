@@ -4,8 +4,6 @@ import com.parse.ParseClassName;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
-import java.util.ArrayList;
-
 /**
  * Created by mic_head on 22/02/15.
  */

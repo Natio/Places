@@ -2,14 +2,10 @@ package com.gcw.sapienza.places.activities;
 
 import android.app.AlertDialog;
 import android.app.FragmentManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationManager;
@@ -17,13 +13,9 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,36 +27,19 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
-
-import com.gcw.sapienza.places.MyFlagsFragment;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.fragments.MainFragment;
+import com.gcw.sapienza.places.fragments.MyFlagsFragment;
 import com.gcw.sapienza.places.fragments.SettingsFragment;
-import com.gcw.sapienza.places.fragments.FlagsListFragment;
-import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
-import com.gcw.sapienza.places.model.Flag;
-import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
 import com.parse.ParseUser;
-import java.util.List;
 
 
-public class MainActivity extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener,
-                                                                OnMapReadyCallback,
-                                                                Preference.OnPreferenceChangeListener,
-                                                                GoogleMap.OnMarkerClickListener {
+public class MainActivity extends ActionBarActivity implements Preference.OnPreferenceChangeListener {
+
 
     public static String TAG = MainActivity.class.getName();
     private DrawerLayout drawerLayout;
@@ -72,7 +47,7 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
     private ActionBarDrawerToggle drawerToggle;
     private static final String [] section_titles = {"Home", "Settings", "My Flags", "Logout"};
     private CharSequence current_title;
-    private MSwipeRefreshLayout srl;
+
     // private int currentDrawerListItemIndex = -1;
 
     private LinearLayout homeHolder;
@@ -89,11 +64,7 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
 
     private static final String FRAG_TAG = "FRAG_TAG";
 
-    private GoogleMap gMap;
-
     private Toast radiusToast;
-
-    private BroadcastReceiver receiver;
 
     private static boolean isForeground = false;
 
@@ -153,181 +124,7 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
 
         this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.green)));
 
-        srl = (MSwipeRefreshLayout)findViewById(R.id.swipe_refresh);
-        srl.setOnRefreshListener(this);
-        srl.setOnChildScrollUpListener(new MSwipeRefreshLayout.OnChildScrollUpListener()
-        {
-            @Override
-            public boolean canChildScrollUp()
-            {
-                List<Fragment> frags = getSupportFragmentManager().getFragments();
-
-                if(frags.size() < 1) return false;
-
-                RecyclerView rv = null;
-
-                for(int i = 0; i < frags.size(); i++)
-                {
-                    if (frags.get(i) instanceof FlagsListFragment)
-                    {
-                        rv = ((FlagsListFragment) frags.get(i)).getRV();
-                        break;
-                    }
-                }
-
-                if(rv == null) return false;
-
-                RecyclerView.LayoutManager layoutManager = rv.getLayoutManager();
-
-                int position = ((LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
-
-                return position != 0 && rv.getAdapter().getItemCount() != 0;
-            }
-        });
-
-        Fragment fragment = new FlagsListFragment();
-        this.getSupportFragmentManager().beginTransaction().replace(R.id.swipe_refresh, fragment).commit();
-
-        SupportMapFragment mapFragment = new SupportMapFragment();
-        this.getSupportFragmentManager().beginTransaction().replace(R.id.map_holder, mapFragment).commit();
-        mapFragment.getMapAsync(this);
-
-        this.receiver = new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive(Context context, Intent intent)
-            {
-                switch(intent.getAction()) {
-//                    TODO first work towards implementing a fragment switch when flaglist is empty
-                    case LocationService.FOUND_NEW_FLAGS_NOTIFICATION:
-//                        Fragment listFragment = new FlagsListFragment();
-//                        MainActivity.this.getSupportFragmentManager().beginTransaction()
-//                                .replace(R.id.swipe_refresh, listFragment).commit();
-                        break;
-
-                    case LocationService.FOUND_NO_FLAGS_NOTIFICATION:
-//                        NoFlagsFragment noFlagsFragment = new NoFlagsFragment();
-//                        MainActivity.this.getSupportFragmentManager().beginTransaction()
-//                                .replace(R.id.swipe_refresh, noFlagsFragment).commit();
-                        break;
-
-                    default:
-                }
-                updateMarkersOnMap();
-            }
-        };
-    }
-
-    @Override
-    protected void onDestroy()
-    {
-        super.onDestroy();
-
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(this.receiver);
-    }
-
-    @Override
-    public boolean onMarkerClick(Marker marker)
-    {
-        int index = Integer.parseInt(marker.getSnippet());
-
-        List<Fragment> frags = getSupportFragmentManager().getFragments();
-
-        if(frags.size() < 1) return false;
-
-        for(int i = 0; i < frags.size(); i++)
-        {
-            if (frags.get(i) instanceof FlagsListFragment)
-            {
-                FlagsListFragment flf = ((FlagsListFragment) frags.get(i));
-                flf.getRV().smoothScrollToPosition(index);
-                // TODO item highlight on flag clicked on map?
-
-                break;
-            }
-        }
-
-        // by returning false we can show text on flag in the map
-        // return false;
-        return true;
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap)
-    {
-        this.gMap = googleMap;
-
-        this.gMap.getUiSettings().setScrollGesturesEnabled(false);
-        this.gMap.getUiSettings().setZoomGesturesEnabled(false);
-        this.gMap.setMyLocationEnabled(true);
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
-        LocalBroadcastManager.getInstance(this).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
-
-
-        this.updateMarkersOnMap();
-    }
-
-    public void updateMarkersOnMap()
-    {
-        List<Flag> flags= PlacesApplication.getInstance().getFlags();
-
-        if(flags != null && this.gMap != null)
-        {
-            this.gMap.clear();
-
-            //zooms around all the Flags
-            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
-            int index = 0;
-
-            for (ParseObject p : flags)
-            {
-                Flag f = (Flag) p;
-                ParseGeoPoint location = f.getLocation();
-                String text = f.getText();
-                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                builder.include(latLng);
-
-                gMap.setOnMarkerClickListener(this);
-
-                //25% size original icon
-                int marker_id = Utils.getIconForCategory(f.getCategory(), this);
-                Bitmap marker = BitmapFactory.decodeResource(getResources(), marker_id);
-                Bitmap halfSizeMarker = Bitmap.createScaledBitmap
-                                            (marker,
-                                            (int)(marker.getWidth() * 0.25f),
-                                            (int)(marker.getHeight() * 0.25f),
-                                            false);
-
-                this.gMap.addMarker(new MarkerOptions()
-                        .position(latLng)
-                        .title(text)
-                        .snippet(index+"")
-                        .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
-                        // .icon(BitmapDescriptorFactory.fromResource(Utils.getIconForCategory(f.getCategory(), this)))
-                        //.icon(BitmapDescriptorFactory.defaultMarker(Utils.getCategoryColor(f.getCategory(), this)))
-                        .alpha(0.85f));
-
-                index++;
-            }
-
-            if(flags.size() > 0)
-            {
-                LatLngBounds bounds = builder.build();
-//                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, MAP_BOUNDS));
-                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
-            }else{
-                Location currentLocation = gMap.getMyLocation();
-                if(currentLocation != null){
-                    LatLng currentLocationLatLng = new LatLng(currentLocation.getLatitude(),
-                            currentLocation.getLongitude());
-                    this.gMap.moveCamera(CameraUpdateFactory
-                            .newLatLngZoom(currentLocationLatLng, Utils.ZOOM_LVL));
-                }
-            }
-
-        }
+        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
     }
 
     @Deprecated
@@ -352,13 +149,6 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
         else if (category.equals(category_array[2])) return BitmapDescriptorFactory.HUE_ORANGE;
         else if (category.equals(category_array[3])) return BitmapDescriptorFactory.HUE_BLUE;
         else return BitmapDescriptorFactory.HUE_MAGENTA; // 'Food' category
-    }
-
-    @Override
-    public void onRefresh()
-    {
-        refresh();
-        srl.setRefreshing(false);
     }
 
     public void refresh()
@@ -506,7 +296,7 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
 
             case FLAGS_LIST_POSITION:
 //                if(homeHolder.getVisibility() == View.INVISIBLE)
-                switchToListMapFrags();
+                switchToOtherFrag(new MainFragment());
                 break;
 
             case MY_FLAGS_POSITION:
@@ -573,14 +363,20 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
         else if(frag2!= null) this.getSupportFragmentManager().beginTransaction().remove(frag2).commit();
     }
 
-    private void switchToFragOtherThanHome()
+    private void switchToSupportFrag()
+    {
+        fragHolder.setVisibility(View.INVISIBLE);
+        homeHolder.setVisibility(View.VISIBLE);
+    }
+
+    private void switchToNonSupportFrag()
     {
         homeHolder.setVisibility(View.INVISIBLE);
         fragHolder.setVisibility(View.VISIBLE);
     }
 
-    private void switchToListMapFrags()
-    {
+//    private void switchToListMapFrags()
+//    {
 //        getRidOfUnusedFrag();
 //
 //        homeHolder.setVisibility(View.VISIBLE);
@@ -594,19 +390,18 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
 //        SupportMapFragment mapFragment = new SupportMapFragment();
 //        this.getSupportFragmentManager().beginTransaction().replace(R.id.map_holder, mapFragment).commit();
 //        mapFragment.getMapAsync(this);
-
-        Intent intent = getIntent();
-        finish();
-        startActivity(intent);
-    }
+//        switchToSupportFrag();
+//
+//        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).addToBackStack(null).commit();
+//    }
 
     private void switchToSettingsFrag()
     {
         Log.d(TAG, "Switching to SettingsFragment");
 //        getRidOfUnusedFrag();
-//        switchToFragOtherThanHome();
+        switchToNonSupportFrag();
 
-        this.getFragmentManager().beginTransaction().replace(R.id.home_container, new SettingsFragment()).addToBackStack(null).commit();
+        this.getFragmentManager().beginTransaction().replace(R.id.frag_container, new SettingsFragment()).commit();
     }
 
     public void switchToOtherFrag(Fragment frag)
@@ -614,6 +409,13 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
         Log.d(TAG, "Switching to other fragment: " + frag.getClass());
 //        getRidOfUnusedFrag();
 //        switchToFragOtherThanHome();
+        Fragment f = this.getSupportFragmentManager().findFragmentById(R.id.home_container);
+        if(!isNonSupportFragmentVisible() && f != null && f.getClass() == frag.getClass()){
+            Log.w(TAG, "Switching to the same fragment: " + f.getClass());
+            return;
+        }
+
+        switchToSupportFrag();
 
         this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, frag).addToBackStack(null).commit();
     }
@@ -627,16 +429,37 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
 //        }
 //    }
 
+    private boolean isNonSupportFragmentVisible(){
+       return fragHolder.getVisibility() == View.VISIBLE;
+    }
+
     @Override
     public void onBackPressed(){
+        Fragment f = this.getSupportFragmentManager().findFragmentById(R.id.home_container);
+        if(!isNonSupportFragmentVisible() && f != null && f.getClass() == MainFragment.class){
+            Log.d(TAG, "Pressed back button on MainFragment: finishing...");
+            this.getSupportFragmentManager().popBackStack(null, android.support.v4.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            finish();
+            return;
+        }
         FragmentManager fm = getFragmentManager();
-        if(getSupportFragmentManager().getBackStackEntryCount() > 0){
+//        if (fm.getBackStackEntryCount() > 0) {
+//            Log.i("MainActivity", "popping backstack: " +
+//                    fm.getBackStackEntryCount() + ", while support: " +
+//                    getSupportFragmentManager().getBackStackEntryCount());
+//            fm.popBackStack();
+//        }
+//        else
+        if(isNonSupportFragmentVisible()){
+            switchToSupportFrag();
+        }
+        else if(getSupportFragmentManager().getBackStackEntryCount() > 0){
+            Log.i("MainActivity", "popping support: " +
+                    getSupportFragmentManager().getBackStackEntryCount() + ", while backstack: " +
+                    fm.getBackStackEntryCount());
             getSupportFragmentManager().popBackStack();
         }
-        else if (fm.getBackStackEntryCount() > 0) {
-            Log.i("MainActivity", "popping backstack");
-            fm.popBackStack();
-        } else {
+        else {
             Log.i("MainActivity", "nothing on backstack, calling super");
             super.onBackPressed();
         }
