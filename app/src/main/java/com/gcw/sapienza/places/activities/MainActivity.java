@@ -53,6 +53,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
@@ -62,7 +63,8 @@ import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener,
                                                                 OnMapReadyCallback,
-                                                                Preference.OnPreferenceChangeListener {
+                                                                Preference.OnPreferenceChangeListener,
+                                                                GoogleMap.OnMarkerClickListener {
 
     public static String TAG = MainActivity.class.getName();
     private DrawerLayout drawerLayout;
@@ -225,6 +227,32 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
     }
 
     @Override
+    public boolean onMarkerClick(Marker marker)
+    {
+        int index = Integer.parseInt(marker.getSnippet());
+
+        List<Fragment> frags = getSupportFragmentManager().getFragments();
+
+        if(frags.size() < 1) return false;
+
+        for(int i = 0; i < frags.size(); i++)
+        {
+            if (frags.get(i) instanceof FlagsListFragment)
+            {
+                FlagsListFragment flf = ((FlagsListFragment) frags.get(i));
+                flf.getRV().smoothScrollToPosition(index);
+                // TODO item highlight on flag clicked on map?
+
+                break;
+            }
+        }
+
+        // by returning false we can show text on flag in the map
+        // return false;
+        return true;
+    }
+
+    @Override
     public void onMapReady(GoogleMap googleMap)
     {
         this.gMap = googleMap;
@@ -251,6 +279,8 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
             //zooms around all the Flags
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
+            int index = 0;
+
             for (ParseObject p : flags)
             {
                 Flag f = (Flag) p;
@@ -258,6 +288,8 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
                 String text = f.getText();
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                 builder.include(latLng);
+
+                gMap.setOnMarkerClickListener(this);
 
                 //25% size original icon
                 int marker_id = Utils.getIconForCategory(f.getCategory(), this);
@@ -271,10 +303,13 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
                 this.gMap.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title(text)
+                        .snippet(index+"")
                         .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
-                                // .icon(BitmapDescriptorFactory.fromResource(Utils.getIconForCategory(f.getCategory(), this)))
-                                //.icon(BitmapDescriptorFactory.defaultMarker(Utils.getCategoryColor(f.getCategory(), this)))
-                        .alpha(0.8f));
+                        // .icon(BitmapDescriptorFactory.fromResource(Utils.getIconForCategory(f.getCategory(), this)))
+                        //.icon(BitmapDescriptorFactory.defaultMarker(Utils.getCategoryColor(f.getCategory(), this)))
+                        .alpha(0.85f));
+
+                index++;
             }
 
             if(flags.size() > 0)
