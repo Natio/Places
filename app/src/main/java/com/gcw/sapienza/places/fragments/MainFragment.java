@@ -198,6 +198,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
         this.gMap.getUiSettings().setScrollGesturesEnabled(false);
         this.gMap.getUiSettings().setZoomGesturesEnabled(false);
+        this.gMap.setOnMarkerClickListener(this);
         this.gMap.setMyLocationEnabled(true);
 
         this.updateMarkersOnMap();
@@ -213,6 +214,8 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
             //zooms around all the Flags
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+            int index = 0;
 
             for (ParseObject p : flags)
             {
@@ -234,10 +237,13 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                 this.gMap.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title(text)
+                        .snippet(index+"")
                         .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
                                 // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
                                 //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
                         .alpha(0.8f));
+
+                index++;
             }
 
             if(flags.size() > 0)
