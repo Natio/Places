@@ -32,6 +32,7 @@ public class Flag extends ParseObject{
     public static final String LOL_COUNT_KEY = "lolCount";
     public static final String BOO_COUNT_KEY = "booCount";
     public static final String OWNER_KEY = "owner";
+    public static final String PASSWORD_KEY = "password";
 
 
     public void setOwner(ParseUser owner){
@@ -80,6 +81,8 @@ public class Flag extends ParseObject{
     public int getLolCount() { return this.getInt(LOL_COUNT_KEY); }
 
     public int getBooCount() { return this.getInt(BOO_COUNT_KEY); }
+
+    public String getPassword() { return this.getString(PASSWORD_KEY); }
 
     public void setThumbnailFile(ParseFile pic){
         this.put(THUMBNAIL_KEY, pic);
@@ -134,4 +137,6 @@ public class Flag extends ParseObject{
     public void incrementBooCount() { this.increment(BOO_COUNT_KEY); }
 
     public void decrementBooCount() { this.increment(BOO_COUNT_KEY, -1); }
+
+    public void setPassword(String psw) { this.put(PASSWORD_KEY, psw); }
 }

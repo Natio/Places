@@ -23,17 +23,22 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.adapters.MSpinnerAdapter;
@@ -44,7 +49,6 @@ import com.gcw.sapienza.places.utils.FlagUploader;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseAnalytics;
 import com.parse.ParseGeoPoint;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -53,7 +57,7 @@ import java.util.Map;
 
 
 public class ShareActivity extends ActionBarActivity implements View.OnLongClickListener,
-        View.OnClickListener, View.OnCreateContextMenuListener
+        View.OnClickListener, View.OnCreateContextMenuListener, CompoundButton.OnCheckedChangeListener
 {
 
     private static final String TAG = "ShareActivity";
@@ -62,6 +66,8 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     public static final String VIDEO_FORMAT = ".mp4";
 
     private static final String BUNDLED_IMG_PATH = "image path";
+
+    private String password;
 
     private static final int PIC_CODE = 0;
     private static final int AUDIO_CODE = 1;
@@ -79,11 +85,16 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     private ImageButton vidButton;
     private ImageButton phoneButton;
 
+    private CheckBox privateCheckbox;
+
+    private LinearLayout linearLayout;
+
     private boolean isPicTaken = false;
     private boolean isVideoShoot = false;
     private boolean isSoundCaptured = false;
     private boolean isPhoneMediaSelected = false;
 
+    private boolean isPrivate;
 
     private File pic;
     private File video;
@@ -334,6 +345,8 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         this.micButton = (ImageButton)findViewById(R.id.mic_button);
         this.vidButton = (ImageButton)findViewById(R.id.vid_button);
         this.phoneButton = (ImageButton)findViewById(R.id.phone_button);
+        this.privateCheckbox = (CheckBox)findViewById(R.id.private_checkbox);
+        this.linearLayout = (LinearLayout)findViewById(R.id.share_holder);
         this.getSupportActionBar().setTitle("Places");
 
         //these lines are necessary for a correct visualization
@@ -361,6 +374,10 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         this.picButton.setOnClickListener(this);
         this.vidButton.setOnClickListener(this);
         this.micButton.setOnClickListener(this);
+
+        this.privateCheckbox.setOnCheckedChangeListener(this);
+
+        this.isPrivate = false;
 
 //        registerForContextMenu(this.phoneButton);
 //        this.phoneButton.setOnCreateContextMenuListener(this);
@@ -492,6 +509,12 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     }
 
     @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+    {
+        if(buttonView.getId() == R.id.private_checkbox) isPrivate = isChecked;
+    }
+
+    @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
 
         menu.setHeaderTitle("File Type");
@@ -593,6 +616,13 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         }
 
         final Flag f = new Flag();
+
+        if(isPrivate)
+        {
+            askForPassword();
+            if (password == null || password.length() == 0) return;
+            else f.put("password", password);
+        }
 
         ParseGeoPoint p = new ParseGeoPoint(current_location.getLatitude(), current_location.getLongitude());
 
@@ -722,6 +752,54 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
         this.resetMedia();
 
+    }
+
+    private void askForPassword()
+    {
+        LayoutInflater li = LayoutInflater.from(this);
+        View passwordDialogLayout = li.inflate(R.layout.password_dialog, null);
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setView(passwordDialogLayout);
+
+        final EditText userInput = (EditText) passwordDialogLayout.findViewById(R.id.password_field);
+
+        // final InputMethodManager inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        alertDialogBuilder
+                .setCancelable(false)
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id)
+                            {
+                                dialog.dismiss();
+
+                                confirmButton.setVisible(true);
+                            }
+                        })
+                .setPositiveButton("Confirm",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id)
+                            {
+                                password = userInput.getText().toString();
+                                if(password.length() == 0)
+                                    Toast.makeText(getApplicationContext(), "Invalid password", Toast.LENGTH_LONG).show();
+
+                                dialog.dismiss();
+
+                                confirmButton.setVisible(true);
+                            }
+
+                        }
+
+                );
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+
+        // inputMethodManager.toggleSoftInputFromWindow(linearLayout.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
+        // inputMethodManager.toggleSoftInputFromWindow(linearLayout.getApplicationWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+
+        confirmButton.setVisible(false);
     }
 
     /**

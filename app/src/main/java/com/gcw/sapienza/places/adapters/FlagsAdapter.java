@@ -1,7 +1,8 @@
 package com.gcw.sapienza.places.adapters;
 
 import android.app.Activity;
-import android.app.Application;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -11,8 +12,10 @@ import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
@@ -30,7 +33,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,7 +43,9 @@ import java.util.Locale;
  * Created by paolo on 18/02/15.
  */
 public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder> {
+
     private static final String TAG = "FlagsAdapter";
+
     private final List<Flag> flags;
     private final View view;
     private final Activity mainActivity;
@@ -72,7 +76,8 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
         flagViewHolder.setCurrentFlag(f);
         flagViewHolder.flagAdapter = this;
 
-        flagViewHolder.main_text.setText(f.getText());
+        if(f.getPassword() == null) flagViewHolder.main_text.setText(f.getText());
+        else flagViewHolder.main_text.setText("***Private flag***");
 
         String user_id = f.getFbId();
 
@@ -93,7 +98,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
         });
 
         ParseFile pic = f.getThumbnail();
-        if(pic != null){
+        if(pic != null && f.getPassword() == null){
             String url = pic.getUrl();
             Picasso.with(this.view.getContext()).load(url).into(flagViewHolder.main_image);
             flagViewHolder.main_image.setVisibility(View.VISIBLE);
@@ -159,6 +164,8 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
         protected final ImageView main_image;
         private final Activity mainActivity;
 
+        private String password;
+
         protected FlagsAdapter flagAdapter;
 
         private Flag mFlag;
@@ -187,7 +194,12 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
         @Override
         public void onClick(View v)
         {
+            if(mFlag.getPassword() != null) askForPassword(mFlag.getPassword());
+            else openFlag();
+        }
 
+        private void openFlag()
+        {
             Date date = mFlag.getDate();
             DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
             String sDate = df.format(date);
@@ -227,6 +239,55 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
             frag.setArguments(bundle);
 
             ((MainActivity)mainActivity).switchToOtherFrag(frag);
+        }
+
+        private void askForPassword(final String psw)
+        {
+            LayoutInflater li = LayoutInflater.from(mainActivity);
+            View passwordDialogLayout = li.inflate(R.layout.password_dialog, null);
+            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mainActivity);
+            alertDialogBuilder.setView(passwordDialogLayout);
+
+            final EditText userInput = (EditText) passwordDialogLayout.findViewById(R.id.password_field);
+
+            // final InputMethodManager inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            alertDialogBuilder
+                    .setCancelable(false)
+                    .setNegativeButton("Cancel",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog,int id)
+                                {
+                                    dialog.dismiss();
+                                }
+                            })
+                    .setPositiveButton("Confirm",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog,int id)
+                                {
+                                    password = userInput.getText().toString();
+                                    if(!password.equals(psw))
+                                    {
+                                        Toast.makeText(mainActivity, "Wrong password", Toast.LENGTH_LONG).show();
+                                        userInput.setText("");
+                                    }
+                                    else
+                                    {
+                                        dialog.dismiss();
+
+                                        openFlag();
+                                    }
+                                }
+
+                            }
+
+                    );
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+
+            // inputMethodManager.toggleSoftInputFromWindow(linearLayout.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
+            // inputMethodManager.toggleSoftInputFromWindow(linearLayout.getApplicationWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
         }
 
         @Override
