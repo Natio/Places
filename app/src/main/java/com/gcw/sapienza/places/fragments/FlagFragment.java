@@ -1,6 +1,8 @@
 package com.gcw.sapienza.places.fragments;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -84,8 +86,10 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private Button commentsButton;
     private RelativeLayout commentsHolder;
     private ListView commentsList;
+    private Button addCommentButton;
     private ArrayAdapter<String> commentsAdapter;
     private ArrayList<Comment> comments;
+    private String newComment;
 
     public static enum MediaType{ PIC, AUDIO, VIDEO, NONE }
     private MediaType mediaType;
@@ -167,6 +171,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         commentsButton = (Button)view.findViewById(R.id.comments_button);
         commentsHolder = (RelativeLayout)view.findViewById(R.id.comments_holder);
         commentsList = (ListView)view.findViewById(R.id.comments_list);
+        addCommentButton = (Button)view.findViewById(R.id.add_comment_button);
 
         iw.setOnClickListener(this);
         vv.setOnTouchListener(this);
@@ -179,6 +184,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         booButton.setOnClickListener(this);
 
         commentsButton.setOnClickListener(this);
+        addCommentButton.setOnClickListener(this);
 
         this.changeLayoutAccordingToMediaType();
 
@@ -310,6 +316,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         else if(v.getId() == R.id.lol_button) wlbFlag(LOL_CODE);
         else if(v.getId() == R.id.boo_button) wlbFlag(BOO_CODE);
         else if(v.getId() == R.id.comments_button) toggleComments();
+        else if(v.getId() == R.id.add_comment_button) insertComment();
     }
 
     @Override
@@ -350,7 +357,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                     DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
                     String sDate = df.format(date);
 
-                    cmnt += sDate;
+                    cmnt += sDate + "\n\n\n";
 
                     texts.add(cmnt);
                 }
@@ -360,6 +367,64 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 commentsList.setAdapter(commentsAdapter);
             }
         });
+    }
+
+    private void insertComment()
+    {
+        LayoutInflater li = LayoutInflater.from(getActivity());
+        View passwordDialogLayout = li.inflate(R.layout.comment_insertion_layout, null);
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+        alertDialogBuilder.setView(passwordDialogLayout);
+
+        final EditText userInput = (EditText) passwordDialogLayout.findViewById(R.id.new_comment);
+
+        // final InputMethodManager inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        alertDialogBuilder
+                .setCancelable(false)
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id)
+                            {
+                                dialog.dismiss();
+                            }
+                        })
+                .setPositiveButton("Confirm",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id)
+                            {
+                                newComment = userInput.getText().toString();
+                                if(newComment.length() == 0)
+                                {
+                                    Toast.makeText(getActivity(), "Comment cannot be empty!", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+
+                                final Comment comment =  new Comment();
+                                comment.put("text", newComment);
+                                comment.put("userId", FacebookUtils.getInstance().getCurrentUserId());
+                                comment.put("flagId", flagId);
+
+                                FacebookUtils.getInstance().getFacebookUsernameFromID(FacebookUtils.getInstance().getCurrentUserId(), new FacebookUtilCallback() {
+                                    @Override
+                                    public void onResult(String result, Exception e)
+                                    {
+                                        comment.setUsername(result);
+                                        comment.saveInBackground();
+                                    }
+                                });
+
+                                dialog.dismiss();
+
+                                retrieveComments();
+                            }
+
+                        }
+
+                );
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
     private void playRecording()
