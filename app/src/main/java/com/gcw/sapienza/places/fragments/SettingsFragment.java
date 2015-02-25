@@ -85,6 +85,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
 
             if(ar_sensor >= AR_THRESHOLD)
             {
+                // TODO there will be more
                 showAR();
                 sensorEnabled = false;
             }

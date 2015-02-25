@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.gcw.sapienza.places.model.Comment;
 import com.gcw.sapienza.places.model.CustomParseObject;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.model.FlagReport;
@@ -159,6 +160,7 @@ public class PlacesApplication extends Application{
         ParseObject.registerSubclass(Flag.class);
         ParseObject.registerSubclass(FlagReport.class);
         ParseObject.registerSubclass(CustomParseObject.class);
+        ParseObject.registerSubclass(Comment.class);
         Parse.initialize(this, PARSE_COM_APP_KEY , PARSE_COM_CLIENT_KEY);
         ParseFacebookUtils.initialize(getString(R.string.app_id));
         ParseConfig.getInBackground(new ConfigCallback() {

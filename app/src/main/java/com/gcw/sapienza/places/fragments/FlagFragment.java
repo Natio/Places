@@ -13,10 +13,12 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +26,7 @@ import android.widget.VideoView;
 
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.ShareActivity;
+import com.gcw.sapienza.places.model.Comment;
 import com.gcw.sapienza.places.model.CustomParseObject;
 import com.gcw.sapienza.places.model.Flag;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
@@ -41,7 +44,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by mic_head on 02/02/15.
@@ -72,6 +80,12 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private Button wowButton;
     private Button lolButton;
     private Button booButton;
+
+    private Button commentsButton;
+    private RelativeLayout commentsHolder;
+    private ListView commentsList;
+    private ArrayAdapter<String> commentsAdapter;
+    private ArrayList<Comment> comments;
 
     public static enum MediaType{ PIC, AUDIO, VIDEO, NONE }
     private MediaType mediaType;
@@ -117,6 +131,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         booCount = bundle.getInt("booCount");
 
         userId = FacebookUtils.getInstance().getCurrentUserId();
+
+        retrieveComments();
     }
 
     @Override
@@ -148,6 +164,10 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         lolButton = (Button)view.findViewById(R.id.lol_button);
         booButton = (Button)view.findViewById(R.id.boo_button);
 
+        commentsButton = (Button)view.findViewById(R.id.comments_button);
+        commentsHolder = (RelativeLayout)view.findViewById(R.id.comments_holder);
+        commentsList = (ListView)view.findViewById(R.id.comments_list);
+
         iw.setOnClickListener(this);
         vv.setOnTouchListener(this);
         audioHolder.setOnClickListener(this);
@@ -157,6 +177,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         wowButton.setOnClickListener(this);
         lolButton.setOnClickListener(this);
         booButton.setOnClickListener(this);
+
+        commentsButton.setOnClickListener(this);
 
         this.changeLayoutAccordingToMediaType();
 
@@ -186,6 +208,11 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                     if(frameLayout.getVisibility() == View.VISIBLE)
                     {
                         frameLayout.setVisibility(View.GONE);
+                        return true;
+                    }
+                    else if(commentsHolder.getVisibility() == View.VISIBLE)
+                    {
+                        commentsHolder.setVisibility(View.GONE);
                         return true;
                     }
                 }
@@ -282,6 +309,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         else if(v.getId() == R.id.wow_button) wlbFlag(WOW_CODE);
         else if(v.getId() == R.id.lol_button) wlbFlag(LOL_CODE);
         else if(v.getId() == R.id.boo_button) wlbFlag(BOO_CODE);
+        else if(v.getId() == R.id.comments_button) toggleComments();
     }
 
     @Override
@@ -292,6 +320,46 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         }
 
         return false;
+    }
+
+    private void retrieveComments()
+    {
+        ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
+        query.whereEqualTo("flagId", flagId);
+        query.findInBackground(new FindCallback<Comment>() {
+            @Override
+            public void done(List<Comment> result, ParseException e) {
+
+                if(result == null || result.size() == 0)
+                {
+                    Toast.makeText(getActivity(), "There are no comments for this flag", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                comments = new ArrayList<Comment>();
+                comments.addAll(result);
+
+                // TODO this needs to be replaced in order to show author and timestamp too
+                ArrayList<String> texts = new ArrayList<String>();
+                for(int i = 0; i < comments.size(); i++)
+                {
+                    Comment comment = comments.get(i);
+                    String cmnt = comment.getCommentText() + "\n\n" + comment.getUsername() + "\n";
+
+                    Date date = comment.getTimestamp();
+                    DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
+                    String sDate = df.format(date);
+
+                    cmnt += sDate;
+
+                    texts.add(cmnt);
+                }
+
+                // TODO change adapter layout
+                commentsAdapter = new ArrayAdapter<String>(getActivity(), R.layout.comment_item_layout, texts);
+                commentsList.setAdapter(commentsAdapter);
+            }
+        });
     }
 
     private void playRecording()
@@ -719,6 +787,12 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     {
         if(booed) booButton.setText("You boo this. (" + booCount + ")");
         else booButton.setText("BOO (" + booCount + ")");
+    }
+
+    private void toggleComments()
+    {
+        if(commentsHolder.getVisibility() == View.VISIBLE) commentsHolder.setVisibility(View.GONE);
+        else commentsHolder.setVisibility(View.VISIBLE);
     }
 
     private void changeLayoutAccordingToMediaType(){
