@@ -31,6 +31,7 @@ import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.fragments.MainFragment;
 import com.gcw.sapienza.places.fragments.MyFlagsFragment;
+import com.gcw.sapienza.places.fragments.MyProfleFragment;
 import com.gcw.sapienza.places.fragments.SettingsFragment;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.Utils;
@@ -45,7 +46,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private ActionBarDrawerToggle drawerToggle;
-    private static final String [] section_titles = {"Home", "Settings", "My Flags", "Logout"};
+    private static final String [] section_titles = {"Home", "My Profile", "Settings", "My Flags", "Logout"};
     private CharSequence current_title;
 
     // private int currentDrawerListItemIndex = -1;
@@ -58,9 +59,10 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     private static final int SHARE_ACTIVITY_REQUEST_CODE = 95;
 
     private static final int FLAGS_LIST_POSITION = 0;
-    private static final int SETTINGS_POSITION = 1;
-    private static final int MY_FLAGS_POSITION = 2;
-    private static final int LOGOUT_POSITION = 3;
+    private static final int MY_PROFILE_POSITION = 1;
+    private static final int SETTINGS_POSITION = 2;
+    private static final int MY_FLAGS_POSITION = 3;
+    private static final int LOGOUT_POSITION = 4;
 
     private static final String FRAG_TAG = "FRAG_TAG";
 
@@ -259,6 +261,34 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         return super.onPrepareOptionsMenu(menu);
     }
 
+    //    }
+//        }
+//            switchToListMapFrags();
+//        {
+//        if(homeHolder.getVisibility() == View.INVISIBLE)
+//    {
+//    public void onBackPressed()
+//    }
+//        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).addToBackStack(null).commit();
+//
+//        switchToSupportFrag();
+//        mapFragment.getMapAsync(this);
+//        this.getSupportFragmentManager().beginTransaction().replace(R.id.map_holder, mapFragment).commit();
+//        SupportMapFragment mapFragment = new SupportMapFragment();
+//
+//        this.getSupportFragmentManager().beginTransaction().replace(R.id.swipe_refresh, fragment).commit();
+//        Fragment fragment = new FlagsListFragment();
+//
+//        fragHolder.setVisibility(View.INVISIBLE);
+//        homeHolder.setVisibility(View.VISIBLE);
+//
+//        getRidOfUnusedFrag();
+//    {
+
+    private void myProfile() {
+        switchToOtherFrag(new MyProfleFragment());
+    }
+
     private void logout()
     {
         // Log the user out
@@ -269,8 +299,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         // Go to the login view
         FacebookUtils.startLoginActivity(this);
     }
-
-
 
     /** Swaps fragments in the main content view */
     private void selectItem(int position)
@@ -288,6 +316,10 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
             case SETTINGS_POSITION:
                 switchToSettingsFrag();
+                break;
+
+            case MY_PROFILE_POSITION:
+                myProfile();
                 break;
 
             case LOGOUT_POSITION:
@@ -309,6 +341,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         }
         this.drawerLayout.closeDrawers();
     }
+
 
     private void unHighlightSelection()
     {
@@ -376,24 +409,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     }
 
 //    private void switchToListMapFrags()
-//    {
-//        getRidOfUnusedFrag();
-//
-//        homeHolder.setVisibility(View.VISIBLE);
-//        fragHolder.setVisibility(View.INVISIBLE);
 
 //        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new Fragment()).commit();
-//
-//        Fragment fragment = new FlagsListFragment();
-//        this.getSupportFragmentManager().beginTransaction().replace(R.id.swipe_refresh, fragment).commit();
-//
-//        SupportMapFragment mapFragment = new SupportMapFragment();
-//        this.getSupportFragmentManager().beginTransaction().replace(R.id.map_holder, mapFragment).commit();
-//        mapFragment.getMapAsync(this);
-//        switchToSupportFrag();
-//
-//        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).addToBackStack(null).commit();
-//    }
 
     private void switchToSettingsFrag()
     {
@@ -421,13 +438,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     }
 
 //    @Override
-//    public void onBackPressed()
-//    {
-//        if(homeHolder.getVisibility() == View.INVISIBLE)
-//        {
-//            switchToListMapFrags();
-//        }
-//    }
 
     private boolean isNonSupportFragmentVisible(){
        return fragHolder.getVisibility() == View.VISIBLE;
