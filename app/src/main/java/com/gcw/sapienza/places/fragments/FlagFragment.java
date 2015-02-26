@@ -163,7 +163,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         flagText.setText(text);
 
         final String weatherString = (weather == null || weather.isEmpty()) ? "" : "\nWeather: " + weather;
-        final String bottomLineText = date + weatherString + "\nCategory: " + category;
+        final String inPlaceString = "In Place: " + (inPlace ? "✓" : "✗");
+
+        final String bottomLineText = date + weatherString + "\nCategory: " + category + "\n" + inPlaceString;
 
         FacebookUtils.getInstance().getFacebookUsernameFromID(this.id, new FacebookUtilCallback() {
             @Override

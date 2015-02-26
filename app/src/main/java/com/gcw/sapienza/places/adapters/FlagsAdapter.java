@@ -253,7 +253,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
             // final InputMethodManager inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 
             alertDialogBuilder
-                    .setCancelable(false)
+                    .setCancelable(true)
                     .setNegativeButton("Cancel",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog,int id)
