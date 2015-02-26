@@ -188,21 +188,13 @@
         android:layout_height="fill_parent"
         android:visibility="gone"
         android:id="@+id/comments_holder"
-        android:background="@color/transparent_green" >
+        android:background="@color/white" >
 
         <ListView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:id="@+id/comments_list" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/comments_list"
-            android:text="Insert comment"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/add_comment_button" />
 
     </RelativeLayout>
 

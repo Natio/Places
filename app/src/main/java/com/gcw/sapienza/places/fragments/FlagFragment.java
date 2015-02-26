@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,7 +26,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
-
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.ShareActivity;
 import com.gcw.sapienza.places.model.Comment;
@@ -41,7 +41,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -84,9 +83,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private Button booButton;
 
     private Button commentsButton;
+    private Button addCommentButton;
     private RelativeLayout commentsHolder;
     private ListView commentsList;
-    private Button addCommentButton;
     private ArrayAdapter<String> commentsAdapter;
     private ArrayList<Comment> comments;
     private String newComment;
@@ -171,7 +170,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         commentsButton = (Button)view.findViewById(R.id.comments_button);
         commentsHolder = (RelativeLayout)view.findViewById(R.id.comments_holder);
         commentsList = (ListView)view.findViewById(R.id.comments_list);
-        addCommentButton = (Button)view.findViewById(R.id.add_comment_button);
 
         iw.setOnClickListener(this);
         vv.setOnTouchListener(this);
@@ -183,7 +181,12 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         lolButton.setOnClickListener(this);
         booButton.setOnClickListener(this);
 
+        ViewGroup header = (ViewGroup)inflater.inflate(R.layout.comments_header, commentsList, false);
+        commentsList.addHeaderView(header);
+        commentsList.setDividerHeight(3);
+
         commentsButton.setOnClickListener(this);
+        addCommentButton = (Button)header.findViewById(R.id.add_comment_button);
         addCommentButton.setOnClickListener(this);
 
         this.changeLayoutAccordingToMediaType();
@@ -339,7 +342,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
                 if(result == null || result.size() == 0)
                 {
-                    Toast.makeText(getActivity(), "There are no comments for this flag", Toast.LENGTH_LONG).show();
+                    // Toast.makeText(getActivity(), "There are no comments for this flag", Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -357,12 +360,12 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                     DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
                     String sDate = df.format(date);
 
-                    cmnt += sDate + "\n\n\n";
+                    cmnt += sDate;
 
                     texts.add(cmnt);
                 }
 
-                // TODO change adapter layout
+                // TODO change adapter's layout
                 commentsAdapter = new ArrayAdapter<String>(getActivity(), R.layout.comment_item_layout, texts);
                 commentsList.setAdapter(commentsAdapter);
             }
@@ -381,7 +384,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         // final InputMethodManager inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 
         alertDialogBuilder
-                .setCancelable(false)
+                .setCancelable(true)
                 .setNegativeButton("Cancel",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,int id)
