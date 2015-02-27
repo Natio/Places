@@ -61,6 +61,17 @@
         android:textSize="25sp" />
 
     <Button
+        android:id="@+id/comments_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show comments"
+        android:textSize="18sp"
+        android:layout_above="@+id/wow_button"
+        android:layout_marginBottom="20dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/my_border_3" />
+
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -169,6 +180,21 @@
             android:id="@+id/focused_pic"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="gone"
+        android:id="@+id/comments_holder"
+        android:background="@color/white" >
+
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/comments_list" />
 
     </RelativeLayout>
 
