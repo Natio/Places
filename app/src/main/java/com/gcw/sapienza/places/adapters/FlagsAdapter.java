@@ -25,6 +25,7 @@ import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.CropCircleTransformation;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
+import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -90,7 +91,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
             flagViewHolder.username.setText(fb_username);
         }
 
-        FacebookUtils.getInstance().getFbProfilePictureURL(user_id, FacebookUtils.PicSize.SMALL, new FacebookUtilCallback() {
+        FacebookUtils.getInstance().getFbProfilePictureURL(user_id, PlacesLoginUtils.PicSize.SMALL, new FacebookUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
                 Picasso.with(FlagsAdapter.this.view.getContext()).load(result).transform(transformation).into(flagViewHolder.user_profile_pic);
@@ -301,7 +302,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
             //        Flag sel_usr = (Flag)(recycleView.getItemAtPosition(info.position));
             //        String fb_id = sel_usr.getFbId();
             //
-            if(FacebookUtils.getInstance().getCurrentUserId().equals(fb_id)) {
+            if(PlacesLoginUtils.getInstance().getCurrentUserId().equals(fb_id)) {
                 menu.add(Utils.FLAG_LIST_GROUP, Utils.DELETE_FLAG, 0, "Delete Flag");
             }else {
                 Log.d(TAG, "Username: " + ParseUser.getCurrentUser().getUsername());

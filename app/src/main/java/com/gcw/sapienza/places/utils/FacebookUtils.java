@@ -32,26 +32,6 @@ import java.util.Set;
 public final class FacebookUtils {
     private static final String TAG = "FacebookUtils";
 
-    public enum PicSize {
-        SMALL, LARGE;
-
-        public String toString() {
-            if (this == SMALL) {
-                return SMALL_PIC_SIZE;
-            }
-            return LARGE_PIC_SIZE;
-        }
-    }
-
-    private static final String LARGE_PIC_SIZE = "200";
-    private static final String SMALL_PIC_SIZE = "120";
-
-    private String fbId = "";
-    private final ArrayList<String> friends = new ArrayList<>();
-    private final HashMap<String, String> userIdMap = new HashMap<>();
-    private final HashMap<String, String> userProfilePicMapSmall = new HashMap<>();
-    private final HashMap<String, String> userProfilePicMapLarge = new HashMap<>();
-
     private final HashMap<String, HashSet<FacebookUtilCallback>> scheduledOperationsQueue = new HashMap<>();
 
     private static final FacebookUtils shared_instance = new FacebookUtils();
@@ -65,73 +45,6 @@ public final class FacebookUtils {
      */
     public static FacebookUtils getInstance() {
         return FacebookUtils.shared_instance;
-    }
-
-
-    /**
-     * Removes all user data
-     */
-    public void clearUserData() {
-        this.fbId = "";
-        this.friends.clear();
-        this.userIdMap.clear();
-        this.userProfilePicMapSmall.clear();
-        this.userProfilePicMapLarge.clear();
-    }
-
-    /**
-     * @return current user's fb id
-     */
-    public String getCurrentUserId() {
-        return this.fbId;
-    }
-
-
-
-    /**
-     * @return true if there is a valid facebook id for the current user
-     */
-    public boolean hasCurrentUserId() {
-        return !(this.fbId == null || this.fbId.isEmpty());
-    }
-
-    /**
-     * Returns  fb user name for a given id
-     *
-     * @param id the facebook id of a user
-     * @return fb user name for a given id
-     */
-    private String getUserNameFromId(String id) {
-        return this.userIdMap.get(id);
-    }
-
-    public String getProfilePictureSmall(String profile_id) {
-        return this.userProfilePicMapSmall.get(profile_id);
-    }
-
-    public String getProfilePictureLarge(String profile_id) {
-        return this.userProfilePicMapLarge.get(profile_id);
-    }
-
-    /**
-     * @param profile_id profile idenrifier
-     * @param size       Site of the picture
-     * @return cached URL of profile_id profile picture. Returns null if the picture is not cached
-     */
-    public String getProfilePictureURL(String profile_id, PicSize size) {
-        if (size == PicSize.LARGE) {
-            return this.getProfilePictureLarge(profile_id);
-        } else if (size == PicSize.SMALL) {
-            return this.getProfilePictureSmall(profile_id);
-        }
-        throw new InvalidParameterException("wrong size specified: " + size);
-    }
-
-    /**
-     * @return current user's friend list
-     */
-    public List<String> getFriends() {
-        return this.friends;
     }
 
     /**
@@ -152,14 +65,14 @@ public final class FacebookUtils {
                     @Override
                     public void onCompleted(GraphUser user, Response response) {
                         if (user != null) {
-                            FacebookUtils.this.fbId = user.getId();
-                            FacebookUtils.this.userIdMap.put(user.getId(), user.getUsername());
+                            PlacesLoginUtils.getInstance().setCurrentUserId(user.getId());
+                            PlacesLoginUtils.getInstance().addEntryToUserIdMap(user.getId(), user.getUsername());
 
                             FacebookUtils.this.fetchFbFriends(new FacebookUtilsFriendsCallback() {
                                 @Override
                                 public void onFriendsResult(List<String> friends, Exception e) {
                                     if (cbk != null) {
-                                        cbk.onResult(FacebookUtils.this.fbId, e);
+                                        cbk.onResult(PlacesLoginUtils.getInstance().getCurrentUserId(), e);
                                     }
                                 }
                             });
@@ -177,7 +90,7 @@ public final class FacebookUtils {
      * @param cbk callback
      */
     public void fetchFbFriends(final FacebookUtilsFriendsCallback cbk) {
-        this.friends.clear();
+        PlacesLoginUtils.getInstance().clearFriends();
 
         Bundle bundle = new Bundle();
         bundle.putString("fields", "id");
@@ -197,10 +110,10 @@ public final class FacebookUtils {
                             JSONArray array = obj.getJSONArray("data");
 
                             for (int i = 0; i < array.length(); i++) {
-                                FacebookUtils.this.friends.add(((JSONObject) array.get(i)).getString("id"));
+                                PlacesLoginUtils.getInstance().addFriend(((JSONObject) array.get(i)).getString("id"));
                             }
                             if (cbk != null) {
-                                cbk.onFriendsResult(FacebookUtils.this.friends, null);
+                                cbk.onFriendsResult(PlacesLoginUtils.getInstance().getFriends(), null);
                             }
                         } catch (JSONException e) {
                             Log.v(TAG, "Couldn't retrieve user's friends.  Error: " + e.toString());
@@ -224,7 +137,7 @@ public final class FacebookUtils {
      * @param cbk   callback parameter. MUST not be null. User Username will be given as a parameter of onResult method
      */
     public void getFacebookUsernameFromID(final String fb_id, final FacebookUtilCallback cbk) {
-        String username = this.getUserNameFromId(fb_id);
+        String username = PlacesLoginUtils.getInstance().getUserNameFromId(fb_id);
         if (username != null) {
             if (cbk != null) {
                 cbk.onResult(username, null);
@@ -260,7 +173,7 @@ public final class FacebookUtils {
                             JSONObject obj = go.getInnerJSONObject();
                             String name = obj.getString("name");
 
-                            FacebookUtils.this.userIdMap.put(fb_id, name);
+                            PlacesLoginUtils.getInstance().addEntryToUserIdMap(fb_id, name);
 
                             Set<FacebookUtilCallback> cbks;
                             synchronized (FacebookUtils.this.scheduledOperationsQueue){
@@ -322,7 +235,7 @@ public final class FacebookUtils {
      * @param user_id   facebook user id
      * @param imageView ImageView where to load picture
      */
-    public void loadProfilePicIntoImageView(final String user_id, final ImageView imageView, final PicSize size) {
+    public void loadProfilePicIntoImageView(final String user_id, final ImageView imageView, final PlacesLoginUtils.PicSize size) {
         this.getFbProfilePictureURL(user_id, size, new FacebookUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
@@ -342,8 +255,8 @@ public final class FacebookUtils {
      * @param size    size of the profile picture
      * @param cbk     callback parameter. MUST not be null. Picture URL will be given as a parameter of onResult method
      */
-    public void getFbProfilePictureURL(final String user_id, final PicSize size, final FacebookUtilCallback cbk) {
-        String pic_url = this.getProfilePictureURL(user_id, size);
+    public void getFbProfilePictureURL(final String user_id, final PlacesLoginUtils.PicSize size, final FacebookUtilCallback cbk) {
+        String pic_url = PlacesLoginUtils.getInstance().getProfilePictureURL(user_id, size);
 
         if (pic_url != null) {
             cbk.onResult(pic_url, null);
@@ -384,10 +297,10 @@ public final class FacebookUtils {
                             JSONObject obj = go.getInnerJSONObject();
                             final String url = obj.getJSONObject("data").getString("url");
 
-                            if (size == PicSize.SMALL) {
-                                FacebookUtils.this.userProfilePicMapSmall.put(user_id, url);
+                            if (size == PlacesLoginUtils.PicSize.SMALL) {
+                                PlacesLoginUtils.getInstance().addEntryToSmallPicMap(user_id, url);
                             } else {
-                                FacebookUtils.this.userProfilePicMapLarge.put(user_id, url);
+                                PlacesLoginUtils.getInstance().addEntryToLargePicMap(user_id, url);
                             }
 
                             Set<FacebookUtilCallback> cbks;
@@ -400,7 +313,6 @@ public final class FacebookUtils {
                                     c.onResult(url, null);
                                 }
                             }
-
 
                         } catch (JSONException e) {
                             Log.v(TAG, "Couldn't retrieve facebook user data.  Error: " + e.toString());
@@ -422,7 +334,6 @@ public final class FacebookUtils {
 
         req.executeAsync();
     }
-
 
     /**
      *
@@ -455,20 +366,5 @@ public final class FacebookUtils {
                 }
             }
         });
-    }
-
-    /**
-     *
-     * @param activity the activity where to start the intent
-     */
-    public static void startLoginActivity(Activity activity)
-    {
-        PlacesLoginBuilder builder = new PlacesLoginBuilder(activity);
-
-        // builder.setAppLogo(R.drawable.app_logo);
-        Intent loginIntent = builder.build();
-        loginIntent.setClass(activity, PlacesLoginActivity.class);
-
-        activity.startActivityForResult(loginIntent, Utils.LOGIN_REQUEST_CODE);
     }
 }

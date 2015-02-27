@@ -24,6 +24,7 @@ import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.FacebookUtils;
+import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -125,7 +126,7 @@ public class LocationService extends Service implements
 
     public void queryParsewithCurrentUser(){
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
-        query.whereEqualTo("fbId", FacebookUtils.getInstance().getCurrentUserId());
+        query.whereEqualTo("fbId", PlacesLoginUtils.getInstance().getCurrentUserId());
         query.orderByDescending("createdAt");
         query.findInBackground(new FindCallback<Flag>() {
             @Override
@@ -205,13 +206,13 @@ public class LocationService extends Service implements
         Log.v(TAG, "None: " + none_check);
         Log.v(TAG, "Music: " + music_check);
 
-        if(FacebookUtils.getInstance().hasCurrentUserId() == false)
+        if(PlacesLoginUtils.getInstance().hasCurrentUserId() == false)
         {
             final android.os.Handler handler = new android.os.Handler();
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (FacebookUtils.getInstance().hasCurrentUserId() == false){
+                    if (PlacesLoginUtils.getInstance().hasCurrentUserId() == false){
                         handler.postDelayed(this, Utils.UPDATE_DELAY);
                     }
                     else{
@@ -254,13 +255,13 @@ public class LocationService extends Service implements
             if(lone_wolf && with_friends_surrounded)
             {
                 ArrayList<String> meAndMyFriends = new ArrayList<>();
-                meAndMyFriends.add(FacebookUtils.getInstance().getCurrentUserId());
-                meAndMyFriends.addAll(FacebookUtils.getInstance().getFriends());
+                meAndMyFriends.add(PlacesLoginUtils.getInstance().getCurrentUserId());
+                meAndMyFriends.addAll(PlacesLoginUtils.getInstance().getFriends());
                 query.whereContainedIn("fbId", meAndMyFriends);
             }
 
-            else if(lone_wolf) query.whereEqualTo("fbId", FacebookUtils.getInstance().getCurrentUserId());
-            else if(with_friends_surrounded) query.whereContainedIn("fbId", FacebookUtils.getInstance().getFriends());
+            else if(lone_wolf) query.whereEqualTo("fbId", PlacesLoginUtils.getInstance().getCurrentUserId());
+            else if(with_friends_surrounded) query.whereContainedIn("fbId", PlacesLoginUtils.getInstance().getFriends());
             else
             {
                 Toast.makeText(getApplicationContext(), "No filter selected: "
@@ -281,9 +282,9 @@ public class LocationService extends Service implements
         else
         {
             if (!lone_wolf)
-                query.whereNotEqualTo("fbId", FacebookUtils.getInstance().getCurrentUserId());
+                query.whereNotEqualTo("fbId", PlacesLoginUtils.getInstance().getCurrentUserId());
             if (!with_friends_surrounded)
-                query.whereNotContainedIn("fbId", FacebookUtils.getInstance().getFriends()); // this is rather expensive
+                query.whereNotContainedIn("fbId", PlacesLoginUtils.getInstance().getFriends()); // this is rather expensive
         }
 
         if(archaeologist) query.orderByAscending("createdAt");
@@ -347,7 +348,7 @@ public class LocationService extends Service implements
         this.location = location;
         queryParsewithLocation(location);
         if(this.parseObjects != null && this.parseObjects.size() > 0
-                && !MainActivity.isForeground() && FacebookUtils.getInstance().hasCurrentUserId()) {
+                && !MainActivity.isForeground() && PlacesLoginUtils.getInstance().hasCurrentUserId()) {
             Log.d(TAG, "Notifying user..." +
                     this.parseObjects.size() + " flags found");
             notifyUser();

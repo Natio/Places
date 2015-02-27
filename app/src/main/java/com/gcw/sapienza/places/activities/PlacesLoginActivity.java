@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.fragments.PlacesLoginFragment;
+import com.gcw.sapienza.places.utils.GPlusUtils;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
@@ -240,6 +241,8 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
                             if (user != null && e == null)
                             {
                                 Log.i(TAG, "The Google user validated");
+
+                                GPlusUtils.getInstance().setGoogleApiClient(mGoogleApiClient);
 
                                 setResult(RESULT_OK);
                                 finish();

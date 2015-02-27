@@ -45,6 +45,7 @@ import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.FlagUploader;
+import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseAnalytics;
 import com.parse.ParseGeoPoint;
@@ -255,7 +256,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 FacebookUtils.downloadFacebookInfo(this);
             }
             else{
-                FacebookUtils.startLoginActivity(this);
+                PlacesLoginUtils.startLoginActivity(this);
             }
 
         }
@@ -584,7 +585,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             this.onShareFailed(ENABLE_NETWORK_SERVICE_TEXT);
             return false;
         }
-        else if(!FacebookUtils.getInstance().hasCurrentUserId()){
+        else if(!PlacesLoginUtils.getInstance().hasCurrentUserId()){
 
             Map<String, String> dimensions = new HashMap<>(1);
             dimensions.put("reason", "Share with No Facebook");
@@ -630,7 +631,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
         final String category = spinner.getSelectedItem().toString();
 
-        f.setFbId(FacebookUtils.getInstance().getCurrentUserId());
+        f.setFbId(PlacesLoginUtils.getInstance().getCurrentUserId());
         f.setCategory(category);
         f.setLocation(p);
         f.setText(this.textView.getText().toString());
