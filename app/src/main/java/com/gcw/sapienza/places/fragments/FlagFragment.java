@@ -32,6 +32,7 @@ import com.gcw.sapienza.places.models.CustomParseObject;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
+import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.parse.FindCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
@@ -132,7 +133,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         lolCount = bundle.getInt("lolCount");
         booCount = bundle.getInt("booCount");
 
-        userId = FacebookUtils.getInstance().getCurrentUserId();
+        userId = PlacesLoginUtils.getInstance().getCurrentUserId();
 
         retrieveComments();
     }
@@ -204,7 +205,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             }
         });
 
-        FacebookUtils.getInstance().loadProfilePicIntoImageView(this.id, profilePicimageView, FacebookUtils.PicSize.LARGE);
+        FacebookUtils.getInstance().loadProfilePicIntoImageView(this.id, profilePicimageView, PlacesLoginUtils.PicSize.LARGE);
 
         view.setFocusableInTouchMode(true);
         view.requestFocus();
@@ -486,10 +487,10 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
                                 final Comment comment =  new Comment();
                                 comment.put("text", newComment);
-                                comment.put("userId", FacebookUtils.getInstance().getCurrentUserId());
+                                comment.put("userId", PlacesLoginUtils.getInstance().getCurrentUserId());
                                 comment.put("flagId", flagId);
 
-                                FacebookUtils.getInstance().getFacebookUsernameFromID(FacebookUtils.getInstance().getCurrentUserId(), new FacebookUtilCallback() {
+                                FacebookUtils.getInstance().getFacebookUsernameFromID(PlacesLoginUtils.getInstance().getCurrentUserId(), new FacebookUtilCallback() {
                                     @Override
                                     public void onResult(String result, Exception e)
                                     {
@@ -631,7 +632,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                             CustomParseObject obj = new CustomParseObject();
                             obj.setUser(ParseUser.getCurrentUser());
                             obj.setFlagId(flagId);
-                            obj.setFacebookId(FacebookUtils.getInstance().getCurrentUserId());
+                            obj.setFacebookId(PlacesLoginUtils.getInstance().getCurrentUserId());
                             obj.setWowBoolean(true);
                             obj.saveInBackground(new SaveCallback() {
                                 @Override
@@ -681,7 +682,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                             CustomParseObject obj = new CustomParseObject();
                             obj.setUser(ParseUser.getCurrentUser());
                             obj.setFlagId(flagId);
-                            obj.setFacebookId(FacebookUtils.getInstance().getCurrentUserId());
+                            obj.setFacebookId(PlacesLoginUtils.getInstance().getCurrentUserId());
                             obj.setLolBoolean(true);
                             obj.saveInBackground(new SaveCallback() {
                                 @Override
@@ -731,7 +732,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                             CustomParseObject obj = new CustomParseObject();
                             obj.setUser(ParseUser.getCurrentUser());
                             obj.setFlagId(flagId);
-                            obj.setFacebookId(FacebookUtils.getInstance().getCurrentUserId());
+                            obj.setFacebookId(PlacesLoginUtils.getInstance().getCurrentUserId());
                             obj.setBooBoolean(true);
                             obj.saveInBackground(new SaveCallback() {
                                 @Override

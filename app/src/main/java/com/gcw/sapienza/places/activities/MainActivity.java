@@ -77,14 +77,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(FacebookUtils.isFacebookSessionOpened())
-        {
-            FacebookUtils.downloadFacebookInfo(this);
-        }
-        else
-        {
-            FacebookUtils.startLoginActivity(this);
-        }
+        if(PlacesLoginUtils.getInstance().isSessionValid()) PlacesLoginUtils.getInstance().downloadUserInfo(this);
+        else PlacesLoginUtils.startLoginActivity(this);
 
         setContentView(R.layout.activity_main_drawer_layout);
         this.current_title = this.getTitle();
@@ -296,10 +290,10 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         // Log the user out
         ParseUser.logOut();
 
-        FacebookUtils.getInstance().clearUserData();
+        PlacesLoginUtils.getInstance().clearUserData();
 
         // Go to the login view
-        FacebookUtils.startLoginActivity(this);
+        PlacesLoginUtils.startLoginActivity(this);
     }
 
     /** Swaps fragments in the main content view */
