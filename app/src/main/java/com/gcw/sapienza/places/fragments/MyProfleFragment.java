@@ -40,7 +40,7 @@ public class MyProfleFragment extends Fragment {
         FacebookUtils.getInstance().getFacebookUsernameFromID(FacebookUtils.getInstance().getCurrentUserId(), new FacebookUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
-                fbNameView.setText(result);
+                fbNameView.setText("User name: " + result);
             }
         });
 
