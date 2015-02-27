@@ -68,6 +68,8 @@ public class PlacesLoginFragment extends ParseLoginFragment {
         facebookLoginButton = (Button) v.findViewById(R.id.facebook_login);
         twitterLoginButton = (Button) v.findViewById(R.id.twitter_login);
         gPlusSigninButton = (SignInButton) v.findViewById(R.id.gplus_sign_in_button);
+        gPlusSigninButton.setColorScheme(SignInButton.COLOR_LIGHT);
+        gPlusSigninButton.setSize(SignInButton.SIZE_ICON_ONLY);
 
         gPlusSigninButton.setOnClickListener((View.OnClickListener)getActivity());
 
