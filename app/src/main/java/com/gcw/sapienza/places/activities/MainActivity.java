@@ -34,8 +34,10 @@ import com.gcw.sapienza.places.fragments.MyFlagsFragment;
 import com.gcw.sapienza.places.fragments.MyProfleFragment;
 import com.gcw.sapienza.places.fragments.SettingsFragment;
 import com.gcw.sapienza.places.utils.FacebookUtils;
+import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
 
@@ -374,7 +376,11 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
                 if(resultCode == RESULT_OK){
                     //this.startDownloadingFacebookInfo();
-                    FacebookUtils.downloadFacebookInfo(this);
+
+                    if(ParseFacebookUtils.getSession() == null) PlacesLoginUtils.loginType = PlacesLoginUtils.LoginType.GPLUS;
+                    else PlacesLoginUtils.loginType = PlacesLoginUtils.LoginType.FACEBOOK;
+
+                    PlacesLoginUtils.downloadUserInfo(this);
                 }
                 break;
             case SHARE_ACTIVITY_REQUEST_CODE:

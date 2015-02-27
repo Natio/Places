@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.facebook.HttpMethod;
 import com.facebook.Request;
 import com.facebook.Response;
@@ -18,16 +17,12 @@ import com.facebook.model.GraphUser;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.activities.PlacesLoginActivity;
 import com.parse.ParseFacebookUtils;
-import com.parse.ui.ParseLoginBuilder;
 import com.squareup.picasso.Picasso;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;

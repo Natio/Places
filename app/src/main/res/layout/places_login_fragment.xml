@@ -32,10 +32,8 @@
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/gplus_sign_in_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:onClick="signinWithGPlus"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 
     <include layout="@layout/com_parse_ui_parse_login_form" />

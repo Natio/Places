@@ -4,32 +4,47 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.widget.Toast;
 
+import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.fragments.PlacesLoginFragment;
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
+import com.parse.FunctionCallback;
+import com.parse.LogInCallback;
 import com.parse.Parse;
+import com.parse.ParseCloud;
+import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 import com.parse.ui.ParseLoginActivity;
-
 import com.google.android.gms.common.ConnectionResult;
+import java.io.IOException;
+import java.util.HashMap;
 
 
 /**
  * Created by paolo on 23/02/15.
  */
 public class PlacesLoginActivity extends ParseLoginActivity implements  com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks,
-                                                                        com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener {
+                                                                        com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener,
+                                                                        View.OnClickListener {
 
     private static final String TAG = "PlacesLoginActivity";
 
     /* Request code used to invoke sign in user interactions. */
     private static final int RC_SIGN_IN = 0;
+
+    private static final int REQUEST_CODE_TOKEN_AUTH = 1;
 
     /* Client used to interact with Google APIs. */
     private GoogleApiClient mGoogleApiClient;
@@ -132,6 +147,8 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
     public void onConnected(Bundle connectionHint) {
         // We've resolved any connection errors.  mGoogleApiClient can be used to
         // access Google APIs on behalf of the user.
+
+        getGPlusAccessToken();
     }
 
     public void onConnectionSuspended(int cause) {
@@ -148,8 +165,102 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
         }
     }
 
-    public void signinWithGPlus(View v)
+    @Override
+    public void onClick(View v)
+    {
+        if(v.getId() == R.id.gplus_sign_in_button) signinWithGPlus();
+    }
+
+    public void signinWithGPlus()
     {
         mGoogleApiClient.connect();
+    }
+
+    private void getGPlusAccessToken()
+    {
+        AsyncTask<Void, Void, String> task = new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                String accessToken = null;
+                try {
+                    accessToken = GoogleAuthUtil.getToken(getApplicationContext(),
+                            Plus.AccountApi.getAccountName(mGoogleApiClient),
+                            "oauth2:" + Scopes.PLUS_LOGIN);
+                } catch (IOException transientEx) {
+                    // network or server error, the call is expected to succeed if you try again later.
+                    // Don't attempt to call again immediately - the request is likely to
+                    // fail, you'll hit quotas or back-off.
+                    return null;
+                } catch (UserRecoverableAuthException e) {
+                    // Recover
+                    accessToken = null;
+                } catch (GoogleAuthException authEx) {
+                    // Failure. The call is not expected to ever succeed so it should not be
+                    // retried.
+                    return null;
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
+                return accessToken;
+            }
+
+            @Override
+            protected void onPostExecute(String token)
+            {
+                Log.i(TAG, "Google+ access token retrieved: " + token);
+
+                completeLoginWithParse(token);
+            }
+
+        };
+
+        task.execute();
+    }
+
+    private void completeLoginWithParse(String token)
+    {
+        String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
+        final HashMap<String, Object> params = new HashMap();
+        params.put("code", token);
+        params.put("email", email);
+
+        //loads the Cloud function to create a Google user
+        ParseCloud.callFunctionInBackground("accessGoogleUser", params, new FunctionCallback<Object>()
+        {
+            @Override
+            public void done(Object returnObj, ParseException e)
+            {
+                if (e == null)
+                {
+                    ParseUser.becomeInBackground(returnObj.toString(), new LogInCallback()
+                    {
+                        public void done(ParseUser user, ParseException e)
+                        {
+                            if (user != null && e == null)
+                            {
+                                Log.i(TAG, "The Google user validated");
+
+                                setResult(RESULT_OK);
+                                finish();
+                            }
+                            else if (e != null)
+                            {
+                                Toast.makeText(getApplicationContext(), "There was a problem creating your account.", Toast.LENGTH_SHORT).show();
+                                e.printStackTrace();
+                                mGoogleApiClient.disconnect();
+                            }
+                            else Log.i(TAG, "The Google token could not be validated");
+                        }
+                    });
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(), "There was a problem creating your account.", Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                    mGoogleApiClient.disconnect();
+                }
+            }
+        });
     }
 }

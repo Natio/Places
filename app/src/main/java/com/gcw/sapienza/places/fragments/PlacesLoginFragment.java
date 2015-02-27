@@ -69,6 +69,8 @@ public class PlacesLoginFragment extends ParseLoginFragment {
         twitterLoginButton = (Button) v.findViewById(R.id.twitter_login);
         gPlusSigninButton = (SignInButton) v.findViewById(R.id.gplus_sign_in_button);
 
+        gPlusSigninButton.setOnClickListener((View.OnClickListener)getActivity());
+
         if (appLogo != null && config.getAppLogo() != null) {
             appLogo.setImageResource(config.getAppLogo());
         }
