@@ -30,7 +30,7 @@ import android.widget.TextView;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
-import com.gcw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;

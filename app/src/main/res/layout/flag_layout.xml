@@ -66,23 +66,22 @@
         android:layout_height="wrap_content"
         android:text="Show comments"
         android:textSize="18sp"
-        android:layout_above="@+id/wow_button"
-        android:layout_marginBottom="20dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="10dp"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/my_border_3" />
+        android:background="@drawable/my_border_3"
+        android:layout_alignParentBottom="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:text="WOW"
         android:textSize="14sp"
         android:background="@drawable/my_border_3"
         android:layout_centerHorizontal="true"
         android:id="@+id/wow_button"
-        android:layout_marginBottom="10dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginLeft="20dp" />
+        android:layout_marginBottom="5dp"
+        android:layout_above="@+id/comments_button" />
 
     <Button
         android:layout_width="wrap_content"
@@ -95,7 +94,8 @@
         android:id="@+id/lol_button"
         android:layout_marginBottom="10dp"
         android:layout_marginRight="5dp"
-        android:layout_marginLeft="5dp" />
+        android:layout_marginLeft="5dp"
+        android:visibility="gone" />
 
     <Button
         android:layout_width="wrap_content"
@@ -108,7 +108,8 @@
         android:id="@+id/boo_button"
         android:layout_marginBottom="10dp"
         android:layout_marginRight="5dp"
-        android:layout_marginLeft="5dp" />
+        android:layout_marginLeft="5dp"
+        android:visibility="gone" />
 
     <ImageView
         android:layout_marginTop="10dp"

@@ -1,4 +1,4 @@
-package com.gcw.sapienza.places.model;
+package com.gcw.sapienza.places.models;
 
 
 import com.parse.ParseClassName;

@@ -15,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,9 +27,9 @@ import android.widget.Toast;
 import android.widget.VideoView;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.ShareActivity;
-import com.gcw.sapienza.places.model.Comment;
-import com.gcw.sapienza.places.model.CustomParseObject;
-import com.gcw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.models.Comment;
+import com.gcw.sapienza.places.models.CustomParseObject;
+import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.parse.FindCallback;
@@ -231,6 +230,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             }
         });
 
+        updateWowInfo();
+
         return view;
     }
 
@@ -239,6 +240,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     {
         super.onResume();
 
+        /*
         ParseQuery<Flag> queryPosts = ParseQuery.getQuery("Posts");
         queryPosts.whereEqualTo("objectId", flagId);
 
@@ -308,6 +310,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 }
             }
         });
+        */
     }
 
     @Override
@@ -332,6 +335,82 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         }
 
         return false;
+    }
+
+    private void updateWowInfo()
+    {
+        ParseQuery<Flag> queryPosts = ParseQuery.getQuery("Posts");
+        queryPosts.whereEqualTo("objectId", flagId);
+
+        queryPosts.findInBackground(new FindCallback<Flag>()
+        {
+            public void done(List<Flag> markers, ParseException e)
+            {
+                if (e == null && markers.size() != 0)
+                {
+                    Flag flag = markers.get(0);
+
+                    wowCount = flag.getInt("wowCount");
+                    lolCount = flag.getInt("lolCount");
+                    booCount = flag.getInt("booCount");
+                }
+            }
+        });
+
+        // TODO I totally have to go over this mess
+        // if(wowButton.getText().charAt(wowButton.getText().length() - 1) != ')')
+            wowButton.setText(wowButton.getText() + " (" + wowCount + ")");
+
+        lolButton.setText(lolButton.getText() + " (" + lolCount + ")");
+        booButton.setText(booButton.getText() + " (" + booCount + ")");
+
+        ParseQuery<CustomParseObject> queryW = ParseQuery.getQuery("Wow_Lol_Boo");
+        queryW.whereEqualTo("fbId", userId);
+        queryW.whereEqualTo("flagId", flagId);
+        queryW.whereEqualTo("boolWow", true);
+
+        queryW.findInBackground(new FindCallback<CustomParseObject>()
+        {
+            public void done(List<CustomParseObject> markers, ParseException e)
+            {
+                if (e == null && markers.size() != 0)
+                {
+                    wowButton.setText("You wow this." + " (" + wowCount + ")");
+                }
+            }
+        });
+
+        ParseQuery<CustomParseObject> queryL = ParseQuery.getQuery("Wow_Lol_Boo");
+        queryL.whereEqualTo("fbId", userId);
+        queryL.whereEqualTo("flagId", flagId);
+        queryL.whereEqualTo("boolLol", true);
+
+        queryL.findInBackground(new FindCallback<CustomParseObject>()
+        {
+            public void done(List<CustomParseObject> markers, ParseException e)
+            {
+                if (e == null && markers.size() != 0)
+                {
+                    lolButton.setText("You lol this." + " (" + lolCount + ")");
+                }
+            }
+        });
+
+        ParseQuery<CustomParseObject> queryB = ParseQuery.getQuery("Wow_Lol_Boo");
+        queryB.whereEqualTo("fbId", userId);
+        queryB.whereEqualTo("flagId", flagId);
+        queryB.whereEqualTo("boolBoo", true);
+
+        queryB.findInBackground(new FindCallback<CustomParseObject>()
+        {
+            public void done(List<CustomParseObject> markers, ParseException e)
+            {
+                if (e == null && markers.size() != 0)
+                {
+                    booButton.setText("You boo this." + " (" + booCount + ")");
+                }
+            }
+        });
     }
 
     private void retrieveComments()

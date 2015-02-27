@@ -13,11 +13,12 @@ import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.gcw.sapienza.places.model.Comment;
-import com.gcw.sapienza.places.model.CustomParseObject;
-import com.gcw.sapienza.places.model.Flag;
-import com.gcw.sapienza.places.model.FlagReport;
+import com.gcw.sapienza.places.models.Comment;
+import com.gcw.sapienza.places.models.CustomParseObject;
+import com.gcw.sapienza.places.models.Flag;
+import com.gcw.sapienza.places.models.FlagReport;
 import com.gcw.sapienza.places.services.ILocationUpdater;
+import com.gcw.sapienza.places.services.JSONWeatherTask;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.services.LocationService.LocalBinder;
 import com.parse.ConfigCallback;

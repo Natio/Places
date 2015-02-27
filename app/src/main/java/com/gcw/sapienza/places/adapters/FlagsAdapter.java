@@ -21,7 +21,7 @@ import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.fragments.FlagFragment;
-import com.gcw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.CropCircleTransformation;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;

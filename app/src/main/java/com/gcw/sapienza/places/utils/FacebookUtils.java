@@ -468,12 +468,7 @@ public final class FacebookUtils {
      */
     public static void startLoginActivity(Activity activity)
     {
-        ParseLoginBuilder builder = new ParseLoginBuilder(activity);
-
-        builder.setParseLoginEnabled(false);
-
-        builder.setFacebookLoginEnabled(true);
-        builder.setFacebookLoginPermissions(Arrays.asList("public_profile", "user_friends"/*, "user_relationships", "user_birthday", "user_location"*/));
+        PlacesLoginBuilder builder = new PlacesLoginBuilder(activity);
 
         // builder.setAppLogo(R.drawable.app_logo);
         Intent loginIntent = builder.build();

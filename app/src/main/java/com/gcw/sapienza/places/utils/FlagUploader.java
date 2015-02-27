@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.gcw.sapienza.places.BuildConfig;
 import com.gcw.sapienza.places.R;
-import com.gcw.sapienza.places.model.Flag;
+import com.gcw.sapienza.places.models.Flag;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;

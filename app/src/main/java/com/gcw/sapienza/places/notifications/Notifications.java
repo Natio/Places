@@ -1,4 +1,4 @@
-package com.gcw.sapienza.places;
+package com.gcw.sapienza.places.notifications;
 
 /**
  * Created by snowblack on 1/1/15.

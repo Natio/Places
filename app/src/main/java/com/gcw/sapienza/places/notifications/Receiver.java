@@ -1,4 +1,4 @@
-package com.gcw.sapienza.places;
+package com.gcw.sapienza.places.notifications;
 
 import android.content.Context;
 import android.content.Intent;

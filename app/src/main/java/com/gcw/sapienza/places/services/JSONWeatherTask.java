@@ -1,7 +1,10 @@
-package com.gcw.sapienza.places;
+package com.gcw.sapienza.places.services;
 
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.gcw.sapienza.places.PlacesApplication;
+import com.gcw.sapienza.places.services.WeatherHttpClient;
 
 import org.json.JSONArray;
 import org.json.JSONException;
