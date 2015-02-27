@@ -48,7 +48,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private ActionBarDrawerToggle drawerToggle;
-    private static final String [] section_titles = {"Home", "My Profile", "Settings", "My Flags", "Logout"};
+    private static final String [] section_titles = {"Home", "My Profile", "My Flags", "Settings", "Logout"};
     private CharSequence current_title;
 
     // private int currentDrawerListItemIndex = -1;
@@ -62,8 +62,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
     private static final int FLAGS_LIST_POSITION = 0;
     private static final int MY_PROFILE_POSITION = 1;
-    private static final int SETTINGS_POSITION = 2;
-    private static final int MY_FLAGS_POSITION = 3;
+    private static final int MY_FLAGS_POSITION = 2;
+    private static final int SETTINGS_POSITION = 3;
     private static final int LOGOUT_POSITION = 4;
 
     private static final String FRAG_TAG = "FRAG_TAG";
@@ -316,25 +316,25 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         */
         switch(position){
 
-            case SETTINGS_POSITION:
-                switchToSettingsFrag();
-                break;
-
-            case MY_PROFILE_POSITION:
-                myProfile();
-                break;
-
-            case LOGOUT_POSITION:
-                logout();
-                break;
-
             case FLAGS_LIST_POSITION:
 //                if(homeHolder.getVisibility() == View.INVISIBLE)
                 switchToOtherFrag(new MainFragment());
                 break;
 
+            case MY_PROFILE_POSITION:
+            myProfile();
+            break;
+
             case MY_FLAGS_POSITION:
-                switchToOtherFrag(new MyFlagsFragment());
+            switchToOtherFrag(new MyFlagsFragment());
+            break;
+
+            case SETTINGS_POSITION:
+                switchToSettingsFrag();
+                break;
+
+            case LOGOUT_POSITION:
+                logout();
                 break;
 
             default:
