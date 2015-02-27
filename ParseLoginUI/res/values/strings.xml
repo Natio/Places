@@ -7,8 +7,9 @@
     <string name="com_parse_ui_forgot_password_button_label"><u>Forgot password</u></string>
     <string name="com_parse_ui_parse_login_button_label">Log in</string>
     <string name="com_parse_ui_parse_signup_button_label">Sign up</string>
-    <string name="com_parse_ui_facebook_login_button_label">Log in with Facebook</string>
-    <string name="com_parse_ui_twitter_login_button_label">Log in with Twitter</string>
+    <string name="com_parse_ui_facebook_login_button_label">FB</string>
+    <string name="com_parse_ui_twitter_login_button_label">Twitter</string>
+    <string name="com_parse_ui_google_login_button_label">Google</string>
     <string name="com_parse_ui_email_input_hint">Email</string>
     <string name="com_parse_ui_confirm_password_input_hint">Re-enter password</string>
     <string name="com_parse_ui_name_input_hint">Name</string>
