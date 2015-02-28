@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gcw.sapienza.places.activities.PlacesLoginActivity;
+import com.parse.ui.ParseLoginActivity;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -221,6 +222,7 @@ public class PlacesLoginUtils {
         // builder.setAppLogo(R.drawable.app_logo);
         Intent loginIntent = builder.build();
         loginIntent.setClass(activity, PlacesLoginActivity.class);
+        // loginIntent.setClass(activity, ParseLoginActivity.class);
 
         activity.startActivityForResult(loginIntent, Utils.LOGIN_REQUEST_CODE);
     }

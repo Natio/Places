@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -56,7 +57,7 @@ import java.util.Locale;
 /**
  * Created by mic_head on 02/02/15.
  */
-public class FlagFragment extends Fragment implements View.OnClickListener, View.OnTouchListener {
+public class FlagFragment extends Fragment implements View.OnClickListener, View.OnTouchListener, SwipeRefreshLayout.OnRefreshListener {
 
     private String text;
     private String id;
@@ -85,7 +86,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
     private Button commentsButton;
     private Button addCommentButton;
-    private RelativeLayout commentsHolder;
+    private SwipeRefreshLayout commentsHolder;
     private ListView commentsList;
     private ArrayAdapter<String> commentsAdapter;
     private ArrayList<Comment> comments;
@@ -169,7 +170,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         booButton = (Button)view.findViewById(R.id.boo_button);
 
         commentsButton = (Button)view.findViewById(R.id.comments_button);
-        commentsHolder = (RelativeLayout)view.findViewById(R.id.comments_holder);
+        commentsHolder = (SwipeRefreshLayout)view.findViewById(R.id.comments_holder);
         commentsList = (ListView)view.findViewById(R.id.comments_list);
 
         iw.setOnClickListener(this);
@@ -185,6 +186,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         ViewGroup header = (ViewGroup)inflater.inflate(R.layout.comments_header, commentsList, false);
         commentsList.addHeaderView(header);
         commentsList.setDividerHeight(3);
+
+        commentsHolder.setOnRefreshListener(this);
 
         commentsButton.setOnClickListener(this);
         addCommentButton = (Button)header.findViewById(R.id.add_comment_button);
@@ -313,6 +316,14 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             }
         });
         */
+    }
+
+    @Override
+    public void onRefresh()
+    {
+        commentsHolder.setRefreshing(true);
+        retrieveComments();
+        commentsHolder.setRefreshing(false);
     }
 
     @Override

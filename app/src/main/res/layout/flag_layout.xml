@@ -185,19 +185,18 @@
 
     </RelativeLayout>
 
-    <RelativeLayout
+    <SwipeRefreshLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:visibility="gone"
         android:id="@+id/comments_holder"
-        android:background="@color/white" >
+        android:background="@color/white">
 
         <ListView
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
             android:id="@+id/comments_list" />
 
-    </RelativeLayout>
+    </SwipeRefreshLayout>
 
 </RelativeLayout>

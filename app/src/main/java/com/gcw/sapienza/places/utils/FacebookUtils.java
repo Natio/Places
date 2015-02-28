@@ -328,6 +328,11 @@ public final class FacebookUtils {
                             }
 
                         }
+                        catch(NullPointerException npe)
+                        {
+                            Log.e(TAG, "GraphObject is null!");
+                            npe.printStackTrace();
+                        }
                     }
                 }
         );

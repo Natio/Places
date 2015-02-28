@@ -27,6 +27,8 @@ import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.services.LocationService;
+import com.gcw.sapienza.places.utils.GPlusUtils;
+import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -245,7 +247,8 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
             {
                 final LatLngBounds bounds = builder.build();
 //                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
-                this.gMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+                if(PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.GPLUS)
+                    this.gMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
                     @Override
                     public void onCameraChange(CameraPosition cameraPosition)
                     {
@@ -253,6 +256,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                         gMap.setOnCameraChangeListener(null);
                     }
                 });
+                else gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
             }else{
                 Location currentLocation = gMap.getMyLocation();
                 if(currentLocation != null){

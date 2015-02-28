@@ -64,15 +64,9 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
 
     private ProgressDialog progressDialog;
 
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        GPlusUtils.getInstance().setGoogleApiClient(new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Plus.API)
-                .addScope(Plus.SCOPE_PLUS_LOGIN)
-                .build());
 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -121,21 +115,24 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
         return mergedOptions;
     }
 
+    @Override
     protected void onStop() {
         super.onStop();
 
-        if (GPlusUtils.getInstance().getGoogleApiClient().isConnected()) {
+        if (GPlusUtils.getInstance().getGoogleApiClient() != null &&
+                GPlusUtils.getInstance().getGoogleApiClient().isConnected()) {
             GPlusUtils.getInstance().getGoogleApiClient().disconnect();
         }
     }
 
-        @Override
+    @Override
     public void onBackPressed() {
         //DO NOT call super.onBackPressed
         //to avoid dismissing login
         //view without logging in
     }
 
+    @Override
     public void onConnectionFailed(ConnectionResult result) {
         if (!mIntentInProgress && result.hasResolution()) {
             try {
@@ -151,6 +148,7 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
         }
     }
 
+    @Override
     public void onConnected(Bundle connectionHint)
     {
         // We've resolved any connection errors.  mGoogleApiClient can be used to
@@ -216,14 +214,18 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
         GPlusUtils.getInstance().getGoogleApiClient().connect();
     }
 
+    @Override
     public void onActivityResult(int requestCode, int responseCode, Intent intent) {
-        if (requestCode == RC_SIGN_IN) {
+        // if (requestCode == RC_SIGN_IN) {
             mIntentInProgress = false;
 
-            if (!GPlusUtils.getInstance().getGoogleApiClient().isConnecting()) {
+            if (GPlusUtils.getInstance().getGoogleApiClient() != null &&
+                    !GPlusUtils.getInstance().getGoogleApiClient().isConnecting()) {
                 GPlusUtils.getInstance().getGoogleApiClient().connect();
             }
-        }
+            // Required for making Facebook login work
+            else super.onActivityResult(requestCode, responseCode, intent);
+        // }
     }
 
     @Override
@@ -234,6 +236,12 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
 
     public void signinWithGPlus()
     {
+        GPlusUtils.getInstance().setGoogleApiClient(new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(Plus.API)
+                .addScope(Plus.SCOPE_PLUS_LOGIN)
+                .build());
         GPlusUtils.getInstance().getGoogleApiClient().connect();
 
         progressDialog = ProgressDialog.show(this, null,

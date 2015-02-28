@@ -291,6 +291,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         // Log the user out
         ParseUser.logOut();
 
+        // TODO It needs to be coupled with ParseUser.logOut()
         if(PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.GPLUS &&
                 GPlusUtils.getInstance().getGoogleApiClient() != null)
             GPlusUtils.getInstance().getGoogleApiClient().disconnect();
@@ -381,6 +382,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
                     if(ParseFacebookUtils.getSession() == null) PlacesLoginUtils.loginType = PlacesLoginUtils.LoginType.GPLUS;
                     else PlacesLoginUtils.loginType = PlacesLoginUtils.LoginType.FACEBOOK;
+
+                    PlacesLoginUtils.getInstance().downloadUserInfo(this);
                 }
                 break;
             case SHARE_ACTIVITY_REQUEST_CODE:
