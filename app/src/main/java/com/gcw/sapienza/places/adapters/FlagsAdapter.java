@@ -84,14 +84,23 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
 
         String fb_username = f.getFbName(); // checks if Flag has fb username. if there is one use it otherwise ask FB
         if(fb_username == null){
-            FacebookUtils.getInstance().loadUsernameIntoTextView(user_id, flagViewHolder.username);
+            // FacebookUtils.getInstance().loadUsernameIntoTextView(user_id, flagViewHolder.username);
+            PlacesLoginUtils.getInstance().loadUsernameIntoTextView(user_id, flagViewHolder.username);
 
         }
         else{
             flagViewHolder.username.setText(fb_username);
         }
 
+        /*
         FacebookUtils.getInstance().getFbProfilePictureURL(user_id, PlacesLoginUtils.PicSize.SMALL, new FacebookUtilCallback() {
+            @Override
+            public void onResult(String result, Exception e) {
+                Picasso.with(FlagsAdapter.this.view.getContext()).load(result).transform(transformation).into(flagViewHolder.user_profile_pic);
+            }
+        });
+        */
+        PlacesLoginUtils.getInstance().getFbProfilePictureURL(user_id, PlacesLoginUtils.PicSize.SMALL, new FacebookUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
                 Picasso.with(FlagsAdapter.this.view.getContext()).load(result).transform(transformation).into(flagViewHolder.user_profile_pic);

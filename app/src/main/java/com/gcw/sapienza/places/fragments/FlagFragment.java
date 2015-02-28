@@ -206,7 +206,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             }
         });
 
-        FacebookUtils.getInstance().loadProfilePicIntoImageView(this.id, profilePicimageView, PlacesLoginUtils.PicSize.LARGE);
+        PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(this.id, profilePicimageView, PlacesLoginUtils.PicSize.LARGE);
 
         view.setFocusableInTouchMode(true);
         view.requestFocus();

@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.common.api.GoogleApiClient;
 import java.io.ByteArrayOutputStream;
@@ -105,8 +107,8 @@ public class GPlusUtils {
 
                 PlacesLoginUtils.getInstance().addEntryToLargePicMap(currentPerson.getId(), personPhotoUrl);
 
-                LoadProfileImage lpi = new LoadProfileImage(currentPerson.getId());
-                lpi.execute();
+                // LoadProfileImage lpi = new LoadProfileImage(currentPerson.getId());
+                // lpi.execute();
 
             } else {
                 Toast.makeText(context, "Person information is null", Toast.LENGTH_LONG).show();
@@ -201,5 +203,20 @@ public class GPlusUtils {
                 Log.e(TAG, jsone.toString());
             }
         }
+    }
+
+    public void loadUsernameIntoTextView(String fb_id, final TextView tv)
+    {
+
+    }
+
+    public void getFbProfilePictureURL(final String user_id, final PlacesLoginUtils.PicSize size, final FacebookUtilCallback cbk)
+    {
+
+    }
+
+    public void loadProfilePicIntoImageView(final String user_id, final ImageView imageView, final PlacesLoginUtils.PicSize size)
+    {
+
     }
 }

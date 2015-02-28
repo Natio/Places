@@ -1,5 +1,6 @@
 package com.gcw.sapienza.places.activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.ActivityInfo;
@@ -10,7 +11,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Toast;
-
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.fragments.PlacesLoginFragment;
 import com.gcw.sapienza.places.utils.GPlusUtils;
@@ -21,7 +21,6 @@ import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
@@ -62,6 +61,8 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
 
     private final int fragmentContainer = android.R.id.content;
     private Bundle configOptions;
+
+    private ProgressDialog progressDialog;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -156,10 +157,10 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
         // access Google APIs on behalf of the user.
 
         getGPlusUsername();
-
         getGPlusFriends();
-
         getGPlusAccessToken();
+
+        if(progressDialog != null) progressDialog.dismiss();
     }
 
     @Override
@@ -234,6 +235,9 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
     public void signinWithGPlus()
     {
         GPlusUtils.getInstance().getGoogleApiClient().connect();
+
+        progressDialog = ProgressDialog.show(this, null,
+                getString(com.parse.ui.R.string.com_parse_ui_progress_dialog_text), true, false);
     }
 
     private void getGPlusAccessToken()
@@ -304,7 +308,9 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
                                 GPlusUtils.getInstance().setGoogleApiClient(GPlusUtils.getInstance().getGoogleApiClient());
 
                                 setResult(RESULT_OK);
-                                finish();
+                                // finish();
+                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                startActivity(intent);
                             }
                             else if (e != null)
                             {

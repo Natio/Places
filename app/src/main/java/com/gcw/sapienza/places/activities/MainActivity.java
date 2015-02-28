@@ -371,10 +371,11 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
                 if(resultCode == RESULT_OK){
                     //this.startDownloadingFacebookInfo();
 
+                    // TODO At this time, if G+ login is being used, this code block won't be executed
+                    Log.d(TAG, "Login was successful");
+
                     if(ParseFacebookUtils.getSession() == null) PlacesLoginUtils.loginType = PlacesLoginUtils.LoginType.GPLUS;
                     else PlacesLoginUtils.loginType = PlacesLoginUtils.LoginType.FACEBOOK;
-
-                    PlacesLoginUtils.downloadUserInfo(this);
                 }
                 break;
             case SHARE_ACTIVITY_REQUEST_CODE:

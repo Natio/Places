@@ -3,6 +3,8 @@ package com.gcw.sapienza.places.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.gcw.sapienza.places.activities.PlacesLoginActivity;
 
@@ -181,7 +183,9 @@ public class PlacesLoginUtils {
 
             return true;
         }
-        else if(GPlusUtils.getInstance().getGoogleApiClient() == null) startLoginActivity(activity);
+        else if(GPlusUtils.getInstance().getGoogleApiClient() == null ||
+                !GPlusUtils.getInstance().getGoogleApiClient().isConnected())
+            startLoginActivity(activity);
         else if(GPlusUtils.getInstance().getGoogleApiClient().isConnected())
         {
             loginType = LoginType.GPLUS;
@@ -219,5 +223,23 @@ public class PlacesLoginUtils {
         loginIntent.setClass(activity, PlacesLoginActivity.class);
 
         activity.startActivityForResult(loginIntent, Utils.LOGIN_REQUEST_CODE);
+    }
+
+    public void loadUsernameIntoTextView(String fb_id, final TextView tv)
+    {
+        if(loginType == LoginType.FACEBOOK) FacebookUtils.getInstance().loadUsernameIntoTextView(fb_id, tv);
+        else GPlusUtils.getInstance().loadUsernameIntoTextView(fb_id, tv);
+    }
+
+    public void getFbProfilePictureURL(final String user_id, final PlacesLoginUtils.PicSize size, final FacebookUtilCallback cbk)
+    {
+        if(loginType == LoginType.FACEBOOK) FacebookUtils.getInstance().getFbProfilePictureURL(user_id, size, cbk);
+        else GPlusUtils.getInstance().getFbProfilePictureURL(user_id, size, cbk);
+    }
+
+    public void loadProfilePicIntoImageView(final String user_id, final ImageView imageView, final PlacesLoginUtils.PicSize size)
+    {
+        if(loginType == LoginType.FACEBOOK) FacebookUtils.getInstance().loadProfilePicIntoImageView(user_id, imageView, size);
+        else GPlusUtils.getInstance().loadProfilePicIntoImageView(user_id, imageView, size);
     }
 }

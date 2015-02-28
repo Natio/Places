@@ -147,7 +147,6 @@ public class PlacesApplication extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "CIAO");
 
         PlacesApplication.PLACES_CONTEXT = this.getApplicationContext();
         PlacesApplication.placesApplication = this;
@@ -168,7 +167,8 @@ public class PlacesApplication extends Application{
             @Override
             public void done(ParseConfig parseConfig, ParseException e) {
                 if(e != null){
-                    Log.d(TAG, "Error while configuring: "+e.getMessage());
+                    // Log.d(TAG, "Error while configuring: "+e.getMessage());
+                    Log.d(TAG, "Error while configuring Parse");
                 }
                 else{
                     Log.d(TAG, "Got new Configuration");
@@ -193,7 +193,8 @@ public class PlacesApplication extends Application{
                 if (e == null) {
                     Log.d("com.parse.push", "successfully subscribed to the broadcast channel.");
                 } else {
-                    Log.e("com.parse.push", "failed to subscribe for push", e);
+                    // Log.e("com.parse.push", "failed to subscribe for push", e);
+                    Log.e(TAG, "failed to subscribe for push");
                 }
             }
         });

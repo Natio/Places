@@ -132,7 +132,7 @@ public class LocationService extends Service implements
             @Override
             public void done(List<Flag> flags, ParseException e) {
                 if(e!= null){
-                    Log.e(TAG, e.getMessage());
+                    // Log.e(TAG, e.getMessage());
                     Toast.makeText(getBaseContext(), "Cannot fetch your Flags at the moment,\ntry again later", Toast.LENGTH_SHORT);
                 }
                 if(flags == null){

@@ -335,9 +335,10 @@ var newGoogleUser = function(accessToken, googleData, email) {
   user.set("username", username.toString('base64'));
   user.set("password", password.toString('base64'));
   user.set("email", email);
-  user.set("first_name", firstName);
-  user.set("last_name", lastName);
-  user.set("account_type", 'g');
+  // user.set("first_name", firstName);
+  // user.set("last_name", lastName);
+  user.set("name", firstName + " " + lastName);
+  user.set("account_type", 'g+');
   // Sign up the new User
   return user.signUp().then(function(user) {
     // create a new TokenStorage object to store the user+Google association.
