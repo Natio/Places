@@ -2,41 +2,62 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/green">
+    android:background="@color/green"
+    android:gravity="center_horizontal">
 
     <!-- added screenorientation to avoid rotation in login-->
 
-    <include
-        layout="@layout/com_parse_ui_parse_login_app_logo"
-        android:layout_width="0dp"
-        android:layout_height="0dp" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.65"
-        >
-        <ImageView
+    <!-- I don't what is that for, maybe an old interface?
+        <include
+            layout="@layout/com_parse_ui_parse_login_app_logo"
+            android:layout_width="0dp"
+            android:layout_height="0dp" />
+    -->
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/imageView"
-            android:src="@drawable/title_places"
-            />
-    </RelativeLayout>
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.35"
-        >
-    </RelativeLayout>
+            android:layout_height="0dp"
+            android:layout_weight="0.65"
+            >
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/imageView"
+                android:src="@drawable/title_places"
+                />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.35"
+            >
+        </RelativeLayout>
 
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/gplus_sign_in_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal">
 
-    <include layout="@layout/com_parse_ui_parse_login_form" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Login with: "
+                android:id="@+id/textView"
+                android:textColor="@color/white"
+                android:textSize="16dp"
+                android:gravity="center_vertical" />
 
-    <include layout="@layout/com_parse_ui_parse_login_third_party_section" />
-</LinearLayout>
+            <com.google.android.gms.common.SignInButton
+                android:id="@+id/gplus_sign_in_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <include layout="@layout/com_parse_ui_parse_login_third_party_section" />
+
+            <include layout="@layout/com_parse_ui_parse_login_form" />
+
+        </LinearLayout>
+
+    </LinearLayout>
