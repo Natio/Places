@@ -45,6 +45,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -424,31 +425,33 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
                 if(result == null || result.size() == 0)
                 {
-                    // Toast.makeText(getActivity(), "There are no comments for this flag", Toast.LENGTH_LONG).show();
-                    return;
+                    ArrayList<String> commentsNotFoundText = new ArrayList();
+                    commentsNotFoundText.add("Be the first to comment this flag!");
+                    commentsAdapter = new ArrayAdapter<String>(getActivity(), R.layout.comment_item_layout, commentsNotFoundText);
+                }
+                else {
+                    comments = new ArrayList<Comment>();
+                    comments.addAll(result);
+
+                    // TODO this needs to be replaced in order to show author and timestamp too
+                    ArrayList<String> texts = new ArrayList<String>();
+                    for (int i = 0; i < comments.size(); i++) {
+                        Comment comment = comments.get(i);
+                        String cmnt = comment.getCommentText() + "\n\n" + comment.getUsername() + "\n";
+
+                        Date date = comment.getTimestamp();
+                        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
+                        String sDate = df.format(date);
+
+                        cmnt += sDate;
+
+                        texts.add(cmnt);
+                    }
+
+                    // TODO change adapter's layout
+                    commentsAdapter = new ArrayAdapter<String>(getActivity(), R.layout.comment_item_layout, texts);
                 }
 
-                comments = new ArrayList<Comment>();
-                comments.addAll(result);
-
-                // TODO this needs to be replaced in order to show author and timestamp too
-                ArrayList<String> texts = new ArrayList<String>();
-                for(int i = 0; i < comments.size(); i++)
-                {
-                    Comment comment = comments.get(i);
-                    String cmnt = comment.getCommentText() + "\n\n" + comment.getUsername() + "\n";
-
-                    Date date = comment.getTimestamp();
-                    DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
-                    String sDate = df.format(date);
-
-                    cmnt += sDate;
-
-                    texts.add(cmnt);
-                }
-
-                // TODO change adapter's layout
-                commentsAdapter = new ArrayAdapter<String>(getActivity(), R.layout.comment_item_layout, texts);
                 commentsList.setAdapter(commentsAdapter);
             }
         });
