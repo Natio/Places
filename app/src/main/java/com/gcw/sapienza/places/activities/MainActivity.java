@@ -34,6 +34,7 @@ import com.gcw.sapienza.places.fragments.MyFlagsFragment;
 import com.gcw.sapienza.places.fragments.MyProfleFragment;
 import com.gcw.sapienza.places.fragments.SettingsFragment;
 import com.gcw.sapienza.places.utils.FacebookUtils;
+import com.gcw.sapienza.places.utils.GPlusUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -289,6 +290,10 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     {
         // Log the user out
         ParseUser.logOut();
+
+        if(PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.GPLUS &&
+                GPlusUtils.getInstance().getGoogleApiClient() != null)
+            GPlusUtils.getInstance().getGoogleApiClient().disconnect();
 
         PlacesLoginUtils.getInstance().clearUserData();
 
