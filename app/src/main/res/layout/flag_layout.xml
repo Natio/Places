@@ -121,6 +121,7 @@
         android:adjustViewBounds="true"
         android:background="@drawable/my_border"
         android:id="@+id/pic"
+        android:layout_above="@+id/wow_button"
         android:layout_below="@+id/text"
         android:layout_centerHorizontal="true" />
 

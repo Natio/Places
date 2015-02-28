@@ -17,8 +17,8 @@ public class PlacesLoginUtils {
 
     private static final String TAG = "PlacesLoginUtils";
 
-    private static final String LARGE_PIC_SIZE = "200";
-    private static final String SMALL_PIC_SIZE = "120";
+    protected static final String LARGE_PIC_SIZE = "200";
+    protected static final String SMALL_PIC_SIZE = "120";
 
     public enum PicSize {
         SMALL, LARGE;
@@ -59,7 +59,7 @@ public class PlacesLoginUtils {
     public static void downloadUserInfo(Context context)
     {
         if(loginType == LoginType.FACEBOOK) FacebookUtils.downloadFacebookInfo(context);
-        else if(loginType == LoginType.GPLUS) GPlusUtils.downloadGPlusInfo(context);
+        else if(loginType == LoginType.GPLUS) GPlusUtils.downloadGPlusInfo(GPlusUtils.getInstance().getGoogleApiClient(), context);
     }
 
     public String getCurrentUserId()
@@ -173,7 +173,7 @@ public class PlacesLoginUtils {
         return this.userProfilePicMapLarge.get(profile_id);
     }
 
-    public boolean isSessionValid()
+    public boolean isSessionValid(Activity activity)
     {
         if(FacebookUtils.isFacebookSessionOpened())
         {
@@ -181,6 +181,7 @@ public class PlacesLoginUtils {
 
             return true;
         }
+        else if(GPlusUtils.getInstance().getGoogleApiClient() == null) startLoginActivity(activity);
         else if(GPlusUtils.getInstance().getGoogleApiClient().isConnected())
         {
             loginType = LoginType.GPLUS;

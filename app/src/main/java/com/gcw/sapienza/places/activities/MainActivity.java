@@ -77,7 +77,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(PlacesLoginUtils.getInstance().isSessionValid()) PlacesLoginUtils.getInstance().downloadUserInfo(this);
+        if(PlacesLoginUtils.getInstance().isSessionValid(this)) PlacesLoginUtils.getInstance().downloadUserInfo(this);
         else PlacesLoginUtils.startLoginActivity(this);
 
         setContentView(R.layout.activity_main_drawer_layout);
