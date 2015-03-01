@@ -205,7 +205,12 @@ public class GPlusUtils {
         }
     }
 
-    public void loadUsernameIntoTextView(String fb_id, final TextView tv)
+    public void getFacebookUsernameFromEmail(final String email)
+    {
+        
+    }
+
+    public void loadUsernameIntoTextView(String user_id, final TextView tv)
     {
 
     }
