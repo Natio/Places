@@ -120,10 +120,35 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
         }
 
         //TODO make this accomodate all devices, strange grey bar appears on Android < 5 / Screens < 5"
-        ((CardView)flagViewHolder.itemView).setRadius(20);
-        ((CardView)flagViewHolder.itemView).setShadowPadding(10, 10, 10, 10);
+        //((CardView)flagViewHolder.itemView).setRadius(20);
+        //((CardView)flagViewHolder.itemView).setShadowPadding(10, 10, 10, 10);
+        ((CardView)flagViewHolder.itemView).setShadowPadding(0,0,7,7);
+
+
+        //working on making icons or symbols which represents a category
 
         String[] category_array = PlacesApplication.getInstance().getResources().getStringArray(R.array.categories);
+
+        if (flagViewHolder.mFlag.getCategory().equals(category_array[0])){ //None
+            flagViewHolder.categoryIcon.setImageResource(R.drawable.none);
+        }else if (flagViewHolder.mFlag.getCategory().equals(category_array[1])){ //Thoughts
+            flagViewHolder.categoryIcon.setImageResource(R.drawable.thoughts);
+        }else if (flagViewHolder.mFlag.getCategory().equals(category_array[2])){ //Fun
+            flagViewHolder.categoryIcon.setImageResource(R.drawable.smile);
+        }else if (flagViewHolder.mFlag.getCategory().equals(category_array[3])){ //Music
+            flagViewHolder.categoryIcon.setImageResource(R.drawable.music);
+        }else if (flagViewHolder.mFlag.getCategory().equals(category_array[4])){ //Landscape
+            flagViewHolder.categoryIcon.setImageResource(R.drawable.eyes);
+        }else{ //Food
+            flagViewHolder.categoryIcon.setImageResource(R.drawable.food);
+        }
+
+
+        //************************
+
+/*
+        String[] category_array = PlacesApplication.getInstance().getResources().getStringArray(R.array.categories);
+
 
         if (flagViewHolder.mFlag.getCategory().equals(category_array[0])){ //None
             ((CardView)flagViewHolder.itemView).setCardBackgroundColor(Color.argb(20, 255, 0, 0));
@@ -138,6 +163,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
         }else{ //Food
             ((CardView)flagViewHolder.itemView).setCardBackgroundColor(Color.argb(20, 128, 0, 128));
         }
+        */
     }
 
     @Override
@@ -160,6 +186,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
     @Override
     public FlagsAdapter.FlagsViewHolder onCreateViewHolder(ViewGroup viewGroup, int i)
     {
+
         View itemView = LayoutInflater.
                 from(viewGroup.getContext()).
                 inflate(R.layout.card_layout, viewGroup, false);
@@ -173,6 +200,10 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
         protected final TextView username;
         protected final ImageView user_profile_pic;
         protected final ImageView main_image;
+
+        //new view for icon or line representing the category
+        protected ImageView categoryIcon;
+
         private final Activity mainActivity;
 
         private String password;
@@ -198,6 +229,9 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
             this.user_profile_pic = (ImageView) v.findViewById(R.id.card_profile_pic);
             this.username = (TextView) v.findViewById(R.id.card_textView_username);
             this.main_text = (TextView) v.findViewById(R.id.card_textView_text);
+
+            //new for icon representing category, or a colored line
+            this.categoryIcon= (ImageView) v.findViewById(R.id.categoryIcon);
 
             v.setOnCreateContextMenuListener(this);
         }
