@@ -10,6 +10,7 @@ Parse.Cloud.beforeSave(Parse.User, function(request, response) {
   //ad entry to the _User table with our Facebook ID
   if(Parse.FacebookUtils.isLinked(request.object)){    
     request.object.set("fbId", request.object.get("authData").facebook.id);
+    request.object.set("accountType", "fb");
     console.log("User successfully added with fbId: " + request.object.get("fbId"));
   }
   response.success();
@@ -45,77 +46,77 @@ Parse.Cloud.job("userMigration", function(request, status) {
   var query = new Parse.Query(User);
   query.limit(100);
   query.find({success:function(results){
-	  
-	  var map = [];
-	  
-	  for (var i = 0; i < results.length; i++) { 
-	        var object = results[i];
-	        var data = object.get('authData');
-			//console.log(data["facebook"]["id"]);
-			map[data["facebook"]["id"]] = object;
-	  }
-	  
-	  
-	  var Posts = Parse.Object.extend("Posts");
-	  var query_p = new Parse.Query(Posts);
-	  query_p.limit(1000);
-	  query_p.doesNotExist("owner");
-	  query_p.find({error: function(error){status.error(error);}, 
-	  success: function(results){
-		  console.log("Migrating "+results.length+" records");
-		  for(var k = 0; k < results.length; k++){
-			  var obj = results[k];
-			  var owner = map[obj.get("fbId")];
-			  obj.set("owner", owner);
-		  }
-		  
-		  Parse.Object.saveAll(results , {
-		      success: function(list) {
-		        status.success("Migration completed successfully");
-		      },
-		      error: function(error) {
-		        status.error(error.message);
-		      },
-		    });
-		  
-	  }
-  		
+    
+    var map = [];
+    
+    for (var i = 0; i < results.length; i++) { 
+          var object = results[i];
+          var data = object.get('authData');
+      //console.log(data["facebook"]["id"]);
+      map[data["facebook"]["id"]] = object;
+    }
+    
+    
+    var Posts = Parse.Object.extend("Posts");
+    var query_p = new Parse.Query(Posts);
+    query_p.limit(1000);
+    query_p.doesNotExist("owner");
+    query_p.find({error: function(error){status.error(error);}, 
+    success: function(results){
+      console.log("Migrating "+results.length+" records");
+      for(var k = 0; k < results.length; k++){
+        var obj = results[k];
+        var owner = map[obj.get("fbId")];
+        obj.set("owner", owner);
+      }
+      
+      Parse.Object.saveAll(results , {
+          success: function(list) {
+            status.success("Migration completed successfully");
+          },
+          error: function(error) {
+            status.error(error.message);
+          },
+        });
+      
+    }
+      
   
-  	});
+    });
  
-  	
+    
   },
-	error: function(error){status.error(error.message);}});
+  error: function(error){status.error(error.message);}});
   
   
 });
 
 Parse.Cloud.beforeSave("Posts", function(request, response) {
-	
-	//If owner is not present it is automatically added
-	//in this way old version of the app will continue generating valid falgs
-	if(!request.object.isNew()){
-		response.success();
-		return;
-	}
-	
-	
-	if(request.object.get("owner") == null){
-		request.object.set("owner", Parse.User.current());
-	}
-	
-	if (request.object.get("text").length < 5 
-    	&& request.object.get("audio") == null
-    	&& request.object.get("picture") == null
-    	&& request.object.get("video") == null
-    	&& request.object.get("phone_media") == null) {
-			
-    	response.error("Please, write something meaningful ;)");
-		
-		}
- 	   else {
-    	   response.success();
-  	 	}
+  
+  //If owner is not present it is automatically added
+  //in this way old version of the app will continue generating valid falgs
+  if(!request.object.isNew()){
+    response.success();
+    return;
+  }
+  
+  
+  if(request.object.get("owner") == null){
+    request.object.set("owner", Parse.User.current());
+  }
+  
+  if (request.object.get("text").length < 5 
+      && request.object.get("audio") == null
+      && request.object.get("picture") == null
+      && request.object.get("video") == null
+      && request.object.get("phone_media") == null) {
+      
+      response.error("Please, write something meaningful ;)");
+    
+    }
+     else {
+         response.success();
+      }
 });
 
 Parse.Cloud.beforeSave(Parse.Installation, function(request, response) {
@@ -200,13 +201,13 @@ Parse.Cloud.afterSave("Reported_Posts", function(request, status) {
 
 // ========== Google Plus login ==========
 
-var googleClientId = '575576178991-5oeui21gccun9ngtvoqab02u4vl0o6aq.apps.googleusercontent.com';	//The client ID obtained from the Google Developers Console
+var googleClientId = '575576178991-5oeui21gccun9ngtvoqab02u4vl0o6aq.apps.googleusercontent.com';  //The client ID obtained from the Google Developers Console
 var googleClientSecret = 'YOUR-GOOGLE-CLIENT-SECRET';   //The client secret obtained from the Google Developers Console
 
-var googleValidateEndpoint = 'https://www.googleapis.com/oauth2/v1/userinfo';	//this is the only verification link you need to verify the user's Google Access Token
+var googleValidateEndpoint = 'https://www.googleapis.com/oauth2/v1/userinfo'; //this is the only verification link you need to verify the user's Google Access Token
 
-var googleRedirectEndpoint = 'https://google.com/login/oauth/authorize?';	//not used (handled client side)
-var googleUserEndpoint = 'https://api.google.com/user';						//not used (Google has HTTP requests for the user profile using their User ID but they're not necessary here, and this isn't the right address)
+var googleRedirectEndpoint = 'https://google.com/login/oauth/authorize?'; //not used (handled client side)
+var googleUserEndpoint = 'https://api.google.com/user';           //not used (Google has HTTP requests for the user profile using their User ID but they're not necessary here, and this isn't the right address)
 
 
 /**
@@ -364,14 +365,14 @@ var newGoogleUser = function(accessToken, googleData, email) {
   name = name.split(" ");
   var firstName = name[0];
   if(name.length > 1)
-	var lastName = name[name.length-1];
+  var lastName = name[name.length-1];
   user.set("username", username.toString('base64'));
   user.set("password", password.toString('base64'));
   user.set("email", email);
   // user.set("first_name", firstName);
   // user.set("last_name", lastName);
   user.set("name", firstName + " " + lastName);
-  user.set("account_type", 'g+');
+  user.set("accountType", 'g+');
   // Sign up the new User
   return user.signUp().then(function(user) {
     // create a new TokenStorage object to store the user+Google association.

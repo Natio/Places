@@ -9,26 +9,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.models.Flag;
-import com.gcw.sapienza.places.models.PlacesParseUser;
-import com.gcw.sapienza.places.utils.FacebookUtilCallback;
+import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.parse.CountCallback;
-import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-
-import java.util.List;
 
 /**
  * Created by snowblack on 2/26/15.
@@ -85,12 +78,16 @@ public class MyProfileFragment extends Fragment {
         friendsView = (Button)view.findViewById(R.id.friendsView);
 
 
+        /*
         FacebookUtils.getInstance().getFacebookUsernameFromID(this.fbId, new FacebookUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
                 fbNameView.setText("User name: " + result);
             }
         });
+        */
+
+        fbNameView.setText("User name: " + ((PlacesUser) ParseUser.getCurrentUser()).getName());
 
         FacebookUtils.getInstance().loadProfilePicIntoImageView(this.fbId, fbPicView, PlacesLoginUtils.PicSize.LARGE);
 
@@ -109,9 +106,9 @@ public class MyProfileFragment extends Fragment {
         });
 
 
-        ParseQuery<PlacesParseUser> queryUsers = ParseQuery.getQuery("_User");
-        queryUsers.whereEqualTo(PlacesParseUser.FACEBOOK_ID_KEY, this.fbId);
-        PlacesParseUser user;
+        ParseQuery<PlacesUser> queryUsers = ParseQuery.getQuery("_User");
+        queryUsers.whereEqualTo(PlacesUser.FACEBOOK_ID_KEY, this.fbId);
+        PlacesUser user;
         try {
             user = queryUsers.getFirst();
         } catch (ParseException e) {
