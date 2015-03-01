@@ -185,18 +185,20 @@
 
     </RelativeLayout>
 
-    <SwipeRefreshLayout
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:visibility="gone"
         android:id="@+id/comments_holder"
-        android:background="@color/white">
+        android:background="@color/white"
+        tools:context="com.gcw.sapienza.places.activities.MainActivity" >
 
         <ListView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/comments_list" />
 
-    </SwipeRefreshLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

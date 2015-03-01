@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.models.Flag;
@@ -17,8 +18,14 @@ import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.parse.CountCallback;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
+import java.util.List;
 
 /**
  * Created by snowblack on 2/26/15.
@@ -26,15 +33,38 @@ import com.parse.ParseQuery;
 public class MyProfileFragment extends Fragment {
 
     private static final String TAG = "MyProfileFragment";
+    private static final String FBID = "FacebookID";
+
+    //TODO use the bundle with arguments so to use the Fragment also for non current users
+    private String fbId;
 
     private ImageView fbPicView;
     private TextView fbNameView;
     private TextView postsView;
     private TextView wowedView;
 
+//    public MyProfileFragment(String fbId){
+//        this.fbId = fbId;
+//    }
+
+    public static final MyProfileFragment newInstance(String fbId){
+
+        MyProfileFragment fragment = new MyProfileFragment();
+
+        Bundle bundle = new Bundle();
+        bundle.putString(FBID, fbId);
+
+        fragment.setArguments(bundle);
+        
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
+        this.fbId = getArguments().getString(FBID);
     }
 
     @Override
@@ -50,17 +80,17 @@ public class MyProfileFragment extends Fragment {
         wowedView = (TextView)view.findViewById(R.id.wowedView);
 
 
-        FacebookUtils.getInstance().getFacebookUsernameFromID(PlacesLoginUtils.getInstance().getCurrentUserId(), new FacebookUtilCallback() {
+        FacebookUtils.getInstance().getFacebookUsernameFromID(this.fbId, new FacebookUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
                 fbNameView.setText("User name: " + result);
             }
         });
 
-        FacebookUtils.getInstance().loadProfilePicIntoImageView(PlacesLoginUtils.getInstance().getCurrentUserId(), fbPicView, PlacesLoginUtils.PicSize.LARGE);
+        FacebookUtils.getInstance().loadProfilePicIntoImageView(this.fbId, fbPicView, PlacesLoginUtils.PicSize.LARGE);
 
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
-        query.whereEqualTo("fbId", PlacesLoginUtils.getInstance().getCurrentUserId());
+        query.whereEqualTo("fbId", this.fbId);
         query.countInBackground(new CountCallback() {
             @Override
             public void done(int i, ParseException e) {
@@ -68,6 +98,33 @@ public class MyProfileFragment extends Fragment {
                     postsView.setText("Flags placed: " + i);
                 }else{
                     Log.e(TAG, e.getMessage());
+                    Toast.makeText(getActivity(), "There was a problem retrieving your Flags", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
+        ParseQuery queryUsers = ParseQuery.getQuery("_User");
+        queryUsers.whereEqualTo("fbId", this.fbId);
+        ParseObject user;
+        try {
+            user = queryUsers.getFirst();
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Toast.makeText(getActivity(), "An error occurred while retrieving user data", Toast.LENGTH_SHORT).show();
+            return view;
+        }
+
+        ParseQuery wows = ParseQuery.getQuery("Wow_Lol_Boo");
+        wows.whereEqualTo("user", user);
+        wows.countInBackground(new CountCallback() {
+            @Override
+            public void done(int i, ParseException e) {
+                if (e == null) {
+                    wowedView.setText("Flags wowed: " + i);
+                } else {
+                    Log.e(TAG, e.getMessage());
+                    Toast.makeText(getActivity(), "An error occurred while retrieving social data", Toast.LENGTH_SHORT).show();
                 }
             }
         });
