@@ -17,6 +17,7 @@ import com.gcw.sapienza.places.models.Comment;
 import com.gcw.sapienza.places.models.CustomParseObject;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.models.FlagReport;
+import com.gcw.sapienza.places.models.PlacesParseUser;
 import com.gcw.sapienza.places.services.ILocationUpdater;
 import com.gcw.sapienza.places.services.JSONWeatherTask;
 import com.gcw.sapienza.places.services.LocationService;
@@ -156,11 +157,14 @@ public class PlacesApplication extends Application{
         }
 
 
-        // initialize Parse.com
+        //register subclasses of Parse objects
         ParseObject.registerSubclass(Flag.class);
         ParseObject.registerSubclass(FlagReport.class);
         ParseObject.registerSubclass(CustomParseObject.class);
         ParseObject.registerSubclass(Comment.class);
+        ParseObject.registerSubclass(PlacesParseUser.class);
+
+        // initialize Parse.com
         Parse.initialize(this, PARSE_COM_APP_KEY , PARSE_COM_CLIENT_KEY);
         ParseFacebookUtils.initialize(getString(R.string.app_id));
         ParseConfig.getInBackground(new ConfigCallback() {

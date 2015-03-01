@@ -119,6 +119,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
             flagViewHolder.main_image.setImageDrawable(null);
         }
 
+        //TODO make this accomodate all devices, strange grey bar appears on Android < 5 / Screens < 5"
         ((CardView)flagViewHolder.itemView).setRadius(20);
         ((CardView)flagViewHolder.itemView).setShadowPadding(10, 10, 10, 10);
 

@@ -7,13 +7,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.models.Flag;
+import com.gcw.sapienza.places.models.PlacesParseUser;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
@@ -42,6 +45,7 @@ public class MyProfileFragment extends Fragment {
     private TextView fbNameView;
     private TextView postsView;
     private TextView wowedView;
+    private Button friendsView;
 
 //    public MyProfileFragment(String fbId){
 //        this.fbId = fbId;
@@ -78,6 +82,7 @@ public class MyProfileFragment extends Fragment {
         fbNameView = (TextView)view.findViewById(R.id.fbNameView);
         postsView = (TextView)view.findViewById(R.id.postsView);
         wowedView = (TextView)view.findViewById(R.id.wowedView);
+        friendsView = (Button)view.findViewById(R.id.friendsView);
 
 
         FacebookUtils.getInstance().getFacebookUsernameFromID(this.fbId, new FacebookUtilCallback() {
@@ -104,9 +109,9 @@ public class MyProfileFragment extends Fragment {
         });
 
 
-        ParseQuery queryUsers = ParseQuery.getQuery("_User");
-        queryUsers.whereEqualTo("fbId", this.fbId);
-        ParseObject user;
+        ParseQuery<PlacesParseUser> queryUsers = ParseQuery.getQuery("_User");
+        queryUsers.whereEqualTo(PlacesParseUser.FACEBOOK_ID_KEY, this.fbId);
+        PlacesParseUser user;
         try {
             user = queryUsers.getFirst();
         } catch (ParseException e) {
@@ -126,6 +131,13 @@ public class MyProfileFragment extends Fragment {
                     Log.e(TAG, e.getMessage());
                     Toast.makeText(getActivity(), "An error occurred while retrieving social data", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        friendsView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity)getActivity()).switchToOtherFrag(new MyFriendsFragment());
             }
         });
 

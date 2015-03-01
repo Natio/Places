@@ -6,6 +6,7 @@
     <color name="white">#ffffffff</color>
     <color name="green">#00884a</color>
     <color name="transparent_green">#dd00884a</color>
+    <color name="transparent">#00000000</color>
     <color name="dark_green">#244E1D</color>
     <color name="grey">#ff888888</color>
     <color name="light_grey">#ffcccccc</color>
