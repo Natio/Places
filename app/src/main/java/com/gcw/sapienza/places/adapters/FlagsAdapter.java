@@ -3,7 +3,6 @@ package com.gcw.sapienza.places.adapters;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -24,7 +23,6 @@ import com.gcw.sapienza.places.fragments.FlagFragment;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.CropCircleTransformation;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
-import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseException;
@@ -77,7 +75,19 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
         flagViewHolder.setCurrentFlag(f);
         flagViewHolder.flagAdapter = this;
 
-        if(f.getPassword() == null) flagViewHolder.main_text.setText(f.getText());
+        if(f.getPassword() == null) {
+            String text = f.getText();
+            if(text != null && text.length() > 0){
+                flagViewHolder.main_text.setVisibility(View.VISIBLE);
+                flagViewHolder.main_text.setText(f.getText());
+            }
+            else{
+                flagViewHolder.main_text.setVisibility(View.GONE);
+            }
+
+
+
+        }
         else flagViewHolder.main_text.setText("***Private flag***");
 
         String user_id = f.getFbId();
@@ -92,14 +102,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
             flagViewHolder.username.setText(fb_username);
         }
 
-        /*
-        FacebookUtils.getInstance().getFbProfilePictureURL(user_id, PlacesLoginUtils.PicSize.SMALL, new FacebookUtilCallback() {
-            @Override
-            public void onResult(String result, Exception e) {
-                Picasso.with(FlagsAdapter.this.view.getContext()).load(result).transform(transformation).into(flagViewHolder.user_profile_pic);
-            }
-        });
-        */
+
         PlacesLoginUtils.getInstance().getFbProfilePictureURL(user_id, PlacesLoginUtils.PicSize.SMALL, new FacebookUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
@@ -110,9 +113,10 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
         ParseFile pic = f.getThumbnail();
         if(pic != null && f.getPassword() == null){
             String url = pic.getUrl();
-            Picasso.with(this.view.getContext()).load(url).into(flagViewHolder.main_image);
             flagViewHolder.main_image.setVisibility(View.VISIBLE);
             flagViewHolder.main_image.setClickable(false);
+            Picasso.with(this.view.getContext()).load(url).fit().centerCrop().into(flagViewHolder.main_image);
+
         }
         else{
             flagViewHolder.main_image.setVisibility(View.GONE);
@@ -301,6 +305,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
                     .setCancelable(true)
                     .setNegativeButton("Cancel",
                             new DialogInterface.OnClickListener() {
+                                @Override
                                 public void onClick(DialogInterface dialog,int id)
                                 {
                                     dialog.dismiss();
@@ -308,6 +313,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
                             })
                     .setPositiveButton("Confirm",
                             new DialogInterface.OnClickListener() {
+                                @Override
                                 public void onClick(DialogInterface dialog,int id)
                                 {
                                     password = userInput.getText().toString();
