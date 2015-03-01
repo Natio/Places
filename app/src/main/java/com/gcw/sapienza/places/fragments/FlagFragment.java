@@ -31,6 +31,7 @@ import com.gcw.sapienza.places.activities.ShareActivity;
 import com.gcw.sapienza.places.models.Comment;
 import com.gcw.sapienza.places.models.CustomParseObject;
 import com.gcw.sapienza.places.models.Flag;
+import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
@@ -202,12 +203,16 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         final String bottomLineText = date + weatherString + "\nCategory: " + category + "\n" + inPlaceString;
 
+        /*
         FacebookUtils.getInstance().getFacebookUsernameFromID(this.id, new FacebookUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
                 authorTextView.setText("Author: " + result + bottomLineText);
             }
         });
+        */
+
+        authorTextView.setText("Author: " + ((PlacesUser)ParseUser.getCurrentUser()).getName() + bottomLineText);
 
         PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(this.id, profilePicimageView, PlacesLoginUtils.PicSize.LARGE);
 
@@ -504,6 +509,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                 comment.put("userId", PlacesLoginUtils.getInstance().getCurrentUserId());
                                 comment.put("flagId", flagId);
 
+                                /*
                                 FacebookUtils.getInstance().getFacebookUsernameFromID(PlacesLoginUtils.getInstance().getCurrentUserId(), new FacebookUtilCallback() {
                                     @Override
                                     public void onResult(String result, Exception e)
@@ -512,6 +518,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                         comment.saveInBackground();
                                     }
                                 });
+                                */
+
+                                comment.setUsername(((PlacesUser)ParseUser.getCurrentUser()).getName());
 
                                 dialog.dismiss();
 
@@ -955,8 +964,18 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
     private void toggleComments()
     {
-        if(commentsHolder.getVisibility() == View.VISIBLE) commentsHolder.setVisibility(View.GONE);
-        else commentsHolder.setVisibility(View.VISIBLE);
+        if(commentsHolder.getVisibility() == View.VISIBLE)
+        {
+            commentsHolder.setVisibility(View.GONE);
+            commentsButton.setVisibility(View.VISIBLE);
+            wowButton.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            commentsHolder.setVisibility(View.VISIBLE);
+            commentsButton.setVisibility(View.GONE);
+            wowButton.setVisibility(View.GONE);
+        }
     }
 
     private void changeLayoutAccordingToMediaType(){

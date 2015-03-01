@@ -13,11 +13,11 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textMultiLine"
+        android:inputType="textMultiLine|textCapSentences"
         android:ems="@integer/max_text_size"
         android:background="@android:color/transparent"
         android:id="@+id/new_comment"
-        android:gravity="center"
+        android:gravity="center_vertical|center_horizontal"
         android:layout_below="@+id/author_divider"
         android:layout_centerHorizontal="true"
         android:textSize="22sp" />

@@ -16,7 +16,9 @@ import com.facebook.model.GraphObject;
 import com.facebook.model.GraphUser;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.activities.PlacesLoginActivity;
+import com.gcw.sapienza.places.models.PlacesUser;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -136,6 +138,7 @@ public final class FacebookUtils {
      * @param fb_id FB user id
      * @param cbk   callback parameter. MUST not be null. User Username will be given as a parameter of onResult method
      */
+    @Deprecated
     public void getFacebookUsernameFromID(final String fb_id, final FacebookUtilCallback cbk) {
         String username = PlacesLoginUtils.getInstance().getUserNameFromId(fb_id);
         if (username != null) {
@@ -214,7 +217,9 @@ public final class FacebookUtils {
      * @param fb_id facebook id of user
      * @param tv    the TextView instance where to load the username
      */
+    @Deprecated
     public void loadUsernameIntoTextView(String fb_id, final TextView tv) {
+        /*
         this.getFacebookUsernameFromID(fb_id, new FacebookUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
@@ -226,6 +231,9 @@ public final class FacebookUtils {
                 }
             }
         });
+        */
+
+        tv.setText(((PlacesUser) ParseUser.getCurrentUser()).getName());
     }
 
 

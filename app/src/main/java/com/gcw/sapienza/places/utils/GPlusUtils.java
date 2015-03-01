@@ -8,12 +8,19 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.gcw.sapienza.places.models.PlacesUser;
 import com.google.android.gms.common.api.GoogleApiClient;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.parse.Parse;
+import com.parse.ParseAnonymousUtils;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -205,17 +212,19 @@ public class GPlusUtils {
         }
     }
 
-    public void getFacebookUsernameFromEmail(final String email)
+    @Deprecated
+    public String getGPlusUsername()
     {
-        
+        return ((PlacesUser)ParseUser.getCurrentUser()).getName();
     }
 
+    @Deprecated
     public void loadUsernameIntoTextView(String user_id, final TextView tv)
     {
 
     }
 
-    public void getFbProfilePictureURL(final String user_id, final PlacesLoginUtils.PicSize size, final FacebookUtilCallback cbk)
+    public void getGPlusProfilePictureURL(final String user_id, final PlacesLoginUtils.PicSize size, final FacebookUtilCallback cbk)
     {
 
     }

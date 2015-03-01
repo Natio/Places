@@ -7,6 +7,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gcw.sapienza.places.activities.PlacesLoginActivity;
+import com.gcw.sapienza.places.models.PlacesUser;
+import com.parse.ParseUser;
 import com.parse.ui.ParseLoginActivity;
 
 import java.security.InvalidParameterException;
@@ -229,14 +231,15 @@ public class PlacesLoginUtils {
 
     public void loadUsernameIntoTextView(String fb_id, final TextView tv)
     {
-        if(loginType == LoginType.FACEBOOK) FacebookUtils.getInstance().loadUsernameIntoTextView(fb_id, tv);
-        else GPlusUtils.getInstance().loadUsernameIntoTextView(fb_id, tv);
+        // if(loginType == LoginType.FACEBOOK) FacebookUtils.getInstance().loadUsernameIntoTextView(fb_id, tv);
+        // else GPlusUtils.getInstance().loadUsernameIntoTextView(fb_id, tv);
+        tv.setText(((PlacesUser) ParseUser.getCurrentUser()).getName());
     }
 
     public void getFbProfilePictureURL(final String user_id, final PlacesLoginUtils.PicSize size, final FacebookUtilCallback cbk)
     {
         if(loginType == LoginType.FACEBOOK) FacebookUtils.getInstance().getFbProfilePictureURL(user_id, size, cbk);
-        else GPlusUtils.getInstance().getFbProfilePictureURL(user_id, size, cbk);
+        else GPlusUtils.getInstance().getGPlusProfilePictureURL(user_id, size, cbk);
     }
 
     public void loadProfilePicIntoImageView(final String user_id, final ImageView imageView, final PlacesLoginUtils.PicSize size)

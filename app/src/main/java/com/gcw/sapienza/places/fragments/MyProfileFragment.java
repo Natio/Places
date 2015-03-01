@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.models.Flag;
+import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
@@ -80,12 +81,16 @@ public class MyProfileFragment extends Fragment {
         wowedView = (TextView)view.findViewById(R.id.wowedView);
 
 
+        /*
         FacebookUtils.getInstance().getFacebookUsernameFromID(this.fbId, new FacebookUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
                 fbNameView.setText("User name: " + result);
             }
         });
+        */
+
+        fbNameView.setText("User name: " + ((PlacesUser)ParseUser.getCurrentUser()).getName());
 
         FacebookUtils.getInstance().loadProfilePicIntoImageView(this.fbId, fbPicView, PlacesLoginUtils.PicSize.LARGE);
 
