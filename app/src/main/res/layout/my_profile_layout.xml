@@ -19,4 +19,24 @@
             android:layout_marginTop="10dp"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text=""/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/postsView"
+        android:textColor="@color/transparent_green"
+        android:layout_below="@id/fbNameView"
+        android:layout_marginTop="10dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text=""/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wowedView"
+        android:textColor="@color/transparent_green"
+        android:layout_below="@id/postsView"
+        android:layout_marginTop="10dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text=""/>
 </RelativeLayout>

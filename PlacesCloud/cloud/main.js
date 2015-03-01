@@ -5,6 +5,39 @@
 //  response.success("Hello world!");
 //});
 
+Parse.Cloud.beforeSave(Parse.User, function(request, response) {
+  //in case we have logged in with Facebook, we add
+  //ad entry to the _User table with our Facebook ID
+  if(Parse.FacebookUtils.isLinked(request.object)){    
+    request.object.set("fbId", request.object.get("authData").facebook.id);
+    console.log("User successfully added with fbId: " + request.object.get("fbId"));
+  }
+  response.success();
+});
+
+Parse.Cloud.job("addFbId", function(request, status){
+  Parse.Cloud.useMasterKey();
+  var User = Parse.Object.extend("_User");
+  var query = new Parse.Query(User);
+  query.find({success:function(results){
+    for(var i = 0; i < results.length; i++){
+        if(Parse.FacebookUtils.isLinked(results[i])){
+          // console.log("User with fbId: " + results[i].get("authData").facebook.id);
+          results[i].set("fbId", results[i].get("authData").facebook.id);
+        }
+    }
+    Parse.Object.saveAll(results , {
+      success: function(list) {
+        status.success("Facebook IDs added to eligible users");
+      },
+      error: function(error) {
+        status.error(error.message);
+      },
+    });
+  },
+  error: function(error){status.error(error.message);}});
+});
+
 Parse.Cloud.job("userMigration", function(request, status) {
   // Set up to modify user data
   Parse.Cloud.useMasterKey();
