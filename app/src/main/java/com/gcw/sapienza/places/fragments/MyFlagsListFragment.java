@@ -34,6 +34,7 @@ import java.util.List;
 public class MyFlagsListFragment extends Fragment {
 
     private static final String TAG = "MyFlagsListFragment";
+
     private static final String NO_VALID_FLAG_SELECTED = "No valid Flag selected";
 
     private static final String FLAG_DELETED = "Flag deleted";
