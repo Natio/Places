@@ -3,7 +3,6 @@ package com.gcw.sapienza.places.adapters;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -24,7 +23,6 @@ import com.gcw.sapienza.places.fragments.FlagFragment;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.CropCircleTransformation;
 import com.gcw.sapienza.places.utils.FacebookUtilCallback;
-import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseException;
@@ -77,7 +75,19 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
         flagViewHolder.setCurrentFlag(f);
         flagViewHolder.flagAdapter = this;
 
-        if(f.getPassword() == null) flagViewHolder.main_text.setText(f.getText());
+        if(f.getPassword() == null) {
+            String text = f.getText();
+            if(text != null && text.length() > 0){
+                flagViewHolder.main_text.setVisibility(View.VISIBLE);
+                flagViewHolder.main_text.setText(f.getText());
+            }
+            else{
+                flagViewHolder.main_text.setVisibility(View.GONE);
+            }
+
+
+
+        }
         else flagViewHolder.main_text.setText("***Private flag***");
 
         String user_id = f.getFbId();
@@ -92,14 +102,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
             flagViewHolder.username.setText(fb_username);
         }
 
-        /*
-        FacebookUtils.getInstance().getFbProfilePictureURL(user_id, PlacesLoginUtils.PicSize.SMALL, new FacebookUtilCallback() {
-            @Override
-            public void onResult(String result, Exception e) {
-                Picasso.with(FlagsAdapter.this.view.getContext()).load(result).transform(transformation).into(flagViewHolder.user_profile_pic);
-            }
-        });
-        */
+
         PlacesLoginUtils.getInstance().getFbProfilePictureURL(user_id, PlacesLoginUtils.PicSize.SMALL, new FacebookUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
@@ -110,9 +113,10 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
         ParseFile pic = f.getThumbnail();
         if(pic != null && f.getPassword() == null){
             String url = pic.getUrl();
-            Picasso.with(this.view.getContext()).load(url).into(flagViewHolder.main_image);
             flagViewHolder.main_image.setVisibility(View.VISIBLE);
             flagViewHolder.main_image.setClickable(false);
+            Picasso.with(this.view.getContext()).load(url).fit().centerCrop().into(flagViewHolder.main_image);
+
         }
         else{
             flagViewHolder.main_image.setVisibility(View.GONE);
@@ -120,10 +124,35 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
         }
 
         //TODO make this accomodate all devices, strange grey bar appears on Android < 5 / Screens < 5"
-        ((CardView)flagViewHolder.itemView).setRadius(20);
-        ((CardView)flagViewHolder.itemView).setShadowPadding(10, 10, 10, 10);
+        //((CardView)flagViewHolder.itemView).setRadius(20);
+        //((CardView)flagViewHolder.itemView).setShadowPadding(10, 10, 10, 10);
+        ((CardView)flagViewHolder.itemView).setShadowPadding(0,0,7,7);
+
+
+        //working on making icons or symbols which represents a category
 
         String[] category_array = PlacesApplication.getInstance().getResources().getStringArray(R.array.categories);
+
+        if (flagViewHolder.mFlag.getCategory().equals(category_array[0])){ //None
+            flagViewHolder.categoryIcon.setImageResource(R.drawable.none);
+        }else if (flagViewHolder.mFlag.getCategory().equals(category_array[1])){ //Thoughts
+            flagViewHolder.categoryIcon.setImageResource(R.drawable.thoughts);
+        }else if (flagViewHolder.mFlag.getCategory().equals(category_array[2])){ //Fun
+            flagViewHolder.categoryIcon.setImageResource(R.drawable.smile);
+        }else if (flagViewHolder.mFlag.getCategory().equals(category_array[3])){ //Music
+            flagViewHolder.categoryIcon.setImageResource(R.drawable.music);
+        }else if (flagViewHolder.mFlag.getCategory().equals(category_array[4])){ //Landscape
+            flagViewHolder.categoryIcon.setImageResource(R.drawable.eyes);
+        }else{ //Food
+            flagViewHolder.categoryIcon.setImageResource(R.drawable.food);
+        }
+
+
+        //************************
+
+/*
+        String[] category_array = PlacesApplication.getInstance().getResources().getStringArray(R.array.categories);
+
 
         if (flagViewHolder.mFlag.getCategory().equals(category_array[0])){ //None
             ((CardView)flagViewHolder.itemView).setCardBackgroundColor(Color.argb(20, 255, 0, 0));
@@ -138,6 +167,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
         }else{ //Food
             ((CardView)flagViewHolder.itemView).setCardBackgroundColor(Color.argb(20, 128, 0, 128));
         }
+        */
     }
 
     @Override
@@ -160,6 +190,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
     @Override
     public FlagsAdapter.FlagsViewHolder onCreateViewHolder(ViewGroup viewGroup, int i)
     {
+
         View itemView = LayoutInflater.
                 from(viewGroup.getContext()).
                 inflate(R.layout.card_layout, viewGroup, false);
@@ -173,6 +204,10 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
         protected final TextView username;
         protected final ImageView user_profile_pic;
         protected final ImageView main_image;
+
+        //new view for icon or line representing the category
+        protected ImageView categoryIcon;
+
         private final Activity mainActivity;
 
         private String password;
@@ -198,6 +233,9 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
             this.user_profile_pic = (ImageView) v.findViewById(R.id.card_profile_pic);
             this.username = (TextView) v.findViewById(R.id.card_textView_username);
             this.main_text = (TextView) v.findViewById(R.id.card_textView_text);
+
+            //new for icon representing category, or a colored line
+            this.categoryIcon= (ImageView) v.findViewById(R.id.categoryIcon);
 
             v.setOnCreateContextMenuListener(this);
         }
@@ -267,6 +305,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
                     .setCancelable(true)
                     .setNegativeButton("Cancel",
                             new DialogInterface.OnClickListener() {
+                                @Override
                                 public void onClick(DialogInterface dialog,int id)
                                 {
                                     dialog.dismiss();
@@ -274,6 +313,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
                             })
                     .setPositiveButton("Confirm",
                             new DialogInterface.OnClickListener() {
+                                @Override
                                 public void onClick(DialogInterface dialog,int id)
                                 {
                                     password = userInput.getText().toString();
