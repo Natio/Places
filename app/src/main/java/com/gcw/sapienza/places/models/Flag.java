@@ -12,13 +12,13 @@ import java.util.Date;
  * Class that encapsulate the Post table on Parse.com
  */
 @ParseClassName("Posts")
-public class Flag extends ParseObject{
+public class Flag extends ParseObject {
 
     public static final long MAX_FILE_SIZE_BYTES = 10000000;
 
     public static final String AUDIO_KEY = "audio";
     public static final String VIDEO_KEY = "video";
-    public static final String PICTURE_KEY= "picture";
+    public static final String PICTURE_KEY = "picture";
     public static final String PHONE_MEDIA_KEY = "phone_media";
     public static final String WEATHER_KEY = "weather";
     public static final String FB_ID_KEY = "fbId";
@@ -35,108 +35,154 @@ public class Flag extends ParseObject{
     public static final String PASSWORD_KEY = "password";
 
 
-    public void setOwner(ParseUser owner){
+    public void setOwner(ParseUser owner) {
         this.put(OWNER_KEY, owner);
     }
 
-    public ParseUser getOnwer(){
-        return (ParseUser)this.get(OWNER_KEY);
+    public ParseUser getOnwer() {
+        return (ParseUser) this.get(OWNER_KEY);
     }
 
-    public String getFlagId() { return this.getObjectId(); }
-
-    public String getText(){ return (String)this.get(TEXT_KEY); }
-
-    public String getCategory(){ return(String)this.get(CATEGORY_KEY); }
-
-    public String getFbId()
-    {
-        return (String)this.get(FB_ID_KEY);
+    public String getFlagId() {
+        return this.getObjectId();
     }
 
-    public ParseGeoPoint getLocation(){
-        return (ParseGeoPoint)this.get(LOCATION_KEY);
+    public String getText() {
+        return (String) this.get(TEXT_KEY);
     }
 
-    public Date getDate() { return this.getCreatedAt(); }
-
-    public ParseFile getPic() { return (ParseFile)this.get(PICTURE_KEY); }
-
-    public String getWeather() { return (String)this.get(WEATHER_KEY);  }
-
-    public ParseFile getAudio() { return (ParseFile)this.get(AUDIO_KEY);  }
-
-    public ParseFile getVideo() { return (ParseFile)this.get(VIDEO_KEY);  }
-
-    public ParseFile getThumbnail() { return (ParseFile)this.get(THUMBNAIL_KEY);  }
-
-    public String getFbName(){
-        return (String)this.get(FB_NAME_KEY);
+    public void setText(String text) {
+        this.put(TEXT_KEY, text);
     }
 
-    public boolean getInPlace() { return this.getBoolean(IN_PLACE_KEY); }
+    public String getCategory() {
+        return (String) this.get(CATEGORY_KEY);
+    }
 
-    public int getWowCount() { return this.getInt(WOW_COUNT_KEY); }
+    public void setCategory(String category) {
+        this.put(CATEGORY_KEY, category);
+    }
 
-    public int getLolCount() { return this.getInt(LOL_COUNT_KEY); }
+    public String getFbId() {
+        return (String) this.get(FB_ID_KEY);
+    }
 
-    public int getBooCount() { return this.getInt(BOO_COUNT_KEY); }
+    public void setFbId(String fbId) {
+        this.put(FB_ID_KEY, fbId);
+    }
 
-    public String getPassword() { return this.getString(PASSWORD_KEY); }
+    public ParseGeoPoint getLocation() {
+        return (ParseGeoPoint) this.get(LOCATION_KEY);
+    }
 
-    public void setThumbnailFile(ParseFile pic){
+    public void setLocation(ParseGeoPoint location) {
+        this.put(LOCATION_KEY, location);
+    }
+
+    public Date getDate() {
+        return this.getCreatedAt();
+    }
+
+    public ParseFile getPic() {
+        return (ParseFile) this.get(PICTURE_KEY);
+    }
+
+    public String getWeather() {
+        return (String) this.get(WEATHER_KEY);
+    }
+
+    public void setWeather(String weather) {
+        this.put(WEATHER_KEY, weather);
+    }
+
+    public ParseFile getAudio() {
+        return (ParseFile) this.get(AUDIO_KEY);
+    }
+
+    public ParseFile getVideo() {
+        return (ParseFile) this.get(VIDEO_KEY);
+    }
+
+    public ParseFile getThumbnail() {
+        return (ParseFile) this.get(THUMBNAIL_KEY);
+    }
+
+    public String getFbName() {
+        return (String) this.get(FB_NAME_KEY);
+    }
+
+    public void setFbName(String name) {
+        this.put(FB_NAME_KEY, name);
+    }
+
+    public boolean getInPlace() {
+        return this.getBoolean(IN_PLACE_KEY);
+    }
+
+    public void setInPlace(boolean inPlace) {
+        this.put(IN_PLACE_KEY, inPlace);
+    }
+
+    public int getWowCount() {
+        return this.getInt(WOW_COUNT_KEY);
+    }
+
+    public int getLolCount() {
+        return this.getInt(LOL_COUNT_KEY);
+    }
+
+    public int getBooCount() {
+        return this.getInt(BOO_COUNT_KEY);
+    }
+
+    public String getPassword() {
+        return this.getString(PASSWORD_KEY);
+    }
+
+    public void setPassword(String psw) {
+        this.put(PASSWORD_KEY, psw);
+    }
+
+    public void setThumbnailFile(ParseFile pic) {
         this.put(THUMBNAIL_KEY, pic);
     }
+
     @SuppressWarnings({"UnusedDeclaration"})
-    public void setPictureFile(ParseFile pic){
+    public void setPictureFile(ParseFile pic) {
         this.put(PICTURE_KEY, pic);
     }
 
     @SuppressWarnings({"UnusedDeclaration"})
-    public void setAudioFile(ParseFile audio){
+    public void setAudioFile(ParseFile audio) {
         this.put(AUDIO_KEY, audio);
     }
 
     @SuppressWarnings({"UnusedDeclaration"})
-    public void setVideoFile(ParseFile video){
+    public void setVideoFile(ParseFile video) {
         this.put(VIDEO_KEY, video);
     }
 
-    public void setCategory(String category){
-        this.put(CATEGORY_KEY, category);
+    public void incrementWowCount() {
+        this.increment(WOW_COUNT_KEY);
     }
 
-    public void setWeather(String weather){
-        this.put(WEATHER_KEY, weather);
+    public void decrementWowCount() {
+        this.increment(WOW_COUNT_KEY, -1);
     }
 
-    public void setFbId(String fbId){
-        this.put(FB_ID_KEY, fbId);
+    public void incrementLolCount() {
+        this.increment(LOL_COUNT_KEY);
     }
 
-    public void setLocation(ParseGeoPoint location){
-        this.put(LOCATION_KEY, location);
+    public void decrementLolCount() {
+        this.increment(LOL_COUNT_KEY, -1);
     }
 
-    public void setText(String text){
-        this.put(TEXT_KEY, text);
+    public void incrementBooCount() {
+        this.increment(BOO_COUNT_KEY);
     }
 
-    public void setFbName(String name) { this.put(FB_NAME_KEY, name); }
-
-    public void setInPlace(boolean inPlace) { this.put(IN_PLACE_KEY, inPlace); }
-
-    public void incrementWowCount() { this.increment(WOW_COUNT_KEY); }
-
-    public void decrementWowCount() { this.increment(WOW_COUNT_KEY, -1); }
-
-    public void incrementLolCount() { this.increment(LOL_COUNT_KEY); }
-
-    public void decrementLolCount() { this.increment(LOL_COUNT_KEY, -1); }
-
-    public void incrementBooCount() { this.increment(BOO_COUNT_KEY); }
-
-    public void decrementBooCount() { this.increment(BOO_COUNT_KEY, -1); }
-
-    public void setPassword(String psw) { this.put(PASSWORD_KEY, psw); }
+    public void decrementBooCount() {
+        this.increment(BOO_COUNT_KEY, -1);
+    }
 }

@@ -1,13 +1,12 @@
 package com.gcw.sapienza.places.utils;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.facebook.HttpMethod;
 import com.facebook.Request;
 import com.facebook.Response;
@@ -15,16 +14,15 @@ import com.facebook.Session;
 import com.facebook.model.GraphObject;
 import com.facebook.model.GraphUser;
 import com.gcw.sapienza.places.PlacesApplication;
-import com.gcw.sapienza.places.activities.PlacesLoginActivity;
 import com.gcw.sapienza.places.models.PlacesUser;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,13 +30,13 @@ import java.util.Set;
 
 
 public final class FacebookUtils {
-    private static final String TAG = "FacebookUtils";
 
+    private static final String TAG = "FacebookUtils";
+    private static final FacebookUtils shared_instance = new FacebookUtils();
     private final HashMap<String, HashSet<FacebookUtilCallback>> scheduledOperationsQueue = new HashMap<>();
 
-    private static final FacebookUtils shared_instance = new FacebookUtils();
-
-    private FacebookUtils() {}
+    private FacebookUtils() {
+    }
 
     /**
      * This is a singleton class. This method returns the ONLY instance
@@ -50,6 +48,35 @@ public final class FacebookUtils {
     }
 
     /**
+     * @return true if the current user is ready
+     */
+    public static boolean isFacebookSessionOpened() {
+        return ParseFacebookUtils.getSession() != null && ParseFacebookUtils.getSession().isOpened();
+    }
+
+    public static void downloadFacebookInfo(Context ctx) {
+        final ProgressDialog progress = new ProgressDialog(ctx);
+        progress.setTitle("Loading");
+        progress.setMessage("Wait while loading...");
+        progress.setCancelable(false);
+        progress.show();
+        FacebookUtils.getInstance().makeMeRequest(new FacebookUtilCallback() {
+            @Override
+            public void onResult(String result, Exception e) {
+                if (e != null) {
+                    // FIXME result not being used?
+
+                    Log.d(TAG, e.getMessage());
+                    progress.setMessage(e.getMessage());
+                } else {
+                    progress.dismiss();
+                    Log.d(TAG, result);
+                }
+            }
+        });
+    }
+
+    /**
      * Configures current user
      *
      * @param cbk callback
@@ -57,7 +84,7 @@ public final class FacebookUtils {
     public void makeMeRequest(final FacebookUtilCallback cbk) {
 
         final Session session = ParseFacebookUtils.getSession();
-        if (session == null){
+        if (session == null) {
             cbk.onResult(null, new RuntimeException("Session not valid"));
             return;
         }
@@ -149,14 +176,13 @@ public final class FacebookUtils {
         }
 
         final String current_key = "NAME " + fb_id;
-        synchronized (this.scheduledOperationsQueue){
-            if(this.scheduledOperationsQueue.containsKey(current_key)){
+        synchronized (this.scheduledOperationsQueue) {
+            if (this.scheduledOperationsQueue.containsKey(current_key)) {
                 Set<FacebookUtilCallback> cbks = this.scheduledOperationsQueue.get(current_key);
                 cbks.add(cbk);
                 //Log.d(TAG, "Enqueued"+current_key);
                 return;
-            }
-            else{
+            } else {
                 HashSet<FacebookUtilCallback> newSet = new HashSet<>();
                 newSet.add(cbk);
                 this.scheduledOperationsQueue.put(current_key, newSet);
@@ -179,13 +205,13 @@ public final class FacebookUtils {
                             PlacesLoginUtils.getInstance().addEntryToUserIdMap(fb_id, name);
 
                             Set<FacebookUtilCallback> cbks;
-                            synchronized (FacebookUtils.this.scheduledOperationsQueue){
+                            synchronized (FacebookUtils.this.scheduledOperationsQueue) {
                                 cbks = FacebookUtils.this.scheduledOperationsQueue.remove(current_key);
                             }
 
 
                             if (cbks != null) {
-                                for(FacebookUtilCallback c : cbks){
+                                for (FacebookUtilCallback c : cbks) {
                                     c.onResult(name, null);
                                 }
                             }
@@ -193,11 +219,11 @@ public final class FacebookUtils {
                             Log.v(TAG, "Couldn't resolve facebook user's name.  Error: " + e.toString());
                             e.printStackTrace();
                             Set<FacebookUtilCallback> cbks;
-                            synchronized (FacebookUtils.this.scheduledOperationsQueue){
+                            synchronized (FacebookUtils.this.scheduledOperationsQueue) {
                                 cbks = FacebookUtils.this.scheduledOperationsQueue.remove(current_key);
                             }
                             if (cbks != null) {
-                                for(FacebookUtilCallback c : cbks){
+                                for (FacebookUtilCallback c : cbks) {
                                     c.onResult(null, e);
                                 }
                             }
@@ -236,7 +262,6 @@ public final class FacebookUtils {
         tv.setText(((PlacesUser) ParseUser.getCurrentUser()).getName());
     }
 
-
     /**
      * Asynchronously loads a profile pictures into an image view
      *
@@ -272,15 +297,14 @@ public final class FacebookUtils {
         }
 
         final String current_key = "PIC_" + size + '_' + user_id;
-        synchronized (this.scheduledOperationsQueue){
+        synchronized (this.scheduledOperationsQueue) {
 
-            if(this.scheduledOperationsQueue.containsKey(current_key)){
+            if (this.scheduledOperationsQueue.containsKey(current_key)) {
                 Set<FacebookUtilCallback> cbksSet = this.scheduledOperationsQueue.get(current_key);
                 cbksSet.add(cbk);
                 //Log.d(TAG, "Enqueued: " + user_id);
                 return;
-            }
-            else{
+            } else {
                 HashSet<FacebookUtilCallback> cbksSet = new HashSet<>();
                 cbksSet.add(cbk);
                 //Log.d(TAG, "Scheduled: " + user_id);
@@ -312,12 +336,12 @@ public final class FacebookUtils {
                             }
 
                             Set<FacebookUtilCallback> cbks;
-                            synchronized (FacebookUtils.this.scheduledOperationsQueue){
+                            synchronized (FacebookUtils.this.scheduledOperationsQueue) {
                                 cbks = FacebookUtils.this.scheduledOperationsQueue.remove(current_key);
                             }
 
-                            if(cbks != null){
-                                for (FacebookUtilCallback c : cbks){
+                            if (cbks != null) {
+                                for (FacebookUtilCallback c : cbks) {
                                     c.onResult(url, null);
                                 }
                             }
@@ -326,18 +350,16 @@ public final class FacebookUtils {
                             Log.v(TAG, "Couldn't retrieve facebook user data.  Error: " + e.toString());
                             e.printStackTrace();
                             Set<FacebookUtilCallback> cbks;
-                            synchronized (FacebookUtils.this.scheduledOperationsQueue){
+                            synchronized (FacebookUtils.this.scheduledOperationsQueue) {
                                 cbks = FacebookUtils.this.scheduledOperationsQueue.remove(current_key);
                             }
-                            if(cbks != null){
-                                for (FacebookUtilCallback c : cbks){
+                            if (cbks != null) {
+                                for (FacebookUtilCallback c : cbks) {
                                     c.onResult(null, e);
                                 }
                             }
 
-                        }
-                        catch(NullPointerException npe)
-                        {
+                        } catch (NullPointerException npe) {
                             Log.e(TAG, "GraphObject is null!");
                             npe.printStackTrace();
                         }
@@ -346,38 +368,5 @@ public final class FacebookUtils {
         );
 
         req.executeAsync();
-    }
-
-    /**
-     *
-     * @return true if the current user is ready
-     */
-    public static boolean isFacebookSessionOpened(){
-        return ParseFacebookUtils.getSession() != null && ParseFacebookUtils.getSession().isOpened();
-    }
-
-
-    public static void downloadFacebookInfo(Context ctx){
-        final ProgressDialog progress = new ProgressDialog(ctx);
-        progress.setTitle("Loading");
-        progress.setMessage("Wait while loading...");
-        progress.setCancelable(false);
-        progress.show();
-        FacebookUtils.getInstance().makeMeRequest(new FacebookUtilCallback() {
-            @Override
-            public void onResult(String result, Exception e) {
-                if(e != null)
-                {
-                    // FIXME result not being used?
-
-                    Log.d(TAG, e.getMessage());
-                    progress.setMessage(e.getMessage());
-                }
-                else{
-                    progress.dismiss();
-                    Log.d(TAG, result);
-                }
-            }
-        });
     }
 }

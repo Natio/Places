@@ -32,6 +32,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,7 +42,7 @@ import java.util.Locale;
 /**
  * Created by paolo on 18/02/15.
  */
-public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHolder> {
+public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHolder> {
 
     private static final String TAG = "FlagsAdapter";
 
@@ -52,22 +53,24 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
 
     private int selectedFlagIndex;
 
-    public FlagsAdapter(List<Flag> list, View v, Activity mainActivity){
+    public FlagsAdapter(List<Flag> list, View v, Activity mainActivity) {
         this.flags = list;
         this.view = v;
         this.mainActivity = mainActivity;
     }
 
     public Flag getSelectedFlag() {
-        try{
+        try {
             return flags.get(selectedFlagIndex);
-        }
-        catch (IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             Log.e(TAG, e.getMessage());
             return null;
         }
     }
-    public void setSelectedFlagIndex(int i){ selectedFlagIndex = i;}
+
+    public void setSelectedFlagIndex(int i) {
+        selectedFlagIndex = i;
+    }
 
     @Override
     public void onBindViewHolder(final FlagsAdapter.FlagsViewHolder flagViewHolder, int i) {
@@ -75,30 +78,26 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
         flagViewHolder.setCurrentFlag(f);
         flagViewHolder.flagAdapter = this;
 
-        if(f.getPassword() == null) {
+        if (f.getPassword() == null) {
             String text = f.getText();
-            if(text != null && text.length() > 0){
+            if (text != null && text.length() > 0) {
                 flagViewHolder.main_text.setVisibility(View.VISIBLE);
                 flagViewHolder.main_text.setText(f.getText());
-            }
-            else{
+            } else {
                 flagViewHolder.main_text.setVisibility(View.GONE);
             }
 
 
-
-        }
-        else flagViewHolder.main_text.setText("***Private flag***");
+        } else flagViewHolder.main_text.setText("***Private flag***");
 
         String user_id = f.getFbId();
 
         String fb_username = f.getFbName(); // checks if Flag has fb username. if there is one use it otherwise ask FB
-        if(fb_username == null){
+        if (fb_username == null) {
             // FacebookUtils.getInstance().loadUsernameIntoTextView(user_id, flagViewHolder.username);
             PlacesLoginUtils.getInstance().loadUsernameIntoTextView(user_id, flagViewHolder.username);
 
-        }
-        else{
+        } else {
             flagViewHolder.username.setText(fb_username);
         }
 
@@ -111,14 +110,13 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
         });
 
         ParseFile pic = f.getThumbnail();
-        if(pic != null && f.getPassword() == null){
+        if (pic != null && f.getPassword() == null) {
             String url = pic.getUrl();
             flagViewHolder.main_image.setVisibility(View.VISIBLE);
             flagViewHolder.main_image.setClickable(false);
             Picasso.with(this.view.getContext()).load(url).fit().centerCrop().into(flagViewHolder.main_image);
 
-        }
-        else{
+        } else {
             flagViewHolder.main_image.setVisibility(View.GONE);
             flagViewHolder.main_image.setImageDrawable(null);
         }
@@ -126,24 +124,24 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
         //TODO make this accomodate all devices, strange grey bar appears on Android < 5 / Screens < 5"
         //((CardView)flagViewHolder.itemView).setRadius(20);
         //((CardView)flagViewHolder.itemView).setShadowPadding(10, 10, 10, 10);
-        ((CardView)flagViewHolder.itemView).setShadowPadding(0,0,7,7);
+        ((CardView) flagViewHolder.itemView).setShadowPadding(0, 0, 7, 7);
 
 
         //working on making icons or symbols which represents a category
 
         String[] category_array = PlacesApplication.getInstance().getResources().getStringArray(R.array.categories);
 
-        if (flagViewHolder.mFlag.getCategory().equals(category_array[0])){ //None
+        if (flagViewHolder.mFlag.getCategory().equals(category_array[0])) { //None
             flagViewHolder.categoryIcon.setImageResource(R.drawable.none);
-        }else if (flagViewHolder.mFlag.getCategory().equals(category_array[1])){ //Thoughts
+        } else if (flagViewHolder.mFlag.getCategory().equals(category_array[1])) { //Thoughts
             flagViewHolder.categoryIcon.setImageResource(R.drawable.thoughts);
-        }else if (flagViewHolder.mFlag.getCategory().equals(category_array[2])){ //Fun
+        } else if (flagViewHolder.mFlag.getCategory().equals(category_array[2])) { //Fun
             flagViewHolder.categoryIcon.setImageResource(R.drawable.smile);
-        }else if (flagViewHolder.mFlag.getCategory().equals(category_array[3])){ //Music
+        } else if (flagViewHolder.mFlag.getCategory().equals(category_array[3])) { //Music
             flagViewHolder.categoryIcon.setImageResource(R.drawable.music);
-        }else if (flagViewHolder.mFlag.getCategory().equals(category_array[4])){ //Landscape
+        } else if (flagViewHolder.mFlag.getCategory().equals(category_array[4])) { //Landscape
             flagViewHolder.categoryIcon.setImageResource(R.drawable.eyes);
-        }else{ //Food
+        } else { //Food
             flagViewHolder.categoryIcon.setImageResource(R.drawable.food);
         }
 
@@ -171,15 +169,13 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
     }
 
     @Override
-    public int getItemCount()
-    {
-        if(this.flags == null) return 0;
+    public int getItemCount() {
+        if (this.flags == null) return 0;
         else return this.flags.size();
     }
 
     @Override
-    public int getItemViewType(int position)
-    {
+    public int getItemViewType(int position) {
         // This is brilliant, I can explain
         //return position;
 
@@ -188,8 +184,7 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
     }
 
     @Override
-    public FlagsAdapter.FlagsViewHolder onCreateViewHolder(ViewGroup viewGroup, int i)
-    {
+    public FlagsAdapter.FlagsViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
 
         View itemView = LayoutInflater.
                 from(viewGroup.getContext()).
@@ -198,31 +193,20 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
         return new FlagsAdapter.FlagsViewHolder(itemView, mainActivity);
     }
 
-    public static class FlagsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnCreateContextMenuListener{
+    public static class FlagsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnCreateContextMenuListener {
 
         protected final TextView main_text;
         protected final TextView username;
         protected final ImageView user_profile_pic;
         protected final ImageView main_image;
-
+        private final Activity mainActivity;
         //new view for icon or line representing the category
         protected ImageView categoryIcon;
-
-        private final Activity mainActivity;
-
-        private String password;
-
         protected FlagsAdapter flagAdapter;
-
+        private String password;
         private Flag mFlag;
 
-        public void setCurrentFlag(Flag flag){
-            this.mFlag = flag;
-        }
-
-
-        public FlagsViewHolder(View v,  Activity context)
-        {
+        public FlagsViewHolder(View v, Activity context) {
             super(v);
 
             this.mainActivity = context;
@@ -235,20 +219,22 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
             this.main_text = (TextView) v.findViewById(R.id.card_textView_text);
 
             //new for icon representing category, or a colored line
-            this.categoryIcon= (ImageView) v.findViewById(R.id.categoryIcon);
+            this.categoryIcon = (ImageView) v.findViewById(R.id.categoryIcon);
 
             v.setOnCreateContextMenuListener(this);
         }
 
+        public void setCurrentFlag(Flag flag) {
+            this.mFlag = flag;
+        }
+
         @Override
-        public void onClick(View v)
-        {
-            if(mFlag.getPassword() != null) askForPassword(mFlag.getPassword());
+        public void onClick(View v) {
+            if (mFlag.getPassword() != null) askForPassword(mFlag.getPassword());
             else openFlag();
         }
 
-        private void openFlag()
-        {
+        private void openFlag() {
             Date date = mFlag.getDate();
             DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
             String sDate = df.format(date);
@@ -273,13 +259,11 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
 
             ParseFile file;
             FlagFragment.MediaType mediaType = FlagFragment.MediaType.NONE;
-            if((file = this.mFlag.getPic()) != null){
+            if ((file = this.mFlag.getPic()) != null) {
                 mediaType = FlagFragment.MediaType.PIC;
-            }
-            else if((file = this.mFlag.getVideo()) != null){
+            } else if ((file = this.mFlag.getVideo()) != null) {
                 mediaType = FlagFragment.MediaType.VIDEO;
-            }
-            else if((file = this.mFlag.getAudio()) != null){
+            } else if ((file = this.mFlag.getAudio()) != null) {
                 mediaType = FlagFragment.MediaType.AUDIO;
             }
 
@@ -287,11 +271,10 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
             frag.setMedia(file, mediaType);
             frag.setArguments(bundle);
 
-            ((MainActivity)mainActivity).switchToOtherFrag(frag);
+            ((MainActivity) mainActivity).switchToOtherFrag(frag);
         }
 
-        private void askForPassword(final String psw)
-        {
+        private void askForPassword(final String psw) {
             LayoutInflater li = LayoutInflater.from(mainActivity);
             View passwordDialogLayout = li.inflate(R.layout.password_dialog, null);
             final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mainActivity);
@@ -306,24 +289,19 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
                     .setNegativeButton("Cancel",
                             new DialogInterface.OnClickListener() {
                                 @Override
-                                public void onClick(DialogInterface dialog,int id)
-                                {
+                                public void onClick(DialogInterface dialog, int id) {
                                     dialog.dismiss();
                                 }
                             })
                     .setPositiveButton("Confirm",
                             new DialogInterface.OnClickListener() {
                                 @Override
-                                public void onClick(DialogInterface dialog,int id)
-                                {
+                                public void onClick(DialogInterface dialog, int id) {
                                     password = userInput.getText().toString();
-                                    if(!password.equals(psw))
-                                    {
+                                    if (!password.equals(psw)) {
                                         Toast.makeText(mainActivity, "Wrong password", Toast.LENGTH_LONG).show();
                                         userInput.setText("");
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         dialog.dismiss();
 
                                         openFlag();
@@ -352,9 +330,9 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
             //        Flag sel_usr = (Flag)(recycleView.getItemAtPosition(info.position));
             //        String fb_id = sel_usr.getFbId();
             //
-            if(PlacesLoginUtils.getInstance().getCurrentUserId().equals(fb_id)) {
+            if (PlacesLoginUtils.getInstance().getCurrentUserId().equals(fb_id)) {
                 menu.add(Utils.FLAG_LIST_GROUP, Utils.DELETE_FLAG, 0, "Delete Flag");
-            }else {
+            } else {
                 Log.d(TAG, "Username: " + ParseUser.getCurrentUser().getUsername());
                 Log.d(TAG, "objectId: " + mFlag.getObjectId());
 
@@ -364,9 +342,9 @@ public class FlagsAdapter extends RecyclerView.Adapter <FlagsAdapter.FlagsViewHo
                 queryDelete.whereEqualTo("reported_flag", mFlag);
 
                 try {
-                    if(queryDelete.count() == 0){
+                    if (queryDelete.count() == 0) {
                         menu.add(Utils.FLAG_LIST_GROUP, Utils.REPORT_FLAG, 0, "Report Flag as inappropriate");
-                    }else{
+                    } else {
                         menu.add(Utils.FLAG_LIST_GROUP, Utils.DELETE_REPORT_FLAG, 0, "Revoke Flag report");
                     }
                 } catch (ParseException e) {

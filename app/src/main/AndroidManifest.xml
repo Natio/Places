@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.gcw.sapienza.places" >
+    package="com.gcw.sapienza.places">
 
-    <uses-permission android:name="android.permission.INTERNET" />      <!--required for google maps api and parse and RemoteSettings-->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />      <!--required for  google maps api and parse -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!--required for google maps api and parse and RemoteSettings-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!--required for  google maps api and parse -->
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>     <!--required for  google maps api-->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!--required for  google maps api-->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <!-- The following two permissions are not required to use
          Google Maps Android API v2, but are recommended. -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>    <!-- google maps api-->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>   <!-- google maps api and it is our main feature-->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- google maps api-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- google maps api and it is our main feature-->
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -22,11 +27,14 @@
       IMPORTANT: Change "com.parse.tutorials.pushnotifications.permission.C2D_MESSAGE" in the lines below
       to match your app's package name + ".permission.C2D_MESSAGE".
     -->
-    <permission android:protectionLevel="signature"
-        android:name="com.gcw.sapienza.places.permission.C2D_MESSAGE" />
+    <permission
+        android:name="com.gcw.sapienza.places.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
     <uses-permission android:name="com.gcw.sapienza.places.permission.C2D_MESSAGE" />
 
     <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
@@ -34,37 +42,41 @@
 
     <uses-feature
         android:glEsVersion="0x00020000"
-        android:required="true"/>   <!-- google maps api-->
+        android:required="true" />
+    <!-- google maps api-->
 
     <application
+        android:name="com.gcw.sapienza.places.PlacesApplication"
         android:allowBackup="true"
         android:icon="@drawable/app_logo"
         android:label="@string/app_name"
         android:theme="@style/CustomActionBarTheme"
-        android:name="com.gcw.sapienza.places.PlacesApplication"
         android:versionCode="9"
         android:versionName="1.6.1">
 
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/app_id"/>
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/app_id" />
 
         <!-- **** REQUIRED FOR GOOGLE MAPS API **** -->
 
-        <meta-data android:name="com.google.android.gms.version"
+        <meta-data
+            android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
         <!-- API KEY-->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyAcM1V7C4fyCG0rGqcrpLmq_GnVswzWOrg"/>
+            android:value="AIzaSyAcM1V7C4fyCG0rGqcrpLmq_GnVswzWOrg" />
 
         <!-- **** END REQUIRED ****  -->
 
         <activity
             android:name=".activities.MainActivity"
-            android:launchMode="singleTask"
             android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/CustomActionBarTheme"
-            android:windowSoftInputMode="adjustPan"
-            android:screenOrientation="portrait" > <!-- soft keyboard 'done' button, force vertical orientation -->
+            android:windowSoftInputMode="adjustPan"> <!-- soft keyboard 'done' button, force vertical orientation -->
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -73,13 +85,13 @@
 
         </activity>
 
-        <activity android:name=".activities.VideoCaptureActivity">
-        </activity>
+        <activity android:name=".activities.VideoCaptureActivity"></activity>
 
-        <activity android:name=".activities.ShareActivity"
-                  android:label="@string/app_name"
-                android:screenOrientation="portrait"
-                  android:theme="@style/CustomActionBarTheme">
+        <activity
+            android:name=".activities.ShareActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/CustomActionBarTheme">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -103,9 +115,9 @@
         </activity>
 
 
-        <activity android:name=".activities.AudioRecordingActivity"
-            android:screenOrientation="portrait">
-        </activity>
+        <activity
+            android:name=".activities.AudioRecordingActivity"
+            android:screenOrientation="portrait"></activity>
 
         <!-- <activity
             android:name="com.parse.ui.ParseLoginActivity"
@@ -120,29 +132,32 @@
         <activity
             android:name=".activities.PlacesLoginActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="com.parse.ui.ParseLoginActivity.PARSE_LOGIN_ENABLED"
-                android:value="true"/>
+                android:value="true" />
         </activity>
 
-        <activity android:name="com.facebook.LoginActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:label="@string/app_name" />
+        <activity
+            android:name="com.facebook.LoginActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <!-- service for monitoring user position -->
         <service android:name=".services.LocationService" />
 
         <!-- push service -->
         <service android:name="com.parse.PushService" />
+
         <receiver android:name="com.parse.ParseBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.parse.GcmBroadcastReceiver"
+        <receiver
+            android:name="com.parse.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
@@ -154,7 +169,9 @@
                 <category android:name="com.gcw.sapienza.places" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".notifications.Receiver" android:exported="false">
+        <receiver
+            android:name=".notifications.Receiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
                 <action android:name="com.parse.push.intent.DELETE" />
@@ -163,7 +180,9 @@
         </receiver>
 
         <!-- replace @drawable/push_icon with your push icon identifier -->
-        <meta-data android:name="com.parse.push.notification_icon" android:resource="@drawable/app_logo_small"/>
+        <meta-data
+            android:name="com.parse.push.notification_icon"
+            android:resource="@drawable/app_logo_small" />
 
     </application>
 

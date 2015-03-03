@@ -1,46 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
 
-    <SurfaceView android:id="@+id/surfaceView"
+    <SurfaceView
+        android:id="@+id/surfaceView"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"/>
+        android:layout_height="fill_parent" />
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
-        android:gravity="center">
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <ToggleButton
+            android:id="@+id/toggleHDButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="HD"
-            android:id="@+id/toggleHDButton"
             android:layout_gravity="left"
-            android:checked="false" />
+            android:checked="false"
+            android:text="HD" />
 
         <TextView
+            android:id="@+id/timer_textView"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_gravity="center"
+            android:gravity="center"
             android:text=""
             android:textAlignment="center"
-            android:id="@+id/timer_textView"
-            android:gravity="center"
-            android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="#FFFFFF"
-            android:layout_gravity="center" />
+            android:textStyle="bold" />
 
         <ToggleButton
+            android:id="@+id/toggleRecordingButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="REC"
-            android:id="@+id/toggleRecordingButton"
-            android:layout_gravity="right" />
+            android:layout_gravity="right"
+            android:text="REC" />
 
     </LinearLayout>
 </RelativeLayout>

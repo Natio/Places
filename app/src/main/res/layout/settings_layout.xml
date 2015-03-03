@@ -1,88 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="wrap_content"
-    android:layout_width="wrap_content">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
-    <PreferenceCategory
-        android:title="Filters">
+    <PreferenceCategory android:title="Filters">
 
         <CheckBoxPreference
-            android:summary="Show my flags"
             android:defaultValue="true"
             android:key="meFilter"
-            />
+            android:summary="Show my flags" />
+
         <CheckBoxPreference
-            android:summary="Show my friends' flags"
             android:defaultValue="true"
             android:key="flFilter"
-            />
+            android:summary="Show my friends' flags" />
+
         <CheckBoxPreference
-            android:summary="Show flags from people I don't know"
             android:defaultValue="true"
             android:key="strangersFilter"
-            />
+            android:summary="Show flags from people I don't know" />
+
         <CheckBoxPreference
-            android:summary="Assign higher relevance to older flags"
             android:defaultValue="false"
             android:key="timeFilter"
-            />
+            android:summary="Assign higher relevance to older flags" />
         <!--<SeekBarPreference-->
-            <!--android:title="Range of action"-->
-            <!--android:max="4"-->
-            <!--android:defaultValue="1"-->
-            <!--android:progress="1"-->
-            <!--android:key="seekBar"-->
-            <!--/>-->
+        <!--android:title="Range of action"-->
+        <!--android:max="4"-->
+        <!--android:defaultValue="1"-->
+        <!--android:progress="1"-->
+        <!--android:key="seekBar"-->
+        <!--/>-->
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="Flags">
+    <PreferenceCategory android:title="Flags">
+
         <SeekBarPreference
-            android:title="Max number of visible flags"
-            android:max="4"
             android:defaultValue="1"
-            android:progress="1"
             android:key="maxFetch"
-            />
+            android:max="4"
+            android:progress="1"
+            android:title="Max number of visible flags" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="Visible Categories">
+    <PreferenceCategory android:title="Visible Categories">
+
         <CheckBoxPreference
-            android:summary="None"
             android:defaultValue="true"
             android:key="noneCheck"
-            />
+            android:summary="None" />
+
         <CheckBoxPreference
-            android:summary="Thoughts"
             android:defaultValue="true"
             android:key="thoughtsCheck"
-            />
+            android:summary="Thoughts" />
+
         <CheckBoxPreference
-            android:summary="Fun"
             android:defaultValue="true"
             android:key="funCheck"
-            />
+            android:summary="Fun" />
+
         <CheckBoxPreference
-            android:summary="Music"
             android:defaultValue="true"
             android:key="musicCheck"
-            />
+            android:summary="Music" />
+
         <CheckBoxPreference
-            android:summary="Landscape"
             android:defaultValue="true"
             android:key="landscapeCheck"
-            />
+            android:summary="Landscape" />
+
         <CheckBoxPreference
-            android:summary="Food"
             android:defaultValue="true"
             android:key="foodCheck"
-            />
+            android:summary="Food" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="About">
+    <PreferenceCategory android:title="About">
 
         <Preference
             android:key="version"

@@ -41,27 +41,23 @@ import java.util.List;
 public class FlagsListFragment extends Fragment {
 
     private static final String TAG = "FlagsListFragment";
-    private static final String NO_VALID_FLAG_SELECTED = "No valid Flag selected";
-
-    private static final String FLAG_DELETED = "Flag deleted";
-    private static final String FLAG_REPORTED = "Flag reported";
-    private static final String FLAG_REPORT_REVOKED = "Flag report revoked";
-
-    private RecyclerView recycleView;
-
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals(LocationService.FOUND_NEW_FLAGS_NOTIFICATION)){
+            if (intent.getAction().equals(LocationService.FOUND_NEW_FLAGS_NOTIFICATION)) {
                 FlagsListFragment.this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getFlags());
 
             }
             Log.d(TAG, intent.getAction());
         }
     };
+    private static final String NO_VALID_FLAG_SELECTED = "No valid Flag selected";
+    private static final String FLAG_DELETED = "Flag deleted";
+    private static final String FLAG_REPORTED = "Flag reported";
+    private static final String FLAG_REPORT_REVOKED = "Flag report revoked";
+    private RecyclerView recycleView;
 
-    public RecyclerView getRV()
-    {
+    public RecyclerView getRV() {
         return recycleView;
     }
 
@@ -89,16 +85,17 @@ public class FlagsListFragment extends Fragment {
         LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(this.receiver);
     }
 
-    public void updateRecycleViewWithNewContents(List<Flag> l){
+    public void updateRecycleViewWithNewContents(List<Flag> l) {
         this.recycleView.setAdapter(new FlagsAdapter(l, recycleView, getActivity()));
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        FlagsAdapter fa = (FlagsAdapter)recycleView.getAdapter();
+        FlagsAdapter fa = (FlagsAdapter) recycleView.getAdapter();
         Flag sel_usr = fa.getSelectedFlag();
 
-        if(sel_usr == null) Toast.makeText(getActivity(), NO_VALID_FLAG_SELECTED, Toast.LENGTH_SHORT).show();
+        if (sel_usr == null)
+            Toast.makeText(getActivity(), NO_VALID_FLAG_SELECTED, Toast.LENGTH_SHORT).show();
 
         switch (item.getItemId()) {
 
@@ -125,16 +122,17 @@ public class FlagsListFragment extends Fragment {
 
     /**
      * Deletes the Flag
+     *
      * @param f flag to delete
      */
-    private void deleteFlag(Flag f){
+    private void deleteFlag(Flag f) {
         f.deleteInBackground(new DeleteCallback() {
             @Override
             public void done(com.parse.ParseException e) {
-                if(e == null) {
+                if (e == null) {
                     Toast.makeText(recycleView.getContext(), FLAG_DELETED, Toast.LENGTH_SHORT).show();
-                    ((MainActivity)getActivity()).refresh();
-                }else
+                    ((MainActivity) getActivity()).refresh();
+                } else
                     Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -142,17 +140,18 @@ public class FlagsListFragment extends Fragment {
 
     /**
      * Reports a flag
+     *
      * @param f flag to report
      */
-    private void reportFlag(final Flag f){
+    private void reportFlag(final Flag f) {
 
         FlagReport report = FlagReport.createFlagReportFromFlag(f);
         report.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                if(e == null) {
+                if (e == null) {
                     Toast.makeText(recycleView.getContext(), FLAG_REPORTED, Toast.LENGTH_SHORT).show();
-                }else
+                } else
                     Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -160,6 +159,7 @@ public class FlagsListFragment extends Fragment {
 
     /**
      * Deletes an entry from the Reported_Posts table
+     *
      * @param f flag related to the entry to be deleted
      */
     private void deleteReportFlag(Flag f) {

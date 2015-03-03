@@ -3,7 +3,6 @@ package com.gcw.sapienza.places.fragments;
 import android.app.Activity;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.model.GraphUser;
@@ -51,6 +51,12 @@ public class PlacesLoginFragment extends ParseLoginFragment {
 
     private ParseLoginConfig config;
 
+    public static PlacesLoginFragment newInstance(Bundle configOptions) {
+        PlacesLoginFragment loginFragment = new PlacesLoginFragment();
+        loginFragment.setArguments(configOptions);
+        return loginFragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent,
                              Bundle savedInstanceState) {
@@ -71,7 +77,7 @@ public class PlacesLoginFragment extends ParseLoginFragment {
         gPlusSigninButton.setColorScheme(SignInButton.COLOR_LIGHT);
         gPlusSigninButton.setSize(SignInButton.SIZE_ICON_ONLY);
 
-        gPlusSigninButton.setOnClickListener((View.OnClickListener)getActivity());
+        gPlusSigninButton.setOnClickListener((View.OnClickListener) getActivity());
 
         if (appLogo != null && config.getAppLogo() != null) {
             appLogo.setImageResource(config.getAppLogo());
@@ -112,12 +118,6 @@ public class PlacesLoginFragment extends ParseLoginFragment {
             throw new IllegalArgumentException(
                     "Activity must implemement ParseOnLoadingListener");
         }
-    }
-
-    public static PlacesLoginFragment newInstance(Bundle configOptions) {
-        PlacesLoginFragment loginFragment = new PlacesLoginFragment();
-        loginFragment.setArguments(configOptions);
-        return loginFragment;
     }
 
     private void setUpParseLoginAndSignup() {

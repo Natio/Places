@@ -24,26 +24,19 @@ import java.io.IOException;
 /**
  * Created by mic_head on 15/02/15.
  */
-public class AudioRecordingActivity extends ActionBarActivity implements View.OnClickListener, View.OnTouchListener
-{
+public class AudioRecordingActivity extends ActionBarActivity implements View.OnClickListener, View.OnTouchListener {
 
     private static final String TAG = "AudioRecordingActivity";
-
+    private static final String ERROR_WHILE_RECORDING_TEXT = "Error encountered while recording";
+    protected static MediaRecorder audioRec;
+    protected static String audio_filename;
     private ImageView bigMicButton;
     private ImageView confirmButton;
     private ImageView cancelButton;
-
     private TextView recordText;
-
-    protected static MediaRecorder audioRec;
-    protected static String audio_filename;
-
-    private enum RecordState{ RECORD, PLAY, PAUSE }
     private RecordState recordState = RecordState.RECORD;
 
     private MediaPlayer mediaPlayer;
-
-    private static final String ERROR_WHILE_RECORDING_TEXT = "Error encountered while recording";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +47,11 @@ public class AudioRecordingActivity extends ActionBarActivity implements View.On
         getSupportActionBar().setTitle("Places");
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.green)));
 
-        bigMicButton = (ImageView)findViewById(R.id.big_mic_button);
-        confirmButton = (ImageView)findViewById(R.id.confirm_button);
-        cancelButton = (ImageView)findViewById(R.id.cancel_button);
+        bigMicButton = (ImageView) findViewById(R.id.big_mic_button);
+        confirmButton = (ImageView) findViewById(R.id.confirm_button);
+        cancelButton = (ImageView) findViewById(R.id.cancel_button);
 
-        recordText = (TextView)findViewById(R.id.record_text);
+        recordText = (TextView) findViewById(R.id.record_text);
 
         bigMicButton.setOnClickListener(this);
         confirmButton.setOnClickListener(this);
@@ -68,18 +61,15 @@ public class AudioRecordingActivity extends ActionBarActivity implements View.On
     }
 
     @Override
-    public void onClick(View v)
-    {
-        if(v.getId() == R.id.big_mic_button && recordState == RecordState.PLAY) playRecording();
-        else if(v.getId() == R.id.confirm_button) confirm();
-        else if(v.getId() == R.id.cancel_button) cancel();
+    public void onClick(View v) {
+        if (v.getId() == R.id.big_mic_button && recordState == RecordState.PLAY) playRecording();
+        else if (v.getId() == R.id.confirm_button) confirm();
+        else if (v.getId() == R.id.cancel_button) cancel();
     }
 
     @Override
-    public boolean onTouch(View v, MotionEvent event)
-    {
-        if(v.getId() == R.id.big_mic_button && recordState == RecordState.RECORD)
-        {
+    public boolean onTouch(View v, MotionEvent event) {
+        if (v.getId() == R.id.big_mic_button && recordState == RecordState.RECORD) {
             recordAudio(event);
 
             return true;
@@ -88,14 +78,11 @@ public class AudioRecordingActivity extends ActionBarActivity implements View.On
         return super.onTouchEvent(event);
     }
 
-    private void recordAudio(MotionEvent event)
-    {
-        if (event.getAction() == MotionEvent.ACTION_DOWN)
-        {
+    private void recordAudio(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
             bigMicButton.setImageResource(R.drawable.mic_darkgreen);
 
-            try
-            {
+            try {
                 audio_filename = Utils.createAudioFile(ShareActivity.AUDIO_FORMAT, AudioRecordingActivity.this).getAbsolutePath();
                 audioRec = new MediaRecorder();
                 audioRec.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -103,30 +90,22 @@ public class AudioRecordingActivity extends ActionBarActivity implements View.On
                 audioRec.setOutputFile(audio_filename);
                 audioRec.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
                 audioRec.prepare();
-            } catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 ioe.printStackTrace();
                 Toast.makeText(this, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
                 Log.e(TAG, ERROR_WHILE_RECORDING_TEXT);
             }
             audioRec.start();
-        }
-        else if(event.getAction() == MotionEvent.ACTION_UP)
-        {
-            if(audioRec == null)
-            {
+        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+            if (audioRec == null) {
                 Toast.makeText(this, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
                 Log.v(TAG, ERROR_WHILE_RECORDING_TEXT);
                 return;
-            }
-            else try
-            {
+            } else try {
                 audioRec.stop();
                 audioRec.release();
                 audioRec = null;
-            }
-            catch(RuntimeException re)
-            {
+            } catch (RuntimeException re) {
                 re.printStackTrace();
                 Toast.makeText(this, ERROR_WHILE_RECORDING_TEXT, Toast.LENGTH_LONG).show();
                 return;
@@ -135,16 +114,14 @@ public class AudioRecordingActivity extends ActionBarActivity implements View.On
             bigMicButton.setImageDrawable(getResources().getDrawable(R.drawable.play_button));
             recordState = RecordState.PLAY;
 
-            try
-            {
+            try {
                 File temp = new File(audio_filename);
 
                 mediaPlayer = new MediaPlayer();
 
                 mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
-                    public void onCompletion(MediaPlayer mp)
-                    {
+                    public void onCompletion(MediaPlayer mp) {
                         bigMicButton.setImageResource(R.drawable.play_button);
                         recordState = RecordState.PLAY;
                     }
@@ -156,9 +133,7 @@ public class AudioRecordingActivity extends ActionBarActivity implements View.On
                 mediaPlayer.setDataSource(inStream.getFD());
 
                 mediaPlayer.prepare();
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
 
@@ -169,32 +144,26 @@ public class AudioRecordingActivity extends ActionBarActivity implements View.On
         }
     }
 
-    private void playRecording()
-    {
-        if(mediaPlayer.isPlaying())
-        {
+    private void playRecording() {
+        if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
             bigMicButton.setImageResource(R.drawable.play_button);
             recordState = RecordState.PLAY;
-        }
-        else
-        {
+        } else {
             mediaPlayer.start();
             bigMicButton.setImageResource(R.drawable.pause_button);
             recordState = RecordState.PAUSE;
         }
     }
 
-    private void confirm()
-    {
+    private void confirm() {
         Intent closeIntent = new Intent();
         closeIntent.putExtra("result", AudioRecordingActivity.this.audio_filename);
         AudioRecordingActivity.this.setResult(RESULT_OK, closeIntent);
         AudioRecordingActivity.this.finish();
     }
 
-    private void cancel()
-    {
+    private void cancel() {
         bigMicButton.setImageResource(R.drawable.mic_green);
         recordState = RecordState.RECORD;
 
@@ -203,4 +172,6 @@ public class AudioRecordingActivity extends ActionBarActivity implements View.On
         cancelButton.setVisibility(View.GONE);
         confirmButton.setVisibility(View.GONE);
     }
+
+    private enum RecordState {RECORD, PLAY, PAUSE}
 }

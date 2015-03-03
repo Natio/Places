@@ -27,13 +27,13 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
+
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.fragments.MainFragment;
 import com.gcw.sapienza.places.fragments.MyFlagsFragment;
-import com.gcw.sapienza.places.fragments.MyProfileFragment;
+import com.gcw.sapienza.places.fragments.ProfileFragment;
 import com.gcw.sapienza.places.fragments.SettingsFragment;
-import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.GPlusUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
@@ -45,40 +45,37 @@ import com.parse.ParseUser;
 public class MainActivity extends ActionBarActivity implements Preference.OnPreferenceChangeListener {
 
 
-    public static String TAG = MainActivity.class.getName();
-    private DrawerLayout drawerLayout;
-    private ListView drawerList;
-    private ActionBarDrawerToggle drawerToggle;
-    private static final String [] section_titles = {"Home", "My Profile", "My Flags", "Settings", "Logout"};
-    private CharSequence current_title;
-
-    // private int currentDrawerListItemIndex = -1;
-
-    private LinearLayout homeHolder;
-    private FrameLayout fragHolder;
-
-    public Menu mMenu;
-
+    private static final String[] section_titles = {"Home", "My Profile", "My Flags", "Settings", "Logout"};
     private static final int SHARE_ACTIVITY_REQUEST_CODE = 95;
-
     private static final int FLAGS_LIST_POSITION = 0;
     private static final int MY_PROFILE_POSITION = 1;
     private static final int MY_FLAGS_POSITION = 2;
     private static final int SETTINGS_POSITION = 3;
+
+    // private int currentDrawerListItemIndex = -1;
     private static final int LOGOUT_POSITION = 4;
-
     private static final String FRAG_TAG = "FRAG_TAG";
-
+    public static String TAG = MainActivity.class.getName();
+    private static boolean isForeground = false;
+    public Menu mMenu;
+    private DrawerLayout drawerLayout;
+    private ListView drawerList;
+    private ActionBarDrawerToggle drawerToggle;
+    private CharSequence current_title;
+    private LinearLayout homeHolder;
+    private FrameLayout fragHolder;
     private Toast radiusToast;
 
-    private static boolean isForeground = false;
-
+    public static boolean isForeground() {
+        return isForeground;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(PlacesLoginUtils.getInstance().isSessionValid(this)) PlacesLoginUtils.getInstance().downloadUserInfo(this);
+        if (PlacesLoginUtils.getInstance().isSessionValid(this))
+            PlacesLoginUtils.getInstance().downloadUserInfo(this);
         else PlacesLoginUtils.startLoginActivity(this);
 
         setContentView(R.layout.activity_main_drawer_layout);
@@ -92,12 +89,10 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         // Set the adapter for the list view
         this.drawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, section_titles));
 
-        this.drawerToggle = new ActionBarDrawerToggle(this, this.drawerLayout, R.drawable.ic_drawer, R.drawable.ic_drawer)
-        {
+        this.drawerToggle = new ActionBarDrawerToggle(this, this.drawerLayout, R.drawable.ic_drawer, R.drawable.ic_drawer) {
             /** Called when a drawer has settled in a completely closed state. */
             @Override
-            public void onDrawerClosed(View view)
-            {
+            public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
                 MainActivity.this.getSupportActionBar().setTitle(MainActivity.this.current_title);
                 unHighlightSelection();
@@ -105,8 +100,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
             /** Called when a drawer has settled in a completely open state. */
             @Override
-            public void onDrawerOpened(View drawerView)
-            {
+            public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
                 // MainActivity.this.getSupportActionBar().setTitle("To_find_a_title");
             }
@@ -127,8 +121,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     }
 
     @Deprecated
-    private int getIconForCategory(String category)
-    {
+    private int getIconForCategory(String category) {
         String[] category_array = this.getResources().getStringArray(R.array.categories);
 
         if (category == null || category.equals(category_array[0])) return R.drawable.flag_red;
@@ -139,24 +132,22 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     }
 
     @Deprecated
-    private float getCategoryColor(String category)
-    {
+    private float getCategoryColor(String category) {
         String[] category_array = this.getResources().getStringArray(R.array.categories);
 
-        if (category == null || category.equals(category_array[0])) return BitmapDescriptorFactory.HUE_RED;
+        if (category == null || category.equals(category_array[0]))
+            return BitmapDescriptorFactory.HUE_RED;
         else if (category.equals(category_array[1])) return BitmapDescriptorFactory.HUE_AZURE;
         else if (category.equals(category_array[2])) return BitmapDescriptorFactory.HUE_ORANGE;
         else if (category.equals(category_array[3])) return BitmapDescriptorFactory.HUE_BLUE;
         else return BitmapDescriptorFactory.HUE_MAGENTA; // 'Food' category
     }
 
-    public void refresh()
-    {
+    public void refresh() {
         Location currentLocation = PlacesApplication.getInstance().getLocation();
-        if(currentLocation != null){
+        if (currentLocation != null) {
             PlacesApplication.getInstance().getLocationService().queryParsewithLocation(currentLocation);
-        }
-        else
+        } else
             Toast.makeText(this, "No location data available\n" +
                     "Are Location Services enabled?", Toast.LENGTH_LONG).show();
     }
@@ -173,12 +164,9 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         // Pass the event to ActionBarDrawerToggle, if it returns
         // true, then it has handled the app icon touch event
 
-        if (drawerToggle.onOptionsItemSelected(item))
-        {
+        if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
-        }
-        else if(item.getItemId() == R.id.action_add_flag)
-        {
+        } else if (item.getItemId() == R.id.action_add_flag) {
             Intent shareIntent = new Intent(this, ShareActivity.class);
             startActivityForResult(shareIntent, MainActivity.SHARE_ACTIVITY_REQUEST_CODE);
             // item.setVisible(false);
@@ -189,15 +177,14 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
 
-        LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-                &&!locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                && !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             promptForLocationServices();
-        }else {
+        } else {
             PlacesApplication.getInstance().startLocationService();
         }
 
@@ -205,16 +192,11 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
 
         isForeground = false;
 
-    }
-
-    public static boolean isForeground(){
-        return isForeground;
     }
 
     private void promptForLocationServices() {
@@ -283,16 +265,15 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 //    {
 
     private void myProfile() {
-        switchToOtherFrag(MyProfileFragment.newInstance(PlacesLoginUtils.getInstance().getCurrentUserId()));
+        switchToOtherFrag(ProfileFragment.newInstance(PlacesLoginUtils.getInstance().getCurrentUserId()));
     }
 
-    private void logout()
-    {
+    private void logout() {
         // Log the user out
         ParseUser.logOut();
 
         // TODO It needs to be coupled with ParseUser.logOut()
-        if(PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.GPLUS &&
+        if (PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.GPLUS &&
                 GPlusUtils.getInstance().getGoogleApiClient() != null)
             GPlusUtils.getInstance().getGoogleApiClient().disconnect();
 
@@ -302,9 +283,10 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         PlacesLoginUtils.startLoginActivity(this);
     }
 
-    /** Swaps fragments in the main content view */
-    private void selectItem(int position)
-    {
+    /**
+     * Swaps fragments in the main content view
+     */
+    private void selectItem(int position) {
         // TODO I have temporarily removed the block of code below for my implementation to work
         /*
         if(this.currentDrawerListItemIndex == position)
@@ -314,7 +296,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             return;
         }
         */
-        switch(position){
+        switch (position) {
 
             case FLAGS_LIST_POSITION:
 //                if(homeHolder.getVisibility() == View.INVISIBLE)
@@ -322,12 +304,12 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
                 break;
 
             case MY_PROFILE_POSITION:
-            myProfile();
-            break;
+                myProfile();
+                break;
 
             case MY_FLAGS_POSITION:
-            switchToOtherFrag(new MyFlagsFragment());
-            break;
+                switchToOtherFrag(new MyFlagsFragment());
+                break;
 
             case SETTINGS_POSITION:
                 switchToSettingsFrag();
@@ -345,8 +327,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     }
 
 
-    private void unHighlightSelection()
-    {
+    private void unHighlightSelection() {
         int toClear = this.drawerList.getCheckedItemPosition();
 
         if (toClear >= 0) drawerList.setItemChecked(toClear, false);
@@ -358,29 +339,21 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         this.getSupportActionBar().setTitle(this.current_title);
     }
 
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-
-        @Override
-        public void onItemClick(AdapterView parent, View view, int position, long id) {
-            MainActivity.this.selectItem(position);
-        }
-    }
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        switch (requestCode)
-        {
+        switch (requestCode) {
             case Utils.LOGIN_REQUEST_CODE:
 
-                if(resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     //this.startDownloadingFacebookInfo();
 
                     // TODO At this time, if G+ login is being used, this code block won't be executed
                     Log.d(TAG, "Login was successful");
 
-                    if(ParseFacebookUtils.getSession() == null) PlacesLoginUtils.loginType = PlacesLoginUtils.LoginType.GPLUS;
+                    if (ParseFacebookUtils.getSession() == null)
+                        PlacesLoginUtils.loginType = PlacesLoginUtils.LoginType.GPLUS;
                     else PlacesLoginUtils.loginType = PlacesLoginUtils.LoginType.FACEBOOK;
 
                     PlacesLoginUtils.getInstance().downloadUserInfo(this);
@@ -388,41 +361,34 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
                 break;
             case SHARE_ACTIVITY_REQUEST_CODE:
 
-                if(resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     Toast.makeText(this, data.getExtras().getString("result"), Toast.LENGTH_LONG).show();
                 }
                 break;
         }
     }
 
-    private void getRidOfUnusedFrag()
-    {
+    private void getRidOfUnusedFrag() {
         android.app.Fragment frag1 = this.getFragmentManager().findFragmentByTag(FRAG_TAG);
         Fragment frag2 = this.getSupportFragmentManager().findFragmentByTag(FRAG_TAG);
 
         // TODO We need to check if we need both lines since we got both "fragments" and "support fragments"
-        if(frag1 != null) this.getFragmentManager().beginTransaction().remove(frag1).commit();
-        else if(frag2!= null) this.getSupportFragmentManager().beginTransaction().remove(frag2).commit();
+        if (frag1 != null) this.getFragmentManager().beginTransaction().remove(frag1).commit();
+        else if (frag2 != null)
+            this.getSupportFragmentManager().beginTransaction().remove(frag2).commit();
     }
 
-    private void switchToSupportFrag()
-    {
+    private void switchToSupportFrag() {
         fragHolder.setVisibility(View.INVISIBLE);
         homeHolder.setVisibility(View.VISIBLE);
     }
 
-    private void switchToNonSupportFrag()
-    {
+    private void switchToNonSupportFrag() {
         homeHolder.setVisibility(View.INVISIBLE);
         fragHolder.setVisibility(View.VISIBLE);
     }
 
-//    private void switchToListMapFrags()
-
-//        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new Fragment()).commit();
-
-    private void switchToSettingsFrag()
-    {
+    private void switchToSettingsFrag() {
         Log.d(TAG, "Switching to SettingsFragment");
 //        getRidOfUnusedFrag();
         switchToNonSupportFrag();
@@ -430,13 +396,16 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         this.getFragmentManager().beginTransaction().replace(R.id.frag_container, new SettingsFragment()).commit();
     }
 
-    public void switchToOtherFrag(Fragment frag)
-    {
+//    private void switchToListMapFrags()
+
+//        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new Fragment()).commit();
+
+    public void switchToOtherFrag(Fragment frag) {
         Log.d(TAG, "Switching to other fragment: " + frag.getClass());
 //        getRidOfUnusedFrag();
 //        switchToFragOtherThanHome();
         Fragment f = this.getSupportFragmentManager().findFragmentById(R.id.home_container);
-        if(!isNonSupportFragmentVisible() && f != null && f.getClass() == frag.getClass()){
+        if (!isNonSupportFragmentVisible() && f != null && f.getClass() == frag.getClass()) {
             Log.w(TAG, "Switching to the same fragment: " + f.getClass());
             return;
         }
@@ -446,16 +415,16 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, frag).addToBackStack(null).commit();
     }
 
-//    @Override
-
-    private boolean isNonSupportFragmentVisible(){
-       return fragHolder.getVisibility() == View.VISIBLE;
+    private boolean isNonSupportFragmentVisible() {
+        return fragHolder.getVisibility() == View.VISIBLE;
     }
 
+//    @Override
+
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
         Fragment f = this.getSupportFragmentManager().findFragmentById(R.id.home_container);
-        if(!isNonSupportFragmentVisible() && f != null && f.getClass() == MainFragment.class){
+        if (!isNonSupportFragmentVisible() && f != null && f.getClass() == MainFragment.class) {
             Log.d(TAG, "Pressed back button on MainFragment: finishing...");
             this.getSupportFragmentManager().popBackStack(null, android.support.v4.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
             finish();
@@ -469,27 +438,24 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 //            fm.popBackStack();
 //        }
 //        else
-        if(isNonSupportFragmentVisible()){
+        if (isNonSupportFragmentVisible()) {
             switchToSupportFrag();
-        }
-        else if(getSupportFragmentManager().getBackStackEntryCount() > 0){
+        } else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             Log.i("MainActivity", "popping support: " +
                     getSupportFragmentManager().getBackStackEntryCount() + ", while backstack: " +
                     fm.getBackStackEntryCount());
             getSupportFragmentManager().popBackStack();
-        }
-        else {
+        } else {
             Log.i("MainActivity", "nothing on backstack, calling super");
             super.onBackPressed();
         }
     }
 
     @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue)
-    {
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor editor = preferences.edit();
-        if(preference.getKey().equals("meFilter") ||
+        if (preference.getKey().equals("meFilter") ||
                 preference.getKey().equals("flFilter") ||
                 preference.getKey().equals("strangersFilter") ||
                 preference.getKey().equals("timeFilter") ||
@@ -498,10 +464,9 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
                 preference.getKey().equals("musicCheck") ||
                 preference.getKey().equals("landscapeCheck") ||
                 preference.getKey().equals("foodCheck") ||
-                preference.getKey().equals("noneCheck"))
-        {
+                preference.getKey().equals("noneCheck")) {
             Log.d(TAG, "Called onPreferenceChange for: " + preference.getKey());
-            editor.putBoolean(preference.getKey(), (boolean)newValue);
+            editor.putBoolean(preference.getKey(), (boolean) newValue);
             editor.commit();
         }
         /*
@@ -514,10 +479,9 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             Log.d(TAG, "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
         }
         */
-        else if(preference.getKey().equals("maxFetch"))
-        {
+        else if (preference.getKey().equals("maxFetch")) {
             preference.setDefaultValue(newValue);
-            int value = Utils.stepValues[(int)newValue];
+            int value = Utils.stepValues[(int) newValue];
             Utils.MAX_FLAGS = value;
             showToast("Max number of visible flags: " + value);
         }
@@ -529,11 +493,19 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     }
 
     private void showToast(String text) {
-        if(radiusToast != null)
+        if (radiusToast != null)
             radiusToast.cancel();
         radiusToast = Toast.makeText(getBaseContext(), text,
                 Toast.LENGTH_SHORT);
         radiusToast.show();
+    }
+
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView parent, View view, int position, long id) {
+            MainActivity.this.selectItem(position);
+        }
     }
 
 }

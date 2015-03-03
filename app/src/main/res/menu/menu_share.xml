@@ -2,7 +2,8 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/action_confirm_flag"
+    <item
+        android:id="@+id/action_confirm_flag"
         android:icon="@drawable/flag_done"
         android:title="Place flag"
         app:showAsAction="ifRoom" />

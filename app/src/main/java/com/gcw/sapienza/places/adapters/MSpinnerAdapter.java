@@ -16,31 +16,30 @@ import java.util.List;
 /**
  * Created by mic_head on 08/01/15.
  */
-public class MSpinnerAdapter extends ArrayAdapter implements SpinnerAdapter{
+public class MSpinnerAdapter extends ArrayAdapter implements SpinnerAdapter {
     @SuppressWarnings("unused")
     private static final String TAG = "MSpinnerFragment";
 
     Context mContext;
     List<String> values;
 
-    public MSpinnerAdapter(Context context, List<String> values)
-    {
-        super(context, R.layout.custom_spinner,values);
+    public MSpinnerAdapter(Context context, List<String> values) {
+        super(context, R.layout.custom_spinner, values);
         this.mContext = context;
         this.values = values;
     }
 
     @Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent){
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
 
         View v = convertView;
 
         if (v == null) {
-            LayoutInflater vi = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater vi = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = vi.inflate(android.R.layout.simple_spinner_dropdown_item, null);
         }
 
-        TextView tv=(TextView) v.findViewById(android.R.id.text1);
+        TextView tv = (TextView) v.findViewById(android.R.id.text1);
 
         /*
         switch (position) {
@@ -61,8 +60,7 @@ public class MSpinnerAdapter extends ArrayAdapter implements SpinnerAdapter{
         }
         */
 
-        switch (position)
-        {
+        switch (position) {
             case 0:
                 tv.setTextColor(mContext.getResources().getColor(R.color.grey));
                 break;

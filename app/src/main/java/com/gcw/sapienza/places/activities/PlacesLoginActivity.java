@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Toast;
+
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.fragments.PlacesLoginFragment;
 import com.gcw.sapienza.places.utils.GPlusUtils;
@@ -18,6 +19,7 @@ import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -34,7 +36,7 @@ import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 import com.parse.ui.ParseLoginActivity;
-import com.google.android.gms.common.ConnectionResult;
+
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -42,10 +44,10 @@ import java.util.HashMap;
 /**
  * Created by paolo on 23/02/15.
  */
-public class PlacesLoginActivity extends ParseLoginActivity implements  com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks,
-                                                                        com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener,
-                                                                        View.OnClickListener,
-                                                                        ResultCallback<People.LoadPeopleResult> {
+public class PlacesLoginActivity extends ParseLoginActivity implements com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks,
+        com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener,
+        View.OnClickListener,
+        ResultCallback<People.LoadPeopleResult> {
 
     private static final String TAG = "PlacesLoginActivity";
 
@@ -53,13 +55,11 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
     private static final int RC_SIGN_IN = 0;
 
     private static final int REQUEST_CODE_TOKEN_AUTH = 1;
-
+    private final int fragmentContainer = android.R.id.content;
     /* A flag indicating that a PendingIntent is in progress and prevents
      * us from starting further intents.
      */
     private boolean mIntentInProgress;
-
-    private final int fragmentContainer = android.R.id.content;
     private Bundle configOptions;
 
     private ProgressDialog progressDialog;
@@ -149,8 +149,7 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
     }
 
     @Override
-    public void onConnected(Bundle connectionHint)
-    {
+    public void onConnected(Bundle connectionHint) {
         // We've resolved any connection errors.  mGoogleApiClient can be used to
         // access Google APIs on behalf of the user.
 
@@ -158,44 +157,34 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
         getGPlusFriends();
         getGPlusAccessToken();
 
-        if(progressDialog != null) progressDialog.dismiss();
+        if (progressDialog != null) progressDialog.dismiss();
     }
 
     @Override
-    public void onResult(People.LoadPeopleResult loadPeopleResult)
-    {
-        if (loadPeopleResult.getStatus().getStatusCode() == CommonStatusCodes.SUCCESS)
-        {
+    public void onResult(People.LoadPeopleResult loadPeopleResult) {
+        if (loadPeopleResult.getStatus().getStatusCode() == CommonStatusCodes.SUCCESS) {
             PersonBuffer personBuffer = loadPeopleResult.getPersonBuffer();
-            try
-            {
+            try {
                 int count = personBuffer.getCount();
-                for (int i = 0; i < count; i++)
-                {
+                for (int i = 0; i < count; i++) {
                     Person person = personBuffer.get(i);
                     Log.d(TAG, "Display name: " + person.getDisplayName());
                     PlacesLoginUtils.getInstance().addEntryToUserIdMap(person.getId(), person.getDisplayName());
                     PlacesLoginUtils.getInstance().addFriend(person.getDisplayName());
                 }
-            }
-            finally
-            {
+            } finally {
                 personBuffer.close();
             }
-        }
-        else
-        {
+        } else {
             Log.e(TAG, "Error requesting people data: " + loadPeopleResult.getStatus());
         }
 
     }
 
-    public void getGPlusUsername()
-    {
+    public void getGPlusUsername() {
         Plus.PeopleApi.loadVisible(GPlusUtils.getInstance().getGoogleApiClient(), null).setResultCallback(this);
 
-        if (Plus.PeopleApi.getCurrentPerson(GPlusUtils.getInstance().getGoogleApiClient()) != null)
-        {
+        if (Plus.PeopleApi.getCurrentPerson(GPlusUtils.getInstance().getGoogleApiClient()) != null) {
             GPlusUtils.getInstance().setCurrentPerson(Plus.PeopleApi.getCurrentPerson(GPlusUtils.getInstance().getGoogleApiClient()));
             String personName = GPlusUtils.getInstance().getCurrentPerson().getDisplayName();
             String personId = GPlusUtils.getInstance().getCurrentPerson().getId();
@@ -205,8 +194,7 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
         }
     }
 
-    public void getGPlusFriends()
-    {
+    public void getGPlusFriends() {
         Plus.PeopleApi.loadVisible(GPlusUtils.getInstance().getGoogleApiClient(), GPlusUtils.getInstance().getCurrentPerson().getId()).setResultCallback(this);
     }
 
@@ -217,25 +205,23 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
     @Override
     public void onActivityResult(int requestCode, int responseCode, Intent intent) {
         // if (requestCode == RC_SIGN_IN) {
-            mIntentInProgress = false;
+        mIntentInProgress = false;
 
-            if (GPlusUtils.getInstance().getGoogleApiClient() != null &&
-                    !GPlusUtils.getInstance().getGoogleApiClient().isConnecting()) {
-                GPlusUtils.getInstance().getGoogleApiClient().connect();
-            }
-            // Required for making Facebook login work
-            else super.onActivityResult(requestCode, responseCode, intent);
+        if (GPlusUtils.getInstance().getGoogleApiClient() != null &&
+                !GPlusUtils.getInstance().getGoogleApiClient().isConnecting()) {
+            GPlusUtils.getInstance().getGoogleApiClient().connect();
+        }
+        // Required for making Facebook login work
+        else super.onActivityResult(requestCode, responseCode, intent);
         // }
     }
 
     @Override
-    public void onClick(View v)
-    {
-        if(v.getId() == R.id.gplus_sign_in_button) signinWithGPlus();
+    public void onClick(View v) {
+        if (v.getId() == R.id.gplus_sign_in_button) signinWithGPlus();
     }
 
-    public void signinWithGPlus()
-    {
+    public void signinWithGPlus() {
         GPlusUtils.getInstance().setGoogleApiClient(new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -248,8 +234,7 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
                 getString(com.parse.ui.R.string.com_parse_ui_progress_dialog_text), true, false);
     }
 
-    private void getGPlusAccessToken()
-    {
+    private void getGPlusAccessToken() {
         AsyncTask<Void, Void, String> task = new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
@@ -278,8 +263,7 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
             }
 
             @Override
-            protected void onPostExecute(String token)
-            {
+            protected void onPostExecute(String token) {
                 Log.i(TAG, "Google+ access token retrieved: " + token);
 
                 completeLoginWithParse(token);
@@ -290,27 +274,20 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
         task.execute();
     }
 
-    private void completeLoginWithParse(String token)
-    {
+    private void completeLoginWithParse(String token) {
         String email = Plus.AccountApi.getAccountName(GPlusUtils.getInstance().getGoogleApiClient());
         final HashMap<String, Object> params = new HashMap();
         params.put("code", token);
         params.put("email", email);
 
         //loads the Cloud function to create a Google user
-        ParseCloud.callFunctionInBackground("accessGoogleUser", params, new FunctionCallback<Object>()
-        {
+        ParseCloud.callFunctionInBackground("accessGoogleUser", params, new FunctionCallback<Object>() {
             @Override
-            public void done(Object returnObj, ParseException e)
-            {
-                if (e == null)
-                {
-                    ParseUser.becomeInBackground(returnObj.toString(), new LogInCallback()
-                    {
-                        public void done(ParseUser user, ParseException e)
-                        {
-                            if (user != null && e == null)
-                            {
+            public void done(Object returnObj, ParseException e) {
+                if (e == null) {
+                    ParseUser.becomeInBackground(returnObj.toString(), new LogInCallback() {
+                        public void done(ParseUser user, ParseException e) {
+                            if (user != null && e == null) {
                                 Log.i(TAG, "The Google user validated");
 
                                 GPlusUtils.getInstance().setGoogleApiClient(GPlusUtils.getInstance().getGoogleApiClient());
@@ -319,19 +296,14 @@ public class PlacesLoginActivity extends ParseLoginActivity implements  com.goog
                                 // finish();
                                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                 startActivity(intent);
-                            }
-                            else if (e != null)
-                            {
+                            } else if (e != null) {
                                 Toast.makeText(getApplicationContext(), "There was a problem creating your account.", Toast.LENGTH_SHORT).show();
                                 e.printStackTrace();
                                 GPlusUtils.getInstance().getGoogleApiClient().disconnect();
-                            }
-                            else Log.i(TAG, "The Google token could not be validated");
+                            } else Log.i(TAG, "The Google token could not be validated");
                         }
                     });
-                }
-                else
-                {
+                } else {
                     Toast.makeText(getApplicationContext(), "There was a problem creating your account.", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                     GPlusUtils.getInstance().getGoogleApiClient().disconnect();

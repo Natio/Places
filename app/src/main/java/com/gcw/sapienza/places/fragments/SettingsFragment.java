@@ -18,10 +18,9 @@ import com.gcw.sapienza.places.R;
 public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceClickListener {
     @SuppressWarnings("unused")
     private static final String TAG = "SettingsFragment";
-
+    private final int AR_THRESHOLD = 10;
     private int ar_sensor;
     private boolean sensorEnabled;
-    private final int AR_THRESHOLD = 10;
     private boolean firstClick;
 
     private AlertDialog dialog;
@@ -33,7 +32,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.layout.settings_layout);
 
-        Preference loneWolf_filter =  findPreference("meFilter");
+        Preference loneWolf_filter = findPreference("meFilter");
         Preference fl_filter = findPreference("flFilter");
         Preference strangers_filter = findPreference("strangersFilter");
         Preference time_filter = findPreference("timeFilter");
@@ -41,34 +40,33 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         Preference max_fetch = findPreference("maxFetch");
         Preference version_label = findPreference("version");
 
-        Preference thoughts_check =  findPreference("thoughtsCheck");
-        Preference fun_check =  findPreference("funCheck");
-        Preference music_check =  findPreference("musicCheck");
-        Preference landscape_check =  findPreference("landscapeCheck");
-        Preference food_check =  findPreference("foodCheck");
-        Preference none_check =  findPreference("noneCheck");
+        Preference thoughts_check = findPreference("thoughtsCheck");
+        Preference fun_check = findPreference("funCheck");
+        Preference music_check = findPreference("musicCheck");
+        Preference landscape_check = findPreference("landscapeCheck");
+        Preference food_check = findPreference("foodCheck");
+        Preference none_check = findPreference("noneCheck");
 
         version_label.setSummary(BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")");
-        loneWolf_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
-        fl_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
-        strangers_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
-        time_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
+        loneWolf_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
+        fl_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
+        strangers_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
+        time_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
 //        seek_bar.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
-        max_fetch.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
+        max_fetch.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
 
-        thoughts_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
-        fun_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
-        music_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
-        landscape_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
-        food_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
-        none_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
+        thoughts_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
+        fun_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
+        music_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
+        landscape_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
+        food_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
+        none_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
 
         version_label.setOnPreferenceClickListener(this);
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
         this.firstClick = true;
@@ -77,14 +75,11 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     }
 
     @Override
-    public boolean onPreferenceClick(Preference preference)
-    {
-        if(preference.getKey().equals("version") && sensorEnabled)
-        {
+    public boolean onPreferenceClick(Preference preference) {
+        if (preference.getKey().equals("version") && sensorEnabled) {
             ar_sensor++;
 
-            if(ar_sensor >= AR_THRESHOLD)
-            {
+            if (ar_sensor >= AR_THRESHOLD) {
                 // TODO there will be more
                 showAR();
                 sensorEnabled = false;
@@ -96,8 +91,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         return false;
     }
 
-    private void showAR()
-    {
+    private void showAR() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
@@ -108,43 +102,36 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
                 .setCancelable(false);
 
         dialog = builder.create();
-            dialog.show();
+        dialog.show();
 
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(new CustomListener(dialog));
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new CustomListener(dialog));
     }
 
-    class CustomListener implements View.OnClickListener
-    {
-        private final AlertDialog dialog;
-
-        public CustomListener(AlertDialog dialog)
-        {
-            this.dialog = dialog;
-        }
-        @Override
-        public void onClick(View v)
-        {
-            Button b = (Button)v;
-
-            if(b.getText().equals("No"))
-            {
-                if (firstClick)
-                {
-                    b.setText("Yes");
-
-                    firstClick = false;
-                }
-                else getRidOfDialogAndShowToast();
-            }
-            else getRidOfDialogAndShowToast();
-        }
-    }
-
-    private void getRidOfDialogAndShowToast()
-    {
+    private void getRidOfDialogAndShowToast() {
         Toast.makeText(getActivity(), "Simone likes this.", Toast.LENGTH_LONG).show();
 
         dialog.dismiss();
+    }
+
+    class CustomListener implements View.OnClickListener {
+        private final AlertDialog dialog;
+
+        public CustomListener(AlertDialog dialog) {
+            this.dialog = dialog;
+        }
+
+        @Override
+        public void onClick(View v) {
+            Button b = (Button) v;
+
+            if (b.getText().equals("No")) {
+                if (firstClick) {
+                    b.setText("Yes");
+
+                    firstClick = false;
+                } else getRidOfDialogAndShowToast();
+            } else getRidOfDialogAndShowToast();
+        }
     }
 }

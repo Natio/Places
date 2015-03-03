@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto">
-<item android:id="@+id/action_add_flag"
-    android:icon="@drawable/p_plus"
-    android:title="Place a flag"
-    app:showAsAction="ifRoom" />
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_add_flag"
+        android:icon="@drawable/p_plus"
+        android:title="Place a flag"
+        app:showAsAction="ifRoom" />
 </menu>

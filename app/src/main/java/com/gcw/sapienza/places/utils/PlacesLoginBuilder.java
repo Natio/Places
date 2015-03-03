@@ -17,8 +17,7 @@ public class PlacesLoginBuilder extends ParseLoginBuilder {
     private Context context;
     private ParseLoginConfig config = new ParseLoginConfig();
 
-    public PlacesLoginBuilder(Context context)
-    {
+    public PlacesLoginBuilder(Context context) {
         super(context);
 
         this.context = context;
@@ -28,8 +27,7 @@ public class PlacesLoginBuilder extends ParseLoginBuilder {
         config.setFacebookLoginPermissions(Arrays.asList("public_profile", "user_friends"/*, "user_relationships", "user_birthday", "user_location"*/));
     }
 
-    public Intent build()
-    {
+    public Intent build() {
         Intent intent = new Intent(context, ParseLoginActivity.class);
         intent.putExtras(config.toBundle());
         return intent;

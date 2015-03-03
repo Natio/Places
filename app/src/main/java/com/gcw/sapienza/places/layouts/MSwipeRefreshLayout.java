@@ -5,22 +5,16 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.util.Log;
 
-public class MSwipeRefreshLayout extends SwipeRefreshLayout
-{
+public class MSwipeRefreshLayout extends SwipeRefreshLayout {
 
-    public MSwipeRefreshLayout(Context context)
-    {
+    private OnChildScrollUpListener mScrollListenerNeeded;
+
+    public MSwipeRefreshLayout(Context context) {
         super(context, null);
     }
 
     public MSwipeRefreshLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-    }
-
-    private OnChildScrollUpListener mScrollListenerNeeded;
-
-    public static interface OnChildScrollUpListener {
-        public boolean canChildScrollUp();
     }
 
     public void setOnChildScrollUpListener(OnChildScrollUpListener listener) {
@@ -33,5 +27,9 @@ public class MSwipeRefreshLayout extends SwipeRefreshLayout
             Log.e(MSwipeRefreshLayout.class.getSimpleName(), "OnChildScrollListener is null!");
         }
         return mScrollListenerNeeded == null ? false : mScrollListenerNeeded.canChildScrollUp();
+    }
+
+    public static interface OnChildScrollUpListener {
+        public boolean canChildScrollUp();
     }
 }
