@@ -19,36 +19,16 @@ import java.util.HashMap;
  */
 public class PlacesLoginUtils {
 
-    private static final String TAG = "PlacesLoginUtils";
-
     protected static final String LARGE_PIC_SIZE = "200";
     protected static final String SMALL_PIC_SIZE = "120";
-
-    public enum PicSize {
-        SMALL, LARGE;
-
-        public String toString() {
-            if (this == SMALL) {
-                return SMALL_PIC_SIZE;
-            }
-            return LARGE_PIC_SIZE;
-        }
-    }
-
-    private String userId;
-
-    public enum LoginType {FACEBOOK, GPLUS}
-
+    private static final String TAG = "PlacesLoginUtils";
+    private static final PlacesLoginUtils shared_instance = new PlacesLoginUtils();
     public static LoginType loginType;
-
     private final ArrayList<String> friends = new ArrayList<>();
     private final HashMap<String, String> userIdMap = new HashMap<>();
     private final HashMap<String, String> userProfilePicMapSmall = new HashMap<>();
     private final HashMap<String, String> userProfilePicMapLarge = new HashMap<>();
-
-    private static final PlacesLoginUtils shared_instance = new PlacesLoginUtils();
-
-
+    private String userId;
     private PlacesLoginUtils() {
     }
 
@@ -67,12 +47,34 @@ public class PlacesLoginUtils {
             GPlusUtils.downloadGPlusInfo(GPlusUtils.getInstance().getGoogleApiClient(), context);
     }
 
+    /**
+     * @param activity the activity where to start the intent
+     */
+    public static void startLoginActivity(Activity activity) {
+        PlacesLoginBuilder builder = new PlacesLoginBuilder(activity);
+
+        // builder.setAppLogo(R.drawable.app_logo);
+        Intent loginIntent = builder.build();
+        loginIntent.setClass(activity, PlacesLoginActivity.class);
+        // loginIntent.setClass(activity, ParseLoginActivity.class);
+
+        activity.startActivityForResult(loginIntent, Utils.LOGIN_REQUEST_CODE);
+    }
+
     public String getCurrentUserId() {
         return this.userId;
     }
 
+    public void setCurrentUserId(String userId) {
+        this.userId = userId;
+    }
+
     public ArrayList<String> getFriends() {
         return this.friends;
+    }
+
+    public void setFriends(ArrayList<String> friends) {
+        this.friends.addAll(friends);
     }
 
     public HashMap<String, String> getUserIdMap() {
@@ -87,16 +89,8 @@ public class PlacesLoginUtils {
         return this.getUserProfilePicMapLarge();
     }
 
-    public void setCurrentUserId(String userId) {
-        this.userId = userId;
-    }
-
     public void addFriend(String friend) {
         this.friends.add(friend);
-    }
-
-    public void setFriends(ArrayList<String> friends) {
-        this.friends.addAll(friends);
     }
 
     public void addEntryToUserIdMap(String key, String value) {
@@ -194,20 +188,6 @@ public class PlacesLoginUtils {
         throw new InvalidParameterException("wrong size specified: " + size);
     }
 
-    /**
-     * @param activity the activity where to start the intent
-     */
-    public static void startLoginActivity(Activity activity) {
-        PlacesLoginBuilder builder = new PlacesLoginBuilder(activity);
-
-        // builder.setAppLogo(R.drawable.app_logo);
-        Intent loginIntent = builder.build();
-        loginIntent.setClass(activity, PlacesLoginActivity.class);
-        // loginIntent.setClass(activity, ParseLoginActivity.class);
-
-        activity.startActivityForResult(loginIntent, Utils.LOGIN_REQUEST_CODE);
-    }
-
     public void loadUsernameIntoTextView(String fb_id, final TextView tv) {
         // if(loginType == LoginType.FACEBOOK) FacebookUtils.getInstance().loadUsernameIntoTextView(fb_id, tv);
         // else GPlusUtils.getInstance().loadUsernameIntoTextView(fb_id, tv);
@@ -225,4 +205,17 @@ public class PlacesLoginUtils {
             FacebookUtils.getInstance().loadProfilePicIntoImageView(user_id, imageView, size);
         else GPlusUtils.getInstance().loadProfilePicIntoImageView(user_id, imageView, size);
     }
+
+    public enum PicSize {
+        SMALL, LARGE;
+
+        public String toString() {
+            if (this == SMALL) {
+                return SMALL_PIC_SIZE;
+            }
+            return LARGE_PIC_SIZE;
+        }
+    }
+
+    public enum LoginType {FACEBOOK, GPLUS}
 }

@@ -51,6 +51,12 @@ public class PlacesLoginFragment extends ParseLoginFragment {
 
     private ParseLoginConfig config;
 
+    public static PlacesLoginFragment newInstance(Bundle configOptions) {
+        PlacesLoginFragment loginFragment = new PlacesLoginFragment();
+        loginFragment.setArguments(configOptions);
+        return loginFragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent,
                              Bundle savedInstanceState) {
@@ -112,12 +118,6 @@ public class PlacesLoginFragment extends ParseLoginFragment {
             throw new IllegalArgumentException(
                     "Activity must implemement ParseOnLoadingListener");
         }
-    }
-
-    public static PlacesLoginFragment newInstance(Bundle configOptions) {
-        PlacesLoginFragment loginFragment = new PlacesLoginFragment();
-        loginFragment.setArguments(configOptions);
-        return loginFragment;
     }
 
     private void setUpParseLoginAndSignup() {

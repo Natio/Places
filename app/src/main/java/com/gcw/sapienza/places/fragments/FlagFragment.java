@@ -59,6 +59,11 @@ import java.util.Locale;
  */
 public class FlagFragment extends Fragment implements View.OnClickListener, View.OnTouchListener, SwipeRefreshLayout.OnRefreshListener {
 
+    private static final String TAG = "FlagFragment";
+    private static final int WOW_CODE = 0;
+    private static final int LOL_CODE = 1;
+    private static final int BOO_CODE = 2;
+    protected String userId;
     private String text;
     private String id;
     private String date;
@@ -66,11 +71,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private String category;
     private boolean inPlace;
     private String flagId;
-
     private int wowCount;
     private int lolCount;
     private int booCount;
-
     private MediaPlayer mediaPlayer;
     private VideoView vv;
     private ImageView iw;
@@ -79,11 +82,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private ImageView playVideoButton;
     private FrameLayout videoHolder;
     private ImageView audioHolder;
-
     private Button wowButton;
     private Button lolButton;
     private Button booButton;
-
     private Button commentsButton;
     private Button addCommentButton;
     private SwipeRefreshLayout commentsHolder;
@@ -91,21 +92,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private ArrayAdapter<String> commentsAdapter;
     private ArrayList<Comment> comments;
     private String newComment;
-
-    public static enum MediaType {PIC, AUDIO, VIDEO, NONE}
-
     private MediaType mediaType;
     private ParseFile mediaFile;
-
-    protected String userId;
-
     private View view;
-
-    private static final String TAG = "FlagFragment";
-
-    private static final int WOW_CODE = 0;
-    private static final int LOL_CODE = 1;
-    private static final int BOO_CODE = 2;
 
     /**
      * Must be called BEFORE adding the fragment to the
@@ -525,7 +514,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         return true;
     }
-
 
     private void onVideoDownloaded(String videoPath) {
         Uri videoUri = Uri.parse(videoPath);
@@ -988,6 +976,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         }
 
     }
+
+    public static enum MediaType {PIC, AUDIO, VIDEO, NONE}
 
 }
 

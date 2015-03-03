@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    android:id="@+id/share_holder"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:weightSum="1"
-    android:id="@+id/share_holder">
+    android:orientation="vertical"
+    android:weightSum="1">
 
     <!-- <TextView
         android:layout_width="wrap_content"
@@ -21,23 +21,23 @@
         android:id="@+id/private_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_weight="0.125"
-        android:text="Make private"
-        android:textSize="22sp"
         android:layout_gravity="center_horizontal"
-        android:checked="false" />
+        android:layout_weight="0.125"
+        android:checked="false"
+        android:text="Make private"
+        android:textSize="22sp" />
 
     <EditText
-        android:inputType="textMultiLine|textNoSuggestions|textCapSentences"
+        android:id="@+id/share_text_field"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="0.6"
-        android:hint="@string/hint_text"
         android:background="@android:color/transparent"
-        android:textSize="25sp"
-        android:id="@+id/share_text_field"
         android:gravity="center_vertical|center_horizontal"
-        android:paddingBottom="20dp" />
+        android:hint="@string/hint_text"
+        android:inputType="textMultiLine|textNoSuggestions|textCapSentences"
+        android:paddingBottom="20dp"
+        android:textSize="25sp" />
 
     <View
         android:layout_width="fill_parent"
@@ -45,54 +45,54 @@
         android:background="@color/grey" />
 
     <LinearLayout
+        android:id="@+id/linear_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.15"
-        android:weightSum="1"
-        android:id="@+id/linear_layout">
+        android:weightSum="1">
 
         <ImageButton
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
             android:id="@+id/mic_button"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:background="@android:color/transparent"
-            android:src="@drawable/mic_selector"
-            android:scaleType="centerInside"
             android:layout_weight="0.25"
-            android:padding="18dp" />
+            android:background="@android:color/transparent"
+            android:padding="18dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/mic_selector" />
 
         <ImageButton
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
             android:id="@+id/pic_button"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/cam_selector"
-            android:background="@android:color/transparent"
-            android:scaleType="centerInside"
-            android:layout_weight="0.25"
-            android:padding="18dp" />
-
-        <ImageButton
             android:layout_width="100dp"
             android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="0.25"
+            android:background="@android:color/transparent"
+            android:padding="18dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/cam_selector" />
+
+        <ImageButton
             android:id="@+id/vid_button"
-            android:background="@android:color/transparent"
-            android:src="@drawable/videocam_selector"
-            android:layout_alignParentRight="true"
-            android:scaleType="centerInside"
-            android:padding="18dp" />
-
-        <ImageButton
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:id="@+id/phone_button"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/attach_selector"
+            android:layout_alignParentRight="true"
             android:background="@android:color/transparent"
+            android:padding="18dp"
             android:scaleType="centerInside"
+            android:src="@drawable/videocam_selector" />
+
+        <ImageButton
+            android:id="@+id/phone_button"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
             android:layout_weight="0.25"
-            android:padding="18dp" />
+            android:background="@android:color/transparent"
+            android:padding="18dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/attach_selector" />
 
     </LinearLayout>
 
@@ -102,14 +102,14 @@
         android:background="@color/grey" />
 
     <Spinner
+        android:id="@+id/spinner"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:id="@+id/spinner"
         android:layout_centerHorizontal="true"
-        android:gravity="center_horizontal"
-        android:textAlignment="gravity"
+        android:layout_weight="0.125"
         android:dropDownWidth="400dp"
-        android:layout_weight="0.125" />
+        android:gravity="center_horizontal"
+        android:textAlignment="gravity" />
 
     <!-- <Button
         style="?android:attr/borderlessButtonStyle"
@@ -127,31 +127,31 @@
 
     <RelativeLayout
         android:id="@+id/frame_layout"
-        android:animateLayoutChanges="true"
-        android:visibility="gone"
-        android:background="@color/transparent_green"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:background="@color/transparent_green"
+        android:visibility="gone">
 
         <ProgressBar
+            android:id="@+id/share_progress_bar"
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:indeterminate="true"
-            android:layout_gravity="center"
-            android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:id="@+id/share_progress_bar" />
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:indeterminate="true" />
 
         <TextView
+            android:id="@+id/share_progress_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/share_progress_bar"
-            android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_centerVertical="true"
             android:text=""
-            android:id="@+id/share_progress_text_view" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
     </RelativeLayout>
 
 </LinearLayout>

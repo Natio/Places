@@ -61,55 +61,15 @@ import java.util.Map;
 public class ShareActivity extends ActionBarActivity implements View.OnLongClickListener,
         View.OnClickListener, View.OnCreateContextMenuListener, CompoundButton.OnCheckedChangeListener {
 
-    private static final String TAG = "ShareActivity";
     public static final String PICTURE_FORMAT = ".jpg";
     public static final String AUDIO_FORMAT = ".3gp";
     public static final String VIDEO_FORMAT = ".mp4";
-
+    private static final String TAG = "ShareActivity";
     private static final String BUNDLED_IMG_PATH = "image path";
-
-    private String password;
-
     private static final int PIC_CODE = 0;
     private static final int AUDIO_CODE = 1;
     private static final int VIDEO_CODE = 2;
     private static final int PHONE_MEDIA_CODE = 3;
-
-
-    private Spinner spinner;
-    private TextView textView;
-    private RelativeLayout progressBarHolder;
-    private TextView progressTextView;
-
-    private ImageButton picButton;
-    private ImageButton micButton;
-    private ImageButton vidButton;
-    private ImageButton phoneButton;
-
-    private CheckBox privateCheckbox;
-
-    private LinearLayout linearLayout;
-
-    private boolean isPicTaken = false;
-    private boolean isVideoShoot = false;
-    private boolean isSoundCaptured = false;
-    private boolean isPhoneMediaSelected = false;
-
-    private boolean isPrivate;
-
-    private File pic;
-    private File video;
-    private File audio;
-    private File phoneMedia;
-
-    private MenuItem confirmButton;
-
-    private int requestedPhoneMediaType;
-
-    private File imageFile;
-
-    private FlagUploader uploader;
-
     private static final String FLAG_PLACED_TEXT = "Flag has been placed!";
     private static final String FB_ID_NOT_FOUND_TEXT = "Couldn't retrieve your Facebook credentials\nPlease check your internet connection.";
     private static final String EMPTY_FLAG_TEXT = "Please insert text or take a picture";
@@ -118,7 +78,172 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     private static final String AUDIO_NOT_FOUND_TEXT = "Error encountered while retrieving recording\nFlag won't be stored";
     private static final String VIDEO_NOT_FOUND_TEXT = "Error encountered while retrieving video\nFlag won't be stored";
     private static final String PHONE_MEDIA_NOT_FOUND_TEXT = "Error encountered while retrieving phone media\nFlag won't be stored";
+    private String password;
+    private Spinner spinner;
+    private TextView textView;
+    private RelativeLayout progressBarHolder;
+    private TextView progressTextView;
+    private ImageButton picButton;
+    private ImageButton micButton;
+    private ImageButton vidButton;
+    private ImageButton phoneButton;
+    private CheckBox privateCheckbox;
+    private LinearLayout linearLayout;
+    private boolean isPicTaken = false;
+    private boolean isVideoShoot = false;
+    private boolean isSoundCaptured = false;
+    private boolean isPhoneMediaSelected = false;
+    private boolean isPrivate;
+    private File pic;
+    private File video;
+    private File audio;
+    private File phoneMedia;
+    private MenuItem confirmButton;
+    private int requestedPhoneMediaType;
+    private File imageFile;
+    private FlagUploader uploader;
 
+    /**
+     * check if the file is an image
+     *
+     * @param file the file to be checked
+     * @return true if the file is an image
+     */
+    @SuppressWarnings("UnusedDeclaration")
+    public static boolean isImage(File file) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getPath(), options);
+        return options.outWidth != -1 && options.outHeight != -1;
+    }
+
+    /**
+     * Get a file path from a Uri. This will get the the path for Storage Access
+     * Framework Documents, as well as the _data field for the MediaStore and
+     * other file-based ContentProviders.
+     *
+     * @param context The context.
+     * @param uri     The Uri to query.
+     */
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public static String getPath(final Context context, final Uri uri) {
+
+        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+
+        // DocumentProvider
+        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+            // ExternalStorageProvider
+            if (isExternalStorageDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                if ("primary".equalsIgnoreCase(type)) {
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+                }
+
+                // TODO handle non-primary volumes
+            }
+            // DownloadsProvider
+            else if (isDownloadsDocument(uri)) {
+
+                final String id = DocumentsContract.getDocumentId(uri);
+                final Uri contentUri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+
+                return getDataColumn(context, contentUri, null, null);
+            }
+            // MediaProvider
+            else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                Uri contentUri = null;
+                if ("image".equals(type)) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+
+                final String selection = "_id=?";
+                final String[] selectionArgs = new String[]{
+                        split[1]
+                };
+
+                return getDataColumn(context, contentUri, selection, selectionArgs);
+            }
+        }
+        // MediaStore (and general)
+        else if ("content".equalsIgnoreCase(uri.getScheme())) {
+            return getDataColumn(context, uri, null, null);
+        }
+        // File
+        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the value of the data column for this Uri. This is useful for
+     * MediaStore Uris, and other file-based ContentProviders.
+     *
+     * @param context       The context.
+     * @param uri           The Uri to query.
+     * @param selection     (Optional) Filter used in the query.
+     * @param selectionArgs (Optional) Selection arguments used in the query.
+     * @return The value of the _data column, which is typically a file path.
+     */
+    public static String getDataColumn(Context context, Uri uri, String selection,
+                                       String[] selectionArgs) {
+
+        Cursor cursor = null;
+        final String column = "_data";
+        final String[] projection = {
+                column
+        };
+
+        try {
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                    null);
+            if (cursor != null && cursor.moveToFirst()) {
+                final int column_index = cursor.getColumnIndexOrThrow(column);
+                return cursor.getString(column_index);
+            }
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+        return null;
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is ExternalStorageProvider.
+     */
+    public static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is DownloadsProvider.
+     */
+    public static boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is MediaProvider.
+     */
+    public static boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
 
     public void setVideo(String video) {
         this.video = null;
@@ -245,7 +370,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
 
     }
-
 
     private void handleShareImage(Intent intent) {
         Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
@@ -521,6 +645,17 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
     }
 
+/*
+    public void hideKeyboard()
+    {
+        if(this.getCurrentFocus()!=null)
+        {
+            InputMethodManager inputMethodManager = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+*/
+
     /**
      * Checks if all sharing constraints are satisfied. This method also shows Toasts if constraints are not satisfied
      *
@@ -555,7 +690,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
         return true;
     }
-
 
     /**
      * build up a Flag with the relevant metadata and media
@@ -819,16 +953,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
     }
 
-/*
-    public void hideKeyboard()
-    {
-        if(this.getCurrentFocus()!=null)
-        {
-            InputMethodManager inputMethodManager = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
-        }
-    }
-*/
+    //from the open source library aFileChooser: https://github.com/iPaulPro/aFileChooser
 
     public void takePic() {
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -856,7 +981,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         Intent recordAudio = new Intent(this, AudioRecordingActivity.class);
         this.startActivityForResult(recordAudio, Utils.RECORD_AUDIO_REQUEST_CODE);
     }
-
 
     public void shootVid() {
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -906,7 +1030,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             Toast.makeText(this, "Please install a File Manager", Toast.LENGTH_SHORT).show();
         }
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -979,151 +1102,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 // Toast.makeText(this, "Error encountered while retrieving recording", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    /**
-     * check if the file is an image
-     *
-     * @param file the file to be checked
-     * @return true if the file is an image
-     */
-    @SuppressWarnings("UnusedDeclaration")
-    public static boolean isImage(File file) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(file.getPath(), options);
-        return options.outWidth != -1 && options.outHeight != -1;
-    }
-
-    //from the open source library aFileChooser: https://github.com/iPaulPro/aFileChooser
-
-    /**
-     * Get a file path from a Uri. This will get the the path for Storage Access
-     * Framework Documents, as well as the _data field for the MediaStore and
-     * other file-based ContentProviders.
-     *
-     * @param context The context.
-     * @param uri     The Uri to query.
-     */
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    public static String getPath(final Context context, final Uri uri) {
-
-        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
-
-        // DocumentProvider
-        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
-            // ExternalStorageProvider
-            if (isExternalStorageDocument(uri)) {
-                final String docId = DocumentsContract.getDocumentId(uri);
-                final String[] split = docId.split(":");
-                final String type = split[0];
-
-                if ("primary".equalsIgnoreCase(type)) {
-                    return Environment.getExternalStorageDirectory() + "/" + split[1];
-                }
-
-                // TODO handle non-primary volumes
-            }
-            // DownloadsProvider
-            else if (isDownloadsDocument(uri)) {
-
-                final String id = DocumentsContract.getDocumentId(uri);
-                final Uri contentUri = ContentUris.withAppendedId(
-                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
-
-                return getDataColumn(context, contentUri, null, null);
-            }
-            // MediaProvider
-            else if (isMediaDocument(uri)) {
-                final String docId = DocumentsContract.getDocumentId(uri);
-                final String[] split = docId.split(":");
-                final String type = split[0];
-
-                Uri contentUri = null;
-                if ("image".equals(type)) {
-                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                } else if ("video".equals(type)) {
-                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-                } else if ("audio".equals(type)) {
-                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-                }
-
-                final String selection = "_id=?";
-                final String[] selectionArgs = new String[]{
-                        split[1]
-                };
-
-                return getDataColumn(context, contentUri, selection, selectionArgs);
-            }
-        }
-        // MediaStore (and general)
-        else if ("content".equalsIgnoreCase(uri.getScheme())) {
-            return getDataColumn(context, uri, null, null);
-        }
-        // File
-        else if ("file".equalsIgnoreCase(uri.getScheme())) {
-            return uri.getPath();
-        }
-
-        return null;
-    }
-
-    /**
-     * Get the value of the data column for this Uri. This is useful for
-     * MediaStore Uris, and other file-based ContentProviders.
-     *
-     * @param context       The context.
-     * @param uri           The Uri to query.
-     * @param selection     (Optional) Filter used in the query.
-     * @param selectionArgs (Optional) Selection arguments used in the query.
-     * @return The value of the _data column, which is typically a file path.
-     */
-    public static String getDataColumn(Context context, Uri uri, String selection,
-                                       String[] selectionArgs) {
-
-        Cursor cursor = null;
-        final String column = "_data";
-        final String[] projection = {
-                column
-        };
-
-        try {
-            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
-                    null);
-            if (cursor != null && cursor.moveToFirst()) {
-                final int column_index = cursor.getColumnIndexOrThrow(column);
-                return cursor.getString(column_index);
-            }
-        } finally {
-            if (cursor != null)
-                cursor.close();
-        }
-        return null;
-    }
-
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is ExternalStorageProvider.
-     */
-    public static boolean isExternalStorageDocument(Uri uri) {
-        return "com.android.externalstorage.documents".equals(uri.getAuthority());
-    }
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is DownloadsProvider.
-     */
-    public static boolean isDownloadsDocument(Uri uri) {
-        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
-    }
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is MediaProvider.
-     */
-    public static boolean isMediaDocument(Uri uri) {
-        return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 
     private void changeAlphaBasedOnSelection(int media_code) {

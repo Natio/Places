@@ -34,15 +34,6 @@ import java.util.List;
 public class MyFlagsListFragment extends Fragment {
 
     private static final String TAG = "MyFlagsListFragment";
-
-    private static final String NO_VALID_FLAG_SELECTED = "No valid Flag selected";
-
-    private static final String FLAG_DELETED = "Flag deleted";
-    private static final String FLAG_REPORTED = "Flag reported";
-    private static final String FLAG_REPORT_REVOKED = "Flag report revoked";
-
-    private RecyclerView recycleView;
-
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -61,6 +52,11 @@ public class MyFlagsListFragment extends Fragment {
             }
         }
     };
+    private static final String NO_VALID_FLAG_SELECTED = "No valid Flag selected";
+    private static final String FLAG_DELETED = "Flag deleted";
+    private static final String FLAG_REPORTED = "Flag reported";
+    private static final String FLAG_REPORT_REVOKED = "Flag report revoked";
+    private RecyclerView recycleView;
 
     public RecyclerView getRV() {
         return recycleView;

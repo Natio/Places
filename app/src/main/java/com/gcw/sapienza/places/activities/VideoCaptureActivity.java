@@ -35,14 +35,30 @@ import java.util.TimerTask;
 public class VideoCaptureActivity extends Activity implements View.OnClickListener, MediaRecorder.OnInfoListener {
 
     private static final String TAG = "VideoCaptureActivity";
+    SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
+        @Override
+        public void surfaceCreated(SurfaceHolder holder) {
+            // no-op -- wait until surfaceChanged()
+        }
 
+        @Override
+        public void surfaceChanged(SurfaceHolder holder,
+                                   int format, int width,
+                                   int height) {
+            initPreview(width, height);
+            startPreview();
+            Log.d(TAG, "surfaceChanged");
+        }
+
+        @Override
+        public void surfaceDestroyed(SurfaceHolder holder) {
+            shutdown();
+        }
+    };
     private static final int MAX_VIDEO_LENGTH = 60000;
     private static final int MAX_VIDEO_LENGTH_HD = 24000;
-
     private static final int VIDEO_FPS = 20;
     private static final int VIDEO_FPS_HD = 24;
-
-
     private SurfaceHolder previewHolder;
     private ToggleButton toggleButton;
     private ToggleButton hdButton;
@@ -57,7 +73,6 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
     private boolean isRecording = false;
     private boolean hdEnabled = false;
     private int supportedFPS;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -178,7 +193,6 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
     private void disableHd() {
         hdEnabled = false;
     }
-
 
     @Override
     public void onInfo(MediaRecorder mr, int what, int extra) {
@@ -363,7 +377,6 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
         this.filePath = null;
     }
 
-
     private Camera.Size getBestPreviewSize(int width, int height,
                                            Camera.Parameters parameters) {
         Camera.Size result = null;
@@ -418,27 +431,5 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
             inPreview = true;
         }
     }
-
-
-    SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
-        @Override
-        public void surfaceCreated(SurfaceHolder holder) {
-            // no-op -- wait until surfaceChanged()
-        }
-
-        @Override
-        public void surfaceChanged(SurfaceHolder holder,
-                                   int format, int width,
-                                   int height) {
-            initPreview(width, height);
-            startPreview();
-            Log.d(TAG, "surfaceChanged");
-        }
-
-        @Override
-        public void surfaceDestroyed(SurfaceHolder holder) {
-            shutdown();
-        }
-    };
 
 }

@@ -1,66 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <RelativeLayout
         android:id="@+id/frame_layout"
-        android:animateLayoutChanges="true"
-        android:visibility="gone"
-        android:alpha="0.3"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:alpha="0.3"
+        android:animateLayoutChanges="true"
+        android:visibility="gone">
 
         <ProgressBar
+            android:id="@+id/share_progress_bar"
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:indeterminate="true"
-            android:layout_gravity="center"
-            android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:id="@+id/share_progress_bar" />
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:indeterminate="true" />
 
         <TextView
+            android:id="@+id/share_progress_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/share_progress_bar"
-            android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_centerVertical="true"
             android:text="@string/loading_my_flags"
-            android:textColor="@color/transparent_green"
-            android:id="@+id/share_progress_text_view" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/transparent_green" />
     </RelativeLayout>
 
     <FrameLayout
+        android:id="@+id/my_frag_container"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:visibility="invisible"
-        android:id="@+id/my_frag_container" />
+        android:visibility="invisible" />
 
     <LinearLayout
+        android:id="@+id/my_home_container"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="vertical"
-        android:id="@+id/my_home_container">
+        android:orientation="vertical">
 
         <FrameLayout
+            android:id="@+id/my_map_holder"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="0.4"
-            android:id="@+id/my_map_holder"
             android:background="@color/transparent_green"
             android:paddingBottom="2dp" />
 
         <com.gcw.sapienza.places.layouts.MSwipeRefreshLayout xmlns:tools="http://schemas.android.com/tools"
-            android:orientation="vertical"
+            android:id="@+id/my_swipe_refresh"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            tools:context="com.gcw.sapienza.places.activities.MainActivity"
-            android:id="@+id/my_swipe_refresh"
-            android:layout_weight="0.6" />
+            android:layout_weight="0.6"
+            android:orientation="vertical"
+            tools:context="com.gcw.sapienza.places.activities.MainActivity" />
 
         <!-- <FrameLayout
         android:id="@+id/content_frame"

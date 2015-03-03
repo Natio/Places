@@ -40,35 +40,61 @@ import java.util.Locale;
 
 
 public class PlacesApplication extends Application {
+    public static final boolean isRunningOnEmulator = Build.BRAND.toLowerCase().startsWith("generic");
     //just the tag for logging
     private static final String TAG = "PlacesApplication";
-
-    //the app context
-    private static Context PLACES_CONTEXT = null;
-
     //Parse.com app key
     private static final String PARSE_COM_APP_KEY = "BWtqN9x6uyr935MKAROcWkc6mzv8KLQMMVnFGHps";
 
     //Parse.com client key
     private static final String PARSE_COM_CLIENT_KEY = "Gr1g8Z2kfv3AOZqToZ30hyMyNzH24vj4yudNoKfb";
-
+    //the app context
+    private static Context PLACES_CONTEXT = null;
+    private static PlacesApplication placesApplication;
     //current location
     private Location currentLocation = null;
-
-    public static final boolean isRunningOnEmulator = Build.BRAND.toLowerCase().startsWith("generic");
-
     private List<Flag> flagsNearby = new ArrayList<>(0);
     private List<Flag> myFlags = new ArrayList<>(0);
+    private ILocationUpdater listener = new ILocationUpdater() {
+        @Override
+        public void setLocation(Location l) {
+            PlacesApplication.this.currentLocation = l;
+            PlacesApplication.this.updateWeatherInfo();
+        }
 
+        @Override
+        public void setFlagsNearby(List<Flag> l) {
+            PlacesApplication.this.flagsNearby = l;
+        }
+
+        @Override
+        public void setMyFlags(List<Flag> myFlags) {
+            PlacesApplication.this.myFlags = myFlags;
+        }
+    };
     private LocationService mService;
-
     @SuppressWarnings("UnusedDeclaration")
     private boolean mBound = false;
+    private ServiceConnection mConnection = new ServiceConnection() {
 
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            LocalBinder binder = (LocalBinder) service;
+            mService = binder.getService();
+            mService.setListener(listener);
+            PlacesApplication.this.mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mService = null;
+            PlacesApplication.this.mBound = false;
+        }
+    };
     //shared variable for handling weather conditions
     private String weather = "";
-
-    private static PlacesApplication placesApplication;
 
     /**
      * Call this method to access the UNIQUE PlacesApplication instance
@@ -79,6 +105,27 @@ public class PlacesApplication extends Application {
         return PlacesApplication.placesApplication;
     }
 
+    /**
+     * @return App context
+     */
+    @SuppressWarnings("unused")
+    public static Context getPlacesAppContext() {
+        return PlacesApplication.PLACES_CONTEXT;
+    }
+
+    private static void subscribeToParseBroadcast() {
+        ParsePush.subscribeInBackground("", new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Log.d("com.parse.push", "successfully subscribed to the broadcast channel.");
+                } else {
+                    // Log.e("com.parse.push", "failed to subscribe for push", e);
+                    Log.e(TAG, "failed to subscribe for push");
+                }
+            }
+        });
+    }
 
     /**
      * @return returns LocationService instance
@@ -135,14 +182,6 @@ public class PlacesApplication extends Application {
         return this.myFlags;
     }
 
-    /**
-     * @return App context
-     */
-    @SuppressWarnings("unused")
-    public static Context getPlacesAppContext() {
-        return PlacesApplication.PLACES_CONTEXT;
-    }
-
     //method called when the app is launched
     @Override
     public void onCreate() {
@@ -188,20 +227,6 @@ public class PlacesApplication extends Application {
         PlacesApplication.getInstance().startLocationService();
     }
 
-    private static void subscribeToParseBroadcast() {
-        ParsePush.subscribeInBackground("", new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    Log.d("com.parse.push", "successfully subscribed to the broadcast channel.");
-                } else {
-                    // Log.e("com.parse.push", "failed to subscribe for push", e);
-                    Log.e(TAG, "failed to subscribe for push");
-                }
-            }
-        });
-    }
-
     public void startLocationService() {
         LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
@@ -215,42 +240,6 @@ public class PlacesApplication extends Application {
             Log.w("Places Application", "Location Service not started!");
         }
     }
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            LocalBinder binder = (LocalBinder) service;
-            mService = binder.getService();
-            mService.setListener(listener);
-            PlacesApplication.this.mBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mService = null;
-            PlacesApplication.this.mBound = false;
-        }
-    };
-    private ILocationUpdater listener = new ILocationUpdater() {
-        @Override
-        public void setLocation(Location l) {
-            PlacesApplication.this.currentLocation = l;
-            PlacesApplication.this.updateWeatherInfo();
-        }
-
-        @Override
-        public void setFlagsNearby(List<Flag> l) {
-            PlacesApplication.this.flagsNearby = l;
-        }
-
-        @Override
-        public void setMyFlags(List<Flag> myFlags) {
-            PlacesApplication.this.myFlags = myFlags;
-        }
-    };
 
     private void updateWeatherInfo() {
         Geocoder gcd = new Geocoder(this, Locale.getDefault());

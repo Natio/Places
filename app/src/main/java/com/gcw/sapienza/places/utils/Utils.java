@@ -17,54 +17,40 @@ import java.io.IOException;
  * Created by mic_head on 02/01/15.
  */
 public class Utils {
-    @SuppressWarnings("unused")
-    private static final String TAG = "Utils";
-
     public static final int UPDATE_DELAY = 200;
     public static final int ANIMATION_DURATION = 300;
-
     public static final int MAP_BOUNDS = 70;
     public static final float ZOOM_LVL = 16f;
-
+    public static final int VID_SHOOT_REQUEST_CODE = 90;
+    public static final int PIC_CAPTURE_REQUEST_CODE = 91;
+    public static final int RECORD_AUDIO_REQUEST_CODE = 92;
+    public static final int PHONE_AUDIO_REQUEST_CODE = 93;
+    public static final int PHONE_IMAGE_REQUEST_CODE = 94;
+    public static final int PHONE_VIDEO_REQUEST_CODE = 95;
+    public static final int SHARE_SOCIAL_REQUEST_CODE = 1001;
+    public static final int PHONE_AUDIO = 0;
+    public static final int PHONE_IMAGE = 1;
+    public static final int PHONE_VIDEO = 2;
+    @SuppressWarnings("unused")
+    public static final int SETTINGS_REQUEST_CODE = 70;
+    public static final int GPS_ENABLE_REQUEST_CODE = 71;
+    public static final int LOGIN_REQUEST_CODE = 72;
+    public static final int VIBRATION_DURATION = 0; // I didn't like it that much
+    public static final int FLAG_LIST_GROUP = 0;
+    public static final int PHONE_MEDIA_GROUP = 1;
+    public static final int DELETE_FLAG = 0;
+    public static final int REPORT_FLAG = 1;
+    public static final int DELETE_REPORT_FLAG = 2;
+    protected static final int CHUNK_SIZE = 4096;
+    @SuppressWarnings("unused")
+    private static final String TAG = "Utils";
     /**
      * as the radius settings have been deleted,
      * the static map radius is now set to 150 meters
      */
     public static float MAP_RADIUS = 0.15f;
     public static int MAX_FLAGS = 10;
-
     public static int[] stepValues = {1, 5, 10, 15, 20};
-
-    public static final int VID_SHOOT_REQUEST_CODE = 90;
-    public static final int PIC_CAPTURE_REQUEST_CODE = 91;
-    public static final int RECORD_AUDIO_REQUEST_CODE = 92;
-
-    public static final int PHONE_AUDIO_REQUEST_CODE = 93;
-    public static final int PHONE_IMAGE_REQUEST_CODE = 94;
-    public static final int PHONE_VIDEO_REQUEST_CODE = 95;
-
-    public static final int SHARE_SOCIAL_REQUEST_CODE = 1001;
-
-    public static final int PHONE_AUDIO = 0;
-    public static final int PHONE_IMAGE = 1;
-    public static final int PHONE_VIDEO = 2;
-
-    @SuppressWarnings("unused")
-    public static final int SETTINGS_REQUEST_CODE = 70;
-    public static final int GPS_ENABLE_REQUEST_CODE = 71;
-    public static final int LOGIN_REQUEST_CODE = 72;
-
-    public static final int VIBRATION_DURATION = 0; // I didn't like it that much
-
-    public static final int FLAG_LIST_GROUP = 0;
-    public static final int PHONE_MEDIA_GROUP = 1;
-
-    public static final int DELETE_FLAG = 0;
-    public static final int REPORT_FLAG = 1;
-    public static final int DELETE_REPORT_FLAG = 2;
-
-    protected static final int CHUNK_SIZE = 4096;
-
 
     /**
      * Returns a string containing the name of the file without the extension

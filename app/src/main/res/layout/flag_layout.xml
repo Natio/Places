@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <RelativeLayout
+        android:id="@+id/author_container"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/author_container"
         android:layout_alignParentTop="true">
 
         <TextView
+            android:id="@+id/author"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:id="@+id/author"
-            android:layout_marginLeft="10dp"
             android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <!-- <View
             android:layout_width="1dp"
@@ -27,177 +27,177 @@
             android:id="@+id/profile_pic_divider" /> -->
 
         <ImageView
+            android:id="@+id/profile_pic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/profile_pic"
-            android:layout_gravity="center_vertical"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
             android:background="@drawable/my_border_2" />
 
     </RelativeLayout>
 
     <View
+        android:id="@+id/author_divider"
         android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:background="@color/grey"
         android:layout_below="@id/author_container"
-        android:id="@+id/author_divider" />
+        android:background="@color/grey" />
 
     <EditText
+        android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textMultiLine"
-        android:ems="@integer/max_text_size"
-        android:background="@android:color/transparent"
-        android:id="@+id/text"
-        android:maxWidth="250dp"
-        android:maxHeight="220dp"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
-        android:gravity="center"
         android:layout_below="@+id/author_divider"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
+        android:background="@android:color/transparent"
+        android:ems="@integer/max_text_size"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:gravity="center"
+        android:inputType="textMultiLine"
+        android:maxHeight="220dp"
+        android:maxWidth="250dp"
         android:textSize="25sp" />
 
     <Button
         android:id="@+id/comments_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Show comments"
-        android:textSize="18sp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="10dp"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/my_border_3"
-        android:layout_alignParentBottom="true" />
+        android:text="Show comments"
+        android:textSize="18sp" />
 
     <Button
+        android:id="@+id/wow_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="WOW"
-        android:textSize="14sp"
-        android:background="@drawable/my_border_3"
+        android:layout_above="@+id/comments_button"
         android:layout_centerHorizontal="true"
-        android:id="@+id/wow_button"
         android:layout_marginBottom="5dp"
-        android:layout_above="@+id/comments_button" />
+        android:background="@drawable/my_border_3"
+        android:text="WOW"
+        android:textSize="14sp" />
 
     <Button
+        android:id="@+id/lol_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_toLeftOf="@+id/wow_button"
+        android:background="@drawable/my_border_3"
         android:text="LOL"
         android:textSize="14sp"
-        android:background="@drawable/my_border_3"
-        android:layout_toLeftOf="@+id/wow_button"
-        android:id="@+id/lol_button"
-        android:layout_marginBottom="10dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginLeft="5dp"
         android:visibility="gone" />
 
     <Button
+        android:id="@+id/boo_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_toRightOf="@+id/wow_button"
+        android:background="@drawable/my_border_3"
         android:text="BOO"
         android:textSize="14sp"
-        android:background="@drawable/my_border_3"
-        android:layout_toRightOf="@+id/wow_button"
-        android:id="@+id/boo_button"
-        android:layout_marginBottom="10dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginLeft="5dp"
         android:visibility="gone" />
 
     <ImageView
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:id="@+id/pic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxHeight="270dp"
-        android:maxWidth="270dp"
-        android:adjustViewBounds="true"
-        android:background="@drawable/my_border"
-        android:id="@+id/pic"
         android:layout_above="@+id/wow_button"
         android:layout_below="@+id/text"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:adjustViewBounds="true"
+        android:background="@drawable/my_border"
+        android:maxHeight="270dp"
+        android:maxWidth="270dp" />
 
     <ImageView
-        android:layout_marginTop="70dp"
-        android:layout_marginBottom="30dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/play_button"
         android:id="@+id/audio"
-        android:layout_below="@+id/text"
-        android:layout_centerHorizontal="true" />
-
-    <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
         android:layout_below="@+id/text"
         android:layout_centerHorizontal="true"
-        android:id="@+id/video_holder">
+        android:layout_marginBottom="30dp"
+        android:layout_marginTop="70dp"
+        android:src="@drawable/play_button" />
+
+    <FrameLayout
+        android:id="@+id/video_holder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp">
 
         <!-- hard-coded dimensions, must be changed -->
         <VideoView
+            android:id="@+id/vid"
             android:layout_width="wrap_content"
             android:layout_height="230dp"
-            android:background="@drawable/my_border"
-            android:id="@+id/vid"
-            android:layout_gravity="center_vertical|center_horizontal" />
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:background="@drawable/my_border" />
 
         <ImageButton
             android:id="@+id/play_video_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|center_horizontal"
-            android:src="@drawable/play_video_button"
             android:background="@android:color/transparent"
-            android:visibility="gone"
-            android:clickable="false" />
+            android:clickable="false"
+            android:src="@drawable/play_video_button"
+            android:visibility="gone" />
 
     </FrameLayout>
 
     <RelativeLayout
+        android:id="@+id/frame_layout"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:visibility="gone"
-        android:id="@+id/frame_layout"
         android:background="@color/transparent_green"
-        android:clickable="true">
+        android:clickable="true"
+        android:visibility="gone">
 
         <ImageView
+            android:id="@+id/focused_pic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxHeight="390dp"
-            android:maxWidth="390dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:adjustViewBounds="true"
             android:background="@drawable/my_border"
-            android:id="@+id/focused_pic"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true" />
+            android:maxHeight="390dp"
+            android:maxWidth="390dp" />
 
     </RelativeLayout>
 
     <android.support.v4.widget.SwipeRefreshLayout xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/comments_holder"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:visibility="gone"
-        android:id="@+id/comments_holder"
         android:background="@color/white"
+        android:visibility="gone"
         tools:context="com.gcw.sapienza.places.activities.MainActivity">
 
         <ListView
+            android:id="@+id/comments_list"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/comments_list" />
+            android:layout_height="wrap_content" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

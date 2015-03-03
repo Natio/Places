@@ -199,22 +199,12 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
         protected final TextView username;
         protected final ImageView user_profile_pic;
         protected final ImageView main_image;
-
+        private final Activity mainActivity;
         //new view for icon or line representing the category
         protected ImageView categoryIcon;
-
-        private final Activity mainActivity;
-
-        private String password;
-
         protected FlagsAdapter flagAdapter;
-
+        private String password;
         private Flag mFlag;
-
-        public void setCurrentFlag(Flag flag) {
-            this.mFlag = flag;
-        }
-
 
         public FlagsViewHolder(View v, Activity context) {
             super(v);
@@ -232,6 +222,10 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             this.categoryIcon = (ImageView) v.findViewById(R.id.categoryIcon);
 
             v.setOnCreateContextMenuListener(this);
+        }
+
+        public void setCurrentFlag(Flag flag) {
+            this.mFlag = flag;
         }
 
         @Override

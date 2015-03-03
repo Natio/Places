@@ -32,10 +32,8 @@ import java.util.Set;
 public final class FacebookUtils {
 
     private static final String TAG = "FacebookUtils";
-
-    private final HashMap<String, HashSet<FacebookUtilCallback>> scheduledOperationsQueue = new HashMap<>();
-
     private static final FacebookUtils shared_instance = new FacebookUtils();
+    private final HashMap<String, HashSet<FacebookUtilCallback>> scheduledOperationsQueue = new HashMap<>();
 
     private FacebookUtils() {
     }
@@ -47,6 +45,35 @@ public final class FacebookUtils {
      */
     public static FacebookUtils getInstance() {
         return FacebookUtils.shared_instance;
+    }
+
+    /**
+     * @return true if the current user is ready
+     */
+    public static boolean isFacebookSessionOpened() {
+        return ParseFacebookUtils.getSession() != null && ParseFacebookUtils.getSession().isOpened();
+    }
+
+    public static void downloadFacebookInfo(Context ctx) {
+        final ProgressDialog progress = new ProgressDialog(ctx);
+        progress.setTitle("Loading");
+        progress.setMessage("Wait while loading...");
+        progress.setCancelable(false);
+        progress.show();
+        FacebookUtils.getInstance().makeMeRequest(new FacebookUtilCallback() {
+            @Override
+            public void onResult(String result, Exception e) {
+                if (e != null) {
+                    // FIXME result not being used?
+
+                    Log.d(TAG, e.getMessage());
+                    progress.setMessage(e.getMessage());
+                } else {
+                    progress.dismiss();
+                    Log.d(TAG, result);
+                }
+            }
+        });
     }
 
     /**
@@ -235,7 +262,6 @@ public final class FacebookUtils {
         tv.setText(((PlacesUser) ParseUser.getCurrentUser()).getName());
     }
 
-
     /**
      * Asynchronously loads a profile pictures into an image view
      *
@@ -342,35 +368,5 @@ public final class FacebookUtils {
         );
 
         req.executeAsync();
-    }
-
-    /**
-     * @return true if the current user is ready
-     */
-    public static boolean isFacebookSessionOpened() {
-        return ParseFacebookUtils.getSession() != null && ParseFacebookUtils.getSession().isOpened();
-    }
-
-
-    public static void downloadFacebookInfo(Context ctx) {
-        final ProgressDialog progress = new ProgressDialog(ctx);
-        progress.setTitle("Loading");
-        progress.setMessage("Wait while loading...");
-        progress.setCancelable(false);
-        progress.show();
-        FacebookUtils.getInstance().makeMeRequest(new FacebookUtilCallback() {
-            @Override
-            public void onResult(String result, Exception e) {
-                if (e != null) {
-                    // FIXME result not being used?
-
-                    Log.d(TAG, e.getMessage());
-                    progress.setMessage(e.getMessage());
-                } else {
-                    progress.dismiss();
-                    Log.d(TAG, result);
-                }
-            }
-        });
     }
 }

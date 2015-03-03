@@ -19,16 +19,6 @@ public class FlagReport extends ParseObject {
         super();
     }
 
-    private void setReportedByUser(ParseUser user) {
-        this.put("reported_by", user);
-    }
-
-
-    private void setReportedFlag(Flag f) {
-        this.put("reported_flag", f);
-    }
-
-
     /**
      * Creates a Flag's report. The reporter is current user
      *
@@ -41,6 +31,14 @@ public class FlagReport extends ParseObject {
         report.setReportedFlag(f);
         report.setReportedByUser(ParseUser.getCurrentUser());
         return report;
+    }
+
+    private void setReportedByUser(ParseUser user) {
+        this.put("reported_by", user);
+    }
+
+    private void setReportedFlag(Flag f) {
+        this.put("reported_flag", f);
     }
 
 }

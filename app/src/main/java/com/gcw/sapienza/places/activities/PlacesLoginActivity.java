@@ -55,13 +55,11 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
     private static final int RC_SIGN_IN = 0;
 
     private static final int REQUEST_CODE_TOKEN_AUTH = 1;
-
+    private final int fragmentContainer = android.R.id.content;
     /* A flag indicating that a PendingIntent is in progress and prevents
      * us from starting further intents.
      */
     private boolean mIntentInProgress;
-
-    private final int fragmentContainer = android.R.id.content;
     private Bundle configOptions;
 
     private ProgressDialog progressDialog;

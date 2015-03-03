@@ -27,23 +27,16 @@ import java.io.IOException;
 public class AudioRecordingActivity extends ActionBarActivity implements View.OnClickListener, View.OnTouchListener {
 
     private static final String TAG = "AudioRecordingActivity";
-
+    private static final String ERROR_WHILE_RECORDING_TEXT = "Error encountered while recording";
+    protected static MediaRecorder audioRec;
+    protected static String audio_filename;
     private ImageView bigMicButton;
     private ImageView confirmButton;
     private ImageView cancelButton;
-
     private TextView recordText;
-
-    protected static MediaRecorder audioRec;
-    protected static String audio_filename;
-
-    private enum RecordState {RECORD, PLAY, PAUSE}
-
     private RecordState recordState = RecordState.RECORD;
 
     private MediaPlayer mediaPlayer;
-
-    private static final String ERROR_WHILE_RECORDING_TEXT = "Error encountered while recording";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,4 +172,6 @@ public class AudioRecordingActivity extends ActionBarActivity implements View.On
         cancelButton.setVisibility(View.GONE);
         confirmButton.setVisibility(View.GONE);
     }
+
+    private enum RecordState {RECORD, PLAY, PAUSE}
 }

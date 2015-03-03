@@ -55,31 +55,6 @@ public class GPlusUtils {
         return GPlusUtils.shared_instance;
     }
 
-    public GoogleApiClient getGoogleApiClient() {
-        return mGoogleApiClient;
-    }
-
-    public void setGoogleApiClient(GoogleApiClient googleApiClient) {
-        this.mGoogleApiClient = googleApiClient;
-    }
-
-    public Person getCurrentPerson() {
-        return currentPerson;
-    }
-
-    public void setCurrentPerson(Person currentPerson) {
-        this.currentPerson = currentPerson;
-    }
-
-    public void getProfilePicFromUserId(String userId) {
-        String request = "https://www.googleapis.com/plus/v1/people/";
-        request += userId;
-        request += "?fields=image&key=";
-        request += "AIzaSyALZgcm_3X4_KmZg8ax6MmDLGFzZxE6c7Y";
-
-        new RequestTask(userId).execute("");
-    }
-
     public static void downloadGPlusInfo(GoogleApiClient mGoogleApiClient, Context context) {
         /**
          * Fetching user's information name, email, profile pic
@@ -118,6 +93,57 @@ public class GPlusUtils {
         }
     }
 
+    public GoogleApiClient getGoogleApiClient() {
+        return mGoogleApiClient;
+    }
+
+    public void setGoogleApiClient(GoogleApiClient googleApiClient) {
+        this.mGoogleApiClient = googleApiClient;
+    }
+
+    public Person getCurrentPerson() {
+        return currentPerson;
+    }
+
+    public void setCurrentPerson(Person currentPerson) {
+        this.currentPerson = currentPerson;
+    }
+
+    public void getProfilePicFromUserId(String userId) {
+        String request = "https://www.googleapis.com/plus/v1/people/";
+        request += userId;
+        request += "?fields=image&key=";
+        request += "AIzaSyALZgcm_3X4_KmZg8ax6MmDLGFzZxE6c7Y";
+
+        new RequestTask(userId).execute("");
+    }
+
+    void parseResult(String result, String userId) throws JSONException {
+        JSONObject mainObject = new JSONObject(result);
+        JSONObject imageObject = mainObject.getJSONObject("image");
+        String imageUrl = imageObject.getJSONObject("url").toString();
+
+        PlacesLoginUtils.getInstance().addEntryToLargePicMap(userId, imageUrl);
+    }
+
+    @Deprecated
+    public String getGPlusUsername() {
+        return ((PlacesUser) ParseUser.getCurrentUser()).getName();
+    }
+
+    @Deprecated
+    public void loadUsernameIntoTextView(String user_id, final TextView tv) {
+
+    }
+
+    public void getGPlusProfilePictureURL(final String user_id, final PlacesLoginUtils.PicSize size, final FacebookUtilCallback cbk) {
+
+    }
+
+    public void loadProfilePicIntoImageView(final String user_id, final ImageView imageView, final PlacesLoginUtils.PicSize size) {
+
+    }
+
     /**
      * Background Async task to load user profile picture from url
      */
@@ -145,14 +171,6 @@ public class GPlusUtils {
         protected void onPostExecute(Bitmap result) {
             //TODO
         }
-    }
-
-    void parseResult(String result, String userId) throws JSONException {
-        JSONObject mainObject = new JSONObject(result);
-        JSONObject imageObject = mainObject.getJSONObject("image");
-        String imageUrl = imageObject.getJSONObject("url").toString();
-
-        PlacesLoginUtils.getInstance().addEntryToLargePicMap(userId, imageUrl);
     }
 
     class RequestTask extends AsyncTask<String, String, String> {
@@ -199,23 +217,5 @@ public class GPlusUtils {
                 Log.e(TAG, jsone.toString());
             }
         }
-    }
-
-    @Deprecated
-    public String getGPlusUsername() {
-        return ((PlacesUser) ParseUser.getCurrentUser()).getName();
-    }
-
-    @Deprecated
-    public void loadUsernameIntoTextView(String user_id, final TextView tv) {
-
-    }
-
-    public void getGPlusProfilePictureURL(final String user_id, final PlacesLoginUtils.PicSize size, final FacebookUtilCallback cbk) {
-
-    }
-
-    public void loadProfilePicIntoImageView(final String user_id, final ImageView imageView, final PlacesLoginUtils.PicSize size) {
-
     }
 }

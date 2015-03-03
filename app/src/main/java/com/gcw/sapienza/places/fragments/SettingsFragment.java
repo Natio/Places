@@ -18,10 +18,9 @@ import com.gcw.sapienza.places.R;
 public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceClickListener {
     @SuppressWarnings("unused")
     private static final String TAG = "SettingsFragment";
-
+    private final int AR_THRESHOLD = 10;
     private int ar_sensor;
     private boolean sensorEnabled;
-    private final int AR_THRESHOLD = 10;
     private boolean firstClick;
 
     private AlertDialog dialog;
@@ -109,6 +108,12 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new CustomListener(dialog));
     }
 
+    private void getRidOfDialogAndShowToast() {
+        Toast.makeText(getActivity(), "Simone likes this.", Toast.LENGTH_LONG).show();
+
+        dialog.dismiss();
+    }
+
     class CustomListener implements View.OnClickListener {
         private final AlertDialog dialog;
 
@@ -128,11 +133,5 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
                 } else getRidOfDialogAndShowToast();
             } else getRidOfDialogAndShowToast();
         }
-    }
-
-    private void getRidOfDialogAndShowToast() {
-        Toast.makeText(getActivity(), "Simone likes this.", Toast.LENGTH_LONG).show();
-
-        dialog.dismiss();
     }
 }

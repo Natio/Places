@@ -30,36 +30,36 @@ public class CustomParseObject extends ParseObject {
         return (String) this.get(FACEBOOK_ID_KEY);
     }
 
-    public String getFlagId() {
-        return (String) this.get(FLAG_ID_KEY);
-    }
-
-    public boolean getWowBoolean() {
-        return (boolean) this.get(WOW_KEY);
-    }
-
-    public boolean getLolBoolean() {
-        return (boolean) this.get(LOL_KEY);
-    }
-
-    public boolean getBooBoolean() {
-        return (boolean) this.get(BOO_KEY);
-    }
-
     public void setFacebookId(String fbId) {
         this.put(FACEBOOK_ID_KEY, fbId);
+    }
+
+    public String getFlagId() {
+        return (String) this.get(FLAG_ID_KEY);
     }
 
     public void setFlagId(String flagId) {
         this.put(FLAG_ID_KEY, flagId);
     }
 
+    public boolean getWowBoolean() {
+        return (boolean) this.get(WOW_KEY);
+    }
+
     public void setWowBoolean(boolean wowBool) {
         this.put(WOW_KEY, wowBool);
     }
 
+    public boolean getLolBoolean() {
+        return (boolean) this.get(LOL_KEY);
+    }
+
     public void setLolBoolean(boolean lolBool) {
         this.put(LOL_KEY, lolBool);
+    }
+
+    public boolean getBooBoolean() {
+        return (boolean) this.get(BOO_KEY);
     }
 
     public void setBooBoolean(boolean booBool) {

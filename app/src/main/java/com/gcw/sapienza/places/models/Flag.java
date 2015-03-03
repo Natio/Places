@@ -51,16 +51,32 @@ public class Flag extends ParseObject {
         return (String) this.get(TEXT_KEY);
     }
 
+    public void setText(String text) {
+        this.put(TEXT_KEY, text);
+    }
+
     public String getCategory() {
         return (String) this.get(CATEGORY_KEY);
+    }
+
+    public void setCategory(String category) {
+        this.put(CATEGORY_KEY, category);
     }
 
     public String getFbId() {
         return (String) this.get(FB_ID_KEY);
     }
 
+    public void setFbId(String fbId) {
+        this.put(FB_ID_KEY, fbId);
+    }
+
     public ParseGeoPoint getLocation() {
         return (ParseGeoPoint) this.get(LOCATION_KEY);
+    }
+
+    public void setLocation(ParseGeoPoint location) {
+        this.put(LOCATION_KEY, location);
     }
 
     public Date getDate() {
@@ -73,6 +89,10 @@ public class Flag extends ParseObject {
 
     public String getWeather() {
         return (String) this.get(WEATHER_KEY);
+    }
+
+    public void setWeather(String weather) {
+        this.put(WEATHER_KEY, weather);
     }
 
     public ParseFile getAudio() {
@@ -91,8 +111,16 @@ public class Flag extends ParseObject {
         return (String) this.get(FB_NAME_KEY);
     }
 
+    public void setFbName(String name) {
+        this.put(FB_NAME_KEY, name);
+    }
+
     public boolean getInPlace() {
         return this.getBoolean(IN_PLACE_KEY);
+    }
+
+    public void setInPlace(boolean inPlace) {
+        this.put(IN_PLACE_KEY, inPlace);
     }
 
     public int getWowCount() {
@@ -109,6 +137,10 @@ public class Flag extends ParseObject {
 
     public String getPassword() {
         return this.getString(PASSWORD_KEY);
+    }
+
+    public void setPassword(String psw) {
+        this.put(PASSWORD_KEY, psw);
     }
 
     public void setThumbnailFile(ParseFile pic) {
@@ -128,34 +160,6 @@ public class Flag extends ParseObject {
     @SuppressWarnings({"UnusedDeclaration"})
     public void setVideoFile(ParseFile video) {
         this.put(VIDEO_KEY, video);
-    }
-
-    public void setCategory(String category) {
-        this.put(CATEGORY_KEY, category);
-    }
-
-    public void setWeather(String weather) {
-        this.put(WEATHER_KEY, weather);
-    }
-
-    public void setFbId(String fbId) {
-        this.put(FB_ID_KEY, fbId);
-    }
-
-    public void setLocation(ParseGeoPoint location) {
-        this.put(LOCATION_KEY, location);
-    }
-
-    public void setText(String text) {
-        this.put(TEXT_KEY, text);
-    }
-
-    public void setFbName(String name) {
-        this.put(FB_NAME_KEY, name);
-    }
-
-    public void setInPlace(boolean inPlace) {
-        this.put(IN_PLACE_KEY, inPlace);
     }
 
     public void incrementWowCount() {
@@ -180,9 +184,5 @@ public class Flag extends ParseObject {
 
     public void decrementBooCount() {
         this.increment(BOO_COUNT_KEY, -1);
-    }
-
-    public void setPassword(String psw) {
-        this.put(PASSWORD_KEY, psw);
     }
 }

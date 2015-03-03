@@ -31,9 +31,9 @@ import java.text.SimpleDateFormat;
 public class ProfileFragment extends Fragment {
 
     private static final String TAG = "ProfileFragment";
+
     private static final String FBID = "FacebookID";
 
-    //TODO use the bundle with arguments so to use the Fragment also for non current users
     private String fbId;
 
     private ImageView fbPicView;
@@ -42,10 +42,6 @@ public class ProfileFragment extends Fragment {
     private TextView postsView;
     private TextView wowedView;
     private Button friendsView;
-
-//    public ProfileFragment(String fbId){
-//        this.fbId = fbId;
-//    }
 
     public static final ProfileFragment newInstance(String fbId) {
 
@@ -79,16 +75,6 @@ public class ProfileFragment extends Fragment {
         postsView = (TextView) view.findViewById(R.id.postsView);
         wowedView = (TextView) view.findViewById(R.id.wowedView);
         friendsView = (Button) view.findViewById(R.id.friendsView);
-
-
-        /*
-        FacebookUtils.getInstance().getFacebookUsernameFromID(this.fbId, new FacebookUtilCallback() {
-            @Override
-            public void onResult(String result, Exception e) {
-                fbNameView.setText("User name: " + result);
-            }
-        });
-        */
 
         FacebookUtils.getInstance().loadProfilePicIntoImageView(this.fbId, fbPicView, PlacesLoginUtils.PicSize.LARGE);
 

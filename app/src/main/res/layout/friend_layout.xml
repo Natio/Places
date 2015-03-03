@@ -4,40 +4,40 @@
     android:layout_height="fill_parent">
 
     <RelativeLayout
-        android:orientation="horizontal"
+        android:id="@+id/friends_relativeLayout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:weightSum="1"
-        android:id="@+id/friends_relativeLayout">
+        android:layout_alignParentRight="true"
+        android:orientation="horizontal"
+        android:weightSum="1">
 
         <ImageView
+            android:id="@+id/friend_card_profile_pic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/friend_card_profile_pic"
-            android:padding="2dp"
-            android:background="@color/transparent_green"
-            android:layout_marginTop="3dp"
             android:layout_marginBottom="3dp"
-            android:layout_marginLeft="3dp" />
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="3dp"
+            android:background="@color/transparent_green"
+            android:padding="2dp" />
 
         <TextView
+            android:id="@+id/friend_card_textView_username"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:gravity="center"
-            android:text=""
-            android:textColor="@color/transparent_green"
-            android:id="@+id/friend_card_textView_username"
+            android:layout_gravity="center_vertical"
             android:layout_marginLeft="3dp"
             android:layout_marginStart="3dp"
+            android:layout_marginTop="5dp"
             android:layout_toEndOf="@id/friend_card_profile_pic"
             android:layout_toRightOf="@id/friend_card_profile_pic"
-            android:layout_gravity="center_vertical"
             android:ellipsize="end"
+            android:gravity="center"
             android:minLines="1"
-            android:textStyle="bold"
-            android:layout_marginTop="5dp" />
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/transparent_green"
+            android:textStyle="bold" />
     </RelativeLayout>
 </RelativeLayout>

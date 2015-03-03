@@ -47,40 +47,26 @@ public class LocationService extends Service implements
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
-    private static final String TAG = "LocationService";
-
     public static final String FOUND_NEW_FLAGS_NOTIFICATION = "FOUND_NEW_FLAGS_NOTIFICATION";
     public static final String FOUND_NO_FLAGS_NOTIFICATION = "FOUND_NO_FLAGS_NOTIFICATION";
     public static final String FOUND_MY_FLAGS_NOTIFICATION = "FOUND_MY_FLAGS_NOTIFICATION";
     public static final String FOUND_NO_MY_FLAGS_NOTIFICATION = "FOUND_NO_MY_FLAGS_NOTIFICATION";
-
     public static final String NO_FLAGS_VISIBLE = "you won't be able to see any flags with these settings";
-
-    private final IBinder mBinder = new LocalBinder();
-
+    private static final String TAG = "LocationService";
     private static final long ONE_MIN = 1000 * 60;
-
     private static final long ONE_HOUR = ONE_MIN * 60;
-
-    private static final int KM_TO_M = 1000;
-
+    private static final long FLAG_IN_CACHE_MIN = ONE_HOUR * 2;
     private static final long INTERVAL = ONE_MIN * 5;
     private static final long FASTEST_INTERVAL = ONE_MIN * 3;
-
-    private static final int NOTIFICATION_ID = 12345;
-
     private static final long UPDATE_CACHE_MIN_INTERVAL = ONE_MIN * 15;
-
-    private static final long FLAG_IN_CACHE_MIN = ONE_HOUR * 2;
-
-
-    private HashMap<String, Long> cachedFlags = new HashMap<>();
-
+    private static final int KM_TO_M = 1000;
+    private static final int NOTIFICATION_ID = 12345;
     private static LocationRequest locationRequest;
     private static GoogleApiClient googleApiClient;
-    private Location location;
     private static FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
-
+    private final IBinder mBinder = new LocalBinder();
+    private HashMap<String, Long> cachedFlags = new HashMap<>();
+    private Location location;
     private ILocationUpdater listener;
 
     private List<Flag> parseObjects;
@@ -91,6 +77,33 @@ public class LocationService extends Service implements
 
     private long lastCacheUpdate;
 
+    //courtesy of http://gis.stackexchange.com/questions/25877/how-to-generate-random-locations-nearby-my-location
+    public static Location getRandomLocation(Location center, int radius) {
+        double x0 = center.getLongitude();
+        double y0 = center.getLatitude();
+        Random random = new Random();
+
+        // Convert radius from meters to degrees
+        double radiusInDegrees = radius / 111000f;
+
+        double u = random.nextDouble();
+        double v = random.nextDouble();
+        double w = radiusInDegrees * Math.sqrt(u);
+        double t = 2 * Math.PI * v;
+        double x = w * Math.cos(t);
+        double y = w * Math.sin(t);
+
+        // Adjust the x-coordinate for the shrinking of the east-west distances
+        double new_x = x / Math.cos(y0);
+
+        double foundLongitude = new_x + x0;
+        double foundLatitude = y + y0;
+
+        Location random_loc = new Location("fake_location_in_rome");
+        random_loc.setLatitude(foundLatitude);
+        random_loc.setLongitude(foundLongitude);
+        return random_loc;
+    }
 
     @Override
     public void onConnected(Bundle connectionHint) {
@@ -115,13 +128,6 @@ public class LocationService extends Service implements
 
     public void setListener(ILocationUpdater app) {
         this.listener = app;
-    }
-
-    public class LocalBinder extends Binder {
-        public LocationService getService() {
-            // Return this instance of LocalService so clients can call public methods
-            return LocationService.this;
-        }
     }
 
     public void queryParsewithCurrentUser() {
@@ -474,31 +480,10 @@ public class LocationService extends Service implements
         return mBinder;
     }
 
-    //courtesy of http://gis.stackexchange.com/questions/25877/how-to-generate-random-locations-nearby-my-location
-    public static Location getRandomLocation(Location center, int radius) {
-        double x0 = center.getLongitude();
-        double y0 = center.getLatitude();
-        Random random = new Random();
-
-        // Convert radius from meters to degrees
-        double radiusInDegrees = radius / 111000f;
-
-        double u = random.nextDouble();
-        double v = random.nextDouble();
-        double w = radiusInDegrees * Math.sqrt(u);
-        double t = 2 * Math.PI * v;
-        double x = w * Math.cos(t);
-        double y = w * Math.sin(t);
-
-        // Adjust the x-coordinate for the shrinking of the east-west distances
-        double new_x = x / Math.cos(y0);
-
-        double foundLongitude = new_x + x0;
-        double foundLatitude = y + y0;
-
-        Location random_loc = new Location("fake_location_in_rome");
-        random_loc.setLatitude(foundLatitude);
-        random_loc.setLongitude(foundLongitude);
-        return random_loc;
+    public class LocalBinder extends Binder {
+        public LocationService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return LocationService.this;
+        }
     }
 }

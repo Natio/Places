@@ -28,9 +28,8 @@ import java.util.Map;
  */
 public class FriendsListAdapter extends ArrayAdapter<String> {
 
-    private Map<String, String> idToName;
-
     private static final String TAG = "FriendsListAdapter";
+    private Map<String, String> idToName;
 
     public FriendsListAdapter(Context context, int resource, List<String> friends) {
         super(context, resource, friends);

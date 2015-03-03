@@ -45,34 +45,30 @@ import com.parse.ParseUser;
 public class MainActivity extends ActionBarActivity implements Preference.OnPreferenceChangeListener {
 
 
-    public static String TAG = MainActivity.class.getName();
-    private DrawerLayout drawerLayout;
-    private ListView drawerList;
-    private ActionBarDrawerToggle drawerToggle;
     private static final String[] section_titles = {"Home", "My Profile", "My Flags", "Settings", "Logout"};
-    private CharSequence current_title;
-
-    // private int currentDrawerListItemIndex = -1;
-
-    private LinearLayout homeHolder;
-    private FrameLayout fragHolder;
-
-    public Menu mMenu;
-
     private static final int SHARE_ACTIVITY_REQUEST_CODE = 95;
-
     private static final int FLAGS_LIST_POSITION = 0;
     private static final int MY_PROFILE_POSITION = 1;
     private static final int MY_FLAGS_POSITION = 2;
     private static final int SETTINGS_POSITION = 3;
+
+    // private int currentDrawerListItemIndex = -1;
     private static final int LOGOUT_POSITION = 4;
-
     private static final String FRAG_TAG = "FRAG_TAG";
-
+    public static String TAG = MainActivity.class.getName();
+    private static boolean isForeground = false;
+    public Menu mMenu;
+    private DrawerLayout drawerLayout;
+    private ListView drawerList;
+    private ActionBarDrawerToggle drawerToggle;
+    private CharSequence current_title;
+    private LinearLayout homeHolder;
+    private FrameLayout fragHolder;
     private Toast radiusToast;
 
-    private static boolean isForeground = false;
-
+    public static boolean isForeground() {
+        return isForeground;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -201,10 +197,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
         isForeground = false;
 
-    }
-
-    public static boolean isForeground() {
-        return isForeground;
     }
 
     private void promptForLocationServices() {
@@ -347,14 +339,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         this.getSupportActionBar().setTitle(this.current_title);
     }
 
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-
-        @Override
-        public void onItemClick(AdapterView parent, View view, int position, long id) {
-            MainActivity.this.selectItem(position);
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -404,10 +388,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         fragHolder.setVisibility(View.VISIBLE);
     }
 
-//    private void switchToListMapFrags()
-
-//        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new Fragment()).commit();
-
     private void switchToSettingsFrag() {
         Log.d(TAG, "Switching to SettingsFragment");
 //        getRidOfUnusedFrag();
@@ -415,6 +395,10 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
         this.getFragmentManager().beginTransaction().replace(R.id.frag_container, new SettingsFragment()).commit();
     }
+
+//    private void switchToListMapFrags()
+
+//        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new Fragment()).commit();
 
     public void switchToOtherFrag(Fragment frag) {
         Log.d(TAG, "Switching to other fragment: " + frag.getClass());
@@ -431,11 +415,11 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, frag).addToBackStack(null).commit();
     }
 
-//    @Override
-
     private boolean isNonSupportFragmentVisible() {
         return fragHolder.getVisibility() == View.VISIBLE;
     }
+
+//    @Override
 
     @Override
     public void onBackPressed() {
@@ -514,6 +498,14 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         radiusToast = Toast.makeText(getBaseContext(), text,
                 Toast.LENGTH_SHORT);
         radiusToast.show();
+    }
+
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView parent, View view, int position, long id) {
+            MainActivity.this.selectItem(position);
+        }
     }
 
 }

@@ -65,17 +65,14 @@ public class FlagUploader {
     private static final String PHONE_MEDIA_KEY = Flag.PHONE_MEDIA_KEY;
 
     private final Flag flag;
+    private final Context context;
     private File thumbnail;
     private HashMap<String, File> files;
     private HashMap<String, File> usedFiled;
     private boolean isUploading;
-    private FlagUploaderCallbacks callbacks;
     //  private boolean deleteFilesOnFinish = false;
-
+    private FlagUploaderCallbacks callbacks;
     private String currentFileKey = null;
-
-
-    private final Context context;
 
     /**
      * Creates the instance

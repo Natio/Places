@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <TextView
+        android:id="@+id/record_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hold to record"
         android:layout_above="@+id/big_mic_button"
         android:layout_centerHorizontal="true"
-        android:textSize="30sp"
         android:layout_marginBottom="50dp"
-        android:id="@+id/record_text" />
+        android:text="Hold to record"
+        android:textSize="30sp" />
 
     <ImageView
+        android:id="@+id/big_mic_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:id="@+id/big_mic_button"
         android:layout_marginBottom="50dp"
         android:src="@drawable/mic_green" />
 
     <ImageView
+        android:id="@+id/cancel_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/big_mic_button"
-        android:id="@+id/cancel_button"
-        android:layout_marginLeft="100dp"
         android:layout_alignParentLeft="@+id/confirm_button"
+        android:layout_below="@+id/big_mic_button"
+        android:layout_marginLeft="100dp"
         android:src="@drawable/grey_cancel"
         android:visibility="gone" />
 
     <ImageView
+        android:id="@+id/confirm_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/big_mic_button"
-        android:id="@+id/confirm_button"
-        android:layout_marginRight="100dp"
         android:layout_alignParentRight="true"
+        android:layout_below="@+id/big_mic_button"
+        android:layout_marginRight="100dp"
         android:src="@drawable/grey_tick"
         android:visibility="gone" />
 
