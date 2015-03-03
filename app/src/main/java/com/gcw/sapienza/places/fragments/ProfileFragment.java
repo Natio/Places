@@ -18,6 +18,7 @@ import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
+import com.gcw.sapienza.places.utils.Utils;
 import com.parse.CountCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -43,8 +44,11 @@ public class ProfileFragment extends Fragment {
     private TextView fbNameView;
     private TextView memberSinceView;
     private TextView flagsView;
+    private TextView categoryView;
     private TextView wowedView;
     private Button friendsView;
+
+    private int numFlags;
 
     public static final ProfileFragment newInstance(String fbId) {
 
@@ -76,41 +80,69 @@ public class ProfileFragment extends Fragment {
         fbNameView = (TextView) view.findViewById(R.id.fbNameView);
         memberSinceView = (TextView) view.findViewById(R.id.memberSinceView);
         flagsView = (TextView) view.findViewById(R.id.flagsView);
+        categoryView = (TextView) view.findViewById(R.id.categoryView);
         wowedView = (TextView) view.findViewById(R.id.wowedView);
         friendsView = (Button) view.findViewById(R.id.friendsView);
 
         FacebookUtils.getInstance().loadProfilePicIntoImageView(this.fbId, fbPicView, PlacesLoginUtils.PicSize.LARGE);
 
-        ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
-        query.whereEqualTo("fbId", this.fbId);
-        query.findInBackground(new FindCallback<Flag>() {
-            @Override
-            public void done(List<Flag> flags, ParseException e) {
-                if (e == null) {
-                    String[] categories = getActivity().getResources().getStringArray(R.array.categories);
-                    HashMap<String, Integer> categoriesMap = new HashMap<>();
-                    for(String cat: categories){
-                        Log.d(TAG, "Array category: " + cat);
-                        categoriesMap.put(cat, 0);
+        String[] categories = getActivity().getResources().getStringArray(R.array.categories);
+        for(final String cat: categories){
+            ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
+            query.whereEqualTo("fbId", this.fbId);
+            query.whereEqualTo("category", cat);
+            query.countInBackground(new CountCallback() {
+                @Override
+                public void done(int i, ParseException e) {
+                    if(e == null) {
+                        CharSequence currText = categoryView.getText();
+                        if(currText.equals("")){
+                            categoryView.setText(" • " + cat + ": " + i);
+                        }else{
+                            categoryView.setText(currText + "\n • " + cat + ": " + i);
+                        }
+                        numFlags += i;
+                        flagsView.setText("Flags placed: " + numFlags);
+                    } else {
+                        Log.e(TAG, e.getMessage());
+                        Utils.showToast(getActivity(), "An error occurred while retrieving your Flags data", Toast.LENGTH_SHORT);
                     }
-                    for(int i = 0; i < flags.size(); i++){
-                        Flag currFlag = flags.get(i);
-                        Log.d(TAG, "Flag category: " + currFlag.getCategory());
-                        int currentNumFlags = categoriesMap.get(currFlag.getCategory());
-                        categoriesMap.put(currFlag.getCategory(), ++currentNumFlags);
-                    }
-                    String categoriesString = "Flags placed: "+ flags.size() + "\n";
-                    for(String cat: categories){
-                        categoriesString += " • " + cat + ": " + categoriesMap.get(cat) + "\n";
-                    }
-                    categoriesString = categoriesString.trim();
-                    flagsView.setText(categoriesString);
-                } else {
-                    Log.e(TAG, e.getMessage());
-                    Toast.makeText(getActivity(), "There was a problem retrieving your Flags", Toast.LENGTH_SHORT).show();
                 }
-            }
-        });
+            });
+        }
+
+        //User posts retrieval above is more efficient
+        @Deprecated
+//        ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
+//        query.whereEqualTo("fbId", this.fbId);
+//        query.findInBackground(new FindCallback<Flag>() {
+//            @Override
+//            public void done(List<Flag> flags, ParseException e) {
+//                if (e == null) {
+//                    String[] categories = getActivity().getResources().getStringArray(R.array.categories);
+//                    HashMap<String, Integer> categoriesMap = new HashMap<>();
+//                    for(String cat: categories){
+//                        Log.d(TAG, "Array category: " + cat);
+//                        categoriesMap.put(cat, 0);
+//                    }
+//                    for(int i = 0; i < flags.size(); i++){
+//                        Flag currFlag = flags.get(i);
+//                        Log.d(TAG, "Flag category: " + currFlag.getCategory());
+//                        int currentNumFlags = categoriesMap.get(currFlag.getCategory());
+//                        categoriesMap.put(currFlag.getCategory(), ++currentNumFlags);
+//                    }
+//                    String categoriesString = "Flags placed: "+ flags.size() + "\n";
+//                    for(String cat: categories){
+//                        categoriesString += " • " + cat + ": " + categoriesMap.get(cat) + "\n";
+//                    }
+//                    categoriesString = categoriesString.trim();
+//                    flagsView.setText(categoriesString);
+//                } else {
+//                    Log.e(TAG, e.getMessage());
+//                    Toast.makeText(getActivity(), "There was a problem retrieving your Flags", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
 
 
         ParseQuery<PlacesUser> queryUsers = ParseQuery.getQuery("_User");

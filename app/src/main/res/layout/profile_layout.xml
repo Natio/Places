@@ -50,10 +50,21 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/wowedView"
+        android:id="@+id/categoryView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/flagsView"
+        android:layout_marginLeft="10dp"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/transparent_green"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/wowedView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/categoryView"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:text=""
