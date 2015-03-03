@@ -29,11 +29,9 @@ import java.util.Map;
 public class FriendsListAdapter extends ArrayAdapter<String> {
 
     private static final String TAG = "FriendsListAdapter";
-    private Map<String, String> idToName;
 
     public FriendsListAdapter(Context context, int resource, List<String> friends) {
         super(context, resource, friends);
-        idToName = new HashMap<>();
     }
 
     @Override
@@ -61,24 +59,36 @@ public class FriendsListAdapter extends ArrayAdapter<String> {
         final TextView friendNameView = (TextView) v.findViewById(R.id.friend_card_textView_username);
         final ImageView friendImageView = (ImageView) v.findViewById(R.id.friend_card_profile_pic);
 
-        ParseQuery<PlacesUser> queryUsers = ParseQuery.getQuery("_User");
-        queryUsers.whereEqualTo(PlacesUser.FACEBOOK_ID_KEY, friendId);
-        queryUsers.getFirstInBackground(new GetCallback<PlacesUser>() {
-            @Override
-            public void done(PlacesUser placesUser, ParseException e) {
-                if (e == null) {
-                    friendNameView.setText(placesUser.getName());
-                    idToName.put(friendId, placesUser.getName());
-                } else {
-                    Log.e(TAG, e.getMessage());
-                    Toast.makeText(getContext(), "An error occurred while retrieving friends' data", Toast.LENGTH_SHORT).show();
+
+
+        if(!PlacesLoginUtils.getInstance().isUserNameCached(friendId)) {
+
+            ParseQuery<PlacesUser> queryUsers = ParseQuery.getQuery("_User");
+            queryUsers.whereEqualTo(PlacesUser.FACEBOOK_ID_KEY, friendId);
+            queryUsers.getFirstInBackground(new GetCallback<PlacesUser>() {
+                @Override
+                public void done(PlacesUser placesUser, ParseException e) {
+
+                    if (e == null) {
+
+                        friendNameView.setText(placesUser.getName());
+                        PlacesLoginUtils.getInstance().addEntryToUserIdMap(friendId, placesUser.getName());
+
+                    } else {
+
+                        Log.e(TAG, e.getMessage());
+                        Toast.makeText(getContext(), "An error occurred while retrieving friends' data", Toast.LENGTH_SHORT).show();
+
+                    }
                 }
-            }
-        });
+            });
+
+        }else{
+            String friendName = PlacesLoginUtils.getInstance().getUserNameFromId(friendId);
+            friendNameView.setText(friendName);
+        }
 
         PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(friendId, friendImageView, PlacesLoginUtils.PicSize.LARGE);
-
-        friendNameView.setText(friendId);
 
         return v;
     }

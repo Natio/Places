@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.widget.Toast;
 
 import com.gcw.sapienza.places.R;
 
@@ -162,5 +163,9 @@ public class Utils {
                 cursor.close();
             }
         }
+    }
+    
+    public static void showToast(Context context, String text, int duration){
+        Toast.makeText(context, text, duration).show();
     }
 }
