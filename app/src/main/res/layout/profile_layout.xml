@@ -21,7 +21,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:text=""
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/transparent_green"
         android:textStyle="bold" />
 
@@ -33,19 +33,19 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:text=""
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/transparent_green"
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/postsView"
+        android:id="@+id/flagsView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/memberSinceView"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:text=""
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/transparent_green"
         android:textStyle="bold" />
 
@@ -53,11 +53,11 @@
         android:id="@+id/wowedView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/postsView"
+        android:layout_below="@id/flagsView"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:text=""
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/transparent_green"
         android:textStyle="bold" />
 
@@ -67,10 +67,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/wowedView"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:background="@color/transparent_green"
         android:text="Show Friends"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/white"
         android:textStyle="bold" />
 </RelativeLayout>

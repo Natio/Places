@@ -19,11 +19,14 @@ import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.parse.CountCallback;
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by snowblack on 2/26/15.
@@ -39,7 +42,7 @@ public class ProfileFragment extends Fragment {
     private ImageView fbPicView;
     private TextView fbNameView;
     private TextView memberSinceView;
-    private TextView postsView;
+    private TextView flagsView;
     private TextView wowedView;
     private Button friendsView;
 
@@ -72,7 +75,7 @@ public class ProfileFragment extends Fragment {
         fbPicView = (ImageView) view.findViewById(R.id.fbPicView);
         fbNameView = (TextView) view.findViewById(R.id.fbNameView);
         memberSinceView = (TextView) view.findViewById(R.id.memberSinceView);
-        postsView = (TextView) view.findViewById(R.id.postsView);
+        flagsView = (TextView) view.findViewById(R.id.flagsView);
         wowedView = (TextView) view.findViewById(R.id.wowedView);
         friendsView = (Button) view.findViewById(R.id.friendsView);
 
@@ -80,11 +83,28 @@ public class ProfileFragment extends Fragment {
 
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
         query.whereEqualTo("fbId", this.fbId);
-        query.countInBackground(new CountCallback() {
+        query.findInBackground(new FindCallback<Flag>() {
             @Override
-            public void done(int i, ParseException e) {
+            public void done(List<Flag> flags, ParseException e) {
                 if (e == null) {
-                    postsView.setText("Flags placed: " + i);
+                    String[] categories = getActivity().getResources().getStringArray(R.array.categories);
+                    HashMap<String, Integer> categoriesMap = new HashMap<>();
+                    for(String cat: categories){
+                        Log.d(TAG, "Array category: " + cat);
+                        categoriesMap.put(cat, 0);
+                    }
+                    for(int i = 0; i < flags.size(); i++){
+                        Flag currFlag = flags.get(i);
+                        Log.d(TAG, "Flag category: " + currFlag.getCategory());
+                        int currentNumFlags = categoriesMap.get(currFlag.getCategory());
+                        categoriesMap.put(currFlag.getCategory(), ++currentNumFlags);
+                    }
+                    String categoriesString = "Flags placed: "+ flags.size() + "\n";
+                    for(String cat: categories){
+                        categoriesString += " • " + cat + ": " + categoriesMap.get(cat) + "\n";
+                    }
+                    categoriesString = categoriesString.trim();
+                    flagsView.setText(categoriesString);
                 } else {
                     Log.e(TAG, e.getMessage());
                     Toast.makeText(getActivity(), "There was a problem retrieving your Flags", Toast.LENGTH_SHORT).show();
