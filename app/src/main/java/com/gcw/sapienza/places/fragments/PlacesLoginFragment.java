@@ -15,6 +15,7 @@ import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.model.GraphUser;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.activities.PlacesLoginActivity;
 import com.google.android.gms.common.SignInButton;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
@@ -49,6 +50,8 @@ public class PlacesLoginFragment extends ParseLoginFragment {
     private ParseLoginFragmentListener loginFragmentListener;
     private ParseOnLoginSuccessListener onLoginSuccessListener;
 
+    private boolean canChoose;
+
     private ParseLoginConfig config;
 
     public static PlacesLoginFragment newInstance(Bundle configOptions) {
@@ -61,42 +64,51 @@ public class PlacesLoginFragment extends ParseLoginFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup parent,
                              Bundle savedInstanceState) {
 
-        config = ParseLoginConfig.fromBundle(getArguments(), getActivity());
+        View v = null;
 
-        View v = inflater.inflate(R.layout.places_login_fragment, parent, false);
-        ImageView appLogo = (ImageView) v.findViewById(R.id.app_logo);
-        parseLogin = v.findViewById(R.id.parse_login);
-        usernameField = (EditText) v.findViewById(R.id.login_username_input);
-        passwordField = (EditText) v.findViewById(R.id.login_password_input);
-        parseLoginHelpButton = (Button) v.findViewById(R.id.parse_login_help);
-        parseLoginButton = (Button) v.findViewById(R.id.parse_login_button);
-        parseSignupButton = (Button) v.findViewById(R.id.parse_signup_button);
-        facebookLoginButton = (Button) v.findViewById(R.id.facebook_login);
-        twitterLoginButton = (Button) v.findViewById(R.id.twitter_login);
-        gPlusSigninButton = (SignInButton) v.findViewById(R.id.gplus_sign_in_button);
-        gPlusSigninButton.setColorScheme(SignInButton.COLOR_LIGHT);
-        gPlusSigninButton.setSize(SignInButton.SIZE_ICON_ONLY);
+        if(!canChoose) v = inflater.inflate(R.layout.blank_screen, parent, false);
+        else
+        {
+            config = ParseLoginConfig.fromBundle(getArguments(), getActivity());
 
-        gPlusSigninButton.setOnClickListener((View.OnClickListener) getActivity());
+            v = inflater.inflate(R.layout.places_login_fragment, parent, false);
+            ImageView appLogo = (ImageView) v.findViewById(R.id.app_logo);
+            parseLogin = v.findViewById(R.id.parse_login);
+            usernameField = (EditText) v.findViewById(R.id.login_username_input);
+            passwordField = (EditText) v.findViewById(R.id.login_password_input);
+            parseLoginHelpButton = (Button) v.findViewById(R.id.parse_login_help);
+            parseLoginButton = (Button) v.findViewById(R.id.parse_login_button);
+            parseSignupButton = (Button) v.findViewById(R.id.parse_signup_button);
+            facebookLoginButton = (Button) v.findViewById(R.id.facebook_login);
+            twitterLoginButton = (Button) v.findViewById(R.id.twitter_login);
+            gPlusSigninButton = (SignInButton) v.findViewById(R.id.gplus_sign_in_button);
+            gPlusSigninButton.setColorScheme(SignInButton.COLOR_LIGHT);
+            gPlusSigninButton.setSize(SignInButton.SIZE_ICON_ONLY);
 
-        if (appLogo != null && config.getAppLogo() != null) {
-            appLogo.setImageResource(config.getAppLogo());
+            gPlusSigninButton.setOnClickListener((View.OnClickListener) getActivity());
+
+            if (appLogo != null && config.getAppLogo() != null) {
+                appLogo.setImageResource(config.getAppLogo());
+            }
+            if (allowParseLoginAndSignup()) {
+                setUpParseLoginAndSignup();
+            }
+            if (allowFacebookLogin()) {
+                setUpFacebookLogin();
+            }
+            if (allowTwitterLogin()) {
+                setUpTwitterLogin();
+            }
         }
-        if (allowParseLoginAndSignup()) {
-            setUpParseLoginAndSignup();
-        }
-        if (allowFacebookLogin()) {
-            setUpFacebookLogin();
-        }
-        if (allowTwitterLogin()) {
-            setUpTwitterLogin();
-        }
+
         return v;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+
+        this.canChoose = ((PlacesLoginActivity)activity).canChoose;
 
         if (activity instanceof ParseLoginFragmentListener) {
             loginFragmentListener = (ParseLoginFragmentListener) activity;

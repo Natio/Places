@@ -258,6 +258,8 @@ app.use(express.bodyParser());    // Middleware for reading request body
  *   'become' the user on the client-side and redirect to the /main page.
  */
 Parse.Cloud.define('accessGoogleUser', function(req, res) {
+  console.log("Validating request...");
+
   var data = req.params;
   var token;
   /**
@@ -271,7 +273,9 @@ Parse.Cloud.define('accessGoogleUser', function(req, res) {
   Parse.Cloud.useMasterKey();
   Parse.Promise.as().then(function() {
     // Validate & Exchange the code parameter for an access token from Google
-    return getGoogleAccessToken(data.code);
+    var result = getGoogleAccessToken(data.code);
+    console.log("Access token validated: " + JSON.stringify(result));
+    return result;
   }).then(function(httpResponse) {
     var userData = httpResponse.data;
     if (userData && userData.id) {
@@ -317,8 +321,11 @@ var getGoogleAccessToken = function(code) {
  *   the users session token.  If not found, return the newGoogleUser promise.
  */
 var upsertGoogleUser = function(accessToken, googleData, emailId) {
+  console.log("I'm checking access token validity");
+
   var query = new Parse.Query(TokenStorage);
   query.equalTo('accountId', googleData.id);
+
   //query.ascending('createdAt');
   // Check if this googleId has previously logged in, using the master key
   return query.first({ useMasterKey: true }).then(function(tokenData) {
@@ -376,6 +383,9 @@ var newGoogleUser = function(accessToken, googleData, email) {
   // Sign up the new User
   return user.signUp().then(function(user) {
     // create a new TokenStorage object to store the user+Google association.
+
+    console.log("Inserting new entry in TokenStorage table with access token: " + accessToken);
+
     var ts = new TokenStorage();
     ts.set('user', user);
     ts.set('accountId', googleData.id);

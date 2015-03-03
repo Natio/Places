@@ -361,9 +361,9 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
 
             if (FacebookUtils.isFacebookSessionOpened()) {
-                FacebookUtils.downloadFacebookInfo(this);
+                FacebookUtils.getInstance().downloadFacebookInfo(this);
             } else {
-                PlacesLoginUtils.startLoginActivity(this);
+                PlacesLoginUtils.startLoginActivity(this, true);
             }
 
         }
@@ -1041,7 +1041,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             setResult(RESULT_OK, returnIntent);
             ShareActivity.this.finish();
         } else if (requestCode == Utils.LOGIN_REQUEST_CODE && resultCode == RESULT_OK) {
-            FacebookUtils.downloadFacebookInfo(this);
+            FacebookUtils.getInstance().downloadFacebookInfo(this);
         } else if (requestCode == Utils.PIC_CAPTURE_REQUEST_CODE && resultCode == RESULT_OK) {
 
             if (this.imageFile == null || !this.imageFile.canRead()) {

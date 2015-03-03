@@ -54,7 +54,7 @@ public final class FacebookUtils {
         return ParseFacebookUtils.getSession() != null && ParseFacebookUtils.getSession().isOpened();
     }
 
-    public static void downloadFacebookInfo(Context ctx) {
+    public void downloadFacebookInfo(Context ctx) {
         final ProgressDialog progress = new ProgressDialog(ctx);
         progress.setTitle("Loading");
         progress.setMessage("Wait while loading...");

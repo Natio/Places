@@ -41,24 +41,10 @@ public class PlacesLoginUtils {
         return PlacesLoginUtils.shared_instance;
     }
 
-    public static void downloadUserInfo(Context context) {
-        if (loginType == LoginType.FACEBOOK) FacebookUtils.downloadFacebookInfo(context);
-        else if (loginType == LoginType.GPLUS)
-            GPlusUtils.downloadGPlusInfo(GPlusUtils.getInstance().getGoogleApiClient(), context);
-    }
-
-    /**
-     * @param activity the activity where to start the intent
-     */
-    public static void startLoginActivity(Activity activity) {
-        PlacesLoginBuilder builder = new PlacesLoginBuilder(activity);
-
-        // builder.setAppLogo(R.drawable.app_logo);
-        Intent loginIntent = builder.build();
-        loginIntent.setClass(activity, PlacesLoginActivity.class);
-        // loginIntent.setClass(activity, ParseLoginActivity.class);
-
-        activity.startActivityForResult(loginIntent, Utils.LOGIN_REQUEST_CODE);
+    public static void downloadUserInfo(Activity activity)
+    {
+        if (loginType == LoginType.FACEBOOK) FacebookUtils.getInstance().downloadFacebookInfo(activity);
+        else if (loginType == LoginType.GPLUS) GPlusUtils.getInstance().downloadGPlusInfo(GPlusUtils.getInstance().getGoogleApiClient(), activity);
     }
 
     public String getCurrentUserId() {
@@ -87,6 +73,19 @@ public class PlacesLoginUtils {
 
     public HashMap<String, String> getUserProfilePicMapLarge() {
         return this.getUserProfilePicMapLarge();
+    }
+
+    public static void startLoginActivity(Activity activity, boolean canChoose)
+    {
+        PlacesLoginBuilder builder = new PlacesLoginBuilder(activity);
+
+        // builder.setAppLogo(R.drawable.app_logo);
+        Intent loginIntent = builder.build();
+        loginIntent.setClass(activity, PlacesLoginActivity.class);
+        loginIntent.putExtra("canChoose", canChoose);
+        // loginIntent.setClass(activity, ParseLoginActivity.class);
+
+        activity.startActivityForResult(loginIntent, Utils.LOGIN_REQUEST_CODE);
     }
 
     public void addFriend(String friend) {
@@ -157,16 +156,12 @@ public class PlacesLoginUtils {
         return this.userProfilePicMapLarge.get(profile_id);
     }
 
-    public boolean isSessionValid(Activity activity) {
-        if (FacebookUtils.isFacebookSessionOpened()) {
-            loginType = LoginType.FACEBOOK;
-
-            return true;
-        } else if (GPlusUtils.getInstance().getGoogleApiClient() == null ||
-                !GPlusUtils.getInstance().getGoogleApiClient().isConnected())
-            startLoginActivity(activity);
-        else if (GPlusUtils.getInstance().getGoogleApiClient().isConnected()) {
-            loginType = LoginType.GPLUS;
+    public boolean isSessionValid()
+    {
+        if(ParseUser.getCurrentUser() != null)
+        {
+            if (FacebookUtils.isFacebookSessionOpened()) loginType = LoginType.FACEBOOK;
+            else loginType = LoginType.GPLUS;
 
             return true;
         }
@@ -175,7 +170,7 @@ public class PlacesLoginUtils {
     }
 
     /**
-     * @param profile_id profile idenrifier
+     * @param profile_id profile identifier
      * @param size       Site of the picture
      * @return cached URL of profile_id profile picture. Returns null if the picture is not cached
      */

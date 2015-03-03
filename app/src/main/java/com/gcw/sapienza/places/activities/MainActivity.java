@@ -74,9 +74,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (PlacesLoginUtils.getInstance().isSessionValid(this))
-            PlacesLoginUtils.getInstance().downloadUserInfo(this);
-        else PlacesLoginUtils.startLoginActivity(this);
+        if (PlacesLoginUtils.getInstance().isSessionValid()) PlacesLoginUtils.getInstance().downloadUserInfo(this);
+        else PlacesLoginUtils.startLoginActivity(this, true);
 
         setContentView(R.layout.activity_main_drawer_layout);
         this.current_title = this.getTitle();
@@ -280,7 +279,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         PlacesLoginUtils.getInstance().clearUserData();
 
         // Go to the login view
-        PlacesLoginUtils.startLoginActivity(this);
+        PlacesLoginUtils.startLoginActivity(this, true);
     }
 
     /**
@@ -507,7 +506,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             MainActivity.this.selectItem(position);
         }
     }
-
 }
 
 

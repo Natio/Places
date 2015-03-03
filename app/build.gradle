@@ -33,10 +33,10 @@ dependencies {
     compile project(':ParseLoginUI')
     compile project(':ArcMenu')
     compile 'com.facebook.android:facebook-android-sdk:3.21.1'
-
-    compile 'com.squareup.picasso:picasso:2.4.0' //image caching
-
-    compile "com.android.support:support-v13:21.0.2"
-    compile "com.android.support:recyclerview-v7:21.0.2"
-    compile "com.android.support:cardview-v7:21.0.2"
+    compile 'com.squareup.picasso:picasso:2.4.0'
+    //image caching
+    compile 'com.android.support:support-v13:21.0.2'
+    compile 'com.android.support:recyclerview-v7:21.0.2'
+    compile 'com.android.support:cardview-v7:21.0.2'
+    compile files('libs/gson-2.2.2.jar')
 }

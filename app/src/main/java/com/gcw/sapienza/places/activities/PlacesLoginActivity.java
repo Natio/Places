@@ -1,5 +1,6 @@
 package com.gcw.sapienza.places.activities;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -11,11 +12,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Toast;
-
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.fragments.PlacesLoginFragment;
 import com.gcw.sapienza.places.utils.GPlusUtils;
+import com.gcw.sapienza.places.utils.PlacesLoginBuilder;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
+import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
@@ -36,7 +38,6 @@ import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 import com.parse.ui.ParseLoginActivity;
-
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -64,11 +65,23 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
 
     private ProgressDialog progressDialog;
 
+    public boolean canChoose = true;
+
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        Bundle extras = getIntent().getExtras();
+
+        if(extras != null && extras.containsKey("canChoose"))
+        {
+            canChoose = extras.getBoolean("canChoose");
+            if (!canChoose)
+            {
+                signinWithGPlus();
+            }
+        }
 
         // Combine options from incoming intent and the activity metadata
         configOptions = getMergedOptions();
@@ -149,15 +162,14 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
     }
 
     @Override
-    public void onConnected(Bundle connectionHint) {
+    public void onConnected(Bundle connectionHint)
+    {
         // We've resolved any connection errors.  mGoogleApiClient can be used to
         // access Google APIs on behalf of the user.
 
         getGPlusUsername();
         getGPlusFriends();
         getGPlusAccessToken();
-
-        if (progressDialog != null) progressDialog.dismiss();
     }
 
     @Override
@@ -280,17 +292,33 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
         params.put("code", token);
         params.put("email", email);
 
+        Log.d(TAG, "Calling cloud code for authentication...");
+
         //loads the Cloud function to create a Google user
         ParseCloud.callFunctionInBackground("accessGoogleUser", params, new FunctionCallback<Object>() {
             @Override
-            public void done(Object returnObj, ParseException e) {
+            public void done(final Object returnObj, ParseException e) {
                 if (e == null) {
                     ParseUser.becomeInBackground(returnObj.toString(), new LogInCallback() {
                         public void done(ParseUser user, ParseException e) {
+                            String token = returnObj.toString();
+                            Log.d(TAG, "So that's the token: " + token);
+
                             if (user != null && e == null) {
                                 Log.i(TAG, "The Google user validated");
 
                                 GPlusUtils.getInstance().setGoogleApiClient(GPlusUtils.getInstance().getGoogleApiClient());
+
+                                /*
+                                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                                SharedPreferences.Editor prefsEditor = preferences.edit();
+                                Gson gson = new Gson();
+                                String json = gson.toJson(GPlusUtils.getInstance().getGoogleApiClient());
+                                prefsEditor.putString("GoogleApiClient", json);
+                                prefsEditor.commit();
+                                */
+
+                                if (progressDialog != null) progressDialog.dismiss();
 
                                 setResult(RESULT_OK);
                                 // finish();

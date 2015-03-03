@@ -1,20 +1,37 @@
 package com.gcw.sapienza.places.utils;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.gcw.sapienza.places.activities.MainActivity;
+import com.gcw.sapienza.places.activities.PlacesLoginActivity;
+import com.gcw.sapienza.places.models.PlacesToken;
 import com.gcw.sapienza.places.models.PlacesUser;
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.parse.FindCallback;
+import com.parse.FunctionCallback;
+import com.parse.LogInCallback;
+import com.parse.ParseCloud;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -24,10 +41,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by mic_head on 27/02/15.
@@ -43,6 +61,8 @@ public class GPlusUtils {
 
     private Person currentPerson;
 
+    private boolean mIntentInProgress;
+
     private GPlusUtils() {
     }
 
@@ -55,42 +75,61 @@ public class GPlusUtils {
         return GPlusUtils.shared_instance;
     }
 
-    public static void downloadGPlusInfo(GoogleApiClient mGoogleApiClient, Context context) {
+    public void downloadGPlusInfo(GoogleApiClient mGoogleApiClient, Activity activity) {
         /**
          * Fetching user's information name, email, profile pic
          * */
-        try {
-            if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {
-                Person currentPerson = Plus.PeopleApi
-                        .getCurrentPerson(mGoogleApiClient);
-                String personName = currentPerson.getDisplayName();
-                String personPhotoUrl = currentPerson.getImage().getUrl();
-                String personGooglePlusProfile = currentPerson.getUrl();
-                String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
+        try
+        {
+            // TODO second parameter should be false
+            PlacesLoginUtils.startLoginActivity(activity, false);
+            Person currentPerson = Plus.PeopleApi
+                    .getCurrentPerson(mGoogleApiClient);
+            String personName = currentPerson.getDisplayName();
+            String personPhotoUrl = currentPerson.getImage().getUrl();
+            String personGooglePlusProfile = currentPerson.getUrl();
+            String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
 
-                Log.e(TAG, "Name: " + personName + ", plusProfile: "
-                        + personGooglePlusProfile + ", email: " + email
-                        + ", Image: " + personPhotoUrl);
+            Log.e(TAG, "Name: " + personName + ", plusProfile: "
+                    + personGooglePlusProfile + ", email: " + email
+                    + ", Image: " + personPhotoUrl);
 
 
-                // by default the profile url gives 50x50 px image only
-                // we can replace the value with whatever dimension we want by
-                // replacing sz=X
-                personPhotoUrl = personPhotoUrl.substring(0,
-                        personPhotoUrl.length() - 2)
-                        + PlacesLoginUtils.LARGE_PIC_SIZE;
+            // by default the profile url gives 50x50 px image only
+            // we can replace the value with whatever dimension we want by
+            // replacing sz=X
+            personPhotoUrl = personPhotoUrl.substring(0,
+                    personPhotoUrl.length() - 2)
+                    + PlacesLoginUtils.LARGE_PIC_SIZE;
 
-                PlacesLoginUtils.getInstance().addEntryToLargePicMap(currentPerson.getId(), personPhotoUrl);
+            PlacesLoginUtils.getInstance().addEntryToLargePicMap(currentPerson.getId(), personPhotoUrl);
 
-                // LoadProfileImage lpi = new LoadProfileImage(currentPerson.getId());
-                // lpi.execute();
-
-            } else {
-                Toast.makeText(context, "Person information is null", Toast.LENGTH_LONG).show();
-            }
-        } catch (Exception e) {
+            // LoadProfileImage lpi = new LoadProfileImage(currentPerson.getId());
+            // lpi.execute();
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG, "Error encountered while retrieving G+ info: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    @Deprecated
+    public boolean retrieveCurrentPerson(Context context)
+    {
+        /*
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String json = preferences.getString("GoogleApiClient", "");
+        Log.d(TAG, "mGoogleApiClient serialized: " + json);
+        JsonParser parser = new JsonParser();
+        JsonObject jsonObj = (JsonObject)parser.parse(json);
+        Gson gson = new GsonBuilder().registerTypeAdapter(GoogleApiClient.class, new InterfaceAdapter<GoogleApiClient>()).create();
+        mGoogleApiClient = gson.fromJson(jsonObj, GoogleApiClient.class);
+        if(mGoogleApiClient != null) currentPerson = Plus.PeopleApi.getCurrentPerson(GPlusUtils.getInstance().getGoogleApiClient());
+        return currentPerson != null;
+        */
+
+        return false;
     }
 
     public GoogleApiClient getGoogleApiClient() {
@@ -217,5 +256,25 @@ public class GPlusUtils {
                 Log.e(TAG, jsone.toString());
             }
         }
+    }
+
+    public static boolean checkGPlusTokenValidity()
+    {
+        PlacesUser user = (PlacesUser)ParseUser.getCurrentUser();
+        ParseQuery<PlacesToken> query = ParseQuery.getQuery("TokenStorage");
+        query.whereEqualTo("user", user);
+        query.findInBackground(new FindCallback<PlacesToken>() {
+            @Override
+            public void done(List<PlacesToken> list, ParseException e)
+            {
+                if(e == null) Log.e(TAG, "Error encountered while retrieving access token");
+                else if(list.size() != 0)
+                {
+                    // TODO
+                }
+            }
+        });
+
+        return false;
     }
 }
