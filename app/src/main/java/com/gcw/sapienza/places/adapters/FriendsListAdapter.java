@@ -1,96 +1,89 @@
 package com.gcw.sapienza.places.adapters;
 
-import android.app.Activity;
 import android.content.Context;
-import android.database.DataSetObserver;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListAdapter;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.activities.MainActivity;
+import com.gcw.sapienza.places.fragments.ProfileFragment;
+import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by snowblack on 3/2/15.
  */
-public class FriendsListAdapter implements ListAdapter {
+public class FriendsListAdapter extends ArrayAdapter<String> {
+
+    private Map<String, String> idToName;
 
     private static final String TAG = "FriendsListAdapter";
 
-    private View view;
-    private Context context;
-
-    List<String> friendsList;
-
-    public FriendsListAdapter(View view, Context context) {
-
-        this.view = view;
-        this.context = context;
-
-        friendsList = PlacesLoginUtils.getInstance().getFriends();
-        Log.d(TAG, "Friends list size: " + friendsList.size());
-    }
-
-    @Override
-    public boolean areAllItemsEnabled() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled(int position) {
-        return true;
-    }
-
-    @Override
-    public void registerDataSetObserver(DataSetObserver observer) {
-
-    }
-
-    @Override
-    public void unregisterDataSetObserver(DataSetObserver observer) {
-
-    }
-
-    @Override
-    public int getCount() {
-        return friendsList.size();
-    }
-
-    @Override
-    public Object getItem(int position) {
-        return friendsList.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public boolean hasStableIds() {
-        return false;
+    public FriendsListAdapter(Context context, int resource, List<String> friends) {
+        super(context, resource, friends);
+        idToName = new HashMap<>();
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        return this.view;
+
+        View v = convertView;
+
+        if (v == null) {
+
+            v = LayoutInflater.
+                    from(parent.getContext()).
+                    inflate(R.layout.friend_layout, parent, false);
+
+        }
+
+        final String friendId = getItem(position);
+
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity)getContext()).switchToOtherFrag(new ProfileFragment().newInstance(friendId));
+            }
+        });
+
+        final TextView friendNameView = (TextView)v.findViewById(R.id.friend_card_textView_username);
+        final ImageView friendImageView = (ImageView)v.findViewById(R.id.friend_card_profile_pic);
+
+        ParseQuery<PlacesUser> queryUsers = ParseQuery.getQuery("_User");
+        queryUsers.whereEqualTo(PlacesUser.FACEBOOK_ID_KEY, friendId);
+        queryUsers.getFirstInBackground(new GetCallback<PlacesUser>() {
+            @Override
+            public void done(PlacesUser placesUser, ParseException e) {
+                if(e == null){
+                    friendNameView.setText(placesUser.getName());
+                    idToName.put(friendId, placesUser.getName());
+                }
+                else
+                {
+                    Log.e(TAG, e.getMessage());
+                    Toast.makeText(getContext(), "An error occurred while retrieving friends' data", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(friendId, friendImageView, PlacesLoginUtils.PicSize.LARGE);
+
+        friendNameView.setText(friendId);
+
+        return v;
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        return 0;
-    }
-
-    @Override
-    public int getViewTypeCount() {
-        return friendsList.size();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return friendsList.size() == 0;
-    }
 }

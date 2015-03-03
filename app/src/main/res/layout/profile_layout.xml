@@ -19,6 +19,19 @@
         android:layout_below="@id/fbPicView"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
+        android:textStyle="bold"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text=""/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/memberSinceView"
+        android:textColor="@color/transparent_green"
+        android:layout_below="@id/fbNameView"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:textStyle="bold"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text=""/>
 
@@ -27,9 +40,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/postsView"
         android:textColor="@color/transparent_green"
-        android:layout_below="@id/fbNameView"
+        android:layout_below="@id/memberSinceView"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
+        android:textStyle="bold"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text=""/>
 
@@ -41,6 +55,7 @@
         android:layout_below="@id/postsView"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
+        android:textStyle="bold"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text=""/>
 
@@ -50,6 +65,7 @@
         android:id="@+id/friendsView"
         android:layout_below="@id/wowedView"
         android:text="Show Friends"
+        android:textStyle="bold"
         android:textColor="@color/white"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_marginTop="10dp"

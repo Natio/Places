@@ -21,14 +21,17 @@ import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.parse.CountCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by snowblack on 2/26/15.
  */
-public class MyProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment {
 
-    private static final String TAG = "MyProfileFragment";
+    private static final String TAG = "ProfileFragment";
     private static final String FBID = "FacebookID";
 
     //TODO use the bundle with arguments so to use the Fragment also for non current users
@@ -36,17 +39,18 @@ public class MyProfileFragment extends Fragment {
 
     private ImageView fbPicView;
     private TextView fbNameView;
+    private TextView memberSinceView;
     private TextView postsView;
     private TextView wowedView;
     private Button friendsView;
 
-//    public MyProfileFragment(String fbId){
+//    public ProfileFragment(String fbId){
 //        this.fbId = fbId;
 //    }
 
-    public static final MyProfileFragment newInstance(String fbId){
+    public static final ProfileFragment newInstance(String fbId){
 
-        MyProfileFragment fragment = new MyProfileFragment();
+        ProfileFragment fragment = new ProfileFragment();
 
         Bundle bundle = new Bundle();
         bundle.putString(FBID, fbId);
@@ -69,10 +73,11 @@ public class MyProfileFragment extends Fragment {
     {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        View view = inflater.inflate(R.layout.my_profile_layout, container, false);
+        View view = inflater.inflate(R.layout.profile_layout, container, false);
 
         fbPicView = (ImageView)view.findViewById(R.id.fbPicView);
         fbNameView = (TextView)view.findViewById(R.id.fbNameView);
+        memberSinceView = (TextView)view.findViewById(R.id.memberSinceView);
         postsView = (TextView)view.findViewById(R.id.postsView);
         wowedView = (TextView)view.findViewById(R.id.wowedView);
         friendsView = (Button)view.findViewById(R.id.friendsView);
@@ -86,8 +91,6 @@ public class MyProfileFragment extends Fragment {
             }
         });
         */
-
-        fbNameView.setText("User name: " + ((PlacesUser) ParseUser.getCurrentUser()).getName());
 
         FacebookUtils.getInstance().loadProfilePicIntoImageView(this.fbId, fbPicView, PlacesLoginUtils.PicSize.LARGE);
 
@@ -108,14 +111,22 @@ public class MyProfileFragment extends Fragment {
 
         ParseQuery<PlacesUser> queryUsers = ParseQuery.getQuery("_User");
         queryUsers.whereEqualTo(PlacesUser.FACEBOOK_ID_KEY, this.fbId);
-        PlacesUser user;
+        PlacesUser user = null;
         try {
             user = queryUsers.getFirst();
+            fbNameView.setText("User name: " + user.getName());
+
+            DateFormat dateFormatter = new SimpleDateFormat("EEE, d MMMM yyyy");
+            String formattedDate = dateFormatter.format(user.getCreatedAt().getTime());
+            memberSinceView.setText("Placer since: " + formattedDate);
         } catch (ParseException e) {
             e.printStackTrace();
             Toast.makeText(getActivity(), "An error occurred while retrieving user data", Toast.LENGTH_SHORT).show();
-            return view;
         }
+//        catch (java.text.ParseException e) {
+//            e.printStackTrace();
+//            Toast.makeText(getActivity(), "An error occurred while retrieving user data", Toast.LENGTH_SHORT).show();
+//        }
 
         ParseQuery wows = ParseQuery.getQuery("Wow_Lol_Boo");
         wows.whereEqualTo("user", user);
@@ -130,6 +141,10 @@ public class MyProfileFragment extends Fragment {
                 }
             }
         });
+
+        if(!PlacesLoginUtils.getInstance().getCurrentUserId().equals(this.fbId)){
+            friendsView.setVisibility(View.INVISIBLE);
+        }
 
         friendsView.setOnClickListener(new View.OnClickListener() {
             @Override

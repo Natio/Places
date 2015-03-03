@@ -3,25 +3,36 @@ package com.gcw.sapienza.places.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.adapters.FriendsListAdapter;
+import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by snowblack on 3/1/15.
  */
 public class MyFriendsFragment extends Fragment {
 
+    private static final String TAG = "MyFriendsFragment";
+
     private View view;
-    private ListView friendsList;
-    private ArrayAdapter<String> adapter;
+    private ListView friendsListView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
@@ -29,13 +40,15 @@ public class MyFriendsFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
 
         View view = inflater.inflate(R.layout.my_friends_layout, container, false);
-        friendsList = (ListView)view.findViewById(R.id.friends_list_view);
+        friendsListView = (ListView)view.findViewById(R.id.friends_list_view);
 
-        adapter = new ArrayAdapter<String>(PlacesApplication.getPlacesAppContext(), R.layout.custom_spinner, PlacesLoginUtils.getInstance().getFriends());
+//        adapter = new ArrayAdapter<String>(PlacesApplication.getPlacesAppContext(), R.layout.custom_spinner, PlacesLoginUtils.getInstance().getFriends());
+//
+//        friendsList.setAdapter(adapter);
 
-        friendsList.setAdapter(adapter);
+        List<String> friendListFbId = PlacesLoginUtils.getInstance().getFriends();
 
-//        friendsList.setAdapter(new FriendsListAdapter(friendsList, getActivity()));
+        friendsListView.setAdapter(new FriendsListAdapter(getActivity(), R.layout.friend_layout, friendListFbId));
 
         return view;
     }

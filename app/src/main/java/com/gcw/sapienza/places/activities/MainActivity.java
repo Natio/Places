@@ -31,9 +31,8 @@ import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.fragments.MainFragment;
 import com.gcw.sapienza.places.fragments.MyFlagsFragment;
-import com.gcw.sapienza.places.fragments.MyProfileFragment;
+import com.gcw.sapienza.places.fragments.ProfileFragment;
 import com.gcw.sapienza.places.fragments.SettingsFragment;
-import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.GPlusUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
@@ -283,7 +282,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 //    {
 
     private void myProfile() {
-        switchToOtherFrag(MyProfileFragment.newInstance(PlacesLoginUtils.getInstance().getCurrentUserId()));
+        switchToOtherFrag(ProfileFragment.newInstance(PlacesLoginUtils.getInstance().getCurrentUserId()));
     }
 
     private void logout()
