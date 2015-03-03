@@ -46,7 +46,7 @@ public class MyFlagsListFragment extends Fragment {
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            switch (intent.getAction()){
+            switch (intent.getAction()) {
 
                 case LocationService.FOUND_MY_FLAGS_NOTIFICATION:
                     MyFlagsListFragment.this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getLocationService().getMyFlags());
@@ -62,8 +62,7 @@ public class MyFlagsListFragment extends Fragment {
         }
     };
 
-    public RecyclerView getRV()
-    {
+    public RecyclerView getRV() {
         return recycleView;
     }
 
@@ -92,16 +91,17 @@ public class MyFlagsListFragment extends Fragment {
         LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(this.receiver);
     }
 
-    public void updateRecycleViewWithNewContents(List<Flag> l){
+    public void updateRecycleViewWithNewContents(List<Flag> l) {
         this.recycleView.setAdapter(new FlagsAdapter(l, recycleView, getActivity()));
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        FlagsAdapter fa = (FlagsAdapter)recycleView.getAdapter();
+        FlagsAdapter fa = (FlagsAdapter) recycleView.getAdapter();
         Flag sel_usr = fa.getSelectedFlag();
 
-        if(sel_usr == null) Toast.makeText(getActivity(), NO_VALID_FLAG_SELECTED, Toast.LENGTH_SHORT).show();
+        if (sel_usr == null)
+            Toast.makeText(getActivity(), NO_VALID_FLAG_SELECTED, Toast.LENGTH_SHORT).show();
 
         switch (item.getItemId()) {
 
@@ -118,16 +118,17 @@ public class MyFlagsListFragment extends Fragment {
 
     /**
      * Deletes the Flag
+     *
      * @param f flag to delete
      */
-    private void deleteFlag(Flag f){
+    private void deleteFlag(Flag f) {
         f.deleteInBackground(new DeleteCallback() {
             @Override
             public void done(com.parse.ParseException e) {
-                if(e == null) {
+                if (e == null) {
                     Toast.makeText(recycleView.getContext(), FLAG_DELETED, Toast.LENGTH_SHORT).show();
-                    ((MainActivity)getActivity()).refresh();
-                }else
+                    ((MainActivity) getActivity()).refresh();
+                } else
                     Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

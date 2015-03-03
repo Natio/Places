@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class PlacesApplication extends Application{
+public class PlacesApplication extends Application {
     //just the tag for logging
     private static final String TAG = "PlacesApplication";
 
@@ -72,43 +72,44 @@ public class PlacesApplication extends Application{
 
     /**
      * Call this method to access the UNIQUE PlacesApplication instance
+     *
      * @return The unique instance of PlacesApplication
      */
-    public static PlacesApplication getInstance(){
+    public static PlacesApplication getInstance() {
         return PlacesApplication.placesApplication;
     }
 
 
     /**
-     *
      * @return returns LocationService instance
      */
-    public LocationService getLocationService(){
+    public LocationService getLocationService() {
         return this.mService;
     }
 
     /**
-     *
      * @return string representing weather conditions
      */
-    public String getWeather(){
+    public String getWeather() {
         return this.weather;
     }
 
     /**
      * Sets the weather
+     *
      * @param weather string representing the weather
      */
-    public void setWeather(String weather){
+    public void setWeather(String weather) {
         this.weather = weather;
     }
 
     /**
      * Returns the current location if available. If running on emulator this method
      * will return a fake position somewhere in the middle of Rome.
+     *
      * @return see description
      */
-    public Location getLocation(){
+    public Location getLocation() {
         //if (/*PlacesApplication.isRunningOnEmulator &&*/ this.currentLocation == null) {
         if (PlacesApplication.isRunningOnEmulator && this.currentLocation == null) {
 
@@ -121,27 +122,24 @@ public class PlacesApplication extends Application{
     }
 
     /**
-     *
      * @return returns the list of flags around user's location, filtered according to settings
      */
-    public List<Flag> getFlags(){
+    public List<Flag> getFlags() {
         return this.flagsNearby;
     }
 
     /**
-     *
      * @return returns the list of all the Flags the user has posted
      */
-    public List<Flag> getMyFlags(){
+    public List<Flag> getMyFlags() {
         return this.myFlags;
     }
 
     /**
-     *
      * @return App context
      */
     @SuppressWarnings("unused")
-    public static Context getPlacesAppContext(){
+    public static Context getPlacesAppContext() {
         return PlacesApplication.PLACES_CONTEXT;
     }
 
@@ -153,7 +151,7 @@ public class PlacesApplication extends Application{
         PlacesApplication.PLACES_CONTEXT = this.getApplicationContext();
         PlacesApplication.placesApplication = this;
 
-        if(BuildConfig.DEBUG){
+        if (BuildConfig.DEBUG) {
             Picasso.with(this).setIndicatorsEnabled(false); // if in debug show color indicators on pictures
         }
 
@@ -166,16 +164,15 @@ public class PlacesApplication extends Application{
         ParseUser.registerSubclass(PlacesUser.class);
 
         // initialize Parse.com
-        Parse.initialize(this, PARSE_COM_APP_KEY , PARSE_COM_CLIENT_KEY);
+        Parse.initialize(this, PARSE_COM_APP_KEY, PARSE_COM_CLIENT_KEY);
         ParseFacebookUtils.initialize(getString(R.string.app_id));
         ParseConfig.getInBackground(new ConfigCallback() {
             @Override
             public void done(ParseConfig parseConfig, ParseException e) {
-                if(e != null){
+                if (e != null) {
                     // Log.d(TAG, "Error while configuring: "+e.getMessage());
                     Log.d(TAG, "Error while configuring Parse");
-                }
-                else{
+                } else {
                     Log.d(TAG, "Got new Configuration");
                 }
             }
@@ -206,15 +203,15 @@ public class PlacesApplication extends Application{
     }
 
     public void startLocationService() {
-        LocationManager locationManager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-                || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+                || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             Intent locInt = new Intent(this, LocationService.class);
             Log.d("Places Application", "Starting Location Service");
-    //        stopService(locInt);
+            //        stopService(locInt);
             startService(locInt);
             bindService(locInt, this.mConnection, BIND_AUTO_CREATE);
-        }else{
+        } else {
             Log.w("Places Application", "Location Service not started!");
         }
     }
@@ -239,17 +236,20 @@ public class PlacesApplication extends Application{
     };
     private ILocationUpdater listener = new ILocationUpdater() {
         @Override
-        public void setLocation(Location l){
+        public void setLocation(Location l) {
             PlacesApplication.this.currentLocation = l;
             PlacesApplication.this.updateWeatherInfo();
         }
+
         @Override
-        public void setFlagsNearby(List<Flag> l){
+        public void setFlagsNearby(List<Flag> l) {
             PlacesApplication.this.flagsNearby = l;
         }
 
         @Override
-        public void setMyFlags(List<Flag> myFlags) { PlacesApplication.this.myFlags = myFlags; }
+        public void setMyFlags(List<Flag> myFlags) {
+            PlacesApplication.this.myFlags = myFlags;
+        }
     };
 
     private void updateWeatherInfo() {
@@ -266,7 +266,7 @@ public class PlacesApplication extends Application{
                 JSONWeatherTask task = new JSONWeatherTask();
                 task.execute(locality + ',' + cc);
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             Log.e(TAG, "No locality found! Error: " + e.toString());
         }
     }

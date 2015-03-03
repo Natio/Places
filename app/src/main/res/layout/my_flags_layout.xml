@@ -20,7 +20,7 @@
             android:layout_gravity="center"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:id="@+id/share_progress_bar"/>
+            android:id="@+id/share_progress_bar" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -44,7 +44,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical"
-        android:id="@+id/my_home_container" >
+        android:id="@+id/my_home_container">
 
         <FrameLayout
             android:layout_width="fill_parent"
@@ -52,10 +52,9 @@
             android:layout_weight="0.4"
             android:id="@+id/my_map_holder"
             android:background="@color/transparent_green"
-            android:paddingBottom="2dp"/>
+            android:paddingBottom="2dp" />
 
-        <com.gcw.sapienza.places.layouts.MSwipeRefreshLayout
-            xmlns:tools="http://schemas.android.com/tools"
+        <com.gcw.sapienza.places.layouts.MSwipeRefreshLayout xmlns:tools="http://schemas.android.com/tools"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="0dp"

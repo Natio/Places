@@ -17,33 +17,53 @@ public class CustomParseObject extends ParseObject {
     public static final String BOO_KEY = "boolBoo";
     public static final String USER_KEY = "user";
 
-    public void setUser(ParseUser user){
+    public void setUser(ParseUser user) {
         this.put(USER_KEY, user);
     }
 
-    public ParseUser getuser(){
-        return (ParseUser)this.get(USER_KEY);
+    public ParseUser getuser() {
+        return (ParseUser) this.get(USER_KEY);
     }
 
 
-    public String getFacebookId() { return (String)this.get(FACEBOOK_ID_KEY); }
+    public String getFacebookId() {
+        return (String) this.get(FACEBOOK_ID_KEY);
+    }
 
-    public String getFlagId() { return (String)this.get(FLAG_ID_KEY); }
+    public String getFlagId() {
+        return (String) this.get(FLAG_ID_KEY);
+    }
 
-    public boolean getWowBoolean() { return (boolean)this.get(WOW_KEY); }
+    public boolean getWowBoolean() {
+        return (boolean) this.get(WOW_KEY);
+    }
 
-    public boolean getLolBoolean() { return (boolean)this.get(LOL_KEY); }
+    public boolean getLolBoolean() {
+        return (boolean) this.get(LOL_KEY);
+    }
 
-    public boolean getBooBoolean() { return (boolean)this.get(BOO_KEY); }
+    public boolean getBooBoolean() {
+        return (boolean) this.get(BOO_KEY);
+    }
 
-    public void setFacebookId(String fbId) { this.put(FACEBOOK_ID_KEY, fbId); }
+    public void setFacebookId(String fbId) {
+        this.put(FACEBOOK_ID_KEY, fbId);
+    }
 
-    public void setFlagId(String flagId) { this.put(FLAG_ID_KEY, flagId); }
+    public void setFlagId(String flagId) {
+        this.put(FLAG_ID_KEY, flagId);
+    }
 
-    public void setWowBoolean(boolean wowBool) { this.put(WOW_KEY, wowBool); }
+    public void setWowBoolean(boolean wowBool) {
+        this.put(WOW_KEY, wowBool);
+    }
 
-    public void setLolBoolean(boolean lolBool) { this.put(LOL_KEY, lolBool); }
+    public void setLolBoolean(boolean lolBool) {
+        this.put(LOL_KEY, lolBool);
+    }
 
-    public void setBooBoolean(boolean booBool) { this.put(BOO_KEY, booBool); }
+    public void setBooBoolean(boolean booBool) {
+        this.put(BOO_KEY, booBool);
+    }
 
 }

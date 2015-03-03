@@ -5,11 +5,9 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.util.Log;
 
-public class MSwipeRefreshLayout extends SwipeRefreshLayout
-{
+public class MSwipeRefreshLayout extends SwipeRefreshLayout {
 
-    public MSwipeRefreshLayout(Context context)
-    {
+    public MSwipeRefreshLayout(Context context) {
         super(context, null);
     }
 

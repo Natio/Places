@@ -3,25 +3,15 @@ package com.gcw.sapienza.places.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.adapters.FriendsListAdapter;
-import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
-import com.parse.FindCallback;
-import com.parse.GetCallback;
-import com.parse.ParseException;
-import com.parse.ParseQuery;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,12 +25,11 @@ public class MyFriendsFragment extends Fragment {
     private ListView friendsListView;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
         View view = inflater.inflate(R.layout.my_friends_layout, container, false);
-        friendsListView = (ListView)view.findViewById(R.id.friends_list_view);
+        friendsListView = (ListView) view.findViewById(R.id.friends_list_view);
 
 //        adapter = new ArrayAdapter<String>(PlacesApplication.getPlacesAppContext(), R.layout.custom_spinner, PlacesLoginUtils.getInstance().getFriends());
 //

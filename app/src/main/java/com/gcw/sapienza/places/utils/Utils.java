@@ -16,8 +16,7 @@ import java.io.IOException;
 /**
  * Created by mic_head on 02/01/15.
  */
-public class Utils
-{
+public class Utils {
     @SuppressWarnings("unused")
     private static final String TAG = "Utils";
 
@@ -69,33 +68,35 @@ public class Utils
 
     /**
      * Returns a string containing the name of the file without the extension
+     *
      * @param f file
      * @return the name W/o extension of the file
      */
     @SuppressWarnings("UnusedDeclaration")
     protected static String getNameFromFile(File f) {
         String filenameArray[] = f.getName().split("\\.");
-        if(filenameArray.length == 1) return "";
-        return filenameArray[filenameArray.length-2];
+        if (filenameArray.length == 1) return "";
+        return filenameArray[filenameArray.length - 2];
 
     }
 
     /**
      * Returns a string containing the extension of the file
+     *
      * @param f file
      * @return the extension of the file
      */
-    protected static String getExtensionFromFile(File f){
+    protected static String getExtensionFromFile(File f) {
         String filenameArray[] = f.getName().split("\\.");
-        if(filenameArray.length == 0) return "";
-        return  filenameArray[filenameArray.length-1];
+        if (filenameArray.length == 0) return "";
+        return filenameArray[filenameArray.length - 1];
     }
 
-    public static String generateRandomName(){
+    public static String generateRandomName() {
         return "_" + System.currentTimeMillis();
     }
 
-    public static File createAudioFile(String extension, Context ctx) throws IOException{
+    public static File createAudioFile(String extension, Context ctx) throws IOException {
 
         String imageFileName = 'a' + Utils.generateRandomName();
 
@@ -121,7 +122,7 @@ public class Utils
         );
     }
 
-    public static File createRecordingVideoFile(String extension) throws IOException{
+    public static File createRecordingVideoFile(String extension) throws IOException {
         String imageFileName = "vid" + Utils.generateRandomName();
         File storageDir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_MOVIES);
@@ -136,8 +137,8 @@ public class Utils
     public static String getVideoRealPathFromURI(Context context, Uri contentUri) {
         Cursor cursor = null;
         try {
-            String[] proj = { MediaStore.Video.Media.DATA };
-            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+            String[] proj = {MediaStore.Video.Media.DATA};
+            cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
             cursor.moveToFirst();
             return cursor.getString(column_index);
@@ -149,11 +150,11 @@ public class Utils
 
     }
 
-    public static int getIconForCategory(String category, Context context)
-    {
+    public static int getIconForCategory(String category, Context context) {
         String[] category_array = context.getResources().getStringArray(R.array.categories);
 
-        if (category == null || category.equals(category_array[0])) return R.drawable.flag_red; //None
+        if (category == null || category.equals(category_array[0]))
+            return R.drawable.flag_red; //None
         else if (category.equals(category_array[1])) return R.drawable.flag_green; //Thoughts
         else if (category.equals(category_array[2])) return R.drawable.flag_yellow; //Fun
         else if (category.equals(category_array[3])) return R.drawable.flag_blue; //Music
@@ -161,12 +162,12 @@ public class Utils
         else return R.drawable.flag_purple; //Food
     }
 
-    public static String getImageRealPathFromURI(Context context, Uri uri){
+    public static String getImageRealPathFromURI(Context context, Uri uri) {
 
         Cursor cursor = null;
         try {
-            String[] proj = { MediaStore.Images.Media.DATA };
-            cursor = context.getContentResolver().query(uri,  proj, null, null, null);
+            String[] proj = {MediaStore.Images.Media.DATA};
+            cursor = context.getContentResolver().query(uri, proj, null, null, null);
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             cursor.moveToFirst();
             return cursor.getString(column_index);
@@ -176,7 +177,6 @@ public class Utils
             }
         }
     }
-
 
 
 }

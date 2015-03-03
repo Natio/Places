@@ -18,12 +18,11 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.gcw.sapienza.places.notifications.Notifications;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.models.Flag;
-import com.gcw.sapienza.places.utils.FacebookUtils;
+import com.gcw.sapienza.places.notifications.Notifications;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.common.ConnectionResult;
@@ -94,8 +93,7 @@ public class LocationService extends Service implements
 
 
     @Override
-    public void onConnected(Bundle connectionHint)
-    {
+    public void onConnected(Bundle connectionHint) {
         Log.d(TAG, "Connected to Google Api");
         Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
         if (currentLocation != null) {
@@ -107,11 +105,13 @@ public class LocationService extends Service implements
         fusedLocationProviderApi.requestLocationUpdates(googleApiClient, locationRequest, this);
     }
 
-    public Location getLocation(){
+    public Location getLocation() {
         return this.location;
     }
 
-    public List<Flag> getMyFlags(){ return this.myFlags; }
+    public List<Flag> getMyFlags() {
+        return this.myFlags;
+    }
 
     public void setListener(ILocationUpdater app) {
         this.listener = app;
@@ -124,26 +124,24 @@ public class LocationService extends Service implements
         }
     }
 
-    public void queryParsewithCurrentUser(){
+    public void queryParsewithCurrentUser() {
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
         query.whereEqualTo("fbId", PlacesLoginUtils.getInstance().getCurrentUserId());
         query.orderByDescending("createdAt");
         query.findInBackground(new FindCallback<Flag>() {
             @Override
             public void done(List<Flag> flags, ParseException e) {
-                if(e!= null){
+                if (e != null) {
                     // Log.e(TAG, e.getMessage());
                     Toast.makeText(getBaseContext(), "Cannot fetch your Flags at the moment,\ntry again later", Toast.LENGTH_SHORT);
                 }
-                if(flags == null){
+                if (flags == null) {
                     flags = new ArrayList<Flag>();
                 }
                 LocationService.this.myFlags = flags;
-                if(flags.size() > 0){
+                if (flags.size() > 0) {
                     LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_MY_FLAGS_NOTIFICATION));
-                }
-                else
-                {
+                } else {
                     LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION));
                 }
             }
@@ -153,18 +151,18 @@ public class LocationService extends Service implements
 
     /**
      * given location, we fetch the Flags nearby we are interested in
+     *
      * @param location the location we want to find Flags nearby to
      */
-    public void queryParsewithLocation(Location location)
-    {
+    public void queryParsewithLocation(Location location) {
         //creates a fake location for testing if it is running on simulator
-        if(PlacesApplication.isRunningOnEmulator){
+        if (PlacesApplication.isRunningOnEmulator) {
             location = PlacesApplication.getInstance().getLocation();
         }
 
         //this is for avoiding a crash if location is null
         //the crash happens if there is no GPS data and the action range is changed
-        if(location == null){
+        if (location == null) {
             return;
         }
 
@@ -174,7 +172,7 @@ public class LocationService extends Service implements
 
         float radius = Utils.MAP_RADIUS;
 
-        if(PlacesApplication.isRunningOnEmulator){
+        if (PlacesApplication.isRunningOnEmulator) {
             radius = 10.0f;
         }
 
@@ -206,16 +204,14 @@ public class LocationService extends Service implements
         Log.v(TAG, "None: " + none_check);
         Log.v(TAG, "Music: " + music_check);
 
-        if(PlacesLoginUtils.getInstance().hasCurrentUserId() == false)
-        {
+        if (PlacesLoginUtils.getInstance().hasCurrentUserId() == false) {
             final android.os.Handler handler = new android.os.Handler();
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (PlacesLoginUtils.getInstance().hasCurrentUserId() == false){
+                    if (PlacesLoginUtils.getInstance().hasCurrentUserId() == false) {
                         handler.postDelayed(this, Utils.UPDATE_DELAY);
-                    }
-                    else{
+                    } else {
                         queryParsewithLocation(getLocation());
                     }
                 }
@@ -223,15 +219,14 @@ public class LocationService extends Service implements
             return;
         }
 
-        if(!thoughts_check && !fun_check && !landscape_check
-                && ! food_check && ! none_check){
+        if (!thoughts_check && !fun_check && !landscape_check
+                && !food_check && !none_check) {
             Toast.makeText(getApplicationContext(), "No category selected: "
                     + NO_FLAGS_VISIBLE, Toast.LENGTH_LONG).show();
 
-            if(parseObjects == null){
+            if (parseObjects == null) {
                 parseObjects = new ArrayList<>(0);
-            }
-            else{
+            } else {
                 parseObjects.clear();
             }
 
@@ -242,35 +237,31 @@ public class LocationService extends Service implements
         }
 
         ArrayList<String> selectedCategories = new ArrayList<>();
-        if(thoughts_check) selectedCategories.add("Thoughts");
-        if(fun_check) selectedCategories.add("Fun");
-        if(landscape_check) selectedCategories.add("Landscape");
-        if(food_check) selectedCategories.add("Food");
-        if(none_check) selectedCategories.add("None");
-        if(music_check) selectedCategories.add("Music");
+        if (thoughts_check) selectedCategories.add("Thoughts");
+        if (fun_check) selectedCategories.add("Fun");
+        if (landscape_check) selectedCategories.add("Landscape");
+        if (food_check) selectedCategories.add("Food");
+        if (none_check) selectedCategories.add("None");
+        if (music_check) selectedCategories.add("Music");
         query.whereContainedIn("category", selectedCategories);
 
-        if(!storytellers_in_the_dark)
-        {
-            if(lone_wolf && with_friends_surrounded)
-            {
+        if (!storytellers_in_the_dark) {
+            if (lone_wolf && with_friends_surrounded) {
                 ArrayList<String> meAndMyFriends = new ArrayList<>();
                 meAndMyFriends.add(PlacesLoginUtils.getInstance().getCurrentUserId());
                 meAndMyFriends.addAll(PlacesLoginUtils.getInstance().getFriends());
                 query.whereContainedIn("fbId", meAndMyFriends);
-            }
-
-            else if(lone_wolf) query.whereEqualTo("fbId", PlacesLoginUtils.getInstance().getCurrentUserId());
-            else if(with_friends_surrounded) query.whereContainedIn("fbId", PlacesLoginUtils.getInstance().getFriends());
-            else
-            {
+            } else if (lone_wolf)
+                query.whereEqualTo("fbId", PlacesLoginUtils.getInstance().getCurrentUserId());
+            else if (with_friends_surrounded)
+                query.whereContainedIn("fbId", PlacesLoginUtils.getInstance().getFriends());
+            else {
                 Toast.makeText(getApplicationContext(), "No filter selected: "
                         + NO_FLAGS_VISIBLE, Toast.LENGTH_LONG).show();
 
-                if(parseObjects == null){
+                if (parseObjects == null) {
                     parseObjects = new ArrayList<>(0);
-                }
-                else{
+                } else {
                     parseObjects.clear();
                 }
 
@@ -278,20 +269,18 @@ public class LocationService extends Service implements
 
                 return;
             }
-        }
-        else
-        {
+        } else {
             if (!lone_wolf)
                 query.whereNotEqualTo("fbId", PlacesLoginUtils.getInstance().getCurrentUserId());
             if (!with_friends_surrounded)
                 query.whereNotContainedIn("fbId", PlacesLoginUtils.getInstance().getFriends()); // this is rather expensive
         }
 
-        if(archaeologist) query.orderByAscending("createdAt");
+        if (archaeologist) query.orderByAscending("createdAt");
         else query.orderByDescending("createdAt");
 
         query.setLimit(Utils.MAX_FLAGS);
-        if(PlacesApplication.isRunningOnEmulator){
+        if (PlacesApplication.isRunningOnEmulator) {
             query.setLimit(50);
         }
 
@@ -299,7 +288,7 @@ public class LocationService extends Service implements
         query.findInBackground(new FindCallback<Flag>() {
             @Override
             public void done(List<Flag> parseObjects, ParseException e) {
-                if(parseObjects == null){
+                if (parseObjects == null) {
                     parseObjects = new ArrayList<>();
                 }
                 LocationService.this.parseObjects = parseObjects;
@@ -307,9 +296,9 @@ public class LocationService extends Service implements
                         " flags within " + Utils.MAP_RADIUS + " km");
                 updateApplication();
 
-                if(parseObjects.size() > 0) {
+                if (parseObjects.size() > 0) {
                     LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
-                }else{
+                } else {
                     LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
                 }
 
@@ -325,7 +314,7 @@ public class LocationService extends Service implements
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.i(TAG, "GoogleApiClient connection has failed "+ connectionResult.toString());
+        Log.i(TAG, "GoogleApiClient connection has failed " + connectionResult.toString());
     }
 
     @Override
@@ -333,7 +322,7 @@ public class LocationService extends Service implements
         Log.d(TAG, "Interval: " + INTERVAL);
         Log.d(TAG, "Fastest Interval: " + FASTEST_INTERVAL);
         Log.d(TAG, "Location accuracy: " + location.getAccuracy());
-        if(notificationLocation != null && location.distanceTo(this.notificationLocation) > (Utils.MAP_RADIUS * KM_TO_M)       ){
+        if (notificationLocation != null && location.distanceTo(this.notificationLocation) > (Utils.MAP_RADIUS * KM_TO_M)) {
             NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             nManager.cancel(NOTIFICATION_ID);
         }
@@ -341,13 +330,13 @@ public class LocationService extends Service implements
         long elapsed_time = location.getTime() -
                 (this.location == null ? 0L : this.location.getTime());
         Log.d(TAG, "Elapsed time: " + elapsed_time);
-        if(this.location != null) {
+        if (this.location != null) {
             float distance = location.distanceTo(this.location) / KM_TO_M;
             Log.d(TAG, "Distance from last known location: " + distance);
         }
         this.location = location;
         queryParsewithLocation(location);
-        if(this.parseObjects != null && this.parseObjects.size() > 0
+        if (this.parseObjects != null && this.parseObjects.size() > 0
                 && !MainActivity.isForeground() && PlacesLoginUtils.getInstance().hasCurrentUserId()) {
             Log.d(TAG, "Notifying user..." +
                     this.parseObjects.size() + " flags found");
@@ -363,7 +352,7 @@ public class LocationService extends Service implements
      */
     private void notifyUser() {
         int newFlags = updateCachedPostsAndRet();
-        if(newFlags > 0) {
+        if (newFlags > 0) {
             Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             int numFlags = this.parseObjects.size();
             String textIfOne = "A flag for you!";
@@ -383,7 +372,7 @@ public class LocationService extends Service implements
             builder.setContentIntent(contentIntent);
             NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             nManager.notify(NOTIFICATION_ID, builder.build());
-        }else{
+        } else {
             Log.w(TAG, "Notification to user aborted: no new Flags found: " + newFlags);
         }
     }
@@ -392,12 +381,13 @@ public class LocationService extends Service implements
      * update the cache containing the Flags we have met already
      * in the close past. Returns the number of new Flags met and
      * puts them into cache
+     *
      * @return the number of Flags met that are not stored in cache
      */
     private int updateCachedPostsAndRet() {
         long newTimestamp = new java.util.Date().getTime();
 
-        if(newTimestamp - this.lastCacheUpdate > UPDATE_CACHE_MIN_INTERVAL){
+        if (newTimestamp - this.lastCacheUpdate > UPDATE_CACHE_MIN_INTERVAL) {
             removeCachedPosts();
         }
 
@@ -405,16 +395,16 @@ public class LocationService extends Service implements
 
         Set<String> cachedKeys = this.cachedFlags.keySet();
 
-        for(Flag f: parseObjects){
-            if(cachedKeys.contains(f.getObjectId())){
+        for (Flag f : parseObjects) {
+            if (cachedKeys.contains(f.getObjectId())) {
                 //Flag already cached.
                 nonCachedFlags--;
-            }else{
+            } else {
                 //Not cached yet. Being cached now.
                 this.cachedFlags.put(f.getObjectId(), newTimestamp);
             }
         }
-        
+
         return nonCachedFlags;
     }
 
@@ -423,8 +413,8 @@ public class LocationService extends Service implements
      */
     private void removeCachedPosts() {
         this.lastCacheUpdate = new java.util.Date().getTime();
-        for(String tf: this.cachedFlags.keySet()){
-            if(this.lastCacheUpdate - cachedFlags.get(tf) > FLAG_IN_CACHE_MIN){
+        for (String tf : this.cachedFlags.keySet()) {
+            if (this.lastCacheUpdate - cachedFlags.get(tf) > FLAG_IN_CACHE_MIN) {
                 this.cachedFlags.remove(tf);
             }
         }
@@ -433,14 +423,13 @@ public class LocationService extends Service implements
     /**
      * updates the user location and the Flags that appear in to the user
      */
-    private void updateApplication(){
-        if(listener != null) {
+    private void updateApplication() {
+        if (listener != null) {
             listener.setLocation(location);
             listener.setFlagsNearby(parseObjects);
             listener.setMyFlags(myFlags);
         }
     }
-
 
 
     @Override
@@ -474,7 +463,7 @@ public class LocationService extends Service implements
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         Log.d(TAG, "Being Destroyed");
         super.onDestroy();
         googleApiClient.disconnect();

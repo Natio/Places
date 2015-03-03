@@ -26,14 +26,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
+
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.ShareActivity;
 import com.gcw.sapienza.places.models.Comment;
 import com.gcw.sapienza.places.models.CustomParseObject;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.models.PlacesUser;
-import com.gcw.sapienza.places.utils.FacebookUtilCallback;
-import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.parse.FindCallback;
 import com.parse.GetDataCallback;
@@ -43,11 +42,11 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -93,7 +92,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private ArrayList<Comment> comments;
     private String newComment;
 
-    public static enum MediaType{ PIC, AUDIO, VIDEO, NONE }
+    public static enum MediaType {PIC, AUDIO, VIDEO, NONE}
+
     private MediaType mediaType;
     private ParseFile mediaFile;
 
@@ -108,18 +108,18 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private static final int BOO_CODE = 2;
 
     /**
-     *  Must be called BEFORE adding the fragment to the
+     * Must be called BEFORE adding the fragment to the
+     *
      * @param mediaFile the file to display
-     * @param type the type of the file
+     * @param type      the type of the file
      */
-    public void setMedia(ParseFile mediaFile, MediaType type){
+    public void setMedia(ParseFile mediaFile, MediaType type) {
         this.mediaType = type;
         this.mediaFile = mediaFile;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Bundle bundle = getArguments();
@@ -142,37 +142,35 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         super.onDestroy();
 
-        if(mediaPlayer != null) mediaPlayer.release();
+        if (mediaPlayer != null) mediaPlayer.release();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
         view = inflater.inflate(R.layout.flag_layout, container, false);
 
-        iw = (ImageView)view.findViewById(R.id.pic);
-        vv = (VideoView)view.findViewById(R.id.vid);
-        EditText flagText = (EditText)view.findViewById(R.id.text);
-        authorTextView = (TextView)view.findViewById(R.id.author);
-        ImageView profilePicimageView = (ImageView)view.findViewById(R.id.profile_pic);
-        frameLayout = (RelativeLayout)view.findViewById(R.id.frame_layout);
-        playVideoButton = (ImageView)view.findViewById(R.id.play_video_button);
-        videoHolder = (FrameLayout)view.findViewById(R.id.video_holder);
+        iw = (ImageView) view.findViewById(R.id.pic);
+        vv = (VideoView) view.findViewById(R.id.vid);
+        EditText flagText = (EditText) view.findViewById(R.id.text);
+        authorTextView = (TextView) view.findViewById(R.id.author);
+        ImageView profilePicimageView = (ImageView) view.findViewById(R.id.profile_pic);
+        frameLayout = (RelativeLayout) view.findViewById(R.id.frame_layout);
+        playVideoButton = (ImageView) view.findViewById(R.id.play_video_button);
+        videoHolder = (FrameLayout) view.findViewById(R.id.video_holder);
         audioHolder = (ImageView) view.findViewById(R.id.audio);
 
-        wowButton = (Button)view.findViewById(R.id.wow_button);
-        lolButton = (Button)view.findViewById(R.id.lol_button);
-        booButton = (Button)view.findViewById(R.id.boo_button);
+        wowButton = (Button) view.findViewById(R.id.wow_button);
+        lolButton = (Button) view.findViewById(R.id.lol_button);
+        booButton = (Button) view.findViewById(R.id.boo_button);
 
-        commentsButton = (Button)view.findViewById(R.id.comments_button);
-        commentsHolder = (SwipeRefreshLayout)view.findViewById(R.id.comments_holder);
-        commentsList = (ListView)view.findViewById(R.id.comments_list);
+        commentsButton = (Button) view.findViewById(R.id.comments_button);
+        commentsHolder = (SwipeRefreshLayout) view.findViewById(R.id.comments_holder);
+        commentsList = (ListView) view.findViewById(R.id.comments_list);
 
         iw.setOnClickListener(this);
         vv.setOnTouchListener(this);
@@ -184,14 +182,14 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         lolButton.setOnClickListener(this);
         booButton.setOnClickListener(this);
 
-        ViewGroup header = (ViewGroup)inflater.inflate(R.layout.comments_header, commentsList, false);
+        ViewGroup header = (ViewGroup) inflater.inflate(R.layout.comments_header, commentsList, false);
         commentsList.addHeaderView(header);
         commentsList.setDividerHeight(3);
 
         commentsHolder.setOnRefreshListener(this);
 
         commentsButton.setOnClickListener(this);
-        addCommentButton = (Button)header.findViewById(R.id.add_comment_button);
+        addCommentButton = (Button) header.findViewById(R.id.add_comment_button);
         addCommentButton.setOnClickListener(this);
 
         this.changeLayoutAccordingToMediaType();
@@ -212,26 +210,20 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         });
         */
 
-        authorTextView.setText("Author: " + ((PlacesUser)ParseUser.getCurrentUser()).getName() + bottomLineText);
+        authorTextView.setText("Author: " + ((PlacesUser) ParseUser.getCurrentUser()).getName() + bottomLineText);
 
         PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(this.id, profilePicimageView, PlacesLoginUtils.PicSize.LARGE);
 
         view.setFocusableInTouchMode(true);
         view.requestFocus();
-        view.setOnKeyListener(new View.OnKeyListener()
-        {
+        view.setOnKeyListener(new View.OnKeyListener() {
             @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event)
-            {
-                if (keyCode == KeyEvent.KEYCODE_BACK)
-                {
-                    if(frameLayout.getVisibility() == View.VISIBLE)
-                    {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    if (frameLayout.getVisibility() == View.VISIBLE) {
                         frameLayout.setVisibility(View.GONE);
                         return true;
-                    }
-                    else if(commentsHolder.getVisibility() == View.VISIBLE)
-                    {
+                    } else if (commentsHolder.getVisibility() == View.VISIBLE) {
                         commentsHolder.setVisibility(View.GONE);
                         return true;
                     }
@@ -246,8 +238,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
         /*
@@ -324,48 +315,41 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     }
 
     @Override
-    public void onRefresh()
-    {
+    public void onRefresh() {
         commentsHolder.setRefreshing(true);
         retrieveComments();
         commentsHolder.setRefreshing(false);
     }
 
     @Override
-    public void onClick(View v)
-    {
-        if(v.getId() == R.id.frame_layout) frameLayout.setVisibility(View.GONE);
-        else if(v.getId() == R.id.pic) frameLayout.setVisibility(View.VISIBLE);
-        // else if(v.getId() == playVideoButton.getId()) playVideo();
-        else if(v.getId() == R.id.audio) playRecording();
-        else if(v.getId() == R.id.wow_button) wlbFlag(WOW_CODE);
-        else if(v.getId() == R.id.lol_button) wlbFlag(LOL_CODE);
-        else if(v.getId() == R.id.boo_button) wlbFlag(BOO_CODE);
-        else if(v.getId() == R.id.comments_button) toggleComments();
-        else if(v.getId() == R.id.add_comment_button) insertComment();
+    public void onClick(View v) {
+        if (v.getId() == R.id.frame_layout) frameLayout.setVisibility(View.GONE);
+        else if (v.getId() == R.id.pic) frameLayout.setVisibility(View.VISIBLE);
+            // else if(v.getId() == playVideoButton.getId()) playVideo();
+        else if (v.getId() == R.id.audio) playRecording();
+        else if (v.getId() == R.id.wow_button) wlbFlag(WOW_CODE);
+        else if (v.getId() == R.id.lol_button) wlbFlag(LOL_CODE);
+        else if (v.getId() == R.id.boo_button) wlbFlag(BOO_CODE);
+        else if (v.getId() == R.id.comments_button) toggleComments();
+        else if (v.getId() == R.id.add_comment_button) insertComment();
     }
 
     @Override
-    public boolean onTouch(View v, MotionEvent event)
-    {
-        if(v.getId() == vv.getId() && event.getAction() == MotionEvent.ACTION_DOWN){
+    public boolean onTouch(View v, MotionEvent event) {
+        if (v.getId() == vv.getId() && event.getAction() == MotionEvent.ACTION_DOWN) {
             return playVideo();
         }
 
         return false;
     }
 
-    private void updateWowInfo()
-    {
+    private void updateWowInfo() {
         ParseQuery<Flag> queryPosts = ParseQuery.getQuery("Posts");
         queryPosts.whereEqualTo("objectId", flagId);
 
-        queryPosts.findInBackground(new FindCallback<Flag>()
-        {
-            public void done(List<Flag> markers, ParseException e)
-            {
-                if (e == null && markers.size() != 0)
-                {
+        queryPosts.findInBackground(new FindCallback<Flag>() {
+            public void done(List<Flag> markers, ParseException e) {
+                if (e == null && markers.size() != 0) {
                     Flag flag = markers.get(0);
 
                     wowCount = flag.getInt("wowCount");
@@ -377,7 +361,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         // TODO I totally have to go over this mess
         // if(wowButton.getText().charAt(wowButton.getText().length() - 1) != ')')
-            wowButton.setText(wowButton.getText() + " (" + wowCount + ")");
+        wowButton.setText(wowButton.getText() + " (" + wowCount + ")");
 
         lolButton.setText(lolButton.getText() + " (" + lolCount + ")");
         booButton.setText(booButton.getText() + " (" + booCount + ")");
@@ -387,12 +371,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         queryW.whereEqualTo("flagId", flagId);
         queryW.whereEqualTo("boolWow", true);
 
-        queryW.findInBackground(new FindCallback<CustomParseObject>()
-        {
-            public void done(List<CustomParseObject> markers, ParseException e)
-            {
-                if (e == null && markers.size() != 0)
-                {
+        queryW.findInBackground(new FindCallback<CustomParseObject>() {
+            public void done(List<CustomParseObject> markers, ParseException e) {
+                if (e == null && markers.size() != 0) {
                     wowButton.setText("You wow this." + " (" + wowCount + ")");
                 }
             }
@@ -403,12 +384,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         queryL.whereEqualTo("flagId", flagId);
         queryL.whereEqualTo("boolLol", true);
 
-        queryL.findInBackground(new FindCallback<CustomParseObject>()
-        {
-            public void done(List<CustomParseObject> markers, ParseException e)
-            {
-                if (e == null && markers.size() != 0)
-                {
+        queryL.findInBackground(new FindCallback<CustomParseObject>() {
+            public void done(List<CustomParseObject> markers, ParseException e) {
+                if (e == null && markers.size() != 0) {
                     lolButton.setText("You lol this." + " (" + lolCount + ")");
                 }
             }
@@ -419,33 +397,27 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         queryB.whereEqualTo("flagId", flagId);
         queryB.whereEqualTo("boolBoo", true);
 
-        queryB.findInBackground(new FindCallback<CustomParseObject>()
-        {
-            public void done(List<CustomParseObject> markers, ParseException e)
-            {
-                if (e == null && markers.size() != 0)
-                {
+        queryB.findInBackground(new FindCallback<CustomParseObject>() {
+            public void done(List<CustomParseObject> markers, ParseException e) {
+                if (e == null && markers.size() != 0) {
                     booButton.setText("You boo this." + " (" + booCount + ")");
                 }
             }
         });
     }
 
-    private void retrieveComments()
-    {
+    private void retrieveComments() {
         ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
         query.whereEqualTo("flagId", flagId);
         query.findInBackground(new FindCallback<Comment>() {
             @Override
             public void done(List<Comment> result, ParseException e) {
 
-                if(result == null || result.size() == 0)
-                {
+                if (result == null || result.size() == 0) {
                     ArrayList<String> commentsNotFoundText = new ArrayList();
                     commentsNotFoundText.add("Be the first to comment this flag!");
                     commentsAdapter = new ArrayAdapter<String>(getActivity(), R.layout.comment_item_layout, commentsNotFoundText);
-                }
-                else {
+                } else {
                     comments = new ArrayList<Comment>();
                     comments.addAll(result);
 
@@ -473,8 +445,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         });
     }
 
-    private void insertComment()
-    {
+    private void insertComment() {
         LayoutInflater li = LayoutInflater.from(getActivity());
         View passwordDialogLayout = li.inflate(R.layout.comment_insertion_layout, null);
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
@@ -488,23 +459,20 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 .setCancelable(true)
                 .setNegativeButton("Cancel",
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,int id)
-                            {
+                            public void onClick(DialogInterface dialog, int id) {
                                 dialog.dismiss();
                             }
                         })
                 .setPositiveButton("Confirm",
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,int id)
-                            {
+                            public void onClick(DialogInterface dialog, int id) {
                                 newComment = userInput.getText().toString();
-                                if(newComment.length() == 0)
-                                {
+                                if (newComment.length() == 0) {
                                     Toast.makeText(getActivity(), "Comment cannot be empty!", Toast.LENGTH_LONG).show();
                                     return;
                                 }
 
-                                final Comment comment =  new Comment();
+                                final Comment comment = new Comment();
                                 comment.put("text", newComment);
                                 comment.put("userId", PlacesLoginUtils.getInstance().getCurrentUserId());
                                 comment.put("flagId", flagId);
@@ -520,7 +488,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                 });
                                 */
 
-                                comment.setUsername(((PlacesUser)ParseUser.getCurrentUser()).getName());
+                                comment.setUsername(((PlacesUser) ParseUser.getCurrentUser()).getName());
 
                                 dialog.dismiss();
 
@@ -535,29 +503,21 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         alertDialog.show();
     }
 
-    private void playRecording()
-    {
-        if(mediaPlayer.isPlaying())
-        {
+    private void playRecording() {
+        if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
             audioHolder.setImageResource(R.drawable.play_button);
-        }
-        else
-        {
+        } else {
             mediaPlayer.start();
             audioHolder.setImageResource(R.drawable.pause_button);
         }
     }
 
-    private boolean playVideo()
-    {
-        if(vv.isPlaying())
-        {
+    private boolean playVideo() {
+        if (vv.isPlaying()) {
             vv.pause();
             playVideoButton.setVisibility(View.VISIBLE);
-        }
-        else
-        {
+        } else {
             // vv.resume();
             vv.start();
             playVideoButton.setVisibility(View.GONE);
@@ -567,15 +527,15 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     }
 
 
-    private void onVideoDownloaded(String videoPath){
+    private void onVideoDownloaded(String videoPath) {
         Uri videoUri = Uri.parse(videoPath);
         vv.setVideoURI(videoUri);
 
-        try
-        {
+        try {
             vv.seekTo(10);
+        } catch (RuntimeException re) {
+            Log.d(TAG, "Video is too short to show preview");
         }
-        catch(RuntimeException re){ Log.d(TAG, "Video is too short to show preview"); }
 
         playVideoButton.setVisibility(View.VISIBLE);
         // playVideo();
@@ -588,7 +548,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         });
     }
 
-    private void onAudioDownloaded(String audioPath){
+    private void onAudioDownloaded(String audioPath) {
         try {
             audioHolder.setVisibility(View.VISIBLE);
             File temp = new File(audioPath);
@@ -597,8 +557,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
-                public void onCompletion(MediaPlayer mp)
-                {
+                public void onCompletion(MediaPlayer mp) {
                     audioHolder.setImageResource(R.drawable.play_button);
                 }
             });
@@ -609,21 +568,17 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             mediaPlayer.setDataSource(inStream.getFD());
 
             mediaPlayer.prepare();
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             ioe.printStackTrace();
         }
     }
 
-    private void wlbFlag(int code)
-    {
+    private void wlbFlag(int code) {
         ParseQuery<CustomParseObject> queryWLB = ParseQuery.getQuery("Wow_Lol_Boo");
         queryWLB.whereEqualTo("fbId", userId);
         queryWLB.whereEqualTo("flagId", flagId);
 
-        switch(code)
-        {
+        switch (code) {
             case WOW_CODE:
                 wowButton.setClickable(false);
 
@@ -775,57 +730,43 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         }
     }
 
-    private void updateWLBCount(int code, final boolean increment)
-    {
+    private void updateWLBCount(int code, final boolean increment) {
         ParseQuery<Flag> queryPosts = ParseQuery.getQuery("Posts");
         queryPosts.whereEqualTo("objectId", flagId);
 
-        switch(code)
-        {
+        switch (code) {
             case WOW_CODE:
-                queryPosts.findInBackground(new FindCallback<Flag>()
-                {
-                    public void done(List<Flag> markers, ParseException e)
-                    {
-                        if (e == null && markers.size() != 0)
-                        {
+                queryPosts.findInBackground(new FindCallback<Flag>() {
+                    public void done(List<Flag> markers, ParseException e) {
+                        if (e == null && markers.size() != 0) {
                             Flag flag = markers.get(0);
 
                             final int wowCount = flag.getInt("wowCount");
 
-                            if(increment)
-                            {
+                            if (increment) {
                                 flag.increment("wowCount");
 
-                                flag.saveInBackground(new SaveCallback()
-                                {
+                                flag.saveInBackground(new SaveCallback() {
                                     @Override
-                                    public void done(ParseException e)
-                                    {
+                                    public void done(ParseException e) {
                                         updateWowButtonText(true, wowCount + 1);
 
                                         wowButton.setClickable(true);
                                     }
                                 });
-                            }
-                            else
-                            {
+                            } else {
                                 flag.increment("wowCount", -1);
 
-                                flag.saveInBackground(new SaveCallback()
-                                {
+                                flag.saveInBackground(new SaveCallback() {
                                     @Override
-                                    public void done(ParseException e)
-                                    {
+                                    public void done(ParseException e) {
                                         updateWowButtonText(false, wowCount - 1);
 
                                         wowButton.setClickable(true);
                                     }
                                 });
                             }
-                        }
-                        else
-                        {
+                        } else {
                             Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
                             Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
 
@@ -837,49 +778,37 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 break;
 
             case LOL_CODE:
-                queryPosts.findInBackground(new FindCallback<Flag>()
-                {
-                    public void done(List<Flag> markers, ParseException e)
-                    {
-                        if (e == null && markers.size() != 0)
-                        {
+                queryPosts.findInBackground(new FindCallback<Flag>() {
+                    public void done(List<Flag> markers, ParseException e) {
+                        if (e == null && markers.size() != 0) {
                             Flag flag = markers.get(0);
 
                             final int lolCount = flag.getInt("lolCount");
 
-                            if(increment)
-                            {
+                            if (increment) {
                                 flag.increment("lolCount");
 
-                                flag.saveInBackground(new SaveCallback()
-                                {
+                                flag.saveInBackground(new SaveCallback() {
                                     @Override
-                                    public void done(ParseException e)
-                                    {
+                                    public void done(ParseException e) {
                                         updateLolButtonText(true, lolCount + 1);
 
                                         lolButton.setClickable(true);
                                     }
                                 });
-                            }
-                            else
-                            {
+                            } else {
                                 flag.increment("lolCount", -1);
 
-                                flag.saveInBackground(new SaveCallback()
-                                {
+                                flag.saveInBackground(new SaveCallback() {
                                     @Override
-                                    public void done(ParseException e)
-                                    {
+                                    public void done(ParseException e) {
                                         updateLolButtonText(false, lolCount - 1);
 
                                         lolButton.setClickable(true);
                                     }
                                 });
                             }
-                        }
-                        else
-                        {
+                        } else {
                             Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
                             Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
 
@@ -891,49 +820,37 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 break;
 
             case BOO_CODE:
-                queryPosts.findInBackground(new FindCallback<Flag>()
-                {
-                    public void done(List<Flag> markers, ParseException e)
-                    {
-                        if (e == null && markers.size() != 0)
-                        {
+                queryPosts.findInBackground(new FindCallback<Flag>() {
+                    public void done(List<Flag> markers, ParseException e) {
+                        if (e == null && markers.size() != 0) {
                             Flag flag = markers.get(0);
 
                             final int booCount = flag.getInt("booCount");
 
-                            if(increment)
-                            {
+                            if (increment) {
                                 flag.increment("booCount");
 
-                                flag.saveInBackground(new SaveCallback()
-                                {
+                                flag.saveInBackground(new SaveCallback() {
                                     @Override
-                                    public void done(ParseException e)
-                                    {
+                                    public void done(ParseException e) {
                                         updateBooButtonText(true, booCount + 1);
 
                                         booButton.setClickable(true);
                                     }
                                 });
-                            }
-                            else
-                            {
+                            } else {
                                 flag.increment("booCount", -1);
 
-                                flag.saveInBackground(new SaveCallback()
-                                {
+                                flag.saveInBackground(new SaveCallback() {
                                     @Override
-                                    public void done(ParseException e)
-                                    {
+                                    public void done(ParseException e) {
                                         updateBooButtonText(false, booCount - 1);
 
                                         booButton.setClickable(true);
                                     }
                                 });
                             }
-                        }
-                        else
-                        {
+                        } else {
                             Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
                             Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
 
@@ -944,55 +861,43 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         }
     }
 
-    private void updateWowButtonText(boolean wowed, int wowCount)
-    {
-        if(wowed) wowButton.setText("You wow this. (" + wowCount + ")");
+    private void updateWowButtonText(boolean wowed, int wowCount) {
+        if (wowed) wowButton.setText("You wow this. (" + wowCount + ")");
         else wowButton.setText("WOW (" + wowCount + ")");
     }
 
-    private void updateLolButtonText(boolean lold, int lolCount)
-    {
-        if(lold) lolButton.setText("You lol this. (" + lolCount + ")");
+    private void updateLolButtonText(boolean lold, int lolCount) {
+        if (lold) lolButton.setText("You lol this. (" + lolCount + ")");
         else lolButton.setText("LOL (" + lolCount + ")");
     }
 
-    private void updateBooButtonText(boolean booed, int booCount)
-    {
-        if(booed) booButton.setText("You boo this. (" + booCount + ")");
+    private void updateBooButtonText(boolean booed, int booCount) {
+        if (booed) booButton.setText("You boo this. (" + booCount + ")");
         else booButton.setText("BOO (" + booCount + ")");
     }
 
-    private void toggleComments()
-    {
-        if(commentsHolder.getVisibility() == View.VISIBLE)
-        {
+    private void toggleComments() {
+        if (commentsHolder.getVisibility() == View.VISIBLE) {
             commentsHolder.setVisibility(View.GONE);
             commentsButton.setVisibility(View.VISIBLE);
             wowButton.setVisibility(View.VISIBLE);
-        }
-        else
-        {
+        } else {
             commentsHolder.setVisibility(View.VISIBLE);
             commentsButton.setVisibility(View.GONE);
             wowButton.setVisibility(View.GONE);
         }
     }
 
-    private void changeLayoutAccordingToMediaType(){
-        if(mediaType == MediaType.NONE)
-        {
+    private void changeLayoutAccordingToMediaType() {
+        if (mediaType == MediaType.NONE) {
             audioHolder.setVisibility(View.GONE);
             iw.setVisibility(View.GONE);
             videoHolder.setVisibility(View.GONE);
-        }
-        else if(mediaType == MediaType.AUDIO)
-        {
+        } else if (mediaType == MediaType.AUDIO) {
             iw.setVisibility(View.GONE);
             videoHolder.setVisibility(View.GONE);
             audioHolder.setVisibility(View.GONE);
-        }
-        else if(mediaType == MediaType.PIC)
-        {
+        } else if (mediaType == MediaType.PIC) {
             audioHolder.setVisibility(View.GONE);
             videoHolder.setVisibility(View.GONE);
             Picasso.with(this.getActivity()).load(this.mediaFile.getUrl()).into(this.iw);
@@ -1002,28 +907,26 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             focused_iw = (ImageView)view.findViewById(R.id.focused_pic);
             focused_iw.setImageBitmap(bm);*/
 
-            ImageView focused_imageView = (ImageView)this.view.findViewById(R.id.focused_pic);
+            ImageView focused_imageView = (ImageView) this.view.findViewById(R.id.focused_pic);
             Picasso.with(this.getActivity()).load(this.mediaFile.getUrl()).into(focused_imageView);
 
-        }
-        else
-        {
+        } else {
             audioHolder.setVisibility(View.GONE);
             iw.setVisibility(View.GONE);
         }
 
 
-        if(this.mediaType != MediaType.NONE && this.mediaType != MediaType.PIC){
+        if (this.mediaType != MediaType.NONE && this.mediaType != MediaType.PIC) {
             System.gc();
 
             this.mediaFile.getDataInBackground(new GetDataCallback() {
                 @Override
                 public void done(byte[] bytes, ParseException e) {
-                    if(!FlagFragment.this.isAdded()){
+                    if (!FlagFragment.this.isAdded()) {
                         //orrible hack to prevent a crash when the Fragment is detached from an activity.
                         return;
                     }
-                    if(e == null){
+                    if (e == null) {
                         try {
 
                             MediaType mediaType = FlagFragment.this.mediaType;
@@ -1033,21 +936,18 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                             outputStream.flush();
                             outputStream.close();
 
-                            if(mediaType == MediaType.AUDIO){
+                            if (mediaType == MediaType.AUDIO) {
                                 FlagFragment.this.onAudioDownloaded(tempFile.getAbsolutePath());
-                            }
-                            else if(mediaType == MediaType.VIDEO){
+                            } else if (mediaType == MediaType.VIDEO) {
                                 FlagFragment.this.onVideoDownloaded(tempFile.getAbsolutePath());
                             }
                             FlagFragment.this.mediaFile = null;
 
-                        }
-                        catch(IOException io){
+                        } catch (IOException io) {
                             Log.d(TAG, "IO Error", io);
                             Toast.makeText(FlagFragment.this.getActivity(), "Error downloading file", Toast.LENGTH_LONG).show();
                         }
-                    }
-                    else{
+                    } else {
                         Log.d(TAG, "Download Error", e);
                         Toast.makeText(FlagFragment.this.getActivity(), "Error downloading file", Toast.LENGTH_LONG).show();
                     }
@@ -1058,10 +958,10 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
     }
 
-    private  File tempFileForMediaType(MediaType type){
+    private File tempFileForMediaType(MediaType type) {
         String fileName;
         String fileFormat;
-        switch (type){
+        switch (type) {
             case AUDIO:
                 fileFormat = ShareActivity.AUDIO_FORMAT;
                 fileName = "places_temp_audio";
@@ -1074,15 +974,15 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 fileFormat = ShareActivity.PICTURE_FORMAT;
                 fileName = "places_temp_pic";
                 break;
-            default: return null;
+            default:
+                return null;
         }
 
-        try{
-            Log.d(TAG, "name "+fileName);
-            Log.d(TAG, "format "+fileFormat);
-            return File.createTempFile( fileName, fileFormat, this.getActivity().getCacheDir());
-        }
-        catch(IOException e){
+        try {
+            Log.d(TAG, "name " + fileName);
+            Log.d(TAG, "format " + fileFormat);
+            return File.createTempFile(fileName, fileFormat, this.getActivity().getCacheDir());
+        } catch (IOException e) {
             Log.d(TAG, "Cannot create temp file", e);
             return null;
         }

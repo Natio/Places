@@ -27,7 +27,6 @@ import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.services.LocationService;
-import com.gcw.sapienza.places.utils.GPlusUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -62,20 +61,17 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
     private FragmentActivity myContext;
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.receiver = new BroadcastReceiver()
-        {
+        this.receiver = new BroadcastReceiver() {
             @Override
-            public void onReceive(Context context, Intent intent)
-            {
+            public void onReceive(Context context, Intent intent) {
                 /**
                  * eventually, we might want to have different behaviors
                  * for different events (whether my flags have been found or not)
                  */
-                switch(intent.getAction()) {
+                switch (intent.getAction()) {
 
                     case LocationService.FOUND_NEW_FLAGS_NOTIFICATION:
 
@@ -112,14 +108,13 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
     }
 
     @Override
-    public void onAttach(Activity activity){
-        this.myContext=(FragmentActivity) activity;
+    public void onAttach(Activity activity) {
+        this.myContext = (FragmentActivity) activity;
         super.onAttach(activity);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
         view = inflater.inflate(R.layout.my_flags_layout, container, false);
@@ -127,34 +122,30 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 //        this.progressBarHolder = (RelativeLayout)view.findViewById(R.id.frame_layout);
 //        this.progressTextView = (TextView)view.findViewById(R.id.share_progress_text_view);
 
-        srl = (MSwipeRefreshLayout)view.findViewById(R.id.my_swipe_refresh);
+        srl = (MSwipeRefreshLayout) view.findViewById(R.id.my_swipe_refresh);
         srl.setOnRefreshListener(this);
 
 //        this.homeHolder.setVisibility(View.INVISIBLE);
 //        this.fragHolder.setVisibility(View.INVISIBLE);
 //        this.srl.setVisibility(View.INVISIBLE);
 
-        srl.setOnChildScrollUpListener(new MSwipeRefreshLayout.OnChildScrollUpListener()
-        {
+        srl.setOnChildScrollUpListener(new MSwipeRefreshLayout.OnChildScrollUpListener() {
             @Override
-            public boolean canChildScrollUp()
-            {
+            public boolean canChildScrollUp() {
                 List<Fragment> frags = myContext.getSupportFragmentManager().getFragments();
 
-                if(frags.size() < 1) return false;
+                if (frags.size() < 1) return false;
 
                 RecyclerView rv = null;
 
-                for(int i = 0; i < frags.size(); i++)
-                {
-                    if (frags.get(i) instanceof FlagsListFragment)
-                    {
+                for (int i = 0; i < frags.size(); i++) {
+                    if (frags.get(i) instanceof FlagsListFragment) {
                         rv = ((FlagsListFragment) frags.get(i)).getRV();
                         break;
                     }
                 }
 
-                if(rv == null) return false;
+                if (rv == null) return false;
 
                 RecyclerView.LayoutManager layoutManager = rv.getLayoutManager();
 
@@ -182,8 +173,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         super.onDestroy();
 
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(this.receiver);
@@ -204,10 +194,9 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
     private void updateMarkersOnMap() {
 
-        List<Flag> flags= PlacesApplication.getInstance().getFlags();
+        List<Flag> flags = PlacesApplication.getInstance().getFlags();
 
-        if(flags != null && this.gMap != null)
-        {
+        if (flags != null && this.gMap != null) {
             this.gMap.clear();
 
             //zooms around all the Flags
@@ -215,8 +204,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
             int index = 0;
 
-            for (ParseObject p : flags)
-            {
+            for (ParseObject p : flags) {
                 Flag f = (Flag) p;
                 ParseGeoPoint location = f.getLocation();
                 String text = f.getText();
@@ -228,8 +216,8 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                 Bitmap marker = BitmapFactory.decodeResource(getResources(), marker_id);
                 Bitmap halfSizeMarker = Bitmap.createScaledBitmap
                         (marker,
-                                (int)(marker.getWidth() * 0.25f),
-                                (int)(marker.getHeight() * 0.25f),
+                                (int) (marker.getWidth() * 0.25f),
+                                (int) (marker.getHeight() * 0.25f),
                                 false);
 
                 this.gMap.addMarker(new MarkerOptions()
@@ -243,23 +231,21 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                 index++;
             }
 
-            if(flags.size() > 0)
-            {
+            if (flags.size() > 0) {
                 final LatLngBounds bounds = builder.build();
 //                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
-                if(PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.GPLUS)
+                if (PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.GPLUS)
                     this.gMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-                    @Override
-                    public void onCameraChange(CameraPosition cameraPosition)
-                    {
-                        gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
-                        gMap.setOnCameraChangeListener(null);
-                    }
-                });
+                        @Override
+                        public void onCameraChange(CameraPosition cameraPosition) {
+                            gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
+                            gMap.setOnCameraChangeListener(null);
+                        }
+                    });
                 else gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
-            }else{
+            } else {
                 Location currentLocation = gMap.getMyLocation();
-                if(currentLocation != null){
+                if (currentLocation != null) {
                     LatLng currentLocationLatLng = new LatLng(currentLocation.getLatitude(),
                             currentLocation.getLongitude());
                     this.gMap.animateCamera(CameraUpdateFactory
@@ -294,9 +280,8 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
     }
 
     @Override
-    public void onRefresh()
-    {
-        ((MainActivity)getActivity()).refresh();
+    public void onRefresh() {
+        ((MainActivity) getActivity()).refresh();
         srl.setRefreshing(false);
     }
 }

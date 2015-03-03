@@ -4,7 +4,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.gcw.sapienza.places.PlacesApplication;
-import com.gcw.sapienza.places.services.WeatherHttpClient;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,19 +12,18 @@ import org.json.JSONObject;
 
 /**
  * Created by snowblack on 1/4/15.
- *
  */
 public class JSONWeatherTask extends AsyncTask<String, String, String> {
 
     @Override
     protected String doInBackground(String... params) {
-        String data = ( (new WeatherHttpClient()).getWeatherData(params[0]));
+        String data = ((new WeatherHttpClient()).getWeatherData(params[0]));
         try {
             Log.d("Weather", data);
             JSONObject info = new JSONObject(data);
             JSONObject mainObj = info.getJSONObject("main");
 
-            float temp = (float)mainObj.getDouble("temp") - 273.15f;
+            float temp = (float) mainObj.getDouble("temp") - 273.15f;
             int round_temp = Math.round(temp);
             Log.d("Weather", "Temperatura: " + round_temp);
 

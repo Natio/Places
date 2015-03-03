@@ -55,24 +55,22 @@ public class FriendsListAdapter extends ArrayAdapter<String> {
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity)getContext()).switchToOtherFrag(new ProfileFragment().newInstance(friendId));
+                ((MainActivity) getContext()).switchToOtherFrag(new ProfileFragment().newInstance(friendId));
             }
         });
 
-        final TextView friendNameView = (TextView)v.findViewById(R.id.friend_card_textView_username);
-        final ImageView friendImageView = (ImageView)v.findViewById(R.id.friend_card_profile_pic);
+        final TextView friendNameView = (TextView) v.findViewById(R.id.friend_card_textView_username);
+        final ImageView friendImageView = (ImageView) v.findViewById(R.id.friend_card_profile_pic);
 
         ParseQuery<PlacesUser> queryUsers = ParseQuery.getQuery("_User");
         queryUsers.whereEqualTo(PlacesUser.FACEBOOK_ID_KEY, friendId);
         queryUsers.getFirstInBackground(new GetCallback<PlacesUser>() {
             @Override
             public void done(PlacesUser placesUser, ParseException e) {
-                if(e == null){
+                if (e == null) {
                     friendNameView.setText(placesUser.getName());
                     idToName.put(friendId, placesUser.getName());
-                }
-                else
-                {
+                } else {
                     Log.e(TAG, e.getMessage());
                     Toast.makeText(getContext(), "An error occurred while retrieving friends' data", Toast.LENGTH_SHORT).show();
                 }

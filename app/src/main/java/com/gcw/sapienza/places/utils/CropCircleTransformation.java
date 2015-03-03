@@ -12,7 +12,7 @@ import com.squareup.picasso.Transformation;
 /**
  * Created by paolo on 09/01/15.
  */
-public class CropCircleTransformation implements Transformation{
+public class CropCircleTransformation implements Transformation {
 
     @Override
     public Bitmap transform(Bitmap source) {
@@ -26,7 +26,7 @@ public class CropCircleTransformation implements Transformation{
         paint.setAntiAlias(true);
         canvas.drawARGB(0, 0, 0, 0);
         // paint.setColor(color);
-        canvas.drawCircle(source.getWidth() / 2,source.getHeight() / 2, source.getWidth() / 2, paint);
+        canvas.drawCircle(source.getWidth() / 2, source.getHeight() / 2, source.getWidth() / 2, paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(source, rect, rect, paint);
 
