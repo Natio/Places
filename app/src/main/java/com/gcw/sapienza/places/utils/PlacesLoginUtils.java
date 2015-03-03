@@ -145,7 +145,7 @@ public class PlacesLoginUtils {
      * @param id the facebook id of a user
      * @return fb user name for a given id
      */
-    protected String getUserNameFromId(String id) {
+    public String getUserNameFromId(String id) {
         return this.userIdMap.get(id);
     }
 
@@ -204,6 +204,10 @@ public class PlacesLoginUtils {
         if (loginType == LoginType.FACEBOOK)
             FacebookUtils.getInstance().loadProfilePicIntoImageView(user_id, imageView, size);
         else GPlusUtils.getInstance().loadProfilePicIntoImageView(user_id, imageView, size);
+    }
+
+    public boolean isUserNameCached(String friendId) {
+        return this.userIdMap.containsKey(friendId);
     }
 
     public enum PicSize {
