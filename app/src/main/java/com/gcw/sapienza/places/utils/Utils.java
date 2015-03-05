@@ -1,15 +1,12 @@
 package com.gcw.sapienza.places.utils;
 
-
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.widget.Toast;
-
 import com.gcw.sapienza.places.R;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -164,7 +161,7 @@ public class Utils {
             }
         }
     }
-    
+
     public static void showToast(Context context, String text, int duration){
         Toast.makeText(context, text, duration).show();
     }

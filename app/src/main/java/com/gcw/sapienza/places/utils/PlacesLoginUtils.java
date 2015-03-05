@@ -1,15 +1,12 @@
 package com.gcw.sapienza.places.utils;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.gcw.sapienza.places.activities.PlacesLoginActivity;
 import com.gcw.sapienza.places.models.PlacesUser;
 import com.parse.ParseUser;
-
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +41,7 @@ public class PlacesLoginUtils {
     public static void downloadUserInfo(Activity activity)
     {
         if (loginType == LoginType.FACEBOOK) FacebookUtils.getInstance().downloadFacebookInfo(activity);
-        else if (loginType == LoginType.GPLUS) GPlusUtils.getInstance().downloadGPlusInfo(GPlusUtils.getInstance().getGoogleApiClient(), activity);
+        else if (loginType == LoginType.GPLUS) GPlusUtils.getInstance().downloadGPlusInfo(activity);
     }
 
     public String getCurrentUserId() {
@@ -189,16 +186,16 @@ public class PlacesLoginUtils {
         tv.setText(((PlacesUser) ParseUser.getCurrentUser()).getName());
     }
 
-    public void getFbProfilePictureURL(final String user_id, final PlacesLoginUtils.PicSize size, final FacebookUtilCallback cbk) {
+    public void getProfilePictureURL(final String user_id, final PlacesLoginUtils.PicSize size, final PlacesUtilCallback cbk) {
         if (loginType == LoginType.FACEBOOK)
             FacebookUtils.getInstance().getFbProfilePictureURL(user_id, size, cbk);
-        else GPlusUtils.getInstance().getGPlusProfilePictureURL(user_id, size, cbk);
+        else GPlusUtils.getInstance().getGPlusProfilePictureURL(user_id, size, null, cbk);
     }
 
     public void loadProfilePicIntoImageView(final String user_id, final ImageView imageView, final PlacesLoginUtils.PicSize size) {
         if (loginType == LoginType.FACEBOOK)
             FacebookUtils.getInstance().loadProfilePicIntoImageView(user_id, imageView, size);
-        else GPlusUtils.getInstance().loadProfilePicIntoImageView(user_id, imageView, size);
+        else GPlusUtils.getInstance().loadProfilePicIntoImageView(user_id, imageView, size, null);
     }
 
     public boolean isUserNameCached(String friendId) {

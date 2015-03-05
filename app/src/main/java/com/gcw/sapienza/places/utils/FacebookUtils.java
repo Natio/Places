@@ -33,7 +33,7 @@ public final class FacebookUtils {
 
     private static final String TAG = "FacebookUtils";
     private static final FacebookUtils shared_instance = new FacebookUtils();
-    private final HashMap<String, HashSet<FacebookUtilCallback>> scheduledOperationsQueue = new HashMap<>();
+    private final HashMap<String, HashSet<PlacesUtilCallback>> scheduledOperationsQueue = new HashMap<>();
 
     private FacebookUtils() {
     }
@@ -60,7 +60,7 @@ public final class FacebookUtils {
         progress.setMessage("Wait while loading...");
         progress.setCancelable(false);
         progress.show();
-        FacebookUtils.getInstance().makeMeRequest(new FacebookUtilCallback() {
+        FacebookUtils.getInstance().makeMeRequest(new PlacesUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
                 if (e != null) {
@@ -81,7 +81,7 @@ public final class FacebookUtils {
      *
      * @param cbk callback
      */
-    public void makeMeRequest(final FacebookUtilCallback cbk) {
+    public void makeMeRequest(final PlacesUtilCallback cbk) {
 
         final Session session = ParseFacebookUtils.getSession();
         if (session == null) {
@@ -166,7 +166,7 @@ public final class FacebookUtils {
      * @param cbk   callback parameter. MUST not be null. User Username will be given as a parameter of onResult method
      */
     @Deprecated
-    public void getFacebookUsernameFromID(final String fb_id, final FacebookUtilCallback cbk) {
+    public void getFacebookUsernameFromID(final String fb_id, final PlacesUtilCallback cbk) {
         String username = PlacesLoginUtils.getInstance().getUserNameFromId(fb_id);
         if (username != null) {
             if (cbk != null) {
@@ -178,12 +178,12 @@ public final class FacebookUtils {
         final String current_key = "NAME " + fb_id;
         synchronized (this.scheduledOperationsQueue) {
             if (this.scheduledOperationsQueue.containsKey(current_key)) {
-                Set<FacebookUtilCallback> cbks = this.scheduledOperationsQueue.get(current_key);
+                Set<PlacesUtilCallback> cbks = this.scheduledOperationsQueue.get(current_key);
                 cbks.add(cbk);
                 //Log.d(TAG, "Enqueued"+current_key);
                 return;
             } else {
-                HashSet<FacebookUtilCallback> newSet = new HashSet<>();
+                HashSet<PlacesUtilCallback> newSet = new HashSet<>();
                 newSet.add(cbk);
                 this.scheduledOperationsQueue.put(current_key, newSet);
                 //Log.d(TAG, "Scheduled"+current_key);
@@ -204,26 +204,26 @@ public final class FacebookUtils {
 
                             PlacesLoginUtils.getInstance().addEntryToUserIdMap(fb_id, name);
 
-                            Set<FacebookUtilCallback> cbks;
+                            Set<PlacesUtilCallback> cbks;
                             synchronized (FacebookUtils.this.scheduledOperationsQueue) {
                                 cbks = FacebookUtils.this.scheduledOperationsQueue.remove(current_key);
                             }
 
 
                             if (cbks != null) {
-                                for (FacebookUtilCallback c : cbks) {
+                                for (PlacesUtilCallback c : cbks) {
                                     c.onResult(name, null);
                                 }
                             }
                         } catch (JSONException | NullPointerException e) {
                             Log.v(TAG, "Couldn't resolve facebook user's name.  Error: " + e.toString());
                             e.printStackTrace();
-                            Set<FacebookUtilCallback> cbks;
+                            Set<PlacesUtilCallback> cbks;
                             synchronized (FacebookUtils.this.scheduledOperationsQueue) {
                                 cbks = FacebookUtils.this.scheduledOperationsQueue.remove(current_key);
                             }
                             if (cbks != null) {
-                                for (FacebookUtilCallback c : cbks) {
+                                for (PlacesUtilCallback c : cbks) {
                                     c.onResult(null, e);
                                 }
                             }
@@ -269,7 +269,7 @@ public final class FacebookUtils {
      * @param imageView ImageView where to load picture
      */
     public void loadProfilePicIntoImageView(final String user_id, final ImageView imageView, final PlacesLoginUtils.PicSize size) {
-        this.getFbProfilePictureURL(user_id, size, new FacebookUtilCallback() {
+        this.getFbProfilePictureURL(user_id, size, new PlacesUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
                 if (e == null) {
@@ -288,7 +288,7 @@ public final class FacebookUtils {
      * @param size    size of the profile picture
      * @param cbk     callback parameter. MUST not be null. Picture URL will be given as a parameter of onResult method
      */
-    public void getFbProfilePictureURL(final String user_id, final PlacesLoginUtils.PicSize size, final FacebookUtilCallback cbk) {
+    public void getFbProfilePictureURL(final String user_id, final PlacesLoginUtils.PicSize size, final PlacesUtilCallback cbk) {
         String pic_url = PlacesLoginUtils.getInstance().getProfilePictureURL(user_id, size);
 
         if (pic_url != null) {
@@ -300,12 +300,12 @@ public final class FacebookUtils {
         synchronized (this.scheduledOperationsQueue) {
 
             if (this.scheduledOperationsQueue.containsKey(current_key)) {
-                Set<FacebookUtilCallback> cbksSet = this.scheduledOperationsQueue.get(current_key);
+                Set<PlacesUtilCallback> cbksSet = this.scheduledOperationsQueue.get(current_key);
                 cbksSet.add(cbk);
                 //Log.d(TAG, "Enqueued: " + user_id);
                 return;
             } else {
-                HashSet<FacebookUtilCallback> cbksSet = new HashSet<>();
+                HashSet<PlacesUtilCallback> cbksSet = new HashSet<>();
                 cbksSet.add(cbk);
                 //Log.d(TAG, "Scheduled: " + user_id);
                 this.scheduledOperationsQueue.put(current_key, cbksSet);
@@ -335,13 +335,13 @@ public final class FacebookUtils {
                                 PlacesLoginUtils.getInstance().addEntryToLargePicMap(user_id, url);
                             }
 
-                            Set<FacebookUtilCallback> cbks;
+                            Set<PlacesUtilCallback> cbks;
                             synchronized (FacebookUtils.this.scheduledOperationsQueue) {
                                 cbks = FacebookUtils.this.scheduledOperationsQueue.remove(current_key);
                             }
 
                             if (cbks != null) {
-                                for (FacebookUtilCallback c : cbks) {
+                                for (PlacesUtilCallback c : cbks) {
                                     c.onResult(url, null);
                                 }
                             }
@@ -349,12 +349,12 @@ public final class FacebookUtils {
                         } catch (JSONException e) {
                             Log.v(TAG, "Couldn't retrieve facebook user data.  Error: " + e.toString());
                             e.printStackTrace();
-                            Set<FacebookUtilCallback> cbks;
+                            Set<PlacesUtilCallback> cbks;
                             synchronized (FacebookUtils.this.scheduledOperationsQueue) {
                                 cbks = FacebookUtils.this.scheduledOperationsQueue.remove(current_key);
                             }
                             if (cbks != null) {
-                                for (FacebookUtilCallback c : cbks) {
+                                for (PlacesUtilCallback c : cbks) {
                                     c.onResult(null, e);
                                 }
                             }

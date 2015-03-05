@@ -188,7 +188,7 @@ public class FlagUploader {
         this.callbacks = cbk;
         this.isUploading = true;
 
-        FacebookUtils.getInstance().getFacebookUsernameFromID(PlacesLoginUtils.getInstance().getCurrentUserId(), new FacebookUtilCallback() {
+        FacebookUtils.getInstance().getFacebookUsernameFromID(PlacesLoginUtils.getInstance().getCurrentUserId(), new PlacesUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
                 FlagUploader.this.flag.setFbName(result);

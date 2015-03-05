@@ -15,14 +15,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.fragments.FlagFragment;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.CropCircleTransformation;
-import com.gcw.sapienza.places.utils.FacebookUtilCallback;
+import com.gcw.sapienza.places.utils.PlacesUtilCallback;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseException;
@@ -32,7 +31,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -73,7 +71,7 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
     }
 
     @Override
-    public void onBindViewHolder(final FlagsAdapter.FlagsViewHolder flagViewHolder, int i) {
+    public void onBindViewHolder(final FlagsAdapter.FlagsViewHolder flagViewHolder, final int i) {
         Flag f = this.flags.get(i);
         flagViewHolder.setCurrentFlag(f);
         flagViewHolder.flagAdapter = this;
@@ -102,10 +100,18 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
         }
 
 
-        PlacesLoginUtils.getInstance().getFbProfilePictureURL(user_id, PlacesLoginUtils.PicSize.SMALL, new FacebookUtilCallback() {
+        PlacesLoginUtils.getInstance().getProfilePictureURL(user_id, PlacesLoginUtils.PicSize.SMALL, new PlacesUtilCallback() {
             @Override
-            public void onResult(String result, Exception e) {
-                Picasso.with(FlagsAdapter.this.view.getContext()).load(result).transform(transformation).into(flagViewHolder.user_profile_pic);
+            public void onResult(String result, Exception e)
+            {
+                Log.d(TAG, "Pic path: " + result);
+
+                if(result != null && !result.equals(""))
+                {
+                    Log.d(TAG, "Inserting profile pic in card " + i);
+
+                    Picasso.with(FlagsAdapter.this.view.getContext()).load(result).transform(transformation).into(flagViewHolder.user_profile_pic);
+                }
             }
         });
 

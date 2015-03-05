@@ -3,6 +3,7 @@ package com.gcw.sapienza.places.fragments;
 import android.app.Activity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +11,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.model.GraphUser;
@@ -65,6 +65,8 @@ public class PlacesLoginFragment extends ParseLoginFragment {
                              Bundle savedInstanceState) {
 
         View v = null;
+
+        Log.d(TAG, "canChoose: " + canChoose);
 
         if(!canChoose) v = inflater.inflate(R.layout.blank_screen, parent, false);
         else

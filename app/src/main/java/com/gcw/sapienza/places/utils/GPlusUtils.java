@@ -1,37 +1,25 @@
 package com.gcw.sapienza.places.utils;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-import com.gcw.sapienza.places.activities.MainActivity;
-import com.gcw.sapienza.places.activities.PlacesLoginActivity;
+
+import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.models.PlacesToken;
 import com.gcw.sapienza.places.models.PlacesUser;
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.parse.FindCallback;
-import com.parse.FunctionCallback;
-import com.parse.LogInCallback;
-import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.squareup.picasso.Picasso;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -41,10 +29,16 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
+
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 
 /**
@@ -61,6 +55,8 @@ public class GPlusUtils {
 
     private Person currentPerson;
 
+    private static final String API_KEY = "AIzaSyALZgcm_3X4_KmZg8ax6MmDLGFzZxE6c7Y";
+
     private boolean mIntentInProgress;
 
     private GPlusUtils() {
@@ -75,14 +71,16 @@ public class GPlusUtils {
         return GPlusUtils.shared_instance;
     }
 
-    public void downloadGPlusInfo(GoogleApiClient mGoogleApiClient, Activity activity) {
+    public void downloadGPlusInfo(Activity activity) {
         /**
          * Fetching user's information name, email, profile pic
          * */
         try
         {
-            // TODO second parameter should be false
+            // We don't want to load Login screen, this is why the second parameter is false
             PlacesLoginUtils.startLoginActivity(activity, false);
+
+            /*
             Person currentPerson = Plus.PeopleApi
                     .getCurrentPerson(mGoogleApiClient);
             String personName = currentPerson.getDisplayName();
@@ -106,6 +104,7 @@ public class GPlusUtils {
 
             // LoadProfileImage lpi = new LoadProfileImage(currentPerson.getId());
             // lpi.execute();
+            */
         }
         catch (Exception e)
         {
@@ -114,78 +113,65 @@ public class GPlusUtils {
         }
     }
 
-    @Deprecated
-    public boolean retrieveCurrentPerson(Context context)
+    public GoogleApiClient getGoogleApiClient()
     {
-        /*
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String json = preferences.getString("GoogleApiClient", "");
-        Log.d(TAG, "mGoogleApiClient serialized: " + json);
-        JsonParser parser = new JsonParser();
-        JsonObject jsonObj = (JsonObject)parser.parse(json);
-        Gson gson = new GsonBuilder().registerTypeAdapter(GoogleApiClient.class, new InterfaceAdapter<GoogleApiClient>()).create();
-        mGoogleApiClient = gson.fromJson(jsonObj, GoogleApiClient.class);
-        if(mGoogleApiClient != null) currentPerson = Plus.PeopleApi.getCurrentPerson(GPlusUtils.getInstance().getGoogleApiClient());
-        return currentPerson != null;
-        */
-
-        return false;
-    }
-
-    public GoogleApiClient getGoogleApiClient() {
         return mGoogleApiClient;
     }
 
-    public void setGoogleApiClient(GoogleApiClient googleApiClient) {
+    public void setGoogleApiClient(GoogleApiClient googleApiClient)
+    {
         this.mGoogleApiClient = googleApiClient;
     }
 
-    public Person getCurrentPerson() {
+    public Person getCurrentPerson()
+    {
         return currentPerson;
     }
 
-    public void setCurrentPerson(Person currentPerson) {
+    public void setCurrentPerson(Person currentPerson)
+    {
         this.currentPerson = currentPerson;
     }
 
-    public void getProfilePicFromUserId(String userId) {
-        String request = "https://www.googleapis.com/plus/v1/people/";
-        request += userId;
-        request += "?fields=image&key=";
-        request += "AIzaSyALZgcm_3X4_KmZg8ax6MmDLGFzZxE6c7Y";
-
-        new RequestTask(userId).execute("");
-    }
-
-    void parseResult(String result, String userId) throws JSONException {
+    void parseResult(String result, String userId) throws JSONException
+    {
         JSONObject mainObject = new JSONObject(result);
         JSONObject imageObject = mainObject.getJSONObject("image");
         String imageUrl = imageObject.getJSONObject("url").toString();
 
         PlacesLoginUtils.getInstance().addEntryToLargePicMap(userId, imageUrl);
+        PlacesLoginUtils.getInstance().addEntryToSmallPicMap(userId, imageUrl);
     }
 
     @Deprecated
-    public String getGPlusUsername() {
+    public String getGPlusUsername()
+    {
         return ((PlacesUser) ParseUser.getCurrentUser()).getName();
     }
 
     @Deprecated
-    public void loadUsernameIntoTextView(String user_id, final TextView tv) {
-
+    public void loadUsernameIntoTextView(String user_id, final TextView tv)
+    {
+        // Not implemented, and really no good reason to do it
     }
 
-    public void getGPlusProfilePictureURL(final String user_id, final PlacesLoginUtils.PicSize size, final FacebookUtilCallback cbk) {
+    public void getGPlusProfilePictureURL(final String user_id, final PlacesLoginUtils.PicSize size, ImageView iv, PlacesUtilCallback cbk)
+    {
+        String urlToRead = "https://www.googleapis.com/plus/v1/people/" + user_id + "?fields=image&key=" + API_KEY;
 
+        GetPicTask gpt = new GetPicTask(user_id, iv, cbk);
+        gpt.execute(urlToRead);
     }
 
-    public void loadProfilePicIntoImageView(final String user_id, final ImageView imageView, final PlacesLoginUtils.PicSize size) {
-
+    public void loadProfilePicIntoImageView(final String user_id, final ImageView imageView, final PlacesLoginUtils.PicSize size, PlacesUtilCallback cbk)
+    {
+        getGPlusProfilePictureURL(user_id, size, imageView, cbk);
     }
 
     /**
      * Background Async task to load user profile picture from url
      */
+    @Deprecated
     private static class LoadProfileImage extends AsyncTask<String, Void, Bitmap> {
 
         String userId;
@@ -194,7 +180,8 @@ public class GPlusUtils {
             this.userId = userId;
         }
 
-        protected Bitmap doInBackground(String... urls) {
+        protected Bitmap doInBackground(String... urls)
+        {
             String urldisplay = urls[0];
             Bitmap mIcon11 = null;
             try {
@@ -212,6 +199,7 @@ public class GPlusUtils {
         }
     }
 
+    @Deprecated
     class RequestTask extends AsyncTask<String, String, String> {
 
         private String userId;
@@ -258,6 +246,7 @@ public class GPlusUtils {
         }
     }
 
+    @Deprecated
     public static boolean checkGPlusTokenValidity()
     {
         PlacesUser user = (PlacesUser)ParseUser.getCurrentUser();
@@ -276,5 +265,74 @@ public class GPlusUtils {
         });
 
         return false;
+    }
+
+    class GetPicTask extends AsyncTask<String, String, String>
+    {
+        private String userId;
+        private ImageView imageView;
+        private PlacesUtilCallback cbk;
+
+        public GetPicTask(String userId, ImageView iv, PlacesUtilCallback cbk)
+        {
+            this.userId = userId;
+            this.imageView = iv;
+            this.cbk = cbk;
+        }
+
+        @Override
+        protected String doInBackground(String... uri) {
+            URLConnection url;
+            HttpURLConnection conn;
+            BufferedReader rd;
+            String line;
+            String result = "";
+            try {
+                url = new URL(uri[0]).openConnection();
+                conn = (HttpURLConnection) url;
+                // conn.setRequestMethod("GET");
+                rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                while ((line = rd.readLine()) != null) {
+                    result += line;
+                }
+                rd.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(TAG, "IOException: " + e.getMessage());
+            }
+
+
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(String s)
+        {
+            super.onPostExecute(s);
+
+            String url = "";
+
+            try
+            {
+                JSONObject jsonObject = new JSONObject(s);
+                JSONObject jsonObject1 = (JSONObject)jsonObject.get("image");
+                url = jsonObject1.getString("url");
+
+            }
+            catch(JSONException e)
+            {
+                Log.e(TAG, e.getMessage());
+            }
+
+            Log.d(TAG, "Profile pic URL: " + url);
+            Log.d(TAG, "Is ImageView = null? " + (imageView == null));
+
+            if(imageView != null && s != null && !s.equals("")) Picasso.with(PlacesApplication.getPlacesAppContext()).load(url).into(imageView);
+
+            PlacesLoginUtils.getInstance().addEntryToLargePicMap(userId, url);
+            PlacesLoginUtils.getInstance().addEntryToSmallPicMap(userId, url);
+
+            if(cbk!= null) cbk.onResult(url, null);
+        }
     }
 }

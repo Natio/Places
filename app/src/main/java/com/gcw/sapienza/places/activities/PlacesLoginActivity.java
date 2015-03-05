@@ -1,6 +1,5 @@
 package com.gcw.sapienza.places.activities;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -10,14 +9,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.Toast;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.fragments.PlacesLoginFragment;
 import com.gcw.sapienza.places.utils.GPlusUtils;
-import com.gcw.sapienza.places.utils.PlacesLoginBuilder;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
-import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
@@ -239,6 +235,7 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
                 .addOnConnectionFailedListener(this)
                 .addApi(Plus.API)
                 .addScope(Plus.SCOPE_PLUS_LOGIN)
+                .addScope(Plus.SCOPE_PLUS_PROFILE)
                 .build());
         GPlusUtils.getInstance().getGoogleApiClient().connect();
 
@@ -286,7 +283,8 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
         task.execute();
     }
 
-    private void completeLoginWithParse(String token) {
+    private void completeLoginWithParse(String token)
+    {
         String email = Plus.AccountApi.getAccountName(GPlusUtils.getInstance().getGoogleApiClient());
         final HashMap<String, Object> params = new HashMap();
         params.put("code", token);

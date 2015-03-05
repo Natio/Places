@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
 import com.gcw.sapienza.places.BuildConfig;
 import com.gcw.sapienza.places.R;
 
