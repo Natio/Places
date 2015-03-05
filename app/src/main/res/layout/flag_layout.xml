@@ -178,8 +178,7 @@
         android:layout_centerHorizontal="true"
         android:background="@drawable/my_border_3"
         android:text="WoW!"
-        android:textSize="16sp"
-        android:typeface="serif" />
+        android:textSize="16sp" />
 
     <Button
         android:id="@+id/comments_button"

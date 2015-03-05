@@ -19,11 +19,13 @@ import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.fragments.FlagFragment;
+import com.gcw.sapienza.places.models.CustomParseObject;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.CropCircleTransformation;
 import com.gcw.sapienza.places.utils.PlacesUtilCallback;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -48,6 +50,7 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
     private final View view;
     private final Activity mainActivity;
     private final Transformation transformation = new CropCircleTransformation();
+
 
     private int selectedFlagIndex;
 
@@ -118,6 +121,27 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             }
         });
 
+
+        //Luca
+        //new block of code for stats inside the card
+
+
+
+        int numberOfWows= f.getWowCount();
+        flagViewHolder.stats_wow.setText(numberOfWows+" WoW");
+        //int numberOfComment=
+        flagViewHolder.stats_comment.setText("54" + " comments");
+
+
+
+
+
+
+        //end of new code
+
+
+
+
         ParseFile pic = f.getThumbnail();
         if (pic != null && f.getPassword() == null) {
             String url = pic.getUrl();
@@ -130,11 +154,8 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             flagViewHolder.main_image.setImageDrawable(null);
         }
 
-        //TODO make this accomodate all devices, strange grey bar appears on Android < 5 / Screens < 5"
-        //((CardView)flagViewHolder.itemView).setRadius(20);
-        //((CardView)flagViewHolder.itemView).setShadowPadding(10, 10, 10, 10);
-        ((CardView) flagViewHolder.itemView).setShadowPadding(0, 0, 7, 7);
 
+        ((CardView) flagViewHolder.itemView).setShadowPadding(0, 0, 7, 7);
 
         //working on making icons or symbols which represents a category
 
@@ -206,6 +227,8 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
 
         protected final TextView main_text;
         protected final TextView username;
+        protected final TextView stats_wow;
+        protected final TextView stats_comment;
         protected final ImageView user_profile_pic;
         protected final ImageView main_image;
         private final Activity mainActivity;
@@ -214,6 +237,7 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
         protected FlagsAdapter flagAdapter;
         private String password;
         private Flag mFlag;
+        private int numberOfWows;
 
         public FlagsViewHolder(View v, Activity context) {
             super(v);
@@ -226,9 +250,12 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             this.user_profile_pic = (ImageView) v.findViewById(R.id.card_profile_pic);
             this.username = (TextView) v.findViewById(R.id.card_textView_username);
             this.main_text = (TextView) v.findViewById(R.id.card_textView_text);
-
+            this.stats_wow = (TextView) v.findViewById(R.id.stats_wows);
+            this.stats_comment = (TextView) v.findViewById(R.id.stats_comments);
             //new for icon representing category, or a colored line
             this.categoryIcon = (ImageView) v.findViewById(R.id.categoryIcon);
+
+
 
             v.setOnCreateContextMenuListener(this);
         }
@@ -247,10 +274,8 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
         {
             Date date = mFlag.getDate();
 
-            DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
+            DateFormat df = new SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault());
             String sDate = df.format(date);
-            String[] date_time = sDate.split(" ");
-            sDate = "\nDate: " + date_time[0] + "\nTime: " + date_time[1];
 
             Bundle bundle = new Bundle();
 
@@ -262,6 +287,7 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             bundle.putBoolean("inPlace", mFlag.getInPlace());
             bundle.putString("flagId", mFlag.getFlagId());
             bundle.putString("author", mFlag.getFbName());
+
 
             bundle.putInt("wowCount", mFlag.getWowCount());
             bundle.putInt("lolCount", mFlag.getLolCount());
@@ -366,5 +392,77 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             }*/
             //        inflater.inflate(R.menu.context_menu, menu);
         }
+
+
+
+        //this is as udateWowInfo in the FlagFragment, but only for wow and used for counter in the
+        //card view, useful when we will have a button instead of a textView
+        private void updateWowCounter() { //like update
+            ParseQuery<Flag> queryPosts = ParseQuery.getQuery("Posts");
+            queryPosts.whereEqualTo("objectId", mFlag.getFlagId());
+
+            queryPosts.findInBackground(new FindCallback<Flag>() {
+                public void done(List<Flag> markers, ParseException e) {
+                    if (e == null && markers.size() != 0) {
+                        Flag flag = markers.get(0);
+
+                        numberOfWows = flag.getInt("wowCount");
+                    }
+                }
+            });
+
+            // TODO I totally have to go over this mess
+            // if(wowButton.getText().charAt(wowButton.getText().length() - 1) != ')')
+            stats_wow.setText(numberOfWows + " WoW");
+
+
+            //for now only number of wows is shown, we could like it also from cardView with a button
+            /*
+            ParseQuery<CustomParseObject> queryW = ParseQuery.getQuery("Wow_Lol_Boo");
+            queryW.whereEqualTo("fbId", userId);
+            queryW.whereEqualTo("flagId", flagId);
+            queryW.whereEqualTo("boolWow", true);
+
+            queryW.findInBackground(new FindCallback<CustomParseObject>() {
+                public void done(List<CustomParseObject> markers, ParseException e) {
+                    if (e == null && markers.size() != 0) {
+                        numberOfWows--; //me and all the others but me
+                        stats_wow.setText("You and other "+ numberOfWows+ " WoWed this");
+                    }
+                }
+            });
+            */
+
+
+
+    /*
+            ParseQuery<CustomParseObject> queryL = ParseQuery.getQuery("Wow_Lol_Boo");
+            queryL.whereEqualTo("fbId", userId);
+            queryL.whereEqualTo("flagId", flagId);
+            queryL.whereEqualTo("boolLol", true);
+
+            queryL.findInBackground(new FindCallback<CustomParseObject>() {
+                public void done(List<CustomParseObject> markers, ParseException e) {
+                    if (e == null && markers.size() != 0) {
+                        lolButton.setText("You lol this." + " (" + lolCount + ")");
+                    }
+                }
+            });
+
+            ParseQuery<CustomParseObject> queryB = ParseQuery.getQuery("Wow_Lol_Boo");
+            queryB.whereEqualTo("fbId", userId);
+            queryB.whereEqualTo("flagId", flagId);
+            queryB.whereEqualTo("boolBoo", true);
+
+            queryB.findInBackground(new FindCallback<CustomParseObject>() {
+                public void done(List<CustomParseObject> markers, ParseException e) {
+                    if (e == null && markers.size() != 0) {
+                        booButton.setText("You boo this." + " (" + booCount + ")");
+                    }
+                }
+            });
+            */
+        }
     }
+
 }

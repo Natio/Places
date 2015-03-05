@@ -213,25 +213,12 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         // authorTextView.setText(((PlacesUser) ParseUser.getCurrentUser()).getName());
         authorTextView.setText(author);
 
-
         //to see how to use with icons
         final String weatherString = (weather == null || weather.isEmpty()) ? "" : "\nWeather: " + weather;
         final String inPlaceString = "In Place: " + (inPlace ? "✓" : "✗");
         final String bottomLineText = "Category: " + category;
 
-        //DateFormat df = new SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault());
-        //String flagDate = df.format(date);
-
-        //Date cleaning
-        String forDate;
-        //deleting \n Date:
-        String onlyDate = date.substring(7,date.length()-15);
-        String onlyTime = date.substring(date.length()-8,date.length()-3);
-        forDate = onlyDate + " - " +onlyTime;
-        //temporal
-        forDate=forDate+"\n"+inPlaceString;
-
-        dateTextView.setText(forDate);
+        dateTextView.setText(date+"\n"+inPlaceString);
 
         PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(this.id, profilePicimageView, PlacesLoginUtils.PicSize.LARGE);
 
@@ -395,7 +382,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         queryW.findInBackground(new FindCallback<CustomParseObject>() {
             public void done(List<CustomParseObject> markers, ParseException e) {
                 if (e == null && markers.size() != 0) {
-                    wowButton.setText("You wow this." + " (" + wowCount + ")");
+                    wowButton.setText("you WoWed this." + " (" + wowCount + ")");
                 }
             }
         });
