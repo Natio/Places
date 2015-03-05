@@ -16,8 +16,8 @@ import java.util.HashMap;
  */
 public class PlacesLoginUtils {
 
-    protected static final String LARGE_PIC_SIZE = "200";
-    protected static final String SMALL_PIC_SIZE = "120";
+    protected static final int LARGE_PIC_SIZE = 200;
+    protected static final int SMALL_PIC_SIZE = 120;
     private static final String TAG = "PlacesLoginUtils";
     private static final PlacesLoginUtils shared_instance = new PlacesLoginUtils();
     public static LoginType loginType;
@@ -209,9 +209,9 @@ public class PlacesLoginUtils {
 
         public String toString() {
             if (this == SMALL) {
-                return SMALL_PIC_SIZE;
+                return SMALL_PIC_SIZE+"";
             }
-            return LARGE_PIC_SIZE;
+            return LARGE_PIC_SIZE+"";
         }
     }
 

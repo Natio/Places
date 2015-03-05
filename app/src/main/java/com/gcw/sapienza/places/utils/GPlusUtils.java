@@ -157,7 +157,7 @@ public class GPlusUtils {
 
     public void getGPlusProfilePictureURL(final String user_id, final PlacesLoginUtils.PicSize size, ImageView iv, PlacesUtilCallback cbk)
     {
-        String urlToRead = "https://www.googleapis.com/plus/v1/people/" + user_id + "?fields=image&key=" + API_KEY;
+        String urlToRead = "https://www.googleapis.com/plus/v1/people/" + user_id + "?fields=image&sz=" + size + "&key=" + API_KEY;
 
         Log.d(TAG, "Request URL: " + urlToRead);
 
@@ -313,13 +313,15 @@ public class GPlusUtils {
             super.onPostExecute(s);
 
             String url = "";
+            int size = 0;
 
             try
             {
                 JSONObject jsonObject = new JSONObject(s);
                 JSONObject jsonObject1 = (JSONObject)jsonObject.get("image");
                 url = jsonObject1.getString("url");
-
+                String[] split = url.split("=");
+                size = Integer.parseInt(split[1]);
             }
             catch(JSONException e)
             {
@@ -328,12 +330,12 @@ public class GPlusUtils {
 
             Log.d(TAG, "Profile pic JSON: " + s);
             Log.d(TAG, "Profile pic URL: " + url);
-            Log.d(TAG, "Is ImageView = null? " + (imageView == null));
+            Log.d(TAG, "Pic size: " + size);
 
             if(imageView != null && s != null && !s.equals("")) Picasso.with(PlacesApplication.getPlacesAppContext()).load(url).into(imageView);
 
-            PlacesLoginUtils.getInstance().addEntryToLargePicMap(userId, url);
-            PlacesLoginUtils.getInstance().addEntryToSmallPicMap(userId, url);
+            if(size == PlacesLoginUtils.LARGE_PIC_SIZE) PlacesLoginUtils.getInstance().addEntryToLargePicMap(userId, url);
+            else PlacesLoginUtils.getInstance().addEntryToSmallPicMap(userId, url);
 
             if(cbk!= null) cbk.onResult(url, null);
         }

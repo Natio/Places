@@ -243,13 +243,13 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             else openFlag();
         }
 
-        private void openFlag() {
+        private void openFlag()
+        {
             Date date = mFlag.getDate();
+
             DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
             String sDate = df.format(date);
-
             String[] date_time = sDate.split(" ");
-
             sDate = "\nDate: " + date_time[0] + "\nTime: " + date_time[1];
 
             Bundle bundle = new Bundle();
