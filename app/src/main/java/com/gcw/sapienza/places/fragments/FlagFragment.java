@@ -78,6 +78,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private VideoView vv;
     private ImageView iw;
     private TextView authorTextView;
+    private TextView dateTextView;
+    private TextView flagText;
     private RelativeLayout frameLayout;
     private ImageView playVideoButton;
     private FrameLayout videoHolder;
@@ -145,8 +147,11 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         iw = (ImageView) view.findViewById(R.id.pic);
         vv = (VideoView) view.findViewById(R.id.vid);
-        EditText flagText = (EditText) view.findViewById(R.id.text);
+        //EditText flagText = (EditText) view.findViewById(R.id.text);
+        flagText = (TextView) view.findViewById(R.id.text);
         authorTextView = (TextView) view.findViewById(R.id.author);
+        dateTextView = (TextView) view.findViewById(R.id.dateInfo);
+
         ImageView profilePicimageView = (ImageView) view.findViewById(R.id.profile_pic);
         frameLayout = (RelativeLayout) view.findViewById(R.id.frame_layout);
         playVideoButton = (ImageView) view.findViewById(R.id.play_video_button);
@@ -185,10 +190,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         flagText.setText(text);
 
-        final String weatherString = (weather == null || weather.isEmpty()) ? "" : "\nWeather: " + weather;
-        final String inPlaceString = "In Place: " + (inPlace ? "✓" : "✗");
 
-        final String bottomLineText = date + weatherString + "\nCategory: " + category + "\n" + inPlaceString;
+
 
         /*
         FacebookUtils.getInstance().getFacebookUsernameFromID(this.id, new FacebookUtilCallback() {
@@ -198,8 +201,38 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             }
         });
         */
+        //Strings to show
+        //authorTextView.setText("Author: " + ((PlacesUser) ParseUser.getCurrentUser()).getName() + bottomLineText);
+        //final String weatherString = (weather == null || weather.isEmpty()) ? "" : "\nWeather: " + weather;
+        //final String inPlaceString = "In Place: " + (inPlace ? "✓" : "✗");
+        //final String bottomLineText = date + weatherString + "\nCategory: " + category + "\n" + inPlaceString;
 
-        authorTextView.setText("Author: " + ((PlacesUser) ParseUser.getCurrentUser()).getName() + bottomLineText);
+
+        authorTextView.setText(((PlacesUser) ParseUser.getCurrentUser()).getName());
+
+
+        //to see how to use with icons
+        final String weatherString = (weather == null || weather.isEmpty()) ? "" : "\nWeather: " + weather;
+        final String inPlaceString = "In Place: " + (inPlace ? "✓" : "✗");
+        final String bottomLineText = "Category: " + category;
+
+        //DateFormat df = new SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault());
+        //String flagDate = df.format(date);
+
+        //Date cleaning
+        String forDate;
+        //deleting \n Date:
+        String onlyDate = date.substring(7,date.length()-15);
+        String onlyTime = date.substring(date.length()-8,date.length()-3);
+        forDate = onlyDate + " - " +onlyTime;
+        //temporal
+        forDate=forDate+"\n"+inPlaceString;
+
+        dateTextView.setText(forDate);
+
+
+
+
 
         PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(this.id, profilePicimageView, PlacesLoginUtils.PicSize.LARGE);
 
@@ -417,7 +450,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                         String cmnt = comment.getCommentText() + "\n\n" + comment.getUsername() + "\n";
 
                         Date date = comment.getTimestamp();
-                        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
+                        //DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
+                        //new format attempt
+                        DateFormat df = new SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault());
                         String sDate = df.format(date);
 
                         cmnt += sDate;
