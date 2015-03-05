@@ -159,6 +159,8 @@ public class GPlusUtils {
     {
         String urlToRead = "https://www.googleapis.com/plus/v1/people/" + user_id + "?fields=image&key=" + API_KEY;
 
+        Log.d(TAG, "Request URL: " + urlToRead);
+
         GetPicTask gpt = new GetPicTask(user_id, iv, cbk);
         gpt.execute(urlToRead);
     }
@@ -324,6 +326,7 @@ public class GPlusUtils {
                 Log.e(TAG, e.getMessage());
             }
 
+            Log.d(TAG, "Profile pic JSON: " + s);
             Log.d(TAG, "Profile pic URL: " + url);
             Log.d(TAG, "Is ImageView = null? " + (imageView == null));
 

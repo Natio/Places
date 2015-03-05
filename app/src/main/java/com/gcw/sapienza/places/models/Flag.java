@@ -33,6 +33,7 @@ public class Flag extends ParseObject {
     public static final String BOO_COUNT_KEY = "booCount";
     public static final String OWNER_KEY = "owner";
     public static final String PASSWORD_KEY = "password";
+    public static final String ACCOUNT_TYPE_KEY = "accountType";
 
 
     public void setOwner(ParseUser owner) {
@@ -138,6 +139,10 @@ public class Flag extends ParseObject {
     public String getPassword() {
         return this.getString(PASSWORD_KEY);
     }
+
+    public String getAccountType() { return this.getString(ACCOUNT_TYPE_KEY); }
+
+    public void setAccountType(String accountType) { this.put(ACCOUNT_TYPE_KEY, accountType); }
 
     public void setPassword(String psw) {
         this.put(PASSWORD_KEY, psw);

@@ -720,6 +720,10 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(Utils.VIBRATION_DURATION);
 
+        String accountType = "";
+        if(PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.FACEBOOK) accountType = "fb";
+        else accountType = "g+";
+
         final String category = spinner.getSelectedItem().toString();
 
         f.setFbId(PlacesLoginUtils.getInstance().getCurrentUserId());
@@ -728,6 +732,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         f.setText(this.textView.getText().toString());
         f.setWeather(PlacesApplication.getInstance().getWeather());
         f.setInPlace(!isPhoneMediaSelected);
+        f.setAccountType(accountType);
 
         uploader = new FlagUploader(f, this);
         //uploader.setDeletesFilesOnFinish(true);

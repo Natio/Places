@@ -180,16 +180,18 @@ public class PlacesLoginUtils {
         throw new InvalidParameterException("wrong size specified: " + size);
     }
 
-    public void loadUsernameIntoTextView(String fb_id, final TextView tv) {
-        // if(loginType == LoginType.FACEBOOK) FacebookUtils.getInstance().loadUsernameIntoTextView(fb_id, tv);
-        // else GPlusUtils.getInstance().loadUsernameIntoTextView(fb_id, tv);
-        tv.setText(((PlacesUser) ParseUser.getCurrentUser()).getName());
+    @Deprecated
+    public void loadUsernameIntoTextView(String fb_id, String account_type, final TextView tv)
+    {
+        if(account_type == null || account_type.equals("") || account_type.equals("fb")) FacebookUtils.getInstance().loadUsernameIntoTextView(fb_id, tv);
+        else GPlusUtils.getInstance().loadUsernameIntoTextView(fb_id, tv);
+        // tv.setText(((PlacesUser) ParseUser.getCurrentUser()).getName());
     }
 
-    public void getProfilePictureURL(final String user_id, final PlacesLoginUtils.PicSize size, final PlacesUtilCallback cbk) {
-        if (loginType == LoginType.FACEBOOK)
+    public void getProfilePictureURL(final String user_id, final String account_type, final PlacesLoginUtils.PicSize size, final PlacesUtilCallback cbk) {
+        if (account_type == null || account_type.equals("") || account_type.equals("fb"))
             FacebookUtils.getInstance().getFbProfilePictureURL(user_id, size, cbk);
-        else GPlusUtils.getInstance().getGPlusProfilePictureURL(user_id, size, null, cbk);
+        else if (account_type.equals("g+")) GPlusUtils.getInstance().getGPlusProfilePictureURL(user_id, size, null, cbk);
     }
 
     public void loadProfilePicIntoImageView(final String user_id, final ImageView imageView, final PlacesLoginUtils.PicSize size) {

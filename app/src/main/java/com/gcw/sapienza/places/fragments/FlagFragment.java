@@ -63,6 +63,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private static final int WOW_CODE = 0;
     private static final int LOL_CODE = 1;
     private static final int BOO_CODE = 2;
+
     protected String userId;
     private String text;
     private String id;
@@ -71,6 +72,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private String category;
     private boolean inPlace;
     private String flagId;
+    private String author;
+
     private int wowCount;
     private int lolCount;
     private int booCount;
@@ -122,6 +125,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         category = bundle.getString("category");
         inPlace = bundle.getBoolean("inPlace");
         flagId = bundle.getString("flagId");
+        author = bundle.getString("author");
 
         wowCount = bundle.getInt("wowCount");
         lolCount = bundle.getInt("lolCount");
@@ -191,8 +195,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         flagText.setText(text);
 
 
-
-
         /*
         FacebookUtils.getInstance().getFacebookUsernameFromID(this.id, new FacebookUtilCallback() {
             @Override
@@ -208,7 +210,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         //final String bottomLineText = date + weatherString + "\nCategory: " + category + "\n" + inPlaceString;
 
 
-        authorTextView.setText(((PlacesUser) ParseUser.getCurrentUser()).getName());
+        // authorTextView.setText(((PlacesUser) ParseUser.getCurrentUser()).getName());
+        authorTextView.setText(author);
 
 
         //to see how to use with icons
@@ -229,10 +232,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         forDate=forDate+"\n"+inPlaceString;
 
         dateTextView.setText(forDate);
-
-
-
-
 
         PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(this.id, profilePicimageView, PlacesLoginUtils.PicSize.LARGE);
 
