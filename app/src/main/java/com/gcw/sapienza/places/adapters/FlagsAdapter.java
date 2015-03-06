@@ -11,6 +11,7 @@ import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,6 +20,7 @@ import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.fragments.FlagFragment;
+import com.gcw.sapienza.places.models.Comment;
 import com.gcw.sapienza.places.models.CustomParseObject;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.CropCircleTransformation;
@@ -35,6 +37,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -130,6 +133,10 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
         int numberOfWows= f.getWowCount();
         flagViewHolder.stats_wow.setText(numberOfWows+" WoW");
         //int numberOfComment=
+
+
+
+
         flagViewHolder.stats_comment.setText("54" + " comments");
 
 
@@ -171,7 +178,7 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             flagViewHolder.categoryIcon.setImageResource(R.drawable.music);
         } else if (flagViewHolder.mFlag.getCategory().equals(category_array[4])) { //Landscape
             flagViewHolder.categoryIcon.setImageResource(R.drawable.eyes);
-        } else { //Food
+        } else {
             flagViewHolder.categoryIcon.setImageResource(R.drawable.food);
         }
 
@@ -252,6 +259,7 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             this.main_text = (TextView) v.findViewById(R.id.card_textView_text);
             this.stats_wow = (TextView) v.findViewById(R.id.stats_wows);
             this.stats_comment = (TextView) v.findViewById(R.id.stats_comments);
+
             //new for icon representing category, or a colored line
             this.categoryIcon = (ImageView) v.findViewById(R.id.categoryIcon);
 
@@ -463,6 +471,8 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             });
             */
         }
+
+
     }
 
 }

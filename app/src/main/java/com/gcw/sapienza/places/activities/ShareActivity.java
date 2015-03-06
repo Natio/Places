@@ -731,6 +731,10 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         f.setLocation(p);
         f.setText(this.textView.getText().toString());
         f.setWeather(PlacesApplication.getInstance().getWeather());
+
+        //test for analyzing weather
+        //Log.d(TAG,"stringWeather: "+PlacesApplication.getInstance().getWeather());
+
         f.setInPlace(!isPhoneMediaSelected);
         f.setAccountType(accountType);
 

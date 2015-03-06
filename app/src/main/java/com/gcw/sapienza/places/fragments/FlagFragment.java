@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.StringTokenizer;
 
 /**
  * Created by mic_head on 02/02/15.
@@ -69,6 +70,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private String id;
     private String date;
     private String weather;
+    private String temperature;
+    private String weatherInfo;
     private String category;
     private boolean inPlace;
     private String flagId;
@@ -80,9 +83,11 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private MediaPlayer mediaPlayer;
     private VideoView vv;
     private ImageView iw;
+    private ImageView weatherIco;
     private TextView authorTextView;
     private TextView dateTextView;
     private TextView flagText;
+    private TextView temperatureView;
     private RelativeLayout frameLayout;
     private ImageView playVideoButton;
     private FrameLayout videoHolder;
@@ -100,6 +105,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private MediaType mediaType;
     private ParseFile mediaFile;
     private View view;
+    private StringTokenizer st;
 
     /**
      * Must be called BEFORE adding the fragment to the
@@ -121,7 +127,13 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         text = bundle.getString("text");
         id = bundle.getString("id");
         date = bundle.getString("date");
-        weather = bundle.getString("weather");
+
+        weatherInfo = bundle.getString("weather");
+        st=new StringTokenizer(weatherInfo,",");
+        temperature= st.nextToken();
+        weather= st.nextToken().substring(1);
+        Log.d(TAG, "weather-"+ weather+"-"+ temperature);
+
         category = bundle.getString("category");
         inPlace = bundle.getBoolean("inPlace");
         flagId = bundle.getString("flagId");
@@ -151,10 +163,26 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         iw = (ImageView) view.findViewById(R.id.pic);
         vv = (VideoView) view.findViewById(R.id.vid);
-        //EditText flagText = (EditText) view.findViewById(R.id.text);
+
         flagText = (TextView) view.findViewById(R.id.text);
         authorTextView = (TextView) view.findViewById(R.id.author);
         dateTextView = (TextView) view.findViewById(R.id.dateInfo);
+
+        weatherIco=(ImageView) view.findViewById(R.id.meteo);
+        temperatureView=(TextView) view.findViewById(R.id.temperature);
+        temperatureView.setText(temperature);
+
+        if (weather.equals("Rain")){
+            weatherIco.setImageResource(R.drawable.rain);
+        } else if (weather.equals("Clouds")){
+            weatherIco.setImageResource(R.drawable.cloud);
+        } else if (weather.equals("Clear")){
+            weatherIco.setImageResource(R.drawable.sun);
+        } else if (weather.equals("Snow")){
+            weatherIco.setImageResource(R.drawable.snow);
+        } else
+            weatherIco.setImageResource(R.drawable.cloudsun);
+
 
         ImageView profilePicimageView = (ImageView) view.findViewById(R.id.profile_pic);
         frameLayout = (RelativeLayout) view.findViewById(R.id.frame_layout);

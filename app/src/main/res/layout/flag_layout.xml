@@ -13,75 +13,124 @@
         android:layout_marginRight="3dp"
         android:layout_marginLeft="3dp"
         android:layout_marginTop="4dp"
-        android:background="@color/white">
+        android:background="@color/white"
+        android:minHeight="200dp">
 
-        <LinearLayout
-            android:id="@+id/author_container"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:orientation="horizontal"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="6dp"
-            android:layout_marginRight="6dp">
-
-            <ImageView
-                android:id="@+id/profile_pic"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:cropToPadding="false" />
-
-            <!--
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/my_border_2"
-                 -->
-
+            android:id="@+id/titleBar"
+            android:orientation="horizontal">
 
             <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="fill_parent"
+                android:id="@+id/author_container"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="2dp"
-                android:layout_toRightOf="@id/profile_pic"
-                android:layout_marginTop="2dp">
+                android:layout_alignParentTop="true"
+                android:orientation="horizontal"
+                android:layout_marginLeft="6dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginRight="6dp">
 
-                <TextView
-                    android:id="@+id/author"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
+                <ImageView
+                    android:id="@+id/profile_pic"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:cropToPadding="false" />
+
+                <!--
+                    android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:textColor="@color/black"
-                    android:textStyle="bold"
-                    android:textSize="16sp" />
-                <TextView
-                    android:id="@+id/dateInfo"
-                    android:layout_width="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/my_border_2"
+                     -->
+
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:id="@+id/flagInfo"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"
-                    android:textColor="@color/grey"
-                    android:textSize="14sp" />
-                <!-- add another text view for the rest-->
+                    android:layout_marginLeft="2dp"
+                    android:layout_toRightOf="@id/profile_pic"
+                    android:layout_marginTop="2dp">
+
+                    <TextView
+                        android:id="@+id/author"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        android:textSize="16sp" />
+                    <TextView
+                        android:id="@+id/dateInfo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:textColor="@color/grey"
+                        android:textSize="14sp" />
+
+                    <!-- add another text view for the rest-->
+                </LinearLayout>
+
+
+
+                <!-- <View
+                    android:layout_width="1dp"
+                    android:layout_height="fill_parent"
+                    android:background="@color/grey"
+                    android:layout_toLeftOf="@+id/profile_pic"
+                    android:id="@+id/profile_pic_divider" /> -->
+
+
             </LinearLayout>
 
-            <!-- <View
-                android:layout_width="1dp"
-                android:layout_height="fill_parent"
-                android:background="@color/grey"
-                android:layout_toLeftOf="@+id/profile_pic"
-                android:id="@+id/profile_pic_divider" /> -->
 
-        </LinearLayout>
+            <TextView
+                android:id="@+id/temperature"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="end"
+
+                android:layout_marginRight="62dp"
+                android:layout_marginEnd="62dp"
+
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+
+                android:layout_width="wrap_content"
+                android:textColor="@color/black"
+                android:layout_toLeftOf="@+id/meteo"
+                android:layout_toStartOf="@+id/meteo"
+                android:layout_centerVertical="true"
+
+                />
+
+            <ImageView
+                android:id="@+id/meteo"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:cropToPadding="false"
+                android:layout_marginLeft="2dp"
+                android:layout_marginStart="2dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="end" />
+
+
+
+            </RelativeLayout>
+
 
 
         <View
             android:id="@+id/author_divider"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
-            android:layout_below="@id/author_container"
+            android:layout_below="@id/titleBar"
             android:background="@color/grey"
             android:layout_marginTop="4dp"
             android:layout_marginLeft="6dp"

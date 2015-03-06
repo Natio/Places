@@ -36,8 +36,6 @@ public class WeatherHttpClient {
                 buffer.append(line);
                 buffer.append("\r\n");
             }
-
-
             is.close();
             con.disconnect();
             return buffer.toString();
