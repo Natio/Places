@@ -90,6 +90,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         return false;
     }
 
+    //Easter egg Simone
     private void showAR() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();

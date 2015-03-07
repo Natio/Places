@@ -217,28 +217,57 @@
 
         </LinearLayout>
 
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/signatureCategory">
+
+            <ImageView
+                android:id="@+id/categoryIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="end"
+                />
+
+
+        </RelativeLayout>
+
     </LinearLayout>
 
-    <Button
-        android:id="@+id/wow_button"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/buttons"
+        android:orientation="horizontal"
         android:layout_below="@+id/flagContainer"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/my_border_3"
-        android:text="WoW!"
-        android:textSize="16sp" />
+        android:layout_centerHorizontal="true">
 
-    <Button
-        android:id="@+id/comments_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/wow_button"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/my_border_3"
-        android:text="Show comments"
-        android:textSize="16sp" />
+        <Button
+            android:id="@+id/wow_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/flagContainer"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/my_border_3"
+            android:text="WoW!"
+            android:textSize="16sp" />
 
+        <Button
+            android:id="@+id/comments_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/wow_button"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/my_border_3"
+            android:text="comments"
+            android:textSize="16sp" />
+
+
+    </LinearLayout>
+
+<!-- unused buttons -->
     <Button
         android:id="@+id/lol_button"
         android:layout_width="wrap_content"
@@ -247,7 +276,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:layout_toLeftOf="@+id/wow_button"
+
         android:background="@drawable/my_border_3"
         android:text="LOL"
         android:textSize="14sp"
@@ -261,11 +290,13 @@
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:layout_toRightOf="@+id/wow_button"
+        android:layout_toRightOf="@+id/boo_button"
         android:background="@drawable/my_border_3"
         android:text="BOO"
         android:textSize="14sp"
         android:visibility="gone" />
+    <!-- end Of unused -->
+
 
     <RelativeLayout
         android:id="@+id/frame_layout"

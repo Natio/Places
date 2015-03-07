@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.fragments.FiltersFragment;
 import com.gcw.sapienza.places.fragments.MainFragment;
 import com.gcw.sapienza.places.fragments.MyFlagsFragment;
 import com.gcw.sapienza.places.fragments.ProfileFragment;
@@ -65,6 +66,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     private LinearLayout homeHolder;
     private FrameLayout fragHolder;
     private Toast radiusToast;
+
 
     public static boolean isForeground() {
         return isForeground;
@@ -115,6 +117,10 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 //        this.selectItem(0);
 
         this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.green)));
+
+
+
+        //this.getSupportActionBar().getCustomView().findViewById(R.id.filters).
 
         this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
     }
@@ -169,6 +175,38 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             Intent shareIntent = new Intent(this, ShareActivity.class);
             startActivityForResult(shareIntent, MainActivity.SHARE_ACTIVITY_REQUEST_CODE);
             // item.setVisible(false);
+        } //attempt to add filters in homepage
+        else if(item.getItemId() == R.id.filters) {
+
+            switchToFiltersListFrag();
+            //open fragment
+
+
+
+
+            /* new menu testing
+            PopupMenu popup = new PopupMenu(MainActivity.this, (Button)item);
+            //Inflating the Popup using xml file
+            popup.getMenuInflater()
+                    .inflate(R.menu.filters_list_home, popup.getMenu());
+
+            //registering popup with OnMenuItemClickListener
+            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                public boolean onMenuItemClick(MenuItem item) {
+                    Toast.makeText(
+                            MainActivity.this,
+                            "You Clicked : " + item.getTitle(),
+                            Toast.LENGTH_SHORT
+                    ).show();
+                    return true;
+                }
+            });
+
+            popup.show(); //showing popup menu
+
+        //SPINNER
+            Toast.makeText(this, "DropDown menu for filters", Toast.LENGTH_SHORT).show();
+            */
 
         }
 
@@ -393,6 +431,14 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         switchToNonSupportFrag();
 
         this.getFragmentManager().beginTransaction().replace(R.id.frag_container, new SettingsFragment()).commit();
+    }
+
+    private void switchToFiltersListFrag() {
+        Log.d(TAG, "Switching to FilterListFragment");
+//        getRidOfUnusedFrag();
+        switchToNonSupportFrag();
+
+        this.getFragmentManager().beginTransaction().replace(R.id.frag_container, new FiltersFragment()).commit();
     }
 
 //    private void switchToListMapFrags()

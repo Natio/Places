@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.ShareActivity;
 import com.gcw.sapienza.places.models.Comment;
@@ -84,6 +85,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private VideoView vv;
     private ImageView iw;
     private ImageView weatherIco;
+    private ImageView categoryIco;
     private TextView authorTextView;
     private TextView dateTextView;
     private TextView flagText;
@@ -168,6 +170,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         authorTextView = (TextView) view.findViewById(R.id.author);
         dateTextView = (TextView) view.findViewById(R.id.dateInfo);
 
+        categoryIco=(ImageView) view.findViewById(R.id.categoryIcon);
         weatherIco=(ImageView) view.findViewById(R.id.meteo);
         temperatureView=(TextView) view.findViewById(R.id.temperature);
         temperatureView.setText(temperature);
@@ -183,6 +186,21 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         } else
             weatherIco.setImageResource(R.drawable.cloudsun);
 
+        String[] category_array = PlacesApplication.getInstance().getResources().getStringArray(R.array.categories);
+
+        if (category.equals(category_array[0])) { //None
+            categoryIco.setImageResource(R.drawable.none);
+        } else if (category.equals(category_array[1])) { //Thoughts
+            categoryIco.setImageResource(R.drawable.thoughts);
+        } else if (category.equals(category_array[2])) { //Fun
+            categoryIco.setImageResource(R.drawable.smile);
+        } else if (category.equals(category_array[3])) { //Music
+            categoryIco.setImageResource(R.drawable.music);
+        } else if (category.equals(category_array[4])) { //Landscape
+            categoryIco.setImageResource(R.drawable.eyes);
+        } else {
+            categoryIco.setImageResource(R.drawable.food);
+        }
 
         ImageView profilePicimageView = (ImageView) view.findViewById(R.id.profile_pic);
         frameLayout = (RelativeLayout) view.findViewById(R.id.frame_layout);
@@ -241,10 +259,11 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         // authorTextView.setText(((PlacesUser) ParseUser.getCurrentUser()).getName());
         authorTextView.setText(author);
 
-        //to see how to use with icons
-        final String weatherString = (weather == null || weather.isEmpty()) ? "" : "\nWeather: " + weather;
+        //changed to icons
+        //final String weatherString = (weather == null || weather.isEmpty()) ? "" : "\nWeather: " + weather;
+        //final String bottomLineText = "Category: " + category;
         final String inPlaceString = "In Place: " + (inPlace ? "✓" : "✗");
-        final String bottomLineText = "Category: " + category;
+
 
         dateTextView.setText(date+"\n"+inPlaceString);
 

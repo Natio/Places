@@ -3,9 +3,24 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <!-- filter in homepage -->
+    <item
+        android:id="@+id/filters"
+        android:icon="@drawable/filterico"
+        android:title="Choose filters"
+        app:showAsAction="ifRoom"
+        android:actionViewClass="android.widget.Button"/>
+
+
     <item
         android:id="@+id/action_add_flag"
         android:icon="@drawable/p_plus"
         android:title="Place a flag"
         app:showAsAction="ifRoom" />
+
+
+
+
 </menu>

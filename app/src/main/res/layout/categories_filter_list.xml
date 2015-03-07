@@ -1,0 +1,42 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+
+    <PreferenceCategory>
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="noneCheck"
+            android:summary="None" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="thoughtsCheck"
+            android:summary="Thoughts" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="funCheck"
+            android:summary="Fun" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="musicCheck"
+            android:summary="Music" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="landscapeCheck"
+            android:summary="Landscape" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="foodCheck"
+            android:summary="Food" />
+    </PreferenceCategory>
+
+
+
+
+</PreferenceScreen>
