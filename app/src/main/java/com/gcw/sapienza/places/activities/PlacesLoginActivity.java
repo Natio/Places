@@ -203,7 +203,13 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
     }
 
     public void getGPlusFriends() {
-        Plus.PeopleApi.loadVisible(GPlusUtils.getInstance().getGoogleApiClient(), GPlusUtils.getInstance().getCurrentPerson().getId()).setResultCallback(this);
+        if(GPlusUtils.getInstance().getGoogleApiClient() != null && GPlusUtils.getInstance().getCurrentPerson() != null)
+            Plus.PeopleApi.loadVisible(GPlusUtils.getInstance().getGoogleApiClient(), GPlusUtils.getInstance().getCurrentPerson().getId()).setResultCallback(this);
+        else
+        {
+            Toast.makeText(this, "Cannot retrieve G+ info, please login again.", Toast.LENGTH_LONG).show();
+            Log.d(TAG, "G+ friends cannot be retrieved.");
+        }
     }
 
     public void onConnectionSuspended(int cause) {
