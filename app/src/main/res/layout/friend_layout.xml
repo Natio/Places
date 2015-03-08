@@ -33,6 +33,7 @@
             android:layout_toEndOf="@id/friend_card_profile_pic"
             android:layout_toRightOf="@id/friend_card_profile_pic"
             android:ellipsize="end"
+            android:layout_centerInParent="true"
             android:gravity="center"
             android:minLines="1"
             android:text=""

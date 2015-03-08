@@ -88,6 +88,9 @@ public class ProfileFragment extends Fragment {
 
         String[] categories = getActivity().getResources().getStringArray(R.array.categories);
         for(final String cat: categories){
+
+            numFlags = 0;
+
             ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
             query.whereEqualTo("fbId", this.fbId);
             query.whereEqualTo("category", cat);

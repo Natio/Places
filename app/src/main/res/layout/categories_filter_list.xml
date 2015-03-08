@@ -3,7 +3,7 @@
     android:layout_height="wrap_content">
 
 
-    <PreferenceCategory>
+    <PreferenceCategory android:title="Filters">
 
         <CheckBoxPreference
             android:defaultValue="true"
@@ -35,8 +35,4 @@
             android:key="foodCheck"
             android:summary="Food" />
     </PreferenceCategory>
-
-
-
-
 </PreferenceScreen>

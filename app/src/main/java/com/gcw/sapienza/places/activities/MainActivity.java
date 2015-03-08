@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.fragments.CategoriesFragment;
 import com.gcw.sapienza.places.fragments.FiltersFragment;
 import com.gcw.sapienza.places.fragments.MainFragment;
 import com.gcw.sapienza.places.fragments.MyFlagsFragment;
@@ -178,7 +179,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         } //attempt to add filters in homepage
         else if(item.getItemId() == R.id.filters) {
 
-            switchToFiltersListFrag();
+            switchToNonSupportFrag(new CategoriesFragment());
             //open fragment
 
 
@@ -287,7 +288,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 //    }
 //        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).addToBackStack(null).commit();
 //
-//        switchToSupportFrag();
+//        showSupportFrag();
 //        mapFragment.getMapAsync(this);
 //        this.getSupportFragmentManager().beginTransaction().replace(R.id.map_holder, mapFragment).commit();
 //        SupportMapFragment mapFragment = new SupportMapFragment();
@@ -349,7 +350,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
                 break;
 
             case SETTINGS_POSITION:
-                switchToSettingsFrag();
+                switchToNonSupportFrag(new SettingsFragment());
                 break;
 
             case LOGOUT_POSITION:
@@ -415,30 +416,29 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             this.getSupportFragmentManager().beginTransaction().remove(frag2).commit();
     }
 
-    private void switchToSupportFrag() {
+    private void showSupportFrag() {
         fragHolder.setVisibility(View.INVISIBLE);
         homeHolder.setVisibility(View.VISIBLE);
     }
 
-    private void switchToNonSupportFrag() {
+    private void showNonSupportFrag() {
         homeHolder.setVisibility(View.INVISIBLE);
         fragHolder.setVisibility(View.VISIBLE);
     }
 
-    private void switchToSettingsFrag() {
-        Log.d(TAG, "Switching to SettingsFragment");
-//        getRidOfUnusedFrag();
-        switchToNonSupportFrag();
-
-        this.getFragmentManager().beginTransaction().replace(R.id.frag_container, new SettingsFragment()).commit();
-    }
-
-    private void switchToFiltersListFrag() {
+    private void switchToNonSupportFrag(android.app.Fragment frag) {
         Log.d(TAG, "Switching to FilterListFragment");
 //        getRidOfUnusedFrag();
-        switchToNonSupportFrag();
+        android.app.Fragment f = this.getFragmentManager().findFragmentById(R.id.frag_container);
+        if (isNonSupportFragmentVisible() && f != null && f.getClass() == frag.getClass()) {
+            Log.w(TAG, "Hiding non-support fragment: " + f.getClass());
+            showSupportFrag();
+            return;
+        }
 
-        this.getFragmentManager().beginTransaction().replace(R.id.frag_container, new FiltersFragment()).commit();
+        showNonSupportFrag();
+
+        this.getFragmentManager().beginTransaction().replace(R.id.frag_container, frag).commit();
     }
 
 //    private void switchToListMapFrags()
@@ -455,7 +455,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             return;
         }
 
-        switchToSupportFrag();
+        showSupportFrag();
 
         this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, frag).addToBackStack(null).commit();
     }
@@ -484,7 +484,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 //        }
 //        else
         if (isNonSupportFragmentVisible()) {
-            switchToSupportFrag();
+            showSupportFrag();
         } else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             Log.i("MainActivity", "popping support: " +
                     getSupportFragmentManager().getBackStackEntryCount() + ", while backstack: " +
