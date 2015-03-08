@@ -277,9 +277,13 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 if (keyCode == KeyEvent.KEYCODE_BACK) {
                     if (frameLayout.getVisibility() == View.VISIBLE) {
                         frameLayout.setVisibility(View.GONE);
+
                         return true;
                     } else if (commentsHolder.getVisibility() == View.VISIBLE) {
                         commentsHolder.setVisibility(View.GONE);
+                        commentsButton.setVisibility(View.VISIBLE);
+                        wowButton.setVisibility(View.VISIBLE);
+
                         return true;
                     }
                 }
@@ -464,6 +468,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private void retrieveComments() {
         ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
         query.whereEqualTo("flagId", flagId);
+
+        Log.d(TAG, "Retrieving comments belonging to flag " + flagId);
+
         query.findInBackground(new FindCallback<Comment>() {
             @Override
             public void done(List<Comment> result, ParseException e) {
@@ -494,7 +501,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                     }
 
                     // TODO change adapter's layout
-                    commentsAdapter = new ArrayAdapter<String>(getActivity(), R.layout.comment_item_layout, texts);
+                    commentsAdapter = new ArrayAdapter(getActivity(), R.layout.comment_item_layout, texts);
                 }
 
                 commentsList.setAdapter(commentsAdapter);
@@ -546,10 +553,16 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                 */
 
                                 comment.setUsername(((PlacesUser) ParseUser.getCurrentUser()).getName());
+                                comment.saveInBackground(new SaveCallback()
+                                {
+                                    @Override
+                                    public void done(ParseException e)
+                                    {
+                                        retrieveComments();
+                                    }
+                                });
 
                                 dialog.dismiss();
-
-                                retrieveComments();
                             }
 
                         }

@@ -182,6 +182,8 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
+        Log.d(TAG, "Map is ready!");
+
         this.gMap = googleMap;
 
         this.gMap.getUiSettings().setScrollGesturesEnabled(false);
@@ -193,6 +195,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
     }
 
     private void updateMarkersOnMap() {
+        Log.d(TAG, "Updating markers on map...");
 
         List<Flag> flags = PlacesApplication.getInstance().getFlags();
 
@@ -235,7 +238,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                 final LatLngBounds bounds = builder.build();
 //                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
                 // FIXME That's a mess, Paolo forgive me
-                /*if (PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.GPLUS)*/
+                if (PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.GPLUS)
                     this.gMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
                         @Override
                         public void onCameraChange(CameraPosition cameraPosition) {
@@ -243,7 +246,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                             gMap.setOnCameraChangeListener(null);
                         }
                     });
-                // else gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, tils.MAP_BOUNDS));*/
+                else gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
             } else {
                 Location currentLocation = gMap.getMyLocation();
                 if (currentLocation != null) {

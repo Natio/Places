@@ -27,6 +27,7 @@ import com.gcw.sapienza.places.utils.CropCircleTransformation;
 import com.gcw.sapienza.places.utils.PlacesUtilCallback;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
+import com.parse.CountCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -124,30 +125,19 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             }
         });
 
-
-        //Luca
-        //new block of code for stats inside the card
-
-
-
         int numberOfWows= f.getWowCount();
         flagViewHolder.stats_wow.setText(numberOfWows+" WoW");
-        //int numberOfComment=
 
-
-
-
-        flagViewHolder.stats_comment.setText("54" + " comments");
-
-
-
-
-
-
-        //end of new code
-
-
-
+        ParseQuery<Comment> countQuery = ParseQuery.getQuery("Comments");
+        countQuery.whereEqualTo("flagId", f.getFlagId());
+        countQuery.countInBackground(new CountCallback() {
+            @Override
+            public void done(int i, ParseException e)
+            {
+                if(i == 1) flagViewHolder.stats_comment.setText(i + " comment");
+                else flagViewHolder.stats_comment.setText(i + " comments");
+            }
+        });
 
         ParseFile pic = f.getThumbnail();
         if (pic != null && f.getPassword() == null) {

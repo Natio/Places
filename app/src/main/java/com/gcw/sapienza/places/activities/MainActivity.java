@@ -464,8 +464,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         return fragHolder.getVisibility() == View.VISIBLE;
     }
 
-//    @Override
-
     @Override
     public void onBackPressed() {
         Fragment f = this.getSupportFragmentManager().findFragmentById(R.id.home_container);
