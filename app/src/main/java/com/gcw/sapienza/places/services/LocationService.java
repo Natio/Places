@@ -55,6 +55,7 @@ public class LocationService extends Service implements
     public static final String FOUND_NO_FLAGS_NOTIFICATION = "FOUND_NO_FLAGS_NOTIFICATION";
     public static final String FOUND_MY_FLAGS_NOTIFICATION = "FOUND_MY_FLAGS_NOTIFICATION";
     public static final String FOUND_NO_MY_FLAGS_NOTIFICATION = "FOUND_NO_MY_FLAGS_NOTIFICATION";
+    public static final String LOCATION_CHANGED_NOTIFICATION = "LOCATION_CHANGED_NOTIFICATION";
     public static final String NO_FLAGS_VISIBLE = "you won't be able to see any flags with these settings";
     private static final String TAG = "LocationService";
     private static final long ONE_MIN = 1000 * 60;
@@ -237,8 +238,10 @@ public class LocationService extends Service implements
 
             if (parseObjects == null) {
                 parseObjects = new ArrayList<>(0);
+                hiddenFlags = new ArrayList<>(0);
             } else {
                 parseObjects.clear();
+                hiddenFlags.clear();
             }
 
             updateApplication();
@@ -272,8 +275,10 @@ public class LocationService extends Service implements
 
                 if (parseObjects == null) {
                     parseObjects = new ArrayList<>(0);
+                    hiddenFlags = new ArrayList<>(0);
                 } else {
                     parseObjects.clear();
+                    hiddenFlags.clear();
                 }
 
                 updateApplication();
@@ -358,14 +363,18 @@ public class LocationService extends Service implements
         }
         this.location = location;
         queryParsewithLocation(location);
-        if (this.parseObjects != null && this.parseObjects.size() > 0
-                && !MainActivity.isForeground() && PlacesLoginUtils.getInstance().hasCurrentUserId()) {
-            Log.d(TAG, "Notifying user..." +
-                    this.parseObjects.size() + " flags found");
-            notifyUser();
-            this.notificationLocation = this.location;
+        if (this.parseObjects != null && PlacesLoginUtils.getInstance().hasCurrentUserId()) {
+            if(!MainActivity.isForeground()) {
+                Log.d(TAG, "Notifying user..." +
+                        this.parseObjects.size() + " flags found");
+                notifyUser();
+            }else{
+                Log.d(TAG, "Main Activity in foreground: updating map...");
+                LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.LOCATION_CHANGED_NOTIFICATION));
+            }
         }
-        updateApplication();
+//        else
+//        updateApplication();
     }
 
     /**
@@ -394,6 +403,7 @@ public class LocationService extends Service implements
             builder.setContentIntent(contentIntent);
             NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             nManager.notify(NOTIFICATION_ID, builder.build());
+            this.notificationLocation = this.location;
         } else {
             Log.w(TAG, "Notification to user aborted: no new Flags found: " + newFlags);
         }

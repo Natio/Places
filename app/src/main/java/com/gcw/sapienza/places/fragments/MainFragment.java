@@ -87,6 +87,10 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 //                        this.dismissProgressBar();
                         break;
 
+                    case LocationService.LOCATION_CHANGED_NOTIFICATION:
+                        Log.d(TAG, "Location changed");
+                        break;
+
                     default:
                 }
                 updateMarkersOnMap();
@@ -107,6 +111,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.LOCATION_CHANGED_NOTIFICATION));
     }
 
     @Override
@@ -262,14 +267,16 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                         .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
                                 // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
                                 //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
-                        .alpha(0.50f));
+                        .alpha(0.25f));
             }
 
             Location currentLocation = gMap.getMyLocation();
 
             if(currentLocation != null) {
+                LatLng currentLocationLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                builder.include(currentLocationLatLng);
                 this.gMap.addCircle(new CircleOptions()
-                        .center(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()))
+                        .center(currentLocationLatLng)
                         .radius(Utils.MAP_RADIUS * 1000)
                         .strokeColor(Color.GREEN)
                         .fillColor(Color.TRANSPARENT));
