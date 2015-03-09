@@ -77,13 +77,13 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
                     case LocationService.FOUND_NEW_FLAGS_NOTIFICATION:
 
-                        Log.d(TAG, "My flags found");
+                        Log.d(TAG, "New Flags found");
 //                        this.dismissProgressBar();
                         break;
 
                     case LocationService.FOUND_NO_FLAGS_NOTIFICATION:
 
-                        Log.d(TAG, "No my flags found");
+                        Log.d(TAG, "No Flags found");
 //                        this.dismissProgressBar();
                         break;
 
@@ -334,6 +334,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
     @Override
     public void onRefresh() {
+        Log.d(TAG, "Swipe refreshing");
         ((MainActivity) getActivity()).refresh();
         srl.setRefreshing(false);
     }
