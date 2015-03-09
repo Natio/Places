@@ -3,6 +3,7 @@ package com.gcw.sapienza.places.fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -277,6 +278,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 if (keyCode == KeyEvent.KEYCODE_BACK) {
                     if (frameLayout.getVisibility() == View.VISIBLE) {
                         frameLayout.setVisibility(View.GONE);
+                        // getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
                         return true;
                     } else if (commentsHolder.getVisibility() == View.VISIBLE) {
@@ -382,9 +384,17 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.frame_layout) frameLayout.setVisibility(View.GONE);
-        else if (v.getId() == R.id.pic) frameLayout.setVisibility(View.VISIBLE);
-            // else if(v.getId() == playVideoButton.getId()) playVideo();
+        if (v.getId() == R.id.frame_layout)
+        {
+            // getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            frameLayout.setVisibility(View.GONE);
+        }
+        else if(v.getId() == R.id.pic)
+        {
+            // getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+            frameLayout.setVisibility(View.VISIBLE);
+        }
+        // else if(v.getId() == playVideoButton.getId()) playVideo();
         else if (v.getId() == R.id.audio) playRecording();
         else if (v.getId() == R.id.wow_button) wlbFlag(WOW_CODE);
         else if (v.getId() == R.id.lol_button) wlbFlag(LOL_CODE);
@@ -483,7 +493,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                     comments = new ArrayList<Comment>();
                     comments.addAll(result);
 
-                    // TODO this needs to be replaced in order to show author and timestamp too
                     ArrayList<String> texts = new ArrayList<String>();
                     for (int i = 0; i < comments.size(); i++) {
                         Comment comment = comments.get(i);
@@ -985,7 +994,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         }
 
 
-        if (this.mediaType != MediaType.NONE && this.mediaType != MediaType.PIC) {
+        if (this.mediaType != MediaType.NONE && this.mediaType != MediaType.PIC &&  this.mediaFile != null) {
             System.gc();
 
             this.mediaFile.getDataInBackground(new GetDataCallback() {

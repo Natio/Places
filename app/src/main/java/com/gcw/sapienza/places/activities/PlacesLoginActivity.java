@@ -169,7 +169,10 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
     }
 
     @Override
-    public void onResult(People.LoadPeopleResult loadPeopleResult) {
+    public void onResult(People.LoadPeopleResult loadPeopleResult)
+    {
+        Log.d(TAG, "Result from People request:" + loadPeopleResult.getStatus());
+
         if (loadPeopleResult.getStatus().getStatusCode() == CommonStatusCodes.SUCCESS) {
             PersonBuffer personBuffer = loadPeopleResult.getPersonBuffer();
             try {
@@ -189,10 +192,15 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
 
     }
 
-    public void getGPlusUsername() {
+    public void getGPlusUsername()
+    {
         Plus.PeopleApi.loadVisible(GPlusUtils.getInstance().getGoogleApiClient(), null).setResultCallback(this);
 
-        if (Plus.PeopleApi.getCurrentPerson(GPlusUtils.getInstance().getGoogleApiClient()) != null) {
+        Log.d(TAG, "Is mGoogleApiClient null in getPlusUsername? " + (GPlusUtils.getInstance().getGoogleApiClient() == null));
+        Log.d(TAG, "Does getCurrentPerson return null? " + (Plus.PeopleApi.getCurrentPerson(GPlusUtils.getInstance().getGoogleApiClient()) == null));
+
+        if (Plus.PeopleApi.getCurrentPerson(GPlusUtils.getInstance().getGoogleApiClient()) != null)
+        {
             GPlusUtils.getInstance().setCurrentPerson(Plus.PeopleApi.getCurrentPerson(GPlusUtils.getInstance().getGoogleApiClient()));
             String personName = GPlusUtils.getInstance().getCurrentPerson().getDisplayName();
             String personId = GPlusUtils.getInstance().getCurrentPerson().getId();
@@ -203,6 +211,10 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
     }
 
     public void getGPlusFriends() {
+
+        Log.d(TAG, "Is mGoogleApiClient null? " + (GPlusUtils.getInstance().getGoogleApiClient() == null));
+        Log.d(TAG, "Is currentPerson null? " + (GPlusUtils.getInstance().getCurrentPerson() == null));
+
         if(GPlusUtils.getInstance().getGoogleApiClient() != null && GPlusUtils.getInstance().getCurrentPerson() != null)
             Plus.PeopleApi.loadVisible(GPlusUtils.getInstance().getGoogleApiClient(), GPlusUtils.getInstance().getCurrentPerson().getId()).setResultCallback(this);
         else

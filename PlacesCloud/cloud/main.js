@@ -201,7 +201,7 @@ Parse.Cloud.afterSave("Reported_Posts", function(request, status) {
 
 // ========== Google Plus login ==========
 
-var googleClientId = '575576178991-5oeui21gccun9ngtvoqab02u4vl0o6aq.apps.googleusercontent.com';  //The client ID obtained from the Google Developers Console
+var googleClientId = '575576178991-nadi9gjam4aacmvq9m1ob7hvnqb7c83t.apps.googleusercontent.com';  //The client ID obtained from the Google Developers Console
 var googleClientSecret = 'YOUR-GOOGLE-CLIENT-SECRET';   //The client secret obtained from the Google Developers Console
 
 var googleValidateEndpoint = 'https://www.googleapis.com/oauth2/v1/userinfo'; //this is the only verification link you need to verify the user's Google Access Token

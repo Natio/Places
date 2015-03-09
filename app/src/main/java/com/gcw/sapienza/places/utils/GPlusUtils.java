@@ -19,7 +19,6 @@ import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -29,8 +28,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -55,7 +52,7 @@ public class GPlusUtils {
 
     private Person currentPerson;
 
-    private static final String API_KEY = "AIzaSyALZgcm_3X4_KmZg8ax6MmDLGFzZxE6c7Y";
+    private static final String API_KEY = "AIzaSyCCWHhHY20hJqIzjMQfGnwfYDv1wU_W1GU";
 
     private boolean mIntentInProgress;
 
