@@ -1,28 +1,39 @@
 package com.gcw.sapienza.places.fragments;
 
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.activities.MainActivity;
 
 /**
  * Created by Simone on 12/30/2014.
  */
-public class FiltersFragment extends PreferenceFragment implements Preference.OnPreferenceClickListener {
+public class FiltersFragment extends PreferenceFragment{
     @SuppressWarnings("unused")
     private static final String TAG = "SettingsFragment";
-
-    private int ar_sensor;
-    private boolean sensorEnabled;
-    private boolean firstClick;
-
-    //private AlertDialog dialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        loadPreferencesAndSetListeners();
+
+        LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(CategoriesFragment.ENABLE_ALL_CLICKED));
+
+
+    }
+
+    private void loadPreferencesAndSetListeners(){
 
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.layout.categories_filter_list);
@@ -40,24 +51,30 @@ public class FiltersFragment extends PreferenceFragment implements Preference.On
         landscape_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
         food_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
         none_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
-
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
 
-        this.firstClick = true;
-        this.ar_sensor = 0;
-        this.sensorEnabled = true;
-    }
+                case CategoriesFragment.ENABLE_ALL_CLICKED:
+                    setPreferenceScreen(null);
+                    loadPreferencesAndSetListeners();
+//                    Preference thoughts_check = findPreference("thoughtsCheck");
+//                    ((CheckBoxPreference)thoughts_check).setChecked(true);
+                    break;
 
-    @Override
-    public boolean onPreferenceClick(Preference preference) {
-        if (preference.getKey().equals("noneCheck") && sensorEnabled) {
-            return true;
+                default:
+                    Log.w(FiltersFragment.class.getName(), intent.getAction() + ": cannot identify the received notification");
+            }
         }
-        return false;
+    };
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(this.receiver);
     }
 
 

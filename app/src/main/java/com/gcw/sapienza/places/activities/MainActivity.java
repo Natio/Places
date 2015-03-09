@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -23,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -47,17 +49,18 @@ import com.parse.ParseUser;
 public class MainActivity extends ActionBarActivity implements Preference.OnPreferenceChangeListener {
 
 
+    public static final String TAG = MainActivity.class.getName();
+
     private static final String[] section_titles = {"Home", "My Profile", "My Flags", "Settings", "Logout"};
     private static final int SHARE_ACTIVITY_REQUEST_CODE = 95;
     private static final int FLAGS_LIST_POSITION = 0;
     private static final int MY_PROFILE_POSITION = 1;
     private static final int MY_FLAGS_POSITION = 2;
-    private static final int SETTINGS_POSITION = 3;
 
+    private static final int SETTINGS_POSITION = 3;
     // private int currentDrawerListItemIndex = -1;
     private static final int LOGOUT_POSITION = 4;
     private static final String FRAG_TAG = "FRAG_TAG";
-    public static String TAG = MainActivity.class.getName();
     private static boolean isForeground = false;
     public Menu mMenu;
     private DrawerLayout drawerLayout;
@@ -67,6 +70,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     private LinearLayout homeHolder;
     private FrameLayout fragHolder;
     private Toast radiusToast;
+
+    public static final String PREFERENCES_CHANGED_NOTIFICATION = "Preferences Changed";
 
 
     public static boolean isForeground() {
@@ -496,6 +501,9 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
+
+        Log.d(TAG, "Preferences changed");
+
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor editor = preferences.edit();
         if (preference.getKey().equals("meFilter") ||
@@ -529,8 +537,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             showToast("Max number of visible flags: " + value);
         }
 
-        Location currentLocation = PlacesApplication.getInstance().getLocation();
-        PlacesApplication.getInstance().getLocationService().queryParsewithLocation(currentLocation);
+        LocalBroadcastManager.getInstance(MainActivity.this).sendBroadcast(new Intent(MainActivity.PREFERENCES_CHANGED_NOTIFICATION));
 
         return true;
     }

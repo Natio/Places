@@ -79,6 +79,8 @@
         android:layout_below="@id/wowedView"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="20dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:background="@color/transparent_green"
         android:text="Show Friends"
         android:textAppearance="?android:attr/textAppearanceMedium"

@@ -3,8 +3,10 @@ package com.gcw.sapienza.places.services;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.media.RingtoneManager;
@@ -21,6 +23,7 @@ import android.widget.Toast;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
+import com.gcw.sapienza.places.fragments.CategoriesFragment;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.notifications.Notifications;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
@@ -226,7 +229,7 @@ public class LocationService extends Service implements
         }
 
         if (!thoughts_check && !fun_check && !landscape_check
-                && !food_check && !none_check) {
+                && !food_check && !none_check && !music_check) {
             Toast.makeText(getApplicationContext(), "No category selected: "
                     + NO_FLAGS_VISIBLE, Toast.LENGTH_LONG).show();
 
@@ -441,6 +444,8 @@ public class LocationService extends Service implements
     @Override
     public void onCreate() {
         super.onCreate();
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(this.receiver, new IntentFilter(MainActivity.PREFERENCES_CHANGED_NOTIFICATION));
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(this.receiver, new IntentFilter(CategoriesFragment.ENABLE_ALL_CLICKED));
         connectToGoogleAPI();
     }
 
@@ -473,6 +478,7 @@ public class LocationService extends Service implements
         Log.d(TAG, "Being Destroyed");
         super.onDestroy();
         googleApiClient.disconnect();
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(this.receiver);
     }
 
     @Override
@@ -486,4 +492,22 @@ public class LocationService extends Service implements
             return LocationService.this;
         }
     }
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+
+                //they behave in the same way
+                case MainActivity.PREFERENCES_CHANGED_NOTIFICATION:
+                case CategoriesFragment.ENABLE_ALL_CLICKED:
+                    Location currentLocation = PlacesApplication.getInstance().getLocation();
+                    queryParsewithLocation(currentLocation);
+                    break;
+
+                default:
+                    Log.w(LocationService.class.getName(), intent.getAction() + ": cannot identify the received notification");
+            }
+        }
+    };
 }

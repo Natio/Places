@@ -17,10 +17,13 @@
         android:layout_weight="0.25">
 
         <Button
+            android:id="@+id/enableAllButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="ENABLE ALL"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:background="@color/transparent_green"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/white"
