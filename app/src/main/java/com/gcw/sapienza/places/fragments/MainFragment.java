@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -35,6 +36,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -234,6 +236,45 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                 index++;
             }
 
+            List<Flag> hiddenFlags = PlacesApplication.getInstance().getHiddenFlags();
+
+            Log.d(TAG, "Hidden Flags size: " + hiddenFlags.size());
+
+            for(ParseObject hf: hiddenFlags){
+                Flag f = (Flag) hf;
+                ParseGeoPoint location = f.getLocation();
+                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                builder.include(latLng);
+
+                //25% size original icon
+                int marker_id = Utils.getIconForCategory(f.getCategory(), getActivity());
+                Bitmap marker = BitmapFactory.decodeResource(getResources(), marker_id);
+                Bitmap halfSizeMarker = Bitmap.createScaledBitmap
+                        (marker,
+                                (int) (marker.getWidth() * 0.25f),
+                                (int) (marker.getHeight() * 0.25f),
+                                false);
+
+                this.gMap.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .title("Hidden Flag: get closer to open it")
+                        .snippet("-1")
+                        .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
+                                // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
+                                //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
+                        .alpha(0.50f));
+            }
+
+            Location currentLocation = gMap.getMyLocation();
+
+            if(currentLocation != null) {
+                this.gMap.addCircle(new CircleOptions()
+                        .center(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()))
+                        .radius(Utils.MAP_RADIUS * 1000)
+                        .strokeColor(Color.GREEN)
+                        .fillColor(Color.TRANSPARENT));
+            }
+
             if (flags.size() > 0) {
                 final LatLngBounds bounds = builder.build();
 //                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
@@ -248,7 +289,6 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                     });
                 else gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
             } else {
-                Location currentLocation = gMap.getMyLocation();
                 if (currentLocation != null) {
                     LatLng currentLocationLatLng = new LatLng(currentLocation.getLatitude(),
                             currentLocation.getLongitude());
@@ -263,6 +303,8 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
     @Override
     public boolean onMarkerClick(Marker marker) {
         int index = Integer.parseInt(marker.getSnippet());
+
+        if(index == -1) return false;
 
         List<Fragment> frags = getActivity().getSupportFragmentManager().getFragments();
 

@@ -55,6 +55,7 @@ public class PlacesApplication extends Application {
     private Location currentLocation = null;
     private List<Flag> flagsNearby = new ArrayList<>(0);
     private List<Flag> myFlags = new ArrayList<>(0);
+    private List<Flag> hiddenFlags = new ArrayList<>(0);
     private ILocationUpdater listener = new ILocationUpdater() {
         @Override
         public void setLocation(Location l) {
@@ -66,6 +67,9 @@ public class PlacesApplication extends Application {
         public void setFlagsNearby(List<Flag> l) {
             PlacesApplication.this.flagsNearby = l;
         }
+
+        @Override
+        public void setHiddenFlags(List<Flag> l){ PlacesApplication.this.hiddenFlags = l; }
 
         @Override
         public void setMyFlags(List<Flag> myFlags) {
@@ -180,6 +184,13 @@ public class PlacesApplication extends Application {
      */
     public List<Flag> getMyFlags() {
         return this.myFlags;
+    }
+
+    /**
+     * @return returns the list of all the Flags hidden for Discover Mode
+     */
+    public List<Flag> getHiddenFlags() {
+        return this.hiddenFlags;
     }
 
     //method called when the app is launched

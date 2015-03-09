@@ -41,6 +41,7 @@ import com.parse.ParseQuery;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -73,6 +74,7 @@ public class LocationService extends Service implements
     private ILocationUpdater listener;
 
     private List<Flag> parseObjects;
+    private List<Flag> hiddenFlags;
 
     private List<Flag> myFlags;
 
@@ -176,10 +178,10 @@ public class LocationService extends Service implements
         }
 
 
-        ParseGeoPoint gp = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+        final ParseGeoPoint gp = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
 
-        float radius = Utils.MAP_RADIUS;
+        float radius = Utils.DISCOVER_MODE_RADIUS; // double it for discover mode
 
         if (PlacesApplication.isRunningOnEmulator) {
             radius = 10.0f;
@@ -300,9 +302,20 @@ public class LocationService extends Service implements
                 if (parseObjects == null) {
                     parseObjects = new ArrayList<>();
                 }
+                List<Flag> hiddenFlags = new ArrayList<>();
+                Iterator<Flag> iterParseObjects = parseObjects.iterator();
+                while(iterParseObjects.hasNext()){
+                    Flag currFlag = iterParseObjects.next();
+                    Log.d(TAG, "Flags distance: " + currFlag.getLocation().distanceInKilometersTo(gp) + ", while: " + Utils.MAP_RADIUS);
+                    if(currFlag.getLocation().distanceInKilometersTo(gp) > Utils.MAP_RADIUS){
+                        hiddenFlags.add(currFlag);
+                        iterParseObjects.remove();
+                    }
+                }
                 LocationService.this.parseObjects = parseObjects;
+                LocationService.this.hiddenFlags = hiddenFlags;
                 Log.d(TAG, "Found " + parseObjects.size() +
-                        " flags within " + Utils.MAP_RADIUS + " km");
+                        " flags within " + Utils.DISCOVER_MODE_RADIUS + " km");
                 updateApplication();
 
                 if (parseObjects.size() > 0) {
@@ -436,6 +449,7 @@ public class LocationService extends Service implements
         if (listener != null) {
             listener.setLocation(location);
             listener.setFlagsNearby(parseObjects);
+            listener.setHiddenFlags(hiddenFlags);
             listener.setMyFlags(myFlags);
         }
     }
