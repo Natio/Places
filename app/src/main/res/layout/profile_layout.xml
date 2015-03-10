@@ -14,7 +14,7 @@
             android:id="@+id/fbPicView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="2dp" />
+            android:padding="5dp" />
 
         <TextView
             android:id="@+id/fbNameView"
@@ -38,10 +38,21 @@
             android:paddingLeft="5dp"/>
 
         <TextView
+            android:id="@+id/numFollowersView"
+            android:layout_below="@+id/memberSinceView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/fbPicView"
+            android:layout_toRightOf="@+id/fbPicView"
+            android:text=""
+            android:textColor="@color/grey"
+            android:paddingLeft="5dp" />
+
+        <TextView
             android:id="@+id/flagsView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/memberSinceView"
+            android:layout_below="@+id/numFollowersView"
             android:layout_toEndOf="@+id/fbPicView"
             android:layout_toRightOf="@+id/fbPicView"
             android:paddingTop="5dp"
@@ -59,7 +70,6 @@
             android:text=""
             android:textColor="@color/grey"
             android:paddingLeft="5dp" />
-
 
     </RelativeLayout>
 

@@ -46,6 +46,7 @@ public class ProfileFragment extends Fragment {
     private TextView flagsView;
     private TextView categoryView;
     private TextView wowedView;
+    private TextView numFollowersView;
     private Button friendsView;
 
     private int numFlags;
@@ -82,6 +83,7 @@ public class ProfileFragment extends Fragment {
         flagsView = (TextView) view.findViewById(R.id.flagsView);
         categoryView = (TextView) view.findViewById(R.id.categoryView);
         wowedView = (TextView) view.findViewById(R.id.wowedView);
+        numFollowersView = (TextView) view.findViewById(R.id.numFollowersView);
         friendsView = (Button) view.findViewById(R.id.friendsView);
 
         FacebookUtils.getInstance().loadProfilePicIntoImageView(this.fbId, fbPicView, PlacesLoginUtils.PicSize.LARGE);
@@ -105,7 +107,7 @@ public class ProfileFragment extends Fragment {
                             categoryView.setText(currText + "\n • " + cat + ": " + i);
                         }
                         numFlags += i;
-                        flagsView.setText(numFlags+" flags placed");
+                        flagsView.setText(numFlags+" Flags placed");
                     } else {
                         Log.e(TAG, e.getMessage());
                         Utils.showToast(getActivity(), "An error occurred while retrieving your Flags data", Toast.LENGTH_SHORT);
@@ -157,7 +159,7 @@ public class ProfileFragment extends Fragment {
             fbNameView.setText(user.getName());
             DateFormat dateFormatter = new SimpleDateFormat("EEE, d MMMM yyyy");
             String formattedDate = dateFormatter.format(user.getCreatedAt().getTime());
-            memberSinceView.setText("placer since " + formattedDate);
+            memberSinceView.setText("Placer since: " + formattedDate);
         } catch (ParseException e) {
             e.printStackTrace();
             Toast.makeText(getActivity(), "An error occurred while retrieving user data", Toast.LENGTH_SHORT).show();
@@ -169,13 +171,15 @@ public class ProfileFragment extends Fragment {
             @Override
             public void done(int i, ParseException e) {
                 if (e == null) {
-                    wowedView.setText(i+" flags WoWed");
+                    wowedView.setText(i+" Flags WoWed");
                 } else {
                     Log.e(TAG, e.getMessage());
                     Toast.makeText(getActivity(), "An error occurred while retrieving social data", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
+        numFollowersView.setText(PlacesLoginUtils.getInstance().getFriends().size() + " Placers followed");
 
         if (!PlacesLoginUtils.getInstance().getCurrentUserId().equals(this.fbId)) {
             friendsView.setVisibility(View.INVISIBLE);
