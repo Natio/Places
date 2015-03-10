@@ -43,9 +43,16 @@ public class FlagsListFragment extends Fragment {
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(LocationService.FOUND_NEW_FLAGS_NOTIFICATION)) {
-                FlagsListFragment.this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getFlags());
+            switch (intent.getAction()){
 
+                //handled in the same way
+                case LocationService.FOUND_NEW_FLAGS_NOTIFICATION:
+                case LocationService.FOUND_NO_FLAGS_NOTIFICATION:
+                    FlagsListFragment.this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getFlags());
+                    break;
+
+                default:
+                    Log.w(TAG, "Unknown broadcast message identifier");
             }
             Log.d(TAG, intent.getAction());
         }
@@ -70,6 +77,7 @@ public class FlagsListFragment extends Fragment {
         this.recycleView.setLayoutManager(llm);
 
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
+        LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
 
         this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getFlags());
 

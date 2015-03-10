@@ -165,6 +165,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     }
 
     public void refresh() {
+        Log.d(TAG, "Refreshing application");
         Location currentLocation = PlacesApplication.getInstance().getLocation();
         if (currentLocation != null) {
             PlacesApplication.getInstance().getLocationService().queryParsewithLocation(currentLocation);

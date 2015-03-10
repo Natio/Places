@@ -1,19 +1,15 @@
 package com.gcw.sapienza.places.fragments;
 
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-
 import com.gcw.sapienza.places.R;
-import com.gcw.sapienza.places.activities.MainActivity;
 
 /**
  * Created by Simone on 12/30/2014.

@@ -81,6 +81,8 @@ public class LocationService extends Service implements
 
     private Location notificationLocation;
 
+    private boolean noFlagsWarning;
+
     private long lastCacheUpdate;
 
     //courtesy of http://gis.stackexchange.com/questions/25877/how-to-generate-random-locations-nearby-my-location
@@ -119,7 +121,6 @@ public class LocationService extends Service implements
             this.location = currentLocation;
             queryParsewithLocation(currentLocation);
             queryParsewithCurrentUser();
-            updateApplication();
         }
         fusedLocationProviderApi.requestLocationUpdates(googleApiClient, locationRequest, this);
     }
@@ -136,6 +137,8 @@ public class LocationService extends Service implements
         this.listener = app;
     }
 
+    public void resetNoFlagsWarning() { this.noFlagsWarning = false; }
+
     public void queryParsewithCurrentUser() {
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
         query.whereEqualTo("fbId", PlacesLoginUtils.getInstance().getCurrentUserId());
@@ -151,6 +154,9 @@ public class LocationService extends Service implements
                     flags = new ArrayList<Flag>();
                 }
                 LocationService.this.myFlags = flags;
+
+                updateApplication();
+
                 if (flags.size() > 0) {
                     LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_MY_FLAGS_NOTIFICATION));
                 } else {
@@ -233,8 +239,11 @@ public class LocationService extends Service implements
 
         if (!thoughts_check && !fun_check && !landscape_check
                 && !food_check && !none_check && !music_check) {
-            Toast.makeText(getApplicationContext(), "No category selected: "
-                    + NO_FLAGS_VISIBLE, Toast.LENGTH_LONG).show();
+            if(!noFlagsWarning) {
+                Toast.makeText(getApplicationContext(), "No category selected: "
+                        + NO_FLAGS_VISIBLE, Toast.LENGTH_LONG).show();
+                this.noFlagsWarning = true;
+            }
 
             if (parseObjects == null) {
                 parseObjects = new ArrayList<>(0);
@@ -243,8 +252,8 @@ public class LocationService extends Service implements
                 parseObjects.clear();
                 hiddenFlags.clear();
             }
-
             updateApplication();
+            LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
 
             return;
 
@@ -270,8 +279,11 @@ public class LocationService extends Service implements
             else if (with_friends_surrounded)
                 query.whereContainedIn("fbId", PlacesLoginUtils.getInstance().getFriends());
             else {
-                Toast.makeText(getApplicationContext(), "No filter selected: "
-                        + NO_FLAGS_VISIBLE, Toast.LENGTH_LONG).show();
+                if(!noFlagsWarning) {
+                    Toast.makeText(getApplicationContext(), "No filter selected: "
+                            + NO_FLAGS_VISIBLE, Toast.LENGTH_LONG).show();
+                    this.noFlagsWarning = true;
+                }
 
                 if (parseObjects == null) {
                     parseObjects = new ArrayList<>(0);
@@ -282,6 +294,8 @@ public class LocationService extends Service implements
                 }
 
                 updateApplication();
+
+                LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
 
                 return;
             }
@@ -525,6 +539,7 @@ public class LocationService extends Service implements
                 //they behave in the same way
                 case MainActivity.PREFERENCES_CHANGED_NOTIFICATION:
                 case CategoriesFragment.ENABLE_ALL_CLICKED:
+                    LocationService.this.resetNoFlagsWarning();
                     Location currentLocation = PlacesApplication.getInstance().getLocation();
                     queryParsewithLocation(currentLocation);
                     break;

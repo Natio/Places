@@ -4,86 +4,113 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/fbPicView"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@color/transparent_green"
-        android:padding="2dp" />
+        android:id="@+id/userContainer"
+        android:layout_marginTop="10dp">
 
-    <TextView
-        android:id="@+id/fbNameView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/fbPicView"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/transparent_green"
-        android:textStyle="bold" />
+        <ImageView
+            android:id="@+id/fbPicView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp" />
 
-    <TextView
-        android:id="@+id/memberSinceView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/fbNameView"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/transparent_green"
-        android:textStyle="bold" />
+        <TextView
+            android:id="@+id/fbNameView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="@color/dark_green"
+            android:textStyle="bold"
+            android:layout_toEndOf="@+id/fbPicView"
+            android:layout_toRightOf="@+id/fbPicView"
+            android:paddingLeft="5dp"/>
+        <TextView
+            android:id="@+id/memberSinceView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/fbNameView"
+            android:layout_toEndOf="@+id/fbPicView"
+            android:layout_toRightOf="@+id/fbPicView"
+            android:text=""
+            android:textColor="@color/grey"
+            android:paddingLeft="5dp"/>
 
-    <TextView
-        android:id="@+id/flagsView"
-        android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/numFollowersView"
+            android:layout_below="@+id/memberSinceView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/fbPicView"
+            android:layout_toRightOf="@+id/fbPicView"
+            android:text=""
+            android:textColor="@color/grey"
+            android:paddingLeft="5dp" />
+
+        <TextView
+            android:id="@+id/flagsView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/numFollowersView"
+            android:layout_toEndOf="@+id/fbPicView"
+            android:layout_toRightOf="@+id/fbPicView"
+            android:paddingTop="5dp"
+            android:text=""
+            android:textColor="@color/grey"
+            android:paddingLeft="5dp"/>
+
+        <TextView
+            android:id="@+id/wowedView"
+            android:layout_below="@+id/flagsView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/fbPicView"
+            android:layout_toRightOf="@+id/fbPicView"
+            android:text=""
+            android:textColor="@color/grey"
+            android:paddingLeft="5dp" />
+
+    </RelativeLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/memberSinceView"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/transparent_green"
-        android:textStyle="bold" />
+        android:orientation="vertical"
+        android:layout_below="@+id/userContainer">
+
+
+
 
     <TextView
         android:id="@+id/categoryView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/flagsView"
+
         android:layout_marginLeft="10dp"
         android:text=""
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/transparent_green"
         android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/wowedView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/categoryView"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/transparent_green"
-        android:textStyle="bold" />
+
 
     <Button
         android:id="@+id/friendsView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/wowedView"
+
         android:layout_marginLeft="10dp"
         android:layout_marginTop="20dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:background="@color/transparent_green"
-        android:text="Show Friends"
+        android:text="Placers Followed"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/white"
         android:textStyle="bold" />
+    </LinearLayout>
+
 </RelativeLayout>

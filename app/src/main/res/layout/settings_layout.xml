@@ -49,7 +49,7 @@
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="noneCheck"
-            android:summary="None" />
+            android:summary="Not categorized" />
 
         <CheckBoxPreference
             android:defaultValue="true"
@@ -75,6 +75,7 @@
             android:defaultValue="true"
             android:key="foodCheck"
             android:summary="Food" />
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="About">
