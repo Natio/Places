@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
@@ -41,12 +42,19 @@ import com.gcw.sapienza.places.fragments.SettingsFragment;
 import com.gcw.sapienza.places.utils.GPlusUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.plus.People;
+import com.google.android.gms.plus.model.people.Person;
+import com.google.android.gms.plus.model.people.PersonBuffer;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
 
-public class MainActivity extends ActionBarActivity implements Preference.OnPreferenceChangeListener {
+public class MainActivity extends ActionBarActivity implements Preference.OnPreferenceChangeListener, ResultCallback<People.LoadPeopleResult>, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
 
     public static final String TAG = MainActivity.class.getName();
@@ -82,8 +90,10 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (PlacesLoginUtils.getInstance().isSessionValid()) PlacesLoginUtils.getInstance().downloadUserInfo(this);
-        else PlacesLoginUtils.startLoginActivity(this, true);
+        // if (PlacesLoginUtils.getInstance().isSessionValid(this)) PlacesLoginUtils.getInstance().downloadUserInfo(this);
+        // else PlacesLoginUtils.startLoginActivity(this, true);
+
+        PlacesLoginUtils.getInstance().checkForSessionValidityAndStartDownloadingInfo(this);
 
         setContentView(R.layout.activity_main_drawer_layout);
         this.current_title = this.getTitle();
@@ -556,6 +566,53 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         public void onItemClick(AdapterView parent, View view, int position, long id) {
             MainActivity.this.selectItem(position);
         }
+    }
+
+    @Override
+    public void onResult(People.LoadPeopleResult loadPeopleResult)
+    {
+        Log.d(TAG, "Result from People request:" + loadPeopleResult.getStatus());
+
+        if (loadPeopleResult.getStatus().getStatusCode() == CommonStatusCodes.SUCCESS) {
+            PersonBuffer personBuffer = loadPeopleResult.getPersonBuffer();
+            try {
+                int count = personBuffer.getCount();
+                for (int i = 0; i < count; i++) {
+                    Person person = personBuffer.get(i);
+                    Log.d(TAG, "Display name: " + person.getDisplayName());
+                    PlacesLoginUtils.getInstance().addEntryToUserIdMap(person.getId(), person.getDisplayName());
+                    PlacesLoginUtils.getInstance().addFriend(person.getDisplayName());
+                }
+            } finally {
+                personBuffer.close();
+            }
+        } else {
+            Log.e(TAG, "Error requesting people data: " + loadPeopleResult.getStatus());
+        }
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result)
+    {
+        // TODO handle this!
+        Log.d(TAG, "Login failed");
+        Toast.makeText(this, "Login failed", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint)
+    {
+        // We've resolved any connection errors.  mGoogleApiClient can be used to
+        // access Google APIs on behalf of the user.
+
+        GPlusUtils.getGPlusUsername(this);
+        GPlusUtils.getGPlusFriends(this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause)
+    {
+        GPlusUtils.getInstance().getGoogleApiClient().connect();
     }
 }
 

@@ -286,7 +286,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                 final LatLngBounds bounds = builder.build();
 //                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
                 // FIXME That's a mess, Paolo forgive me
-                if (PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.GPLUS)
+                /*if (PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.GPLUS)
                     this.gMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
                         @Override
                         public void onCameraChange(CameraPosition cameraPosition) {
@@ -294,7 +294,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                             gMap.setOnCameraChangeListener(null);
                         }
                     });
-                else gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
+                else*/ gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
             } else {
                 if (currentLocation != null) {
                     LatLng currentLocationLatLng = new LatLng(currentLocation.getLatitude(),

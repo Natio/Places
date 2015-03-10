@@ -98,15 +98,7 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
         String user_id = f.getFbId();
         String account_type = f.getAccountType();
         String fb_username = f.getFbName(); // checks if Flag has fb username. if there is one use it otherwise ask FB
-        if (fb_username == null)
-        {
-            // This block of code should never be executed
-            Log.d(TAG, "This block of code should never be executed");
-
-            // FacebookUtils.getInstance().loadUsernameIntoTextView(user_id, flagViewHolder.username);
-            PlacesLoginUtils.getInstance().loadUsernameIntoTextView(user_id, account_type, flagViewHolder.username);
-
-        }
+        if (fb_username == null) PlacesLoginUtils.getInstance().loadUsernameIntoTextView(user_id, flagViewHolder.username);
         else flagViewHolder.username.setText(fb_username);
 
 

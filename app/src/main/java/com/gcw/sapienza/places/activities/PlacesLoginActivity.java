@@ -7,6 +7,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -128,10 +129,10 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
     protected void onStop() {
         super.onStop();
 
-        if (GPlusUtils.getInstance().getGoogleApiClient() != null &&
-                GPlusUtils.getInstance().getGoogleApiClient().isConnected()) {
-            GPlusUtils.getInstance().getGoogleApiClient().disconnect();
-        }
+        // if (GPlusUtils.getInstance().getGoogleApiClient() != null &&
+        //         GPlusUtils.getInstance().getGoogleApiClient().isConnected()) {
+        //     GPlusUtils.getInstance().getGoogleApiClient().disconnect();
+        // }
     }
 
     @Override
@@ -301,9 +302,9 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
         task.execute();
     }
 
-    private void completeLoginWithParse(String token)
+    private void completeLoginWithParse(final String token)
     {
-        String email = Plus.AccountApi.getAccountName(GPlusUtils.getInstance().getGoogleApiClient());
+        final String email = Plus.AccountApi.getAccountName(GPlusUtils.getInstance().getGoogleApiClient());
         final HashMap<String, Object> params = new HashMap();
         params.put("code", token);
         params.put("email", email);
@@ -316,10 +317,8 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
             public void done(final Object returnObj, ParseException e) {
                 if (e == null) {
                     ParseUser.becomeInBackground(returnObj.toString(), new LogInCallback() {
-                        public void done(ParseUser user, ParseException e) {
-                            String token = returnObj.toString();
-                            Log.d(TAG, "So that's the token: " + token);
-
+                        public void done(ParseUser user, ParseException e)
+                        {
                             if (user != null && e == null) {
                                 Log.i(TAG, "The Google user validated");
 
@@ -338,6 +337,10 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
 
                                 setResult(RESULT_OK);
                                 // finish();
+
+                                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString(PlacesLoginUtils.GPLUS_TOKEN_SP, token).commit();
+                                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString(PlacesLoginUtils.EMAIL_SP, email).commit();
+
                                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                 startActivity(intent);
                             } else if (e != null) {

@@ -22,6 +22,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -165,7 +166,6 @@ public final class FacebookUtils {
      * @param fb_id FB user id
      * @param cbk   callback parameter. MUST not be null. User Username will be given as a parameter of onResult method
      */
-    @Deprecated
     public void getFacebookUsernameFromID(final String fb_id, final PlacesUtilCallback cbk) {
         String username = PlacesLoginUtils.getInstance().getUserNameFromId(fb_id);
         if (username != null) {
@@ -235,31 +235,16 @@ public final class FacebookUtils {
 
     }
 
-    /**
-     * Asynchronously sets a facebook username into a TextView instance.
-     * If username is cached this method will immediately set the username,
-     * otherwise a request to facebook APIs will be issued
-     *
-     * @param fb_id facebook id of user
-     * @param tv    the TextView instance where to load the username
-     */
-    @Deprecated
-    public void loadUsernameIntoTextView(String fb_id, final TextView tv) {
-        /*
-        this.getFacebookUsernameFromID(fb_id, new FacebookUtilCallback() {
+    protected void loadUsernameIntoTextView(String userId, final TextView tv)
+    {
+        getFacebookUsernameFromID(userId, new PlacesUtilCallback() {
             @Override
-            public void onResult(String result, Exception e) {
-                if (e == null) {
-                    tv.setText(result);
-                } else if(e.getMessage() != null)
-                {
-                    Log.d(TAG, e.getMessage());
-                }
+            public void onResult(String result, Exception e)
+            {
+                Log.d(TAG, "Result in loadUsernameIntoTextView: " + result);
+                tv.setText(result);
             }
         });
-        */
-
-        tv.setText(((PlacesUser) ParseUser.getCurrentUser()).getName());
     }
 
     /**
