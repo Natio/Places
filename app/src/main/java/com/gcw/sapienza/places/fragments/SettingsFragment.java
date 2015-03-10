@@ -22,6 +22,17 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     private boolean sensorEnabled;
     private boolean firstClick;
 
+
+    //nuew intialization attempt
+    private Preference thoughts_check;
+    private Preference fun_check;
+    private Preference music_check;
+    private Preference landscape_check;
+    private Preference food_check;
+    private Preference none_check;
+    private Preference enableAll;
+
+
     private AlertDialog dialog;
 
     @Override
@@ -39,12 +50,21 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         Preference max_fetch = findPreference("maxFetch");
         Preference version_label = findPreference("version");
 
+        /*
         Preference thoughts_check = findPreference("thoughtsCheck");
         Preference fun_check = findPreference("funCheck");
         Preference music_check = findPreference("musicCheck");
         Preference landscape_check = findPreference("landscapeCheck");
         Preference food_check = findPreference("foodCheck");
         Preference none_check = findPreference("noneCheck");
+        */
+        thoughts_check = findPreference("thoughtsCheck");
+        fun_check = findPreference("funCheck");
+        music_check = findPreference("musicCheck");
+        landscape_check = findPreference("landscapeCheck");
+        food_check = findPreference("foodCheck");
+        none_check = findPreference("noneCheck");
+        enableAll = findPreference("enableAll");
 
         version_label.setSummary(BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")");
         loneWolf_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
@@ -60,6 +80,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         landscape_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
         food_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
         none_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
+
 
         version_label.setOnPreferenceClickListener(this);
     }
@@ -86,7 +107,6 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
 
             return true;
         }
-
         return false;
     }
 

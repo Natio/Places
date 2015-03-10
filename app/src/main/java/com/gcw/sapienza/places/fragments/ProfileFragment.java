@@ -105,7 +105,7 @@ public class ProfileFragment extends Fragment {
                             categoryView.setText(currText + "\n • " + cat + ": " + i);
                         }
                         numFlags += i;
-                        flagsView.setText("Flags placed: " + numFlags);
+                        flagsView.setText(numFlags+" flags placed");
                     } else {
                         Log.e(TAG, e.getMessage());
                         Utils.showToast(getActivity(), "An error occurred while retrieving your Flags data", Toast.LENGTH_SHORT);
@@ -153,11 +153,11 @@ public class ProfileFragment extends Fragment {
         PlacesUser user = null;
         try {
             user = queryUsers.getFirst();
-            fbNameView.setText("User name: " + user.getName());
-
+            //fbNameView.setText("User name: " + user.getName());
+            fbNameView.setText(user.getName());
             DateFormat dateFormatter = new SimpleDateFormat("EEE, d MMMM yyyy");
             String formattedDate = dateFormatter.format(user.getCreatedAt().getTime());
-            memberSinceView.setText("Placer since: " + formattedDate);
+            memberSinceView.setText("placer since " + formattedDate);
         } catch (ParseException e) {
             e.printStackTrace();
             Toast.makeText(getActivity(), "An error occurred while retrieving user data", Toast.LENGTH_SHORT).show();
@@ -169,7 +169,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void done(int i, ParseException e) {
                 if (e == null) {
-                    wowedView.setText("Flags wowed: " + i);
+                    wowedView.setText(i+" flags WoWed");
                 } else {
                     Log.e(TAG, e.getMessage());
                     Toast.makeText(getActivity(), "An error occurred while retrieving social data", Toast.LENGTH_SHORT).show();

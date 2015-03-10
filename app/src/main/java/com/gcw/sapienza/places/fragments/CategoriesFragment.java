@@ -16,12 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
-
-import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
-import com.gcw.sapienza.places.services.LocationService;
-import com.gcw.sapienza.places.utils.Utils;
+
 
 /**
  * Created by snowblack on 3/8/15.
@@ -30,8 +27,8 @@ public class CategoriesFragment extends Fragment {
 
     public static final String TAG = CategoriesFragment.class.getName();
 
-    private static final String ENABLE_ALL_STRING = "ENABLE ALL";
-    private static final String DISABLE_ALL_STRING = "DISABLE ALL";
+    private static final String ENABLE_ALL_STRING = "Enable all";
+    private static final String DISABLE_ALL_STRING = "Disable all";
 
     public static final String ENABLE_ALL_CLICKED = "Enable All Clicked";
 
