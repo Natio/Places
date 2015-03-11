@@ -49,6 +49,23 @@ public class ProfileFragment extends Fragment {
     private TextView numFollowersView;
     private Button friendsView;
 
+    private TextView nonCat,thoughtsCat,funCat,landscapeCat,foodCat ,musicCat;
+    private ImageView nonCatIco,thoughtsCatIco,funCatIco,landscapeCatIco,foodCatIco,musicCatIco;
+
+    //a new possible set of categories
+    //private String[] category= new String[8];
+    //initialized to 8 for new ideas of categories
+    //private String NotCategory;
+    //private String SightCategory;
+    //private String TasteCategory;
+    //private String HearingCategory;
+    //private String TouchCategory;
+    //private String SmellCategory;
+    //private String FunCategory;
+    //private String ThoughtsCategory;
+    //int[] catCnt;
+    int cnt;
+
     private int numFlags;
 
     public static final ProfileFragment newInstance(String fbId) {
@@ -65,9 +82,7 @@ public class ProfileFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-
         this.fbId = getArguments().getString(FBID);
     }
 
@@ -81,14 +96,40 @@ public class ProfileFragment extends Fragment {
         fbNameView = (TextView) view.findViewById(R.id.fbNameView);
         memberSinceView = (TextView) view.findViewById(R.id.memberSinceView);
         flagsView = (TextView) view.findViewById(R.id.flagsView);
-        categoryView = (TextView) view.findViewById(R.id.categoryView);
+        //categoryView = (TextView) view.findViewById(R.id.categoryView);
         wowedView = (TextView) view.findViewById(R.id.wowedView);
         numFollowersView = (TextView) view.findViewById(R.id.numFollowersView);
         friendsView = (Button) view.findViewById(R.id.friendsView);
 
+        //new split views for categories
+        nonCat = (TextView) view.findViewById(R.id.cntNone);
+        thoughtsCat = (TextView) view.findViewById(R.id.cntThoughts);
+        funCat = (TextView) view.findViewById(R.id.cntFun);
+        landscapeCat = (TextView) view.findViewById(R.id.cntLandscape);
+        foodCat = (TextView) view.findViewById(R.id.cntFood);
+        musicCat = (TextView) view.findViewById(R.id.cntMusic);
+        //icons in image views
+        nonCatIco=(ImageView) view.findViewById(R.id.icoNone);
+        thoughtsCatIco=(ImageView) view.findViewById(R.id.icoThoughts);
+        funCatIco=(ImageView) view.findViewById(R.id.icoFun);
+        landscapeCatIco=(ImageView) view.findViewById(R.id.icoLandscape);
+        foodCatIco=(ImageView) view.findViewById(R.id.icoFood);
+        musicCatIco=(ImageView) view.findViewById(R.id.icoMusic);
+
+        nonCatIco.setImageResource(R.drawable.none);
+        thoughtsCatIco.setImageResource(R.drawable.thoughts);
+        funCatIco.setImageResource(R.drawable.smile);
+        landscapeCatIco.setImageResource(R.drawable.eyes);
+        foodCatIco.setImageResource(R.drawable.food);
+        musicCatIco.setImageResource(R.drawable.music);
+
+        cnt=0;
+
         FacebookUtils.getInstance().loadProfilePicIntoImageView(this.fbId, fbPicView, PlacesLoginUtils.PicSize.LARGE);
 
         String[] categories = getActivity().getResources().getStringArray(R.array.categories);
+
+
         for(final String cat: categories){
 
             numFlags = 0;
@@ -100,13 +141,31 @@ public class ProfileFragment extends Fragment {
                 @Override
                 public void done(int i, ParseException e) {
                     if(e == null) {
+
+                        if(cnt==0)
+                            nonCat.setText(""+i);
+                        else if(cnt==1)
+                            thoughtsCat.setText(""+i);
+                        else if(cnt==2)
+                            funCat.setText(""+i);
+                        else if(cnt==3)
+                            landscapeCat.setText(""+i);
+                        else if(cnt==4)
+                            foodCat.setText(""+i);
+                        else
+                            musicCat.setText(""+i);
+
+                    cnt++;
+                    numFlags += i;
+                        /*
                         CharSequence currText = categoryView.getText();
                         if(currText.equals("")){
                             categoryView.setText(" • " + cat + ": " + i);
                         }else{
                             categoryView.setText(currText + "\n • " + cat + ": " + i);
                         }
-                        numFlags += i;
+                        */
+
                         flagsView.setText(numFlags+" Flags placed");
                     } else {
                         Log.e(TAG, e.getMessage());
@@ -114,7 +173,26 @@ public class ProfileFragment extends Fragment {
                     }
                 }
             });
+
+
         }
+
+        //putting values in interface
+        //setText doesn't work in this way
+        /*
+        nonCat.setText(""+catCnt[0]);
+        thoughtsCat.setText(""+catCnt[1]);
+        funCat.setText(""+catCnt[2]);
+        landscapeCat.setText(""+catCnt[3]);
+        foodCat.setText(""+catCnt[4]);
+        musicCat.setText(""+catCnt[5]);
+        Log.d(TAG,"category "+catCnt[0]);
+        Log.d(TAG,"category "+catCnt[1]);
+        Log.d(TAG,"category "+catCnt[2]);
+        Log.d(TAG,"category "+catCnt[3]);
+        Log.d(TAG,"category "+catCnt[4]);
+        Log.d(TAG,"category "+c);
+        */
 
         //User posts retrieval above is more efficient
         @Deprecated
