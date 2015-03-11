@@ -3,12 +3,7 @@
     android:layout_height="wrap_content">
 
 
-    <PreferenceCategory android:title="Filters">
-
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="noneCheck"
-            android:summary="Not categorized" />
+    <PreferenceCategory android:title="Show flags belonging to:">
 
         <CheckBoxPreference
             android:defaultValue="true"
@@ -34,6 +29,11 @@
             android:defaultValue="true"
             android:key="foodCheck"
             android:summary="Food" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="noneCheck"
+            android:summary="Not categorized" />
 
     </PreferenceCategory>
 

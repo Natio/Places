@@ -128,6 +128,7 @@
                     android:gravity="center_vertical"
                     android:id="@+id/fun"
                     android:layout_below="@+id/divider_horizontal1">
+
                     <ImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
@@ -148,6 +149,7 @@
                     android:background="@color/grey"
                     android:layout_below="@+id/fun"
                     />
+
                 <LinearLayout
                     android:padding="2dp"
                     android:layout_width="wrap_content"
@@ -156,6 +158,7 @@
                     android:gravity="center_vertical"
                     android:id="@+id/food"
                     android:layout_below="@+id/divider_horizontal2">
+
                     <ImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
@@ -220,6 +223,7 @@
                     android:gravity="center_vertical"
                     android:id="@+id/Landscape"
                     android:layout_below="@+id/divider_horizontal3">
+
                     <ImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
@@ -249,6 +253,7 @@
                     android:orientation="horizontal"
                     android:id="@+id/music"
                     android:layout_below="@+id/divider_horizontal4">
+
                     <ImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
@@ -273,8 +278,6 @@
                 android:textColor="@color/transparent_green"
                 android:textStyle="bold" />
             -->
-
-
 
         </LinearLayout>
 

@@ -59,7 +59,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
     public static final String TAG = MainActivity.class.getName();
 
-    private static final String[] section_titles = {"Home", "My Profile", "My Flags", "Settings", "Logout"};
+    private static final String[] section_titles = {"Home", "Profile", "My Flags", "Settings", "Logout"};
     private static final int SHARE_ACTIVITY_REQUEST_CODE = 95;
     private static final int FLAGS_LIST_POSITION = 0;
     private static final int MY_PROFILE_POSITION = 1;

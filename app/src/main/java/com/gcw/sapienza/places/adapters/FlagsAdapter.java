@@ -164,13 +164,10 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             flagViewHolder.categoryIcon.setImageResource(R.drawable.food);
         }
 
-
         //************************
 
-/*
+        /*
         String[] category_array = PlacesApplication.getInstance().getResources().getStringArray(R.array.categories);
-
-
         if (flagViewHolder.mFlag.getCategory().equals(category_array[0])){ //None
             ((CardView)flagViewHolder.itemView).setCardBackgroundColor(Color.argb(20, 255, 0, 0));
         }else if (flagViewHolder.mFlag.getCategory().equals(category_array[1])){ //Thoughts
@@ -204,7 +201,6 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
 
     @Override
     public FlagsAdapter.FlagsViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-
         View itemView = LayoutInflater.
                 from(viewGroup.getContext()).
                 inflate(R.layout.card_layout, viewGroup, false);
@@ -221,6 +217,7 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
         protected final ImageView user_profile_pic;
         protected final ImageView main_image;
         private final Activity mainActivity;
+
         //new view for icon or line representing the category
         protected ImageView categoryIcon;
         protected FlagsAdapter flagAdapter;
@@ -244,8 +241,6 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
 
             //new for icon representing category, or a colored line
             this.categoryIcon = (ImageView) v.findViewById(R.id.categoryIcon);
-
-
 
             v.setOnCreateContextMenuListener(this);
         }
@@ -277,7 +272,6 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             bundle.putBoolean("inPlace", mFlag.getInPlace());
             bundle.putString("flagId", mFlag.getFlagId());
             bundle.putString("author", mFlag.getFbName());
-
 
             bundle.putInt("wowCount", mFlag.getWowCount());
             bundle.putInt("lolCount", mFlag.getLolCount());
@@ -383,9 +377,7 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             //        inflater.inflate(R.menu.context_menu, menu);
         }
 
-
-
-        //this is as udateWowInfo in the FlagFragment, but only for wow and used for counter in the
+        //this is as updateWowInfo in the FlagFragment, but only for wow and used for counter in the
         //card view, useful when we will have a button instead of a textView
         private void updateWowCounter() { //like update
             ParseQuery<Flag> queryPosts = ParseQuery.getQuery("Posts");
@@ -401,11 +393,10 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
                 }
             });
 
-            // TODO I totally have to go over this mess
-            // if(wowButton.getText().charAt(wowButton.getText().length() - 1) != ')')
             stats_wow.setText(numberOfWows + " WoW");
 
 
+            // TODO I totally have to go over this mess
             //for now only number of wows is shown, we could like it also from cardView with a button
             /*
             ParseQuery<CustomParseObject> queryW = ParseQuery.getQuery("Wow_Lol_Boo");
@@ -422,8 +413,6 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
                 }
             });
             */
-
-
 
     /*
             ParseQuery<CustomParseObject> queryL = ParseQuery.getQuery("Wow_Lol_Boo");
