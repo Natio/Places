@@ -14,17 +14,17 @@
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="flFilter"
-            android:summary="Show my friends' flags" />
+            android:summary="Show flags of placers followed" />
 
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="strangersFilter"
-            android:summary="Show flags from people I don't know" />
+            android:summary="Show flags of placers not followed" />
 
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="timeFilter"
-            android:summary="Assign higher relevance to older flags" />
+            android:summary="Show elder flags first" />
         <!--<SeekBarPreference-->
         <!--android:title="Range of action"-->
         <!--android:max="4"-->
@@ -44,6 +44,7 @@
             android:title="Max number of visible flags" />
     </PreferenceCategory>
 
+    <!--
     <PreferenceCategory android:title="Visible Categories">
 
         <CheckBoxPreference
@@ -77,6 +78,7 @@
             android:summary="Food" />
 
     </PreferenceCategory>
+    -->
 
     <PreferenceCategory android:title="About">
 

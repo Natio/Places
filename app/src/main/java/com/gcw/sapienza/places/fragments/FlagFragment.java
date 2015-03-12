@@ -940,8 +940,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     }
 
     private void updateWowButtonText(boolean wowed, int wowCount) {
-        if (wowed) wowButton.setText("You wow this. (" + wowCount + ")");
-        else wowButton.setText("WOW (" + wowCount + ")");
+        if (wowed) wowButton.setText("You and other " + (wowCount-1) + " WoWed");
+        else wowButton.setText(""+wowCount + " WoWs");
     }
 
     private void updateLolButtonText(boolean lold, int lolCount) {

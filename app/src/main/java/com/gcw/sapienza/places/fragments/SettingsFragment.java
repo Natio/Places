@@ -23,7 +23,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     private boolean firstClick;
 
 
-    //nuew intialization attempt
+    /*
     private Preference thoughts_check;
     private Preference fun_check;
     private Preference music_check;
@@ -31,7 +31,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     private Preference food_check;
     private Preference none_check;
     private Preference enableAll;
-
+    */
 
     private AlertDialog dialog;
 
@@ -51,13 +51,6 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         Preference version_label = findPreference("version");
 
         /*
-        Preference thoughts_check = findPreference("thoughtsCheck");
-        Preference fun_check = findPreference("funCheck");
-        Preference music_check = findPreference("musicCheck");
-        Preference landscape_check = findPreference("landscapeCheck");
-        Preference food_check = findPreference("foodCheck");
-        Preference none_check = findPreference("noneCheck");
-        */
         thoughts_check = findPreference("thoughtsCheck");
         fun_check = findPreference("funCheck");
         music_check = findPreference("musicCheck");
@@ -66,6 +59,14 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         none_check = findPreference("noneCheck");
         enableAll = findPreference("enableAll");
 
+        thoughts_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
+        fun_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
+        music_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
+        landscape_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
+        food_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
+        none_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
+        */
+
         version_label.setSummary(BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")");
         loneWolf_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
         fl_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
@@ -73,14 +74,6 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         time_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
 //        seek_bar.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
         max_fetch.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
-
-        thoughts_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
-        fun_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
-        music_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
-        landscape_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
-        food_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
-        none_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
-
 
         version_label.setOnPreferenceClickListener(this);
     }
