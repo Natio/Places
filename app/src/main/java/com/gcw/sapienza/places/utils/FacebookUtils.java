@@ -24,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -147,6 +148,50 @@ public final class FacebookUtils {
                             }
                         } catch (JSONException e) {
                             Log.v(TAG, "Couldn't retrieve user's friends.  Error: " + e.toString());
+                            e.printStackTrace();
+                            if (cbk != null) {
+                                cbk.onFriendsResult(null, e);
+                            }
+                        }
+                    }
+                }
+        );
+
+        req.executeAsync();
+    }
+
+    /**
+     * WARNING: FETCHING FRIENDS' FRIENDS IS NOT CURRENTLY SUPPORTED,
+     * THEREFORE AT THIS TIME THIS FUNCTION DOESN'T WORK AS EXPECTED
+     * @param fbId Facebook id of the friend
+     * @param cbk callback to be called when response is received
+     */
+    public void getFriendsFriends(String fbId, final FacebookUtilsFriendsCallback cbk){
+        Bundle bundle = new Bundle();
+        bundle.putString("fields", "id");
+
+        final Session session = ParseFacebookUtils.getSession();
+
+        Request req = new Request(session, fbId + "/friends", bundle, HttpMethod.GET,
+                new Request.Callback() {
+                    @Override
+                    public void onCompleted(Response response) {
+                        try {
+                            GraphObject go = response.getGraphObject();
+                            JSONObject obj = go.getInnerJSONObject();
+
+                            Log.v(TAG, "FB friends: " + obj.toString());
+
+                            JSONArray array = obj.getJSONArray("data");
+                            List<String> friendsFriends = new ArrayList<>();
+                            for (int i = 0; i < array.length(); i++) {
+                                friendsFriends.add(((JSONObject) array.get(i)).getString("id"));
+                            }
+                            if (cbk != null) {
+                                cbk.onFriendsResult(friendsFriends, null);
+                            }
+                        } catch (JSONException e) {
+                            Log.v(TAG, "Couldn't retrieve friend's friends.  Error: " + e.toString());
                             e.printStackTrace();
                             if (cbk != null) {
                                 cbk.onFriendsResult(null, e);

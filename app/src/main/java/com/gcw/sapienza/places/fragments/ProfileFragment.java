@@ -12,11 +12,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.android.Util;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.FacebookUtils;
+import com.gcw.sapienza.places.utils.FacebookUtilsFriendsCallback;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.CountCallback;
@@ -107,7 +109,7 @@ public class ProfileFragment extends Fragment {
                             categoryView.setText(currText + "\n • " + cat + ": " + i);
                         }
                         numFlags += i;
-                        flagsView.setText(numFlags+" Flags placed");
+                        flagsView.setText(numFlags + (numFlags != 1 ? " Flags placed" : " Flag placed"));
                     } else {
                         Log.e(TAG, e.getMessage());
                         Utils.showToast(getActivity(), "An error occurred while retrieving your Flags data", Toast.LENGTH_SHORT);
@@ -171,15 +173,33 @@ public class ProfileFragment extends Fragment {
             @Override
             public void done(int i, ParseException e) {
                 if (e == null) {
-                    wowedView.setText(i+" Flags WoWed");
+                    wowedView.setText(i + (i != 1 ? " Flags WoWed" : " Flag WoWed"));
                 } else {
                     Log.e(TAG, e.getMessage());
                     Toast.makeText(getActivity(), "An error occurred while retrieving social data", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+        if (PlacesLoginUtils.getInstance().getCurrentUserId().equals(this.fbId)) {
+            int numFollowers = PlacesLoginUtils.getInstance().getFriends().size();
+            numFollowersView.setText(numFollowers + (numFollowers != 1 ? " Placers followed" : " Placer followed"));
+        }else{
+            numFollowersView.setHeight(0);
+            numFollowersView.setVisibility(View.INVISIBLE);
 
-        numFollowersView.setText(PlacesLoginUtils.getInstance().getFriends().size() + " Placers followed");
+//            Can't retrieve friends' friends
+//            FacebookUtils.getInstance().getFriendsFriends(this.fbId, new FacebookUtilsFriendsCallback() {
+//                @Override
+//                public void onFriendsResult(List<String> friends, Exception e) {
+//                    if(e != null) {
+//                        int numFollowers = friends.size();
+//                        numFollowersView.setText(numFollowers + (numFollowers != 1 ? " Placers followed" : " Placer followed"));
+//                    }else{
+//                        Utils.showToast(getActivity(), "An error occurred while retrieving social data", Toast.LENGTH_SHORT);
+//                    }
+//                }
+//            });
+        }
 
         if (!PlacesLoginUtils.getInstance().getCurrentUserId().equals(this.fbId)) {
             friendsView.setVisibility(View.INVISIBLE);
