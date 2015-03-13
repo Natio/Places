@@ -272,6 +272,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         view.setFocusableInTouchMode(true);
         view.requestFocus();
+        /*
         view.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -292,6 +293,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 return false;
             }
         });
+        */
 
         updateWowInfo();
 

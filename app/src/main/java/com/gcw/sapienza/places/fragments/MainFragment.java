@@ -294,7 +294,21 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                             gMap.setOnCameraChangeListener(null);
                         }
                     });
-                else*/ gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
+                else*/
+                try
+                {
+                    gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
+                }
+                catch(IllegalStateException ise)
+                {
+                    this.gMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+                        @Override
+                        public void onCameraChange(CameraPosition cameraPosition) {
+                            gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
+                            gMap.setOnCameraChangeListener(null);
+                        }
+                    });
+                }
             } else {
                 if (currentLocation != null) {
                     LatLng currentLocationLatLng = new LatLng(currentLocation.getLatitude(),
