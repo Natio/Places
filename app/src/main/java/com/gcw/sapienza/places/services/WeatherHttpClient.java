@@ -1,5 +1,7 @@
 package com.gcw.sapienza.places.services;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -38,6 +40,7 @@ public class WeatherHttpClient {
             }
             is.close();
             con.disconnect();
+
             return buffer.toString();
         } catch (Throwable t) {
             t.printStackTrace();

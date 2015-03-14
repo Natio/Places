@@ -24,6 +24,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -109,6 +110,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private ParseFile mediaFile;
     private View view;
     private StringTokenizer st;
+    private ScrollView flagContent;
 
     /**
      * Must be called BEFORE adding the fragment to the
@@ -132,9 +134,18 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         date = bundle.getString("date");
 
         weatherInfo = bundle.getString("weather");
-        st=new StringTokenizer(weatherInfo,",");
-        temperature= st.nextToken();
-        weather= st.nextToken().substring(1);
+        //Log.d(TAG,"phantomWeather: "+weatherInfo);
+        //temporal bypass of a weather bug, IF to be deleted and keep only the else content
+        if (weatherInfo.equals("")) {
+            temperature=""+20;
+            weather="Cloud";
+        }
+        else{
+            st=new StringTokenizer(weatherInfo,",");
+            temperature= st.nextToken();
+            weather= st.nextToken().substring(1);
+        }
+
         Log.d(TAG, "weather-"+ weather+"-"+ temperature);
 
         category = bundle.getString("category");
@@ -163,6 +174,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         super.onCreateView(inflater, container, savedInstanceState);
 
         view = inflater.inflate(R.layout.flag_layout, container, false);
+        flagContent= (ScrollView) view.findViewById(R.id.FlagContent);
 
         iw = (ImageView) view.findViewById(R.id.pic);
         vv = (VideoView) view.findViewById(R.id.vid);
@@ -213,7 +225,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         lolButton = (Button) view.findViewById(R.id.lol_button);
         booButton = (Button) view.findViewById(R.id.boo_button);
 
-        commentsButton = (Button) view.findViewById(R.id.comments_button);
+        //commentsButton = (Button) view.findViewById(R.id.comments_button);
+
         commentsHolder = (SwipeRefreshLayout) view.findViewById(R.id.comments_holder);
         commentsList = (ListView) view.findViewById(R.id.comments_list);
 
@@ -227,14 +240,15 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         lolButton.setOnClickListener(this);
         booButton.setOnClickListener(this);
 
-        ViewGroup header = (ViewGroup) inflater.inflate(R.layout.comments_header, commentsList, false);
-        commentsList.addHeaderView(header);
-        commentsList.setDividerHeight(3);
+        //ViewGroup header = (ViewGroup) inflater.inflate(R.layout.comments_header, commentsList, false);
+        //commentsList.addHeaderView(header);
+        //commentsList.setDividerHeight(3);
 
         commentsHolder.setOnRefreshListener(this);
 
-        commentsButton.setOnClickListener(this);
-        addCommentButton = (Button) header.findViewById(R.id.add_comment_button);
+        //commentsButton.setOnClickListener(this);
+        //addCommentButton = (Button) header.findViewById(R.id.add_comment_button);
+        addCommentButton = (Button) view.findViewById(R.id.add_comment);
         addCommentButton.setOnClickListener(this);
 
         this.changeLayoutAccordingToMediaType();
@@ -401,8 +415,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         else if (v.getId() == R.id.wow_button) wlbFlag(WOW_CODE);
         else if (v.getId() == R.id.lol_button) wlbFlag(LOL_CODE);
         else if (v.getId() == R.id.boo_button) wlbFlag(BOO_CODE);
-        else if (v.getId() == R.id.comments_button) toggleComments();
-        else if (v.getId() == R.id.add_comment_button) insertComment();
+        //else if (v.getId() == R.id.comments_button) toggleComments();
+        //else if (v.getId() == R.id.add_comment_button) insertComment();
+        else if (v.getId() == R.id.add_comment) insertComment();
     }
 
     @Override
@@ -499,6 +514,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                     for (int i = 0; i < comments.size(); i++) {
                         Comment comment = comments.get(i);
                         String cmnt = comment.getCommentText() + "\n\n" + comment.getUsername() + "\n";
+                        //comment.
 
                         Date date = comment.getTimestamp();
                         //DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
@@ -511,7 +527,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                         texts.add(cmnt);
                     }
 
-                    // TODO change adapter's layout
+                    // TODO change adapter's layout + Author PICTURE
                     commentsAdapter = new ArrayAdapter(getActivity(), R.layout.comment_item_layout, texts);
                 }
 
@@ -942,7 +958,12 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     }
 
     private void updateWowButtonText(boolean wowed, int wowCount) {
-        if (wowed) wowButton.setText("You and other " + (wowCount-1) + " WoWed");
+        if (wowed){
+            if(wowCount==1)
+                wowButton.setText("You WoWed this.");
+            else
+                wowButton.setText("You and other " + (wowCount-1) + " WoWed.");
+        }
         else wowButton.setText(""+wowCount + " WoWs");
     }
 

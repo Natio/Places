@@ -27,6 +27,9 @@
     <string name="no_flags">No Flags nearby</string>
     <string name="loading_my_flags">Loading My Flags...</string>
 
+    <string name="wow">WoW!</string>
+    <string name="comment">Comment</string>
+
     <string name="api_key">AIzaSyALZgcm_3X4_KmZg8ax6MmDLGFzZxE6c7Y</string>
 
 </resources>

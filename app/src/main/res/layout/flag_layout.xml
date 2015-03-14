@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/light_grey">
+<!-- general layout changed from relative to linear to manage weights-->
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/flag_container"
         android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="3dp"
-        android:layout_marginLeft="3dp"
-        android:layout_marginTop="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
         android:background="@color/white"
         android:minHeight="200dp">
 
         <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/titleBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -124,8 +122,6 @@
 
             </RelativeLayout>
 
-
-
         <View
             android:id="@+id/author_divider"
             android:layout_width="fill_parent"
@@ -134,162 +130,194 @@
             android:background="@color/grey"
             android:layout_marginTop="4dp"
             android:layout_marginLeft="6dp"
-            android:layout_marginRight="6dp"
-            />
+            android:layout_marginRight="6dp"/>
 
-
-        <TextView
-            android:id="@+id/text"
-            android:layout_marginTop="2dp"
-            android:layout_below="@+id/author_divider"
+        <ScrollView
+            android:id="@+id/FlagContent"
+            android:layout_below="@id/author_divider"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="@integer/max_text_size"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:inputType="textMultiLine"
-            android:maxHeight="220dp"
-            android:textSize="16sp"
-            android:layout_marginLeft="6dp"
-            android:layout_marginRight="6dp"
-            android:layout_width="wrap_content"
-            android:textColor="@color/black" />
+            >
 
-        <LinearLayout
-            android:id="@+id/media_container"
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/author_container"
-
-            android:gravity="center_horizontal">
-                <ImageView
-                android:id="@+id/pic"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_above="@+id/wow_button"
-                android:layout_below="@+id/text"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="10dp"
-                android:layout_marginTop="10dp"
-                android:adjustViewBounds="true"
-                android:background="@drawable/my_border"
-                android:maxHeight="270dp"
-                android:maxWidth="270dp" />
+                android:orientation="vertical">
 
-                <ImageView
-                android:id="@+id/audio"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/text"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="30dp"
-                android:layout_marginTop="70dp"
-                android:src="@drawable/play_button" />
-
-                <FrameLayout
-                android:id="@+id/video_holder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/text"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="10dp"
-                android:layout_marginTop="10dp">
-
-                <!-- hard-coded dimensions, must be changed -->
-                <VideoView
-                    android:id="@+id/vid"
-                    android:layout_width="wrap_content"
-                    android:layout_height="230dp"
-                    android:layout_gravity="center_vertical|center_horizontal"
-                    android:background="@drawable/my_border" />
-
-                <ImageButton
-                    android:id="@+id/play_video_button"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/text"
+                    android:layout_marginTop="2dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|center_horizontal"
-                    android:background="@android:color/transparent"
-                    android:clickable="false"
-                    android:src="@drawable/play_video_button"
-                    android:visibility="gone" />
+                    android:layout_width="match_parent"
+                    android:ems="@integer/max_text_size"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:textSize="16sp"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginRight="6dp"
+                    android:textColor="@color/black" />
 
-            </FrameLayout>
+                <LinearLayout
+                    android:id="@+id/media_container"
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|center_horizontal">
 
-        </LinearLayout>
+                    <ImageView
+                        android:id="@+id/pic"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp"
+                        android:adjustViewBounds="true"
+                        android:background="@drawable/my_border"
+                        android:maxHeight="270dp"
+                        android:maxWidth="270dp" />
 
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/signatureCategory">
+                    <ImageView
+                        android:id="@+id/audio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/text"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/play_button" />
 
-            <ImageView
-                android:id="@+id/categoryIcon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_gravity="end"
-                />
+                    <FrameLayout
+                        android:id="@+id/video_holder"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp">
+
+                    <!-- hard-coded dimensions, must be changed -->
+                    <VideoView
+                        android:id="@+id/vid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="230dp"
+                        android:layout_gravity="center_vertical|center_horizontal"
+                        android:background="@drawable/my_border" />
+
+                    <ImageButton
+                        android:id="@+id/play_video_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|center_horizontal"
+                        android:background="@android:color/transparent"
+                        android:clickable="false"
+                        android:src="@drawable/play_video_button"
+                        android:visibility="gone" />
+
+                </FrameLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
 
 
-        </RelativeLayout>
 
-    </LinearLayout>
+    </RelativeLayout>
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/stats"
+        android:layout_below="@id/FlagContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/buttons"
-        android:orientation="vertical"
-        android:layout_below="@+id/flag_container"
-        android:layout_centerHorizontal="true"
-        android:background="@color/white">
+        android:gravity="center_horizontal|center_vertical"
+        android:layout_marginTop="2dp"
+        android:background="@color/light_grey">
 
         <Button
             android:id="@+id/wow_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/flagContainer"
             android:layout_gravity="center"
-            android:background="@drawable/my_border_3"
-            android:text="WoW!"
-            android:textSize="16sp" />
+            android:background="@drawable/my_border_2"
+            android:text="@string/wow"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/dark_grey"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
 
         <Button
-            android:id="@+id/comments_button"
+            android:id="@+id/add_comment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/wow_button"
-            android:layout_centerHorizontal="true"
-            android:background="@drawable/my_border_3"
-            android:text="comments"
-            android:textSize="16sp"
-            android:visibility="gone" />
+            android:layout_toRightOf="@+id/wow_button"
+            android:layout_toEndOf="@+id/wow_button"
+            android:layout_gravity="center"
+            android:background="@drawable/my_border_2"
+            android:text="@string/comment"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/dark_grey"/>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/grey" />
+        <ImageView
+            android:id="@+id/categoryIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_toEndOf="@id/add_comment"
+            android:layout_toRightOf="@id/add_comment"
+            android:background="@drawable/my_border_2"/>
+        <!--android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="end"-->
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/comments"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/light_grey">
 
         <android.support.v4.widget.SwipeRefreshLayout xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/comments_holder"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:minHeight="100dp"
             android:visibility="visible"
-            tools:context="com.gcw.sapienza.places.activities.MainActivity"
-            android:layout_below="@+id/flag_container" >
+            tools:context="com.gcw.sapienza.places.activities.MainActivity">
 
             <ListView
-                android:id="@+id/comments_list"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content" />
+               android:id="@+id/comments_list"
+               android:layout_width="fill_parent"
+               android:layout_height="wrap_content" />
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
     </LinearLayout>
 
-<!-- unused buttons -->
+
+    <!--  Big preview of media  -->
+    <RelativeLayout
+        android:id="@+id/frame_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/transparent_green"
+        android:clickable="true"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/focused_pic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:adjustViewBounds="true"
+            android:background="@drawable/my_border"
+            android:maxHeight="390dp"
+            android:maxWidth="390dp" />
+
+    </RelativeLayout>
+
+    <!-- unused buttons -->
+
     <Button
         android:id="@+id/lol_button"
         android:layout_width="wrap_content"
@@ -319,26 +347,17 @@
         android:visibility="gone" />
     <!-- end Of unused -->
 
-
-    <RelativeLayout
-        android:id="@+id/frame_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="@color/transparent_green"
-        android:clickable="true"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/focused_pic"
+    <!--
+        <Button
+            android:id="@+id/comments_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/wow_button"
             android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:adjustViewBounds="true"
-            android:background="@drawable/my_border"
-            android:maxHeight="390dp"
-            android:maxWidth="390dp" />
+            android:background="@drawable/my_border_3"
+            android:text="comments"
+            android:textSize="16sp"
+            android:visibility="gone" />
+-->
 
-    </RelativeLayout>
-
-</RelativeLayout>
+</LinearLayout>
