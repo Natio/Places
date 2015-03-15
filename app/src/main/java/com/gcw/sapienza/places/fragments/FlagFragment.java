@@ -101,7 +101,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private FrameLayout videoHolder;
     private ImageView audioHolder;
 
-    //temporaru managed only as a text view
+    //temporary managed only as a text view
     //private Button wowButton;
     private TextView wowButton;
     private ToggleButton newWowButton;
@@ -221,18 +221,14 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             categoryIco.setImageResource(R.drawable.food);
         }
 
-
         flagContainer = (RelativeLayout) view.findViewById(R.id.flag_container);
 
         ImageView profilePicimageView = (ImageView) view.findViewById(R.id.profile_pic);
         frameLayout = (RelativeLayout) view.findViewById(R.id.frame_layout);
 
-
         //names need to be changed in a coherent way
-
         imageHolder = (LinearLayout) view.findViewById(R.id.imageContainer);
         iw = (ImageView) view.findViewById(R.id.pic);
-
 
         playVideoButton = (ImageView) view.findViewById(R.id.play_video_button);
         videoHolder = (FrameLayout) view.findViewById(R.id.video_holder);
@@ -240,9 +236,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         audioLayout = (LinearLayout) view.findViewById(R.id.audioContainer);
         audioHolder = (ImageView) view.findViewById(R.id.audio);
-
-
-
 
         //wowButton = (Button) view.findViewById(R.id.wow_button);
         wowButton = (TextView) view.findViewById(R.id.wow_stats);
@@ -252,7 +245,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         booButton = (Button) view.findViewById(R.id.boo_button);
 
         //commentsButton = (Button) view.findViewById(R.id.comments_button);
-
         commentsHolder = (SwipeRefreshLayout) view.findViewById(R.id.comments_holder);
         commentsList = (ListView) view.findViewById(R.id.comments_list);
 
@@ -263,30 +255,22 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         //imageHolder.setOnClickListener(this);
 
         // playVideoButton.setOnClickListener(this);
-
         //wowButton.setOnClickListener(this);
         newWowButton.setOnClickListener(this);
         lolButton.setOnClickListener(this);
         booButton.setOnClickListener(this);
 
-        //TODO manage correct creation of togglebutton
+        //TO manage correct creation of togglebutton, already clicked if already wowed
         setWowButton();
-
-        //ViewGroup header = (ViewGroup) inflater.inflate(R.layout.comments_header, commentsList, false);
-        //commentsList.addHeaderView(header);
-        //commentsList.setDividerHeight(3);
 
         commentsHolder.setOnRefreshListener(this);
 
-        //commentsButton.setOnClickListener(this);
-        //addCommentButton = (Button) header.findViewById(R.id.add_comment_button);
         addCommentButton = (Button) view.findViewById(R.id.add_comment);
         addCommentButton.setOnClickListener(this);
 
         this.changeLayoutAccordingToMediaType();
 
         flagText.setText(text);
-
 
         /*
         FacebookUtils.getInstance().getFacebookUsernameFromID(this.id, new FacebookUtilCallback() {
@@ -302,7 +286,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         //final String inPlaceString = "In Place: " + (inPlace ? "✓" : "✗");
         //final String bottomLineText = date + weatherString + "\nCategory: " + category + "\n" + inPlaceString;
 
-
         // authorTextView.setText(((PlacesUser) ParseUser.getCurrentUser()).getName());
         authorTextView.setText(author);
 
@@ -310,7 +293,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         //final String weatherString = (weather == null || weather.isEmpty()) ? "" : "\nWeather: " + weather;
         //final String bottomLineText = "Category: " + category;
         final String inPlaceString = "In Place: " + (inPlace ? "✓" : "✗");
-
 
         dateTextView.setText(date+"\n"+inPlaceString);
 
@@ -478,7 +460,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         });
 
         // TODO I totally have to go over this mess (Simone)
-        // TODO Luca switching organization, statistics separated from button
+        // TODO switching organization, statistics separated from button (Luca)
         //wowButton is ONLY NOW a TEXTVIEW
 
         // if(wowButton.getText().charAt(wowButton.getText().length() - 1) != ')')
@@ -708,8 +690,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             ioe.printStackTrace();
         }
     }
-
-
 
     private void wlbFlag(int code) {
         ParseQuery<CustomParseObject> queryWLB = ParseQuery.getQuery("Wow_Lol_Boo");
@@ -1026,20 +1006,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         else booButton.setText("BOO (" + booCount + ")");
     }
 
-    /*
-    private void toggleComments() {
-        if (commentsHolder.getVisibility() == View.VISIBLE) {
-            commentsHolder.setVisibility(View.GONE);
-            commentsButton.setVisibility(View.VISIBLE);
-            wowButton.setVisibility(View.VISIBLE);
-        } else {
-            commentsHolder.setVisibility(View.VISIBLE);
-            commentsButton.setVisibility(View.GONE);
-            wowButton.setVisibility(View.GONE);
-        }
-    }
-    */
-
     private void changeLayoutAccordingToMediaType() {
         if (mediaType == MediaType.NONE) {
             // TODO managing resizing of flags with very short text
@@ -1086,7 +1052,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 @Override
                 public void done(byte[] bytes, ParseException e) {
                     if (!FlagFragment.this.isAdded()) {
-                        //orrible hack to prevent a crash when the Fragment is detached from an activity.
+                        //horrible hack to prevent a crash when the Fragment is detached from an activity.
                         return;
                     }
                     if (e == null) {
@@ -1154,7 +1120,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
     public static enum MediaType {PIC, AUDIO, VIDEO, NONE}
 
-
     //similar to wlbFlag but just to initialize the toggleButton of WOW in the correct way
     private void setWowButton() {
         ParseQuery<CustomParseObject> queryWLB = ParseQuery.getQuery("Wow_Lol_Boo");
@@ -1210,8 +1175,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                     }
                 });
     }
-
-
 
 
 }
