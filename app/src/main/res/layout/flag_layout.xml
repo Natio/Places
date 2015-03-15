@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/black"
+    android:background="@color/light_grey1"
     android:weightSum="1">
 <!-- general layout changed from relative to linear to manage weights-->
 
@@ -36,14 +36,6 @@
                     android:layout_height="60dp"
                     android:cropToPadding="false" />
 
-                <!--
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:layout_gravity="center_vertical"
-                    android:background="@drawable/my_border_2"
-                     -->
-
-
                 <LinearLayout
                     android:orientation="vertical"
                     android:id="@+id/flagInfo"
@@ -71,17 +63,8 @@
                         android:textColor="@color/grey"
                         android:textSize="14sp" />
 
-                    <!-- add another text view for the rest-->
                 </LinearLayout>
 
-
-
-                <!-- <View
-                    android:layout_width="1dp"
-                    android:layout_height="fill_parent"
-                    android:background="@color/grey"
-                    android:layout_toLeftOf="@+id/profile_pic"
-                    android:id="@+id/profile_pic_divider" /> -->
 
 
             </LinearLayout>
@@ -236,59 +219,66 @@
 
     </RelativeLayout>
 
+    <!-- upper flag - buttons -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/light_grey"/>
 
     <!--buttons-->
     <RelativeLayout
         android:id="@+id/stats"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
+        android:layout_height="35dp"
         android:background="@color/light_grey1">
 
-        <Button
+        <ToggleButton
             android:id="@+id/wow_button"
             android:layout_width="150dp"
-            android:layout_height="32dp"
-            android:background="@drawable/my_border_2"
+            android:layout_height="match_parent"
+            android:background="@drawable/button_wow_selector"
             android:text="@string/wow"
             android:textSize="14sp"
             android:textStyle="bold"
+            android:textOff="WoW!"
+            android:textOn="You WoWed."
             android:textColor="@color/dark_grey"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:drawableRight="@drawable/wowico"
-            android:drawableEnd="@drawable/wowico"/>
-        <!--
+            android:drawableEnd="@drawable/wowico"
+            />
+
         <View
             android:layout_width="1dp"
-            android:layout_height="28dp"
-            android:background="@color/grey"
-            android:layout_centerInParent="true"
-            />
-        -->
+            android:layout_height="29dp"
+            android:background="@color/light_grey"
+            android:layout_centerInParent="true"/>
+
         <Button
             android:id="@+id/add_comment"
             android:layout_width="150dp"
-            android:layout_height="32dp"
-            android:layout_toRightOf="@+id/wow_button"
-            android:layout_toEndOf="@+id/wow_button"
-            android:layout_gravity="center"
-            android:background="@drawable/my_border_2"
+            android:layout_height="match_parent"
+
+            android:background="@drawable/button_model1"
             android:text="@string/comment"
             android:textSize="14sp"
             android:textStyle="bold"
             android:textColor="@color/dark_grey"
+
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:drawableRight="@drawable/commentico"
-            android:drawableEnd="@drawable/commentico"/>
-
-
-        <!--android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_gravity="end"-->
+            android:drawableEnd="@drawable/commentico"
+            />
 
     </RelativeLayout>
+
+    <!-- divider buttons statistics -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/light_grey"/>
 
     <!--statistics-->
     <RelativeLayout
@@ -303,13 +293,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/wow_stats"
-            android:textColor="@color/dark_grey"/>
+            android:textColor="@color/dark_grey"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
 
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/categoryContainer">
+            android:id="@+id/categoryContainer"
+            android:layout_toRightOf="@id/wow_stats"
+            android:layout_toEndOf="@id/wow_stats"
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_centerVertical="true">
 
             <TextView
                 android:id="@+id/category"
@@ -327,7 +324,7 @@
                 android:layout_height="30dp"
                 android:layout_toEndOf="@id/category"
                 android:layout_toRightOf="@id/category"
-                android:background="@drawable/my_border_2"/>
+                android:background="@drawable/button_model1"/>
 
             </RelativeLayout>
 
@@ -335,6 +332,14 @@
 
 
         </RelativeLayout>
+
+    <!--divider stats-comments-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/light_grey"/>
+
+
 
     <!-- comments -->
     <LinearLayout

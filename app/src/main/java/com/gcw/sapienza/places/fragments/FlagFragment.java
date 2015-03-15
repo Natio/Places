@@ -25,6 +25,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 import android.widget.VideoView;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
@@ -100,7 +101,11 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private FrameLayout videoHolder;
     private ImageView audioHolder;
 
-    private Button wowButton;
+    //temporaru managed only as a text view
+    //private Button wowButton;
+    private TextView wowButton;
+    private ToggleButton newWowButton;
+
     private Button lolButton;
     private Button booButton;
     private Button commentsButton;
@@ -239,7 +244,10 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
 
 
-        wowButton = (Button) view.findViewById(R.id.wow_button);
+        //wowButton = (Button) view.findViewById(R.id.wow_button);
+        wowButton = (TextView) view.findViewById(R.id.wow_stats);
+        newWowButton =  (ToggleButton) view.findViewById(R.id.wow_button);
+
         lolButton = (Button) view.findViewById(R.id.lol_button);
         booButton = (Button) view.findViewById(R.id.boo_button);
 
@@ -256,9 +264,13 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         // playVideoButton.setOnClickListener(this);
 
-        wowButton.setOnClickListener(this);
+        //wowButton.setOnClickListener(this);
+        newWowButton.setOnClickListener(this);
         lolButton.setOnClickListener(this);
         booButton.setOnClickListener(this);
+
+        //TODO manage correct creation of togglebutton
+        setWowButton();
 
         //ViewGroup header = (ViewGroup) inflater.inflate(R.layout.comments_header, commentsList, false);
         //commentsList.addHeaderView(header);
@@ -465,7 +477,10 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             }
         });
 
-        // TODO I totally have to go over this mess
+        // TODO I totally have to go over this mess (Simone)
+        // TODO Luca switching organization, statistics separated from button
+        //wowButton is ONLY NOW a TEXTVIEW
+
         // if(wowButton.getText().charAt(wowButton.getText().length() - 1) != ')')
         wowButton.setText(wowButton.getText() + " (" + wowCount + ")");
 
@@ -693,6 +708,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             ioe.printStackTrace();
         }
     }
+
+
 
     private void wlbFlag(int code) {
         ParseQuery<CustomParseObject> queryWLB = ParseQuery.getQuery("Wow_Lol_Boo");
@@ -984,12 +1001,19 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
     private void updateWowButtonText(boolean wowed, int wowCount) {
         if (wowed){
-            if(wowCount==1)
+            if(wowCount==1) {
                 wowButton.setText("You WoWed this.");
-            else
-                wowButton.setText("You and other " + (wowCount-1) + " WoWed.");
+                newWowButton.setChecked(true);
+            }
+            else {
+                wowButton.setText("You and other " + (wowCount - 1) + " WoWed.");
+                newWowButton.setChecked(true);
+            }
         }
-        else wowButton.setText(""+wowCount + " WoWs");
+        else {
+            wowButton.setText("" + wowCount + " WoWs");
+            newWowButton.setChecked(false);
+        }
     }
 
     private void updateLolButtonText(boolean lold, int lolCount) {
@@ -1129,6 +1153,66 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     }
 
     public static enum MediaType {PIC, AUDIO, VIDEO, NONE}
+
+
+    //similar to wlbFlag but just to initialize the toggleButton of WOW in the correct way
+    private void setWowButton() {
+        ParseQuery<CustomParseObject> queryWLB = ParseQuery.getQuery("Wow_Lol_Boo");
+        queryWLB.whereEqualTo("fbId", userId);
+        queryWLB.whereEqualTo("flagId", flagId);
+
+        queryWLB.findInBackground(new FindCallback<CustomParseObject>() {
+            public void done(List<CustomParseObject> markers, ParseException e) {
+                if (e == null /*  && markers.size() != 0   */) {
+                    CustomParseObject obj = markers.get(0);
+
+                    boolean boolWow = obj.getBoolean("boolWow");
+                            if (!boolWow) {
+                                newWowButton.setChecked(false);
+                                /*
+                                obj.setWowBoolean(true);
+                                obj.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        updateWLBCount(WOW_CODE, true);
+                                    }
+                                });*/
+                            } else {
+                                newWowButton.setChecked(true);
+                                /*
+                                obj.setWowBoolean(false);
+                                obj.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        updateWLBCount(WOW_CODE, false);
+                                    }
+                                });*/
+                            }
+                        }/*
+                else if (markers.size() == 0) {
+                            CustomParseObject obj = new CustomParseObject();
+                            obj.setUser(ParseUser.getCurrentUser());
+                            obj.setFlagId(flagId);
+                            obj.setFacebookId(PlacesLoginUtils.getInstance().getCurrentUserId());
+                            obj.setWowBoolean(true);
+                            obj.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    updateWLBCount(WOW_CODE, true);
+                                }
+                            });
+                        } */else {
+                            Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
+
+                            wowButton.setClickable(true);
+                        }
+                    }
+                });
+    }
+
+
+
 
 }
 
