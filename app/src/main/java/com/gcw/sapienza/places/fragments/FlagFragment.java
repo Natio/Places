@@ -1,9 +1,7 @@
 package com.gcw.sapienza.places.fragments;
 
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -12,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,13 +19,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
-
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.ShareActivity;
@@ -45,7 +42,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -61,6 +57,7 @@ import java.util.StringTokenizer;
 /**
  * Created by mic_head on 02/02/15.
  */
+
 public class FlagFragment extends Fragment implements View.OnClickListener, View.OnTouchListener, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "FlagFragment";
@@ -92,10 +89,17 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private TextView dateTextView;
     private TextView flagText;
     private TextView temperatureView;
-    private RelativeLayout frameLayout;
+
     private ImageView playVideoButton;
+    private RelativeLayout flagContainer;
+    private RelativeLayout frameLayout;
+    private LinearLayout audioLayout;
+    private LinearLayout imageContainer;
+    private LinearLayout imageHolder;
+
     private FrameLayout videoHolder;
     private ImageView audioHolder;
+
     private Button wowButton;
     private Button lolButton;
     private Button booButton;
@@ -176,9 +180,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         view = inflater.inflate(R.layout.flag_layout, container, false);
         flagContent= (ScrollView) view.findViewById(R.id.FlagContent);
 
-        iw = (ImageView) view.findViewById(R.id.pic);
-        vv = (VideoView) view.findViewById(R.id.vid);
-
         flagText = (TextView) view.findViewById(R.id.text);
         authorTextView = (TextView) view.findViewById(R.id.author);
         dateTextView = (TextView) view.findViewById(R.id.dateInfo);
@@ -215,11 +216,28 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             categoryIco.setImageResource(R.drawable.food);
         }
 
+
+        flagContainer = (RelativeLayout) view.findViewById(R.id.flag_container);
+
         ImageView profilePicimageView = (ImageView) view.findViewById(R.id.profile_pic);
         frameLayout = (RelativeLayout) view.findViewById(R.id.frame_layout);
+
+
+        //names need to be changed in a coherent way
+
+        imageHolder = (LinearLayout) view.findViewById(R.id.imageContainer);
+        iw = (ImageView) view.findViewById(R.id.pic);
+
+
         playVideoButton = (ImageView) view.findViewById(R.id.play_video_button);
         videoHolder = (FrameLayout) view.findViewById(R.id.video_holder);
+        vv = (VideoView) view.findViewById(R.id.vid);
+
+        audioLayout = (LinearLayout) view.findViewById(R.id.audioContainer);
         audioHolder = (ImageView) view.findViewById(R.id.audio);
+
+
+
 
         wowButton = (Button) view.findViewById(R.id.wow_button);
         lolButton = (Button) view.findViewById(R.id.lol_button);
@@ -234,6 +252,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         vv.setOnTouchListener(this);
         audioHolder.setOnClickListener(this);
         frameLayout.setOnClickListener(this);
+        //imageHolder.setOnClickListener(this);
+
         // playVideoButton.setOnClickListener(this);
 
         wowButton.setOnClickListener(this);
@@ -646,7 +666,12 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
     private void onAudioDownloaded(String audioPath) {
         try {
-            audioHolder.setVisibility(View.VISIBLE);
+            //audioHolder.setVisibility(View.VISIBLE);
+            audioLayout.setVisibility(View.VISIBLE);
+
+            //videoHolder.setVisibility(View.GONE);
+
+
             File temp = new File(audioPath);
 
             mediaPlayer = new MediaPlayer();
@@ -977,6 +1002,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         else booButton.setText("BOO (" + booCount + ")");
     }
 
+    /*
     private void toggleComments() {
         if (commentsHolder.getVisibility() == View.VISIBLE) {
             commentsHolder.setVisibility(View.GONE);
@@ -988,19 +1014,29 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             wowButton.setVisibility(View.GONE);
         }
     }
+    */
 
     private void changeLayoutAccordingToMediaType() {
         if (mediaType == MediaType.NONE) {
-            audioHolder.setVisibility(View.GONE);
-            iw.setVisibility(View.GONE);
-            videoHolder.setVisibility(View.GONE);
+            // TODO managing resizing of flags with very short text
+            //flagContainer.getLayoutParams().height=300;
+            //audioHolder.setVisibility(View.GONE);
+            //audioLayout.setVisibility(View.GONE);
+            //imageHolder.setVisibility(View.GONE);
+            //videoHolder.setVisibility(View.GONE);
+            //iw.setVisibility(View.GONE);
         } else if (mediaType == MediaType.AUDIO) {
-            iw.setVisibility(View.GONE);
-            videoHolder.setVisibility(View.GONE);
-            audioHolder.setVisibility(View.GONE);
+            //iw.setVisibility(View.GONE);
+            audioLayout.setVisibility(View.VISIBLE);
+            //audioHolder.setVisibility(View.VISIBLE);
+            //imageHolder.setVisibility(View.GONE);
+            //videoHolder.setVisibility(View.GONE);
+
         } else if (mediaType == MediaType.PIC) {
-            audioHolder.setVisibility(View.GONE);
-            videoHolder.setVisibility(View.GONE);
+            imageHolder.setVisibility(View.VISIBLE);
+            //audioHolder.setVisibility(View.GONE);
+            //audioLayout.setVisibility(View.GONE);
+            //videoHolder.setVisibility(View.GONE);
             Picasso.with(this.getActivity()).load(this.mediaFile.getUrl()).into(this.iw);
 
             /*Bitmap bm = BitmapFactory.decodeFile(picPath);
@@ -1012,8 +1048,10 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             Picasso.with(this.getActivity()).load(this.mediaFile.getUrl()).into(focused_imageView);
 
         } else {
-            audioHolder.setVisibility(View.GONE);
-            iw.setVisibility(View.GONE);
+            videoHolder.setVisibility(View.VISIBLE);
+            //audioHolder.setVisibility(View.GONE);
+            //iw.setVisibility(View.GONE);
+            //imageHolder.setVisibility(View.GONE);
         }
 
 

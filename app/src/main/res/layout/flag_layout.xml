@@ -3,17 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/light_grey">
+    android:background="@color/light_grey"
+    android:weightSum="1">
 <!-- general layout changed from relative to linear to manage weights-->
 
     <RelativeLayout
         android:id="@+id/flag_container"
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:background="@color/white"
-        android:minHeight="200dp">
+        android:background="@color/white">
 
+        <!--title bar-->
         <RelativeLayout
             android:id="@+id/titleBar"
             android:layout_width="match_parent"
@@ -86,7 +86,6 @@
 
             </LinearLayout>
 
-
             <TextView
                 android:id="@+id/temperature"
                 android:layout_alignParentEnd="true"
@@ -122,6 +121,7 @@
 
             </RelativeLayout>
 
+        <!-- divider-->
         <View
             android:id="@+id/author_divider"
             android:layout_width="fill_parent"
@@ -132,18 +132,19 @@
             android:layout_marginLeft="6dp"
             android:layout_marginRight="6dp"/>
 
+        <!--content -->
         <ScrollView
             android:id="@+id/FlagContent"
             android:layout_below="@id/author_divider"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
+            android:layout_height="match_parent">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <!--Flag's text-->
                 <TextView
                     android:id="@+id/text"
                     android:layout_marginTop="2dp"
@@ -157,56 +158,73 @@
                     android:layout_marginRight="6dp"
                     android:textColor="@color/black" />
 
+                <!-- Media Container-->
                 <LinearLayout
                     android:id="@+id/media_container"
-                    android:orientation="horizontal"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="3dp"
                     android:gravity="center_vertical|center_horizontal">
 
-                    <ImageView
-                        android:id="@+id/pic"
-                        android:layout_width="wrap_content"
+                    <!-- linear layout for picture border-->
+                    <LinearLayout
+                        android:id="@+id/imageContainer"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginTop="10dp"
-                        android:adjustViewBounds="true"
-                        android:background="@drawable/my_border"
-                        android:maxHeight="270dp"
-                        android:maxWidth="270dp" />
+                        android:gravity="center_horizontal"
+                        android:background="@color/black"
+                        android:visibility="gone">
+                            <ImageView
+                                android:id="@+id/pic"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:adjustViewBounds="true"
+                                android:background="@drawable/my_border"
+                                android:maxHeight="270dp"
+                                android:maxWidth="270dp"/>
+                        </LinearLayout>
 
-                    <ImageView
-                        android:id="@+id/audio"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/text"
-                        android:layout_centerHorizontal="true"
-                        android:src="@drawable/play_button" />
+                    <!-- linear layout for managing player -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:id="@+id/audioContainer"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:visibility="gone">
+                        <ImageView
+                            android:id="@+id/audio"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:adjustViewBounds="true"
+                            android:src="@drawable/play_button"
+                            android:layout_gravity="center_horizontal|center_vertical"/>
+                    </LinearLayout>
 
+                    <!-- layout for managing player -->
                     <FrameLayout
                         android:id="@+id/video_holder"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginTop="10dp">
+                        android:background="@color/black"
+                        android:visibility="gone">
 
                     <!-- hard-coded dimensions, must be changed -->
-                    <VideoView
-                        android:id="@+id/vid"
-                        android:layout_width="wrap_content"
-                        android:layout_height="230dp"
-                        android:layout_gravity="center_vertical|center_horizontal"
-                        android:background="@drawable/my_border" />
+                        <VideoView
+                            android:id="@+id/vid"
+                            android:layout_width="wrap_content"
+                            android:layout_height="230dp"
+                            android:layout_gravity="center_vertical|center_horizontal"
+                            />
 
-                    <ImageButton
-                        android:id="@+id/play_video_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical|center_horizontal"
-                        android:background="@android:color/transparent"
-                        android:clickable="false"
-                        android:src="@drawable/play_video_button"
-                        android:visibility="gone" />
+                        <ImageButton
+                            android:id="@+id/play_video_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|center_horizontal"
+                            android:background="@android:color/transparent"
+                            android:clickable="false"
+                            android:src="@drawable/play_video_button"/>
 
                 </FrameLayout>
 
@@ -215,8 +233,6 @@
             </LinearLayout>
 
         </ScrollView>
-
-
 
     </RelativeLayout>
 
@@ -300,7 +316,8 @@
         android:layout_height="fill_parent"
         android:background="@color/transparent_green"
         android:clickable="true"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:layout_weight="1">
 
         <ImageView
             android:id="@+id/focused_pic"

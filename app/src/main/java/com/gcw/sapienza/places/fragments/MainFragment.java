@@ -262,7 +262,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
                 this.gMap.addMarker(new MarkerOptions()
                         .position(latLng)
-                        .title("Hidden Flag: get closer to open it")
+                        .title("**DiscoverMode**\nget closer to see the content")
                         .snippet("-1")
                         .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
                                 // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
