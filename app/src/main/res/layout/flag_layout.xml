@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/light_grey"
+    android:background="@color/black"
     android:weightSum="1">
 <!-- general layout changed from relative to linear to manage weights-->
 
@@ -236,32 +236,40 @@
 
     </RelativeLayout>
 
+
+    <!--buttons-->
     <RelativeLayout
         android:id="@+id/stats"
-        android:layout_below="@id/FlagContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal|center_vertical"
-        android:layout_marginTop="2dp"
-        android:background="@color/light_grey">
+        android:gravity="center_vertical"
+        android:background="@color/light_grey1">
 
         <Button
             android:id="@+id/wow_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_width="150dp"
+            android:layout_height="32dp"
             android:background="@drawable/my_border_2"
             android:text="@string/wow"
             android:textSize="14sp"
             android:textStyle="bold"
             android:textColor="@color/dark_grey"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"/>
-
+            android:layout_alignParentStart="true"
+            android:drawableRight="@drawable/wowico"
+            android:drawableEnd="@drawable/wowico"/>
+        <!--
+        <View
+            android:layout_width="1dp"
+            android:layout_height="28dp"
+            android:background="@color/grey"
+            android:layout_centerInParent="true"
+            />
+        -->
         <Button
             android:id="@+id/add_comment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="150dp"
+            android:layout_height="32dp"
             android:layout_toRightOf="@+id/wow_button"
             android:layout_toEndOf="@+id/wow_button"
             android:layout_gravity="center"
@@ -269,27 +277,72 @@
             android:text="@string/comment"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:textColor="@color/dark_grey"/>
+            android:textColor="@color/dark_grey"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:drawableRight="@drawable/commentico"
+            android:drawableEnd="@drawable/commentico"/>
 
-        <ImageView
-            android:id="@+id/categoryIcon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_toEndOf="@id/add_comment"
-            android:layout_toRightOf="@id/add_comment"
-            android:background="@drawable/my_border_2"/>
+
         <!--android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_gravity="end"-->
 
     </RelativeLayout>
 
+    <!--statistics-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="34dp"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal|center_vertical"
+        android:background="@color/light_grey1">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/wow_stats"
+            android:textColor="@color/dark_grey"/>
+
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/categoryContainer">
+
+            <TextView
+                android:id="@+id/category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:layout_marginBottom="1dp"
+                android:textSize="14sp"
+                android:textColor="@color/dark_grey"
+                android:text="Category: "/>
+
+             <ImageView
+                android:id="@+id/categoryIcon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_toEndOf="@id/category"
+                android:layout_toRightOf="@id/category"
+                android:background="@drawable/my_border_2"/>
+
+            </RelativeLayout>
+
+
+
+
+        </RelativeLayout>
+
+    <!-- comments -->
     <LinearLayout
         android:id="@+id/comments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/light_grey">
+        android:background="@color/light_grey1">
 
         <android.support.v4.widget.SwipeRefreshLayout xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/comments_holder"
