@@ -240,6 +240,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         //wowButton = (Button) view.findViewById(R.id.wow_button);
         wowButton = (TextView) view.findViewById(R.id.wow_stats);
         newWowButton =  (ToggleButton) view.findViewById(R.id.wow_button);
+        //to avoid capital letters in lollipop
+        newWowButton.setTransformationMethod(null);
 
         lolButton = (Button) view.findViewById(R.id.lol_button);
         booButton = (Button) view.findViewById(R.id.boo_button);
@@ -267,6 +269,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         addCommentButton = (Button) view.findViewById(R.id.add_comment);
         addCommentButton.setOnClickListener(this);
+        //to avoid capital letters in lollipop
+        addCommentButton.setTransformationMethod(null);
 
         this.changeLayoutAccordingToMediaType();
 

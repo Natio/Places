@@ -226,53 +226,78 @@
         android:background="@color/light_grey"/>
 
     <!--buttons-->
-    <RelativeLayout
-        android:id="@+id/stats"
+    <LinearLayout
+        android:id="@+id/buttons"
         android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:weightSum="1"
         android:layout_height="35dp"
-        android:background="@color/light_grey1">
+        android:gravity="center_horizontal|center_vertical">
 
-        <ToggleButton
-            android:id="@+id/wow_button"
-            android:layout_width="150dp"
+
+        <LinearLayout
+            android:id="@+id/wow_container"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:orientation="horizontal"
             android:layout_height="match_parent"
-            android:background="@drawable/button_wow_selector"
-            android:text="@string/wow"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textOff="WoW!"
-            android:textOn="You WoWed."
-            android:textColor="@color/dark_grey"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:drawableRight="@drawable/wowico"
-            android:drawableEnd="@drawable/wowico"
-            />
+            android:gravity="center_horizontal|center_vertical">
+            <ToggleButton
+                android:id="@+id/wow_button"
+                android:layout_width="130dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/button_wow_selector"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textOff="@string/wow_off"
+                android:textOn="@string/wow_on"
+                android:textColor="@drawable/button_wow_selector"
+                android:drawableRight="@drawable/wowico"
+                android:drawableEnd="@drawable/wowico"/>
+        </LinearLayout>
 
         <View
+            android:id="@+id/divider1button"
             android:layout_width="1dp"
             android:layout_height="29dp"
-            android:background="@color/light_grey"
-            android:layout_centerInParent="true"/>
+            android:background="@color/light_grey"/>
+        <!--
+        android:layout_toEndOf="@+id/wow_button"
+        android:layout_toRightOf="@+id/wow_button"
+        -->
+
+        <LinearLayout
+            android:id="@+id/comment_container"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:orientation="horizontal"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal|center_vertical">
 
         <Button
             android:id="@+id/add_comment"
-            android:layout_width="150dp"
+            android:layout_width="130dp"
             android:layout_height="match_parent"
-
-            android:background="@drawable/button_model1"
+            android:background="@drawable/button_comment_selector"
             android:text="@string/comment"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:textColor="@color/dark_grey"
-
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
+            android:textColor="@drawable/button_comment_selector"
             android:drawableRight="@drawable/commentico"
-            android:drawableEnd="@drawable/commentico"
-            />
+            android:drawableEnd="@drawable/commentico"/>
+        <!--
+        android:background="@drawable/button_model1"
 
-    </RelativeLayout>
+        android:layout_toEndOf="@+id/divider1button"
+        android:layout_toRightOf="@+id/divider1button"
+        android:layout_marginLeft="2dp"
+        android:layout_marginStart="2dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        -->
+            </LinearLayout>
+
+    </LinearLayout>
 
     <!-- divider buttons statistics -->
     <View
@@ -281,49 +306,42 @@
         android:background="@color/light_grey"/>
 
     <!--statistics-->
-        <RelativeLayout
+    <RelativeLayout
 
+            android:id="@+id/stats"
             android:layout_width="match_parent"
             android:layout_height="32dp"
-            android:id="@+id/categoryContainer"
-            android:gravity="center_vertical"
-            android:layout_marginLeft="5dp"
-            android:layout_marginStart="5dp">
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/wow_stats"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1dp"
-                android:layout_marginBottom="1dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginLeft="2dp"
                 android:textSize="14sp"
                 android:textColor="@color/dark_grey"
                 />
-            <RelativeLayout
+            <TextView
+                android:id="@+id/category"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true">
-                <TextView
-                    android:id="@+id/category"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="1dp"
-                    android:layout_marginBottom="1dp"
-                    android:layout_marginLeft="8dp"
-                    android:textSize="14sp"
-                    android:textColor="@color/dark_grey"
-                    android:text="Category: "/>
-
-                <ImageView
-                    android:id="@+id/categoryIcon"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_toEndOf="@id/category"
-                    android:layout_toRightOf="@id/category"
-                    android:background="@drawable/button_model1"/>
-                </RelativeLayout>
-
+                android:textSize="14sp"
+                android:layout_toRightOf="@id/wow_stats"
+                android:layout_toEndOf="@id/wow_stats"
+                android:layout_marginLeft="6dp"
+                android:layout_marginStart="6dp"
+                android:textColor="@color/dark_grey"
+                android:text="@string/category"/>
+            <ImageView
+                android:id="@+id/categoryIcon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_toEndOf="@id/category"
+                android:layout_toRightOf="@id/category"
+                android:layout_marginLeft="3dp"
+                android:layout_marginStart="3dp"
+                android:background="@drawable/button_model1"/>
 
         </RelativeLayout>
 
@@ -332,7 +350,6 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/light_grey"/>
-
 
 
     <!-- comments -->
