@@ -329,18 +329,22 @@
                 android:textSize="14sp"
                 android:layout_toRightOf="@id/wow_stats"
                 android:layout_toEndOf="@id/wow_stats"
-                android:layout_marginLeft="6dp"
-                android:layout_marginStart="6dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
                 android:textColor="@color/dark_grey"
                 android:text="@string/category"/>
+
+
             <ImageView
                 android:id="@+id/categoryIcon"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_toEndOf="@id/category"
                 android:layout_toRightOf="@id/category"
-                android:layout_marginLeft="3dp"
+
                 android:layout_marginStart="3dp"
+                android:layout_marginLeft="3dp"
+
                 android:background="@drawable/button_model1"/>
 
         </RelativeLayout>
