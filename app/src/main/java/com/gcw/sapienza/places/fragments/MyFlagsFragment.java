@@ -56,22 +56,16 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
     private static final String TAG = "MyFlagsFragment";
 
     private View view;
-
     private GoogleMap gMap;
-
     private BroadcastReceiver receiver;
-
     private RelativeLayout progressBarHolder;
+    private MSwipeRefreshLayout srl;
+    private FragmentActivity myContext;
+    private List<Flag> flags;
     private TextView progressTextView;
-
     private DrawerLayout drawerLayout;
     private LinearLayout homeHolder;
     private FrameLayout fragHolder;
-    private MSwipeRefreshLayout srl;
-
-    private FragmentActivity myContext;
-
-    private List<Flag> flags;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -204,8 +198,8 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
 
         this.gMap = googleMap;
 
-        this.gMap.getUiSettings().setScrollGesturesEnabled(false);
-        this.gMap.getUiSettings().setZoomGesturesEnabled(false);
+        this.gMap.getUiSettings().setScrollGesturesEnabled(true);
+        this.gMap.getUiSettings().setZoomGesturesEnabled(true);
         this.gMap.setOnMarkerClickListener(this);
         this.gMap.setMyLocationEnabled(true);
 

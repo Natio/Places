@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.facebook.HttpMethod;
 import com.facebook.Request;
 import com.facebook.Response;
@@ -14,16 +13,11 @@ import com.facebook.Session;
 import com.facebook.model.GraphObject;
 import com.facebook.model.GraphUser;
 import com.gcw.sapienza.places.PlacesApplication;
-import com.gcw.sapienza.places.models.PlacesUser;
 import com.parse.ParseFacebookUtils;
-import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +30,9 @@ public final class FacebookUtils {
     private static final String TAG = "FacebookUtils";
     private static final FacebookUtils shared_instance = new FacebookUtils();
     private final HashMap<String, HashSet<PlacesUtilCallback>> scheduledOperationsQueue = new HashMap<>();
+
+    //attempt to solve slow download of profile picture
+    public static String picturePath= "http://1.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=256";
 
     private FacebookUtils() {
     }
@@ -299,6 +296,7 @@ public final class FacebookUtils {
      * @param imageView ImageView where to load picture
      */
     public void loadProfilePicIntoImageView(final String user_id, final ImageView imageView, final PlacesLoginUtils.PicSize size) {
+
         this.getFbProfilePictureURL(user_id, size, new PlacesUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {
@@ -319,12 +317,20 @@ public final class FacebookUtils {
      * @param cbk     callback parameter. MUST not be null. Picture URL will be given as a parameter of onResult method
      */
     public void getFbProfilePictureURL(final String user_id, final PlacesLoginUtils.PicSize size, final PlacesUtilCallback cbk) {
-        String pic_url = PlacesLoginUtils.getInstance().getProfilePictureURL(user_id, size);
 
+        picturePath=PlacesLoginUtils.getInstance().getProfilePictureURL(user_id, size);
+        if (picturePath != null) {
+            cbk.onResult(picturePath, null);
+            return;
+        }
+        /*
+        String pic_url = PlacesLoginUtils.getInstance().getProfilePictureURL(user_id, size);
         if (pic_url != null) {
             cbk.onResult(pic_url, null);
             return;
         }
+        */
+
 
         final String current_key = "PIC_" + size + '_' + user_id;
         synchronized (this.scheduledOperationsQueue) {
