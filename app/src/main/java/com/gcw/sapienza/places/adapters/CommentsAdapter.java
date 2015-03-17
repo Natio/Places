@@ -14,12 +14,10 @@ import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.fragments.ProfileFragment;
 import com.gcw.sapienza.places.models.Comment;
-import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -65,6 +63,9 @@ public class CommentsAdapter extends ArrayAdapter<String> {
 
                     authorView.setText(comment.getUsername());
                     PlacesLoginUtils.getInstance().addEntryToUserIdMap(comment.getUserId(), comment.getUsername());
+
+                    //since "getFbProfilePictureURL" could last too much
+                    //i'm putting an initial std picture in authorImageView
                     PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(comment.getUserId(), authorImageView, PlacesLoginUtils.PicSize.SMALL);
                     commentTextView.setText(comment.getCommentText());
 
