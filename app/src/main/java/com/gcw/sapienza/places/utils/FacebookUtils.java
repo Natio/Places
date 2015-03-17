@@ -32,7 +32,7 @@ public final class FacebookUtils {
     private final HashMap<String, HashSet<PlacesUtilCallback>> scheduledOperationsQueue = new HashMap<>();
 
     //attempt to solve slow download of profile picture
-    public static String picturePath= "http://1.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=256";
+    public static final  String DEFAULT_AVATAR_URL = "http://1.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=256";
 
     private FacebookUtils() {
     }
@@ -301,7 +301,12 @@ public final class FacebookUtils {
             @Override
             public void onResult(String result, Exception e) {
                 if (e == null) {
-                    Picasso.with(PlacesApplication.getPlacesAppContext()).load(result).into(imageView);
+                    if(result.trim().length() == 0){
+                        Picasso.with(PlacesApplication.getPlacesAppContext()).load(DEFAULT_AVATAR_URL).into(imageView);
+                    }
+                    else{
+                        Picasso.with(PlacesApplication.getPlacesAppContext()).load(result).into(imageView);
+                    }
                 } else {
                     Log.d(TAG, e.getMessage());
                 }
@@ -318,18 +323,12 @@ public final class FacebookUtils {
      */
     public void getFbProfilePictureURL(final String user_id, final PlacesLoginUtils.PicSize size, final PlacesUtilCallback cbk) {
 
-        picturePath=PlacesLoginUtils.getInstance().getProfilePictureURL(user_id, size);
-        if (picturePath != null) {
-            cbk.onResult(picturePath, null);
-            return;
-        }
-        /*
+
         String pic_url = PlacesLoginUtils.getInstance().getProfilePictureURL(user_id, size);
         if (pic_url != null) {
             cbk.onResult(pic_url, null);
             return;
         }
-        */
 
 
         final String current_key = "PIC_" + size + '_' + user_id;
