@@ -5,7 +5,6 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
@@ -25,16 +24,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.fragments.CategoriesFragment;
-import com.gcw.sapienza.places.fragments.FiltersFragment;
 import com.gcw.sapienza.places.fragments.MainFragment;
 import com.gcw.sapienza.places.fragments.MyFlagsFragment;
 import com.gcw.sapienza.places.fragments.ProfileFragment;
@@ -135,6 +131,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.green)));
 
 
+        //animate().translationY(2);
+        //applied to a view will allow the animation of google map app up and down
 
         //this.getSupportActionBar().getCustomView().findViewById(R.id.filters).
 
@@ -616,8 +614,3 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         GPlusUtils.getInstance().getGoogleApiClient().connect();
     }
 }
-
-
-
-
-

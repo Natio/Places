@@ -14,7 +14,6 @@
     import android.view.MotionEvent;
     import android.view.View;
     import android.view.ViewGroup;
-    import android.widget.ArrayAdapter;
     import android.widget.Button;
     import android.widget.EditText;
     import android.widget.FrameLayout;
@@ -66,7 +65,7 @@
         private static final int WOW_CODE = 0;
         private static final int LOL_CODE = 1;
         private static final int BOO_CODE = 2;
-
+                
         protected String userId;
         private String text;
         private String id;
@@ -102,9 +101,7 @@
         private FrameLayout videoHolder;
         private ImageView audioHolder;
 
-        //temporary managed only as a text view
-        //private Button wowButton;
-        private TextView wowButton;
+        private TextView wowStatText;
         private ToggleButton newWowButton;
 
         private Button lolButton;
@@ -238,8 +235,7 @@
             audioLayout = (LinearLayout) view.findViewById(R.id.audioContainer);
             audioHolder = (ImageView) view.findViewById(R.id.audio);
 
-            //wowButton = (Button) view.findViewById(R.id.wow_button);
-            wowButton = (TextView) view.findViewById(R.id.wow_stats);
+            wowStatText = (TextView) view.findViewById(R.id.wow_stats);
             newWowButton =  (ToggleButton) view.findViewById(R.id.wow_button);
             //to avoid capital letters in lollipop
             newWowButton.setTransformationMethod(null);
@@ -255,26 +251,19 @@
             vv.setOnTouchListener(this);
             audioHolder.setOnClickListener(this);
             frameLayout.setOnClickListener(this);
-            //imageHolder.setOnClickListener(this);
 
-            // playVideoButton.setOnClickListener(this);
-            //wowButton.setOnClickListener(this);
             newWowButton.setOnClickListener(this);
+            setWowButton(); // to manage pressed effect when opening flag
             lolButton.setOnClickListener(this);
             booButton.setOnClickListener(this);
 
-            //TO manage correct creation of togglebutton, already clicked if already wowed
-            setWowButton();
-
             commentsHolder.setOnRefreshListener(this);
-
             addCommentButton = (Button) view.findViewById(R.id.add_comment);
             addCommentButton.setOnClickListener(this);
             //to avoid capital letters in lollipop
             addCommentButton.setTransformationMethod(null);
 
             this.changeLayoutAccordingToMediaType();
-
             flagText.setText(text);
 
             /*
@@ -305,6 +294,7 @@
 
             view.setFocusableInTouchMode(true);
             view.requestFocus();
+            //TODO can the following be deleted?
             /*
             view.setOnKeyListener(new View.OnKeyListener() {
                 @Override
@@ -318,7 +308,7 @@
                         } else if (commentsHolder.getVisibility() == View.VISIBLE) {
                             commentsHolder.setVisibility(View.GONE);
                             commentsButton.setVisibility(View.VISIBLE);
-                            wowButton.setVisibility(View.VISIBLE);
+                            wowStatText.setVisibility(View.VISIBLE);
 
                             return true;
                         }
@@ -327,9 +317,7 @@
                 }
             });
             */
-
             updateWowInfo();
-
             return view;
         }
 
@@ -356,7 +344,7 @@
                 }
             });
 
-            wowButton.setText(wowButton.getText() + " (" + wowCount + ")");
+            wowStatText.setText(wowStatText.getText() + " (" + wowCount + ")");
             lolButton.setText(lolButton.getText() + " (" + lolCount + ")");
             booButton.setText(booButton.getText() + " (" + booCount + ")");
 
@@ -371,7 +359,7 @@
                 {
                     if (e == null && markers.size() != 0)
                     {
-                        wowButton.setText("You wow this." + " (" + wowCount + ")");
+                        wowStatText.setText("You wow this." + " (" + wowCount + ")");
                     }
                 }
             });
@@ -434,8 +422,6 @@
             else if (v.getId() == R.id.wow_button) wlbFlag(WOW_CODE);
             else if (v.getId() == R.id.lol_button) wlbFlag(LOL_CODE);
             else if (v.getId() == R.id.boo_button) wlbFlag(BOO_CODE);
-            //else if (v.getId() == R.id.comments_button) toggleComments();
-            //else if (v.getId() == R.id.add_comment_button) insertComment();
             else if (v.getId() == R.id.add_comment) insertComment();
         }
 
@@ -444,7 +430,6 @@
             if (v.getId() == vv.getId() && event.getAction() == MotionEvent.ACTION_DOWN) {
                 return playVideo();
             }
-
             return false;
         }
 
@@ -464,12 +449,7 @@
                 }
             });
 
-            // TODO I totally have to go over this mess (Simone)
-            // TODO switching organization, statistics separated from button (Luca)
-            //wowButton is ONLY NOW a TEXTVIEW
-
-            // if(wowButton.getText().charAt(wowButton.getText().length() - 1) != ')')
-            wowButton.setText(wowButton.getText() + " (" + wowCount + ")");
+            wowStatText.setText(wowStatText.getText() + " (" + wowCount + ")");
 
             lolButton.setText(lolButton.getText() + " (" + lolCount + ")");
             booButton.setText(booButton.getText() + " (" + booCount + ")");
@@ -482,7 +462,12 @@
             queryW.findInBackground(new FindCallback<CustomParseObject>() {
                 public void done(List<CustomParseObject> markers, ParseException e) {
                     if (e == null && markers.size() != 0) {
-                        wowButton.setText("you WoWed this." + " (" + wowCount + ")");
+                        if(wowCount==1)
+                            wowStatText.setText("you WoWed this.");
+                        else if(wowCount==2)
+                            wowStatText.setText("you and another placer WoWed this.");
+                        else
+                            wowStatText.setText("you and other "+ wowCount+" WoWed this.");
                     }
                 }
             });
@@ -524,47 +509,12 @@
                 @Override
                 public void done(List<Comment> result, ParseException e) {
 
-                    /*
-                    if (result == null || result.size() == 0) {
+                    if (result == null || result.size() == 0){
                         ArrayList<String> commentsNotFoundText = new ArrayList();
-                        commentsNotFoundText.add("Be the first to comment this flag!");
-                        commentsAdapter = new CommentsAdapter(getActivity(), R.layout.comment_item_layout, commentsNotFoundText);
-                    } else {
-                        comments = new ArrayList<Comment>();
-                        comments.addAll(result);
-
-                        ArrayList<String> texts = new ArrayList<String>();
-                        for (int i = 0; i < comments.size(); i++) {
-                            Comment comment = comments.get(i);
-                            String cmnt = comment.getCommentText() + "\n\n" + comment.getUsername() + "\n";
-                            //comment.
-
-                            Date date = comment.getTimestamp();
-                            //DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
-                            //new format attempt
-                            DateFormat df = new SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault());
-                            String sDate = df.format(date);
-
-                            cmnt += sDate;
-
-                            texts.add(cmnt);
-                        }
-
-                        // TODO change adapter's layout + Author PICTURE
-                        commentsAdapter = new CommentsAdapter(getActivity(), R.layout.comment_item_layout, texts);
-                    }
-                    */
-
-                    if (result == null || result.size() == 0)
-                    {
-                        ArrayList<String> commentsNotFoundText = new ArrayList();
-                        // commentsNotFoundText.add("Be the first to comment this flag!");
                         commentsAdapter = new CommentsAdapter(getActivity(), R.layout.comment_item_layout, commentsNotFoundText);
                     }
-                    else
-                    {
+                    else{
                         comments = new ArrayList<String>();
-
                         for(Comment comment: result)
                             comments.add(comment.getObjectId());
 
@@ -722,7 +672,7 @@
 
             switch (code) {
                 case WOW_CODE:
-                    wowButton.setClickable(false);
+                    //wowStatText.setClickable(false);
 
                     queryWLB.findInBackground(new FindCallback<CustomParseObject>() {
                         public void done(List<CustomParseObject> markers, ParseException e) {
@@ -764,7 +714,7 @@
                                 Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
                                 Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
 
-                                wowButton.setClickable(true);
+                                //wowStatText.setClickable(true);
                             }
                         }
                     });
@@ -893,7 +843,7 @@
                                         public void done(ParseException e) {
                                             updateWowButtonText(true, wowCount + 1);
 
-                                            wowButton.setClickable(true);
+                                            //wowStatText.setClickable(true);
                                         }
                                     });
                                 } else {
@@ -904,7 +854,7 @@
                                         public void done(ParseException e) {
                                             updateWowButtonText(false, wowCount - 1);
 
-                                            wowButton.setClickable(true);
+                                            //wowStatText.setClickable(true);
                                         }
                                     });
                                 }
@@ -912,7 +862,7 @@
                                 Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
                                 Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
 
-                                wowButton.setClickable(true);
+                                //wowStatText.setClickable(true);
                             }
                         }
                     });
@@ -954,7 +904,7 @@
                                 Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
                                 Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
 
-                                wowButton.setClickable(true);
+                                //wowStatText.setClickable(true);
                             }
                         }
                     });
@@ -1006,16 +956,16 @@
         private void updateWowButtonText(boolean wowed, int wowCount) {
             if (wowed){
                 if(wowCount==1) {
-                    wowButton.setText("You WoWed this.");
+                    wowStatText.setText("You WoWed this.");
                     newWowButton.setChecked(true);
                 }
                 else {
-                    wowButton.setText("You and other " + (wowCount - 1) + " WoWed.");
+                    wowStatText.setText("You and other " + (wowCount - 1) + " WoWed.");
                     newWowButton.setChecked(true);
                 }
             }
             else {
-                wowButton.setText("" + wowCount + " WoWs");
+                wowStatText.setText("" + wowCount + " WoWs");
                 newWowButton.setChecked(false);
             }
         }
@@ -1033,42 +983,17 @@
         private void changeLayoutAccordingToMediaType() {
             if (mediaType == MediaType.NONE) {
                 // TODO managing resizing of flags with very short text
-                //flagContainer.getLayoutParams().height=300;
-                //audioHolder.setVisibility(View.GONE);
-                //audioLayout.setVisibility(View.GONE);
-                //imageHolder.setVisibility(View.GONE);
-                //videoHolder.setVisibility(View.GONE);
-                //iw.setVisibility(View.GONE);
-            } else if (mediaType == MediaType.AUDIO) {
-                //iw.setVisibility(View.GONE);
-                audioLayout.setVisibility(View.VISIBLE);
-                //audioHolder.setVisibility(View.VISIBLE);
-                //imageHolder.setVisibility(View.GONE);
-                //videoHolder.setVisibility(View.GONE);
 
+            } else if (mediaType == MediaType.AUDIO) {
+                audioLayout.setVisibility(View.VISIBLE);
             } else if (mediaType == MediaType.PIC) {
                 imageHolder.setVisibility(View.VISIBLE);
-                //audioHolder.setVisibility(View.GONE);
-                //audioLayout.setVisibility(View.GONE);
-                //videoHolder.setVisibility(View.GONE);
                 Picasso.with(this.getActivity()).load(this.mediaFile.getUrl()).into(this.iw);
-
-                /*Bitmap bm = BitmapFactory.decodeFile(picPath);
-                iw.setImageBitmap(bm);
-                focused_iw = (ImageView)view.findViewById(R.id.focused_pic);
-                focused_iw.setImageBitmap(bm);*/
-
                 ImageView focused_imageView = (ImageView) this.view.findViewById(R.id.focused_pic);
                 Picasso.with(this.getActivity()).load(this.mediaFile.getUrl()).into(focused_imageView);
-
             } else {
                 videoHolder.setVisibility(View.VISIBLE);
-                //audioHolder.setVisibility(View.GONE);
-                //iw.setVisibility(View.GONE);
-                //imageHolder.setVisibility(View.GONE);
             }
-
-
             if (this.mediaType != MediaType.NONE && this.mediaType != MediaType.PIC &&  this.mediaFile != null) {
                 System.gc();
 
@@ -1107,8 +1032,6 @@
                     }
                 });
             }
-
-
         }
 
         private File tempFileForMediaType(MediaType type) {
@@ -1202,7 +1125,7 @@
                         Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
                         newWowButton.setChecked(false);
-                        //wowButton.setClickable(true);
+                        //wowStatText.setClickable(true);
                     }
                 }
 

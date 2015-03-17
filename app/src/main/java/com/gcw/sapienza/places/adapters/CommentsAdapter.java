@@ -1,5 +1,6 @@
 package com.gcw.sapienza.places.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,12 +14,10 @@ import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.fragments.ProfileFragment;
 import com.gcw.sapienza.places.models.Comment;
-import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -31,31 +30,22 @@ public class CommentsAdapter extends ArrayAdapter<String> {
 
     private static final String TAG = "CommentsAdapter";
 
-    public CommentsAdapter(Context context, int resource, List<String> comments) {
+    private Activity context;
+
+    public CommentsAdapter(Activity context, int resource, List<String> comments) {
         super(context, resource, comments);
+
+        this.context = context;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        View v = convertView;
-
-        if (v == null) {
-
-            v = LayoutInflater.
+        final View v = LayoutInflater.
                     from(parent.getContext()).
                     inflate(R.layout.comment_item_layout, parent, false);
 
-        }
-
         final String commentId = getItem(position);
-
-        v.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((MainActivity) getContext()).switchToOtherFrag(new ProfileFragment().newInstance(commentId));
-            }
-        });
 
         final TextView authorView = (TextView) v.findViewById(R.id.author);
         final ImageView authorImageView = (ImageView) v.findViewById(R.id.comment_profile_pic);
@@ -66,23 +56,37 @@ public class CommentsAdapter extends ArrayAdapter<String> {
         queryUsers.whereEqualTo("objectId", commentId);
         queryUsers.getFirstInBackground(new GetCallback<Comment>() {
             @Override
-            public void done(Comment comment, ParseException e) {
+            public void done(final Comment comment, ParseException e)
+            {
                 if (e == null)
                 {
                     // TODO Check whether the owner of the comment logged in with fb or g+
 
                     authorView.setText(comment.getUsername());
                     PlacesLoginUtils.getInstance().addEntryToUserIdMap(comment.getUserId(), comment.getUsername());
+
+                    //since "getFbProfilePictureURL" could last too much
+                    //i'm putting an initial std picture in authorImageView
                     PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(comment.getUserId(), authorImageView, PlacesLoginUtils.PicSize.SMALL);
                     commentTextView.setText(comment.getCommentText());
 
                     DateFormat df = new SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault());
                     String date = df.format(comment.getTimestamp());
                     commentDate.setText(date);
-                } else {
+
+                    v.setOnClickListener(new View.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(View v)
+                        {
+                            ((MainActivity)context).switchToOtherFrag(ProfileFragment.newInstance(comment.getUserId()));
+                        }
+                    });
+                }
+                else
+                {
                     Log.e(TAG, e.getMessage());
                     Toast.makeText(getContext(), "An error occurred while retrieving comments' data", Toast.LENGTH_SHORT).show();
-
                 }
             }
         });

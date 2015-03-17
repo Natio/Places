@@ -234,7 +234,6 @@
         android:layout_height="35dp"
         android:gravity="center_horizontal|center_vertical">
 
-
         <LinearLayout
             android:id="@+id/wow_container"
             android:layout_width="0dp"
@@ -261,10 +260,6 @@
             android:layout_width="1dp"
             android:layout_height="29dp"
             android:background="@color/light_grey"/>
-        <!--
-        android:layout_toEndOf="@+id/wow_button"
-        android:layout_toRightOf="@+id/wow_button"
-        -->
 
         <LinearLayout
             android:id="@+id/comment_container"
@@ -274,28 +269,18 @@
             android:layout_height="match_parent"
             android:gravity="center_horizontal|center_vertical">
 
-        <Button
-            android:id="@+id/add_comment"
-            android:layout_width="130dp"
-            android:layout_height="match_parent"
-            android:background="@drawable/button_comment_selector"
-            android:text="@string/comment"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="@drawable/button_comment_selector"
-            android:drawableRight="@drawable/commentico"
-            android:drawableEnd="@drawable/commentico"/>
-        <!--
-        android:background="@drawable/button_model1"
-
-        android:layout_toEndOf="@+id/divider1button"
-        android:layout_toRightOf="@+id/divider1button"
-        android:layout_marginLeft="2dp"
-        android:layout_marginStart="2dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        -->
-            </LinearLayout>
+            <Button
+                android:id="@+id/add_comment"
+                android:layout_width="130dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/button_comment_selector"
+                android:text="@string/comment"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@drawable/button_comment_selector"
+                android:drawableRight="@drawable/commentico"
+                android:drawableEnd="@drawable/commentico"/>
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -315,7 +300,7 @@
 
             <TextView
                 android:id="@+id/wow_stats"
-                android:layout_width="wrap_content"
+                android:layout_width="180dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
                 android:layout_marginLeft="2dp"
