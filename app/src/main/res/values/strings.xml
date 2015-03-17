@@ -35,6 +35,12 @@
     <string name="wow_on">You WoWed.</string>
     <string name="wow_off">WoW!</string>
 
+    <string name="followers">Placers followed</string>
+
+    <string name="stats">Statistics</string>
+    <string name="flagcat">Flags per category</string>
+
+
     <string name="api_key">AIzaSyALZgcm_3X4_KmZg8ax6MmDLGFzZxE6c7Y</string>
 
 </resources>

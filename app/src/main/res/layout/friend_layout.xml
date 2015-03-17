@@ -5,21 +5,22 @@
 
     <RelativeLayout
         android:id="@+id/friends_relativeLayout"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:weightSum="1">
 
         <ImageView
             android:id="@+id/friend_card_profile_pic"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:layout_marginBottom="3dp"
             android:layout_marginLeft="3dp"
+            android:layout_marginStart="3dp"
             android:layout_marginTop="3dp"
-            android:background="@color/transparent_green"
             android:padding="2dp" />
 
         <TextView
@@ -27,9 +28,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="3dp"
-            android:layout_marginStart="3dp"
-            android:layout_marginTop="5dp"
             android:layout_toEndOf="@id/friend_card_profile_pic"
             android:layout_toRightOf="@id/friend_card_profile_pic"
             android:ellipsize="end"
@@ -37,8 +35,7 @@
             android:gravity="center"
             android:minLines="1"
             android:text=""
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/transparent_green"
-            android:textStyle="bold" />
+            android:textSize="16sp"
+            android:textColor="@color/green"/>
     </RelativeLayout>
 </RelativeLayout>
