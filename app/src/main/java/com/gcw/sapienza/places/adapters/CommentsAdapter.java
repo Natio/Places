@@ -56,7 +56,8 @@ public class CommentsAdapter extends ArrayAdapter<String> {
         queryUsers.whereEqualTo("objectId", commentId);
         queryUsers.getFirstInBackground(new GetCallback<Comment>() {
             @Override
-            public void done(Comment comment, ParseException e) {
+            public void done(final Comment comment, ParseException e)
+            {
                 if (e == null)
                 {
                     // TODO Check whether the owner of the comment logged in with fb or g+
@@ -73,17 +74,19 @@ public class CommentsAdapter extends ArrayAdapter<String> {
                     String date = df.format(comment.getTimestamp());
                     commentDate.setText(date);
 
-                    v.setOnClickListener(new View.OnClickListener() {
+                    v.setOnClickListener(new View.OnClickListener()
+                    {
                         @Override
                         public void onClick(View v)
                         {
-                            ((MainActivity)context).switchToOtherFrag(ProfileFragment.newInstance(PlacesLoginUtils.getInstance().getCurrentUserId()));
+                            ((MainActivity)context).switchToOtherFrag(ProfileFragment.newInstance(comment.getUserId()));
                         }
                     });
-                } else {
+                }
+                else
+                {
                     Log.e(TAG, e.getMessage());
                     Toast.makeText(getContext(), "An error occurred while retrieving comments' data", Toast.LENGTH_SHORT).show();
-
                 }
             }
         });
