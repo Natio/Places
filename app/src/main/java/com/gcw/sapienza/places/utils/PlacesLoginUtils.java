@@ -8,7 +8,6 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.activities.PlacesLoginActivity;
 import com.gcw.sapienza.places.models.PlacesUser;

@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
+import com.gcw.sapienza.places.adapters.FlagsAdapter;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.services.LocationService;
@@ -44,6 +45,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,6 +58,8 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
     private View view;
 
     private GoogleMap gMap;
+
+    private List<Marker> markers;
 
     private BroadcastReceiver receiver;
     private MSwipeRefreshLayout srl;
@@ -202,6 +206,9 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
     }
 
     private void updateMarkersOnMap() {
+
+        markers = new ArrayList<>();
+
         Log.d(TAG, "Updating markers on map...");
 
         List<Flag> flags = PlacesApplication.getInstance().getFlags();
@@ -230,7 +237,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                                 (int) (marker.getHeight() * 0.25f),
                                 false);
 
-                this.gMap.addMarker(new MarkerOptions()
+                Marker newMarker = this.gMap.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title(text)
                         .snippet(index + "")
@@ -238,6 +245,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                                 // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
                                 //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
                         .alpha(0.85f));
+                this.markers.add(newMarker);
                 index++;
             }
 
@@ -305,7 +313,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                         @Override
                         public void onCameraChange(CameraPosition cameraPosition) {
                             gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
-                            gMap.setOnCameraChangeListener(null);
+//                            gMap.setOnCameraChangeListener(null);
                         }
                     });
                 }
@@ -322,8 +330,9 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
     }
 
     @Override
-    public boolean onMarkerClick(Marker marker) {
-        int index = Integer.parseInt(marker.getSnippet());
+    public boolean onMarkerClick(Marker selectedMarker) {
+
+        int index = Integer.parseInt(selectedMarker.getSnippet());
 
         if(index == -1) return false;
 
@@ -335,8 +344,13 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
             if (frags.get(i) instanceof FlagsListFragment) {
                 FlagsListFragment flf = ((FlagsListFragment) frags.get(i));
                 flf.getRV().smoothScrollToPosition(index);
+                int flagCardsCount = flf.getRV().getAdapter().getItemCount();
+//                flf.getRV().getChildAt(index).setBackgroundColor(Color.RED);
                 // TODO item highlight on flag clicked on map?
-
+                for(Marker marker: this.markers){
+                    marker.setAlpha(0.85f);
+                }
+                selectedMarker.setAlpha(1f);
                 break;
             }
         }
