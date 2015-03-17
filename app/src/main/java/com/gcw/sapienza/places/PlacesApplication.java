@@ -271,10 +271,56 @@ public class PlacesApplication extends Application {
         }
     }
 
-
-
-
 /*
+
+ALERT ALERT ALERT ALERT
+DO NOT CALL THE FOLLOWING METHOD UNLESS YOU REALLY WANT TO COUNT ALL COMMENTS (IT IS REALLY EXPENSIVE)
+
+
+    private void countComments(){
+        ParseQuery<Flag> q = ParseQuery.getQuery("Posts");
+        q.setLimit(1000);
+        q.whereDoesNotExist(Flag.COMMENTS_COUNT_KEY);
+        q.findInBackground(new FindCallback<Flag>() {
+            @Override
+            public void done(final List<Flag> flags, ParseException e) {
+                if(e != null){
+                    Log.e(TAG, "ERRORREERRRRRRRR**",e);
+                    return;
+                }
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for(int i = 0; i< flags.size(); i++){
+                            System.gc();
+
+                            Flag f = flags.get(i);
+                            ParseQuery<Comment> countQuery = ParseQuery.getQuery("Comments");
+                            countQuery.whereEqualTo("flagId", f.getFlagId());
+                            try{
+                                int count = countQuery.count();
+                                f.put(Flag.COMMENTS_COUNT_KEY, count);
+                                f.save();
+                                Log.d(TAG, "Salvo "+(i+1)+" su "+ flags.size());
+                                SystemClock.sleep(100);
+                            }
+                            catch(ParseException e){
+                                Log.e(TAG, "ERRORE", e);
+                                return;
+                            }
+
+
+                        }
+                    }
+                }).start();
+
+
+            }
+        });
+    }
+
+
 
     ALERT ALERT ALERT ALERT
     DO NOT CALL THE FOLLOWING METHOD UNLESS YOU REALLY WANT TO GENERATE ALL THE THUMBNAILS

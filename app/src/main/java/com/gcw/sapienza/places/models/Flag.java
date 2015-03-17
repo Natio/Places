@@ -34,6 +34,7 @@ public class Flag extends ParseObject {
     public static final String OWNER_KEY = "owner";
     public static final String PASSWORD_KEY = "password";
     public static final String ACCOUNT_TYPE_KEY = "accountType";
+    public static final String COMMENTS_COUNT_KEY = "num_comments";
 
 
     public void setOwner(ParseUser owner) {
@@ -126,6 +127,10 @@ public class Flag extends ParseObject {
 
     public int getWowCount() {
         return this.getInt(WOW_COUNT_KEY);
+    }
+
+    public int getNumberOfComments(){
+        return this.getInt(COMMENTS_COUNT_KEY);
     }
 
     public int getLolCount() {

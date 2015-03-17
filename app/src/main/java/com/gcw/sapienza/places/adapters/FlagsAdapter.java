@@ -11,7 +11,6 @@ import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,14 +19,11 @@ import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.fragments.FlagFragment;
-import com.gcw.sapienza.places.models.Comment;
-import com.gcw.sapienza.places.models.CustomParseObject;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.CropCircleTransformation;
 import com.gcw.sapienza.places.utils.PlacesUtilCallback;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
-import com.parse.CountCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -38,7 +34,6 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -108,7 +103,7 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             {
                 Log.d(TAG, "Pic path: " + result);
 
-                if(result != null && !result.equals(""))
+                if(result != null && !result.isEmpty())
                 {
                     Log.d(TAG, "Inserting profile pic in card " + i);
 
@@ -120,6 +115,15 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
         int numberOfWows= f.getWowCount();
         flagViewHolder.stats_wow.setText(numberOfWows+" WoW");
 
+
+        int numberOfComments = f.getNumberOfComments();
+        if(numberOfComments == 1){
+            flagViewHolder.stats_comment.setText(numberOfComments + " comment");
+        }
+        else{
+            flagViewHolder.stats_comment.setText(numberOfComments + " comments");
+        }
+/*
         ParseQuery<Comment> countQuery = ParseQuery.getQuery("Comments");
         countQuery.whereEqualTo("flagId", f.getFlagId());
         countQuery.countInBackground(new CountCallback() {
@@ -130,6 +134,7 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
                 else flagViewHolder.stats_comment.setText(i + " comments");
             }
         });
+*/
 
         ParseFile pic = f.getThumbnail();
         if (pic != null && f.getPassword() == null) {
@@ -384,6 +389,7 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             queryPosts.whereEqualTo("objectId", mFlag.getFlagId());
 
             queryPosts.findInBackground(new FindCallback<Flag>() {
+                @Override
                 public void done(List<Flag> markers, ParseException e) {
                     if (e == null && markers.size() != 0) {
                         Flag flag = markers.get(0);
