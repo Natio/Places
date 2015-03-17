@@ -1,0 +1,83 @@
+package com.gcw.sapienza.places.adapters;
+
+import android.content.Context;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.activities.MainActivity;
+import com.gcw.sapienza.places.fragments.ProfileFragment;
+import com.gcw.sapienza.places.models.Comment;
+import com.gcw.sapienza.places.models.PlacesUser;
+import com.gcw.sapienza.places.utils.PlacesLoginUtils;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+import java.util.List;
+
+/**
+ * Created by Simone on 3/17/2015.
+ */
+public class CommentsAdapter extends ArrayAdapter<String> {
+
+    private static final String TAG = "CommentsAdapter";
+
+    public CommentsAdapter(Context context, int resource, List<String> comments) {
+        super(context, resource, comments);
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+
+        View v = convertView;
+
+        if (v == null) {
+
+            v = LayoutInflater.
+                    from(parent.getContext()).
+                    inflate(R.layout.comment_item_layout, parent, false);
+
+        }
+
+        final String commentId = getItem(position);
+
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity) getContext()).switchToOtherFrag(new ProfileFragment().newInstance(commentId));
+            }
+        });
+
+        final TextView authorView = (TextView) v.findViewById(R.id.author);
+        final ImageView authorImageView = (ImageView) v.findViewById(R.id.comment_profile_pic);
+        final TextView commentTextView = (TextView) v.findViewById(R.id.comment_text);
+
+        ParseQuery<Comment> queryUsers = ParseQuery.getQuery("Comments");
+        queryUsers.whereEqualTo("objectId", commentId);
+        queryUsers.getFirstInBackground(new GetCallback<Comment>() {
+            @Override
+            public void done(Comment comment, ParseException e) {
+                if (e == null)
+                {
+                    // TODO Check whether the owner of the comment logged in with fb or g+
+
+                    authorView.setText(comment.getUsername());
+                    PlacesLoginUtils.getInstance().addEntryToUserIdMap(comment.getUserId(), comment.getUsername());
+                    PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(comment.getUserId(), authorImageView, PlacesLoginUtils.PicSize.SMALL);
+                    commentTextView.setText(comment.getCommentText());
+                } else {
+                    Log.e(TAG, e.getMessage());
+                    Toast.makeText(getContext(), "An error occurred while retrieving comments' data", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+        });
+
+        return v;
+    }
+}

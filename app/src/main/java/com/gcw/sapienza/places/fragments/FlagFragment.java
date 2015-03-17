@@ -30,6 +30,7 @@
     import com.gcw.sapienza.places.PlacesApplication;
     import com.gcw.sapienza.places.R;
     import com.gcw.sapienza.places.activities.ShareActivity;
+    import com.gcw.sapienza.places.adapters.CommentsAdapter;
     import com.gcw.sapienza.places.models.Comment;
     import com.gcw.sapienza.places.models.CustomParseObject;
     import com.gcw.sapienza.places.models.Flag;
@@ -112,8 +113,8 @@
         private Button addCommentButton;
         private SwipeRefreshLayout commentsHolder;
         private ListView commentsList;
-        private ArrayAdapter<String> commentsAdapter;
-        private ArrayList<Comment> comments;
+        private CommentsAdapter commentsAdapter;
+        private ArrayList<String> comments;
         private String newComment;
         private MediaType mediaType;
         private ParseFile mediaFile;
@@ -183,7 +184,7 @@
             super.onCreateView(inflater, container, savedInstanceState);
 
             view = inflater.inflate(R.layout.flag_layout, container, false);
-            flagContent= (ScrollView) view.findViewById(R.id.FlagContent);
+            flagContent= (ScrollView)view.findViewById(R.id.FlagContent);
 
             flagText = (TextView) view.findViewById(R.id.text);
             authorTextView = (TextView) view.findViewById(R.id.author);
@@ -523,10 +524,11 @@
                 @Override
                 public void done(List<Comment> result, ParseException e) {
 
+                    /*
                     if (result == null || result.size() == 0) {
                         ArrayList<String> commentsNotFoundText = new ArrayList();
                         commentsNotFoundText.add("Be the first to comment this flag!");
-                        commentsAdapter = new ArrayAdapter<String>(getActivity(), R.layout.comment_item_layout, commentsNotFoundText);
+                        commentsAdapter = new CommentsAdapter(getActivity(), R.layout.comment_item_layout, commentsNotFoundText);
                     } else {
                         comments = new ArrayList<Comment>();
                         comments.addAll(result);
@@ -549,7 +551,24 @@
                         }
 
                         // TODO change adapter's layout + Author PICTURE
-                        commentsAdapter = new ArrayAdapter(getActivity(), R.layout.comment_item_layout, texts);
+                        commentsAdapter = new CommentsAdapter(getActivity(), R.layout.comment_item_layout, texts);
+                    }
+                    */
+
+                    if (result == null || result.size() == 0)
+                    {
+                        ArrayList<String> commentsNotFoundText = new ArrayList();
+                        // commentsNotFoundText.add("Be the first to comment this flag!");
+                        commentsAdapter = new CommentsAdapter(getActivity(), R.layout.comment_item_layout, commentsNotFoundText);
+                    }
+                    else
+                    {
+                        comments = new ArrayList<String>();
+
+                        for(Comment comment: result)
+                            comments.add(comment.getObjectId());
+
+                        commentsAdapter = new CommentsAdapter(getActivity(), R.layout.comment_item_layout, comments);
                     }
 
                     commentsList.setAdapter(commentsAdapter);
@@ -588,6 +607,7 @@
                                     comment.put("text", newComment);
                                     comment.put("userId", PlacesLoginUtils.getInstance().getCurrentUserId());
                                     comment.put("flagId", flagId);
+                                    comment.put("accountType", (PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.FACEBOOK) ? "fb" : "g+");
 
                                     /*
                                     FacebookUtils.getInstance().getFacebookUsernameFromID(PlacesLoginUtils.getInstance().getCurrentUserId(), new FacebookUtilCallback() {
