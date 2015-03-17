@@ -1,5 +1,6 @@
 package com.gcw.sapienza.places.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,31 +32,22 @@ public class CommentsAdapter extends ArrayAdapter<String> {
 
     private static final String TAG = "CommentsAdapter";
 
-    public CommentsAdapter(Context context, int resource, List<String> comments) {
+    private Activity context;
+
+    public CommentsAdapter(Activity context, int resource, List<String> comments) {
         super(context, resource, comments);
+
+        this.context = context;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        View v = convertView;
-
-        if (v == null) {
-
-            v = LayoutInflater.
+        final View v = LayoutInflater.
                     from(parent.getContext()).
                     inflate(R.layout.comment_item_layout, parent, false);
 
-        }
-
         final String commentId = getItem(position);
-
-        v.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((MainActivity) getContext()).switchToOtherFrag(new ProfileFragment().newInstance(commentId));
-            }
-        });
 
         final TextView authorView = (TextView) v.findViewById(R.id.author);
         final ImageView authorImageView = (ImageView) v.findViewById(R.id.comment_profile_pic);
@@ -79,6 +71,14 @@ public class CommentsAdapter extends ArrayAdapter<String> {
                     DateFormat df = new SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault());
                     String date = df.format(comment.getTimestamp());
                     commentDate.setText(date);
+
+                    v.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v)
+                        {
+                            ((MainActivity)context).switchToOtherFrag(ProfileFragment.newInstance(PlacesLoginUtils.getInstance().getCurrentUserId()));
+                        }
+                    });
                 } else {
                     Log.e(TAG, e.getMessage());
                     Toast.makeText(getContext(), "An error occurred while retrieving comments' data", Toast.LENGTH_SHORT).show();
