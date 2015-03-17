@@ -18,7 +18,11 @@ import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Simone on 3/17/2015.
@@ -56,6 +60,7 @@ public class CommentsAdapter extends ArrayAdapter<String> {
         final TextView authorView = (TextView) v.findViewById(R.id.author);
         final ImageView authorImageView = (ImageView) v.findViewById(R.id.comment_profile_pic);
         final TextView commentTextView = (TextView) v.findViewById(R.id.comment_text);
+        final TextView commentDate = (TextView) v.findViewById(R.id.comment_date);
 
         ParseQuery<Comment> queryUsers = ParseQuery.getQuery("Comments");
         queryUsers.whereEqualTo("objectId", commentId);
@@ -70,6 +75,10 @@ public class CommentsAdapter extends ArrayAdapter<String> {
                     PlacesLoginUtils.getInstance().addEntryToUserIdMap(comment.getUserId(), comment.getUsername());
                     PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(comment.getUserId(), authorImageView, PlacesLoginUtils.PicSize.SMALL);
                     commentTextView.setText(comment.getCommentText());
+
+                    DateFormat df = new SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault());
+                    String date = df.format(comment.getTimestamp());
+                    commentDate.setText(date);
                 } else {
                     Log.e(TAG, e.getMessage());
                     Toast.makeText(getContext(), "An error occurred while retrieving comments' data", Toast.LENGTH_SHORT).show();
