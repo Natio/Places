@@ -5,6 +5,43 @@
 //  response.success("Hello world!");
 //});
 
+Parse.Cloud.beforeSave("Comments", function(request, response) {
+	
+    //if the comment is already present DO NOTHING (otherwise an invalid number will be shown to the user)
+    if(!request.object.isNew()){
+      response.success();
+      return;
+    }
+	var flagId = request.object.get("flagId");
+	var Posts = Parse.Object.extend("Posts");
+	var query = new Parse.Query(Posts);
+	query.equalTo("objectId", flagId);
+	query.find({
+		success: function(results){
+			if(results.length == 0){
+				console.log("Errore 0 flag trovati");
+				return;
+			}
+			
+			var flag = results[0];
+			flag.increment("num_comments", 1);
+	        Parse.Object.saveAll(results , {
+	            success: function(list) {
+	              response.success();
+	            },
+	            error: function(error) {
+	              response.error(error.message);
+	            },
+	          });
+      
+	     }, 
+		error: function(error){
+			response.error(error.message);
+		} 
+	});
+	
+});
+
 Parse.Cloud.beforeSave(Parse.User, function(request, response) {
   //in case we have logged in with Facebook, we add
   //ad entry to the _User table with our Facebook ID
@@ -15,6 +52,9 @@ Parse.Cloud.beforeSave(Parse.User, function(request, response) {
   }
   response.success();
 });
+
+
+
 
 Parse.Cloud.job("addFbId", function(request, status){
   Parse.Cloud.useMasterKey();
@@ -104,6 +144,7 @@ Parse.Cloud.beforeSave("Posts", function(request, response) {
   if(request.object.get("owner") == null){
     request.object.set("owner", Parse.User.current());
   }
+  request.object.set("num_comments", 0);
   
   if (request.object.get("text").length < 5 
       && request.object.get("audio") == null
