@@ -48,24 +48,40 @@ Parse.Cloud.afterSave("Comments", function(request, response){
         return;
       }
 
+      var Posts = Parse.Object.extend("Posts");
+    	var query_post_owner = new Parse.Query(Posts);
+      query_post_owner.equalTo("objectId", request.object.get("flagId"));
+      query_post_owner.first({
+        success: function(first) {
+          if(typeof first === "undefined"){
+            return;
+          }
+          if(first.id != currentUserID){
+            results.push(first.get("owner"));
+          }
 
-			var listOfRecipients = filterDuplicates(results);
-      console.log(listOfRecipients);
-      var query_push = new Parse.Query(Parse.Installation);
-      query_push.containedIn("owner", listOfRecipients);
+          var listOfRecipients = filterDuplicates(results);
+          console.log(listOfRecipients);
+          var query_push = new Parse.Query(Parse.Installation);
+          query_push.containedIn("owner", listOfRecipients);
 
-      Parse.Push.send({
-        where: query_push, // Set our Installation query
-        data: {
-          alert: "A Flag has been commented. Check it out!!!"
-        }
-      }, {
-        success: function() {
-          console.log("Notifiche inviate!!!");
-          //response.success();
+          Parse.Push.send({
+            where: query_push, // Set our Installation query
+            data: {
+              alert: "A Flag has been commented. Check it out!!!"
+            }
+          }, {
+            success: function() {
+              console.log("Notifiche inviate!!!");
+            },
+            error: function(error) {
+              console.log(error.message);
+            }
+          });
+
         },
         error: function(error) {
-          //response.error(error.message);
+          console.log(error.message);
         }
       });
 
