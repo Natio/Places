@@ -12,6 +12,12 @@ Parse.Cloud.beforeSave("Comments", function(request, response) {
       response.success();
       return;
     }
+
+  if(request.object.get("commenter") == null){
+    request.object.set("commenter", Parse.User.current());
+  }
+
+
 	var flagId = request.object.get("flagId");
 	var Posts = Parse.Object.extend("Posts");
 	var query = new Parse.Query(Posts);
