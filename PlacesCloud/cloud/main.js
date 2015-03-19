@@ -5,8 +5,78 @@
 //  response.success("Hello world!");
 //});
 
-Parse.Cloud.beforeSave("Comments", function(request, response) {
+function filterDuplicates(array){
+    var set = [];
 
+    for(var i = 0; i < array.length; i++){
+      var commenter = array[i].get("commenter");
+      set[commenter.id] = commenter;
+    }
+    var values = [];
+    for(var key in set){
+      values.push(set[key]);
+    }
+    return values;
+}
+
+
+
+Parse.Cloud.afterSave("Comments", function(request, response){
+
+  Parse.Cloud.useMasterKey();
+/*  if(!request.object.isNew()){
+      //response.success();
+      return;
+  }*/
+
+  var currentUser = Parse.User.current();
+  var currentUserID = currentUser.id;
+
+  var flagId = request.object.get("flagId");
+  var Comments = Parse.Object.extend("Comments");
+	var query = new Parse.Query(Comments);
+  query.equalTo("flagId", flagId);
+  query.notEqualTo("commenter", currentUser);
+  query.find({
+    error: function(error){
+			response.error(error.message);
+		},
+    success: function(results){
+      console.log("Trovati "+results.length+" destinatari");
+      if(results.length == 0){
+        //response.success();
+        return;
+      }
+
+
+			var listOfRecipients = filterDuplicates(results);
+      console.log(listOfRecipients);
+      var query_push = new Parse.Query(Parse.Installation);
+      query_push.containedIn("owner", listOfRecipients);
+
+      Parse.Push.send({
+        where: query_push, // Set our Installation query
+        data: {
+          alert: "A Flag has been commented. Check it out!!!"
+        }
+      }, {
+        success: function() {
+          console.log("Notifiche inviate!!!");
+          //response.success();
+        },
+        error: function(error) {
+          //response.error(error.message);
+        }
+      });
+
+    }
+
+  });
+});
+
+
+Parse.Cloud.beforeSave("Comments", function(request, response) {
+  Parse.Cloud.useMasterKey();
     //if the comment is already present DO NOTHING (otherwise an invalid number will be shown to the user)
     if(!request.object.isNew()){
       response.success();
@@ -34,6 +104,7 @@ Parse.Cloud.beforeSave("Comments", function(request, response) {
 	        Parse.Object.saveAll(results , {
 	            success: function(list) {
 	              response.success();
+
 	            },
 	            error: function(error) {
 	              response.error(error.message);
@@ -218,11 +289,18 @@ Parse.Cloud.beforeSave("Posts", function(request, response) {
       }
 });
 
+
 Parse.Cloud.beforeSave(Parse.Installation, function(request, response) {
     Parse.Cloud.useMasterKey();
+
+    if(request.object.get("uniqueId") == null){
+      response.success();
+      return;
+    }
+
     var query = new Parse.Query(Parse.Installation);
-    query.equalTo("owner", request.user);
-    query.equalTo("uniqueID", request.object.get("uniqueID"));
+    query.equalTo("uniqueId", request.object.get("uniqueId"));
+    query.notEqualTo("installationId", request.object.get("installationId"));
     query.first().then(function(duplicate) {
         if (typeof duplicate === "undefined") {
             console.log("Duplicate does not exist,New installation");
@@ -232,7 +310,7 @@ Parse.Cloud.beforeSave(Parse.Installation, function(request, response) {
             duplicate.destroy().then(function(duplicate) {
                 console.log("Successfully deleted duplicate");
                 response.success();
-            }, function() {
+            }, function(error) {
                 console.log(error.code + " " + error.message);
                 response.success();
             });
@@ -242,7 +320,9 @@ Parse.Cloud.beforeSave(Parse.Installation, function(request, response) {
         console.warn(error.code + error.message);
         response.success();
     });
+
 });
+
 
 Parse.Cloud.beforeDelete("Posts", function(request, response) {
   query = new Parse.Query("Posts");
