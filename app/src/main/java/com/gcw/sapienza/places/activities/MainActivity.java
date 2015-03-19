@@ -415,6 +415,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
                 if (resultCode == RESULT_OK) {
                     Toast.makeText(this, data.getExtras().getString("result"), Toast.LENGTH_LONG).show();
+                    this.refresh();
                 }
                 break;
         }
