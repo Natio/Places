@@ -1,9 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'placeskey'
+            keyPassword 'Passwordplaces'
+            storeFile file('C:/Users/Simone/Downloads/PlacesKeystore.jks')
+            storePassword 'Passwordplaces'
+        }
+    }
     compileSdkVersion 21
     buildToolsVersion "21.1.1"
-
     defaultConfig {
         applicationId "com.gcw.sapienza.places"
         minSdkVersion 16
@@ -12,9 +19,8 @@ android {
         versionName "1.7"
     }
     buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        debug {
+            signingConfig signingConfigs.config
         }
     }
 }
