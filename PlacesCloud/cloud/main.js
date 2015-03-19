@@ -6,7 +6,7 @@
 //});
 
 Parse.Cloud.beforeSave("Comments", function(request, response) {
-	
+
     //if the comment is already present DO NOTHING (otherwise an invalid number will be shown to the user)
     if(!request.object.isNew()){
       response.success();
@@ -28,7 +28,7 @@ Parse.Cloud.beforeSave("Comments", function(request, response) {
 				console.log("Errore 0 flag trovati");
 				return;
 			}
-			
+
 			var flag = results[0];
 			flag.increment("num_comments", 1);
 	        Parse.Object.saveAll(results , {
@@ -39,19 +39,19 @@ Parse.Cloud.beforeSave("Comments", function(request, response) {
 	              response.error(error.message);
 	            },
 	          });
-      
-	     }, 
+
+	     },
 		error: function(error){
 			response.error(error.message);
-		} 
+		}
 	});
-	
+
 });
 
 Parse.Cloud.beforeSave(Parse.User, function(request, response) {
   //in case we have logged in with Facebook, we add
   //ad entry to the _User table with our Facebook ID
-  if(Parse.FacebookUtils.isLinked(request.object)){    
+  if(Parse.FacebookUtils.isLinked(request.object)){
     request.object.set("fbId", request.object.get("authData").facebook.id);
     request.object.set("accountType", "fb");
     console.log("User successfully added with fbId: " + request.object.get("fbId"));
@@ -85,6 +85,58 @@ Parse.Cloud.job("addFbId", function(request, status){
   error: function(error){status.error(error.message);}});
 });
 
+function getCommentsAndSetCommenter(comments, index, status){
+	if(index >= comments.length){
+		Parse.Object.saveAll(comments , {
+				success: function(list) {
+
+					status.success("Migration completed successfully");
+				},
+				error: function(error) {
+					status.error(error.message);
+				},
+			});
+		return;
+	}
+
+	var comment = comments[index];
+	var fbId = comment.get("userId");
+
+
+	var U = Parse.Object.extend("_User");
+	var query = new Parse.Query(U);
+	query.equalTo("fbId", fbId);
+	query.first({success:function(item){
+		comment.set("commenter", item);
+
+		getCommentsAndSetCommenter(comments, index+1, status);
+
+	}, error: function(error){ status.error(error.message); } });
+
+
+}
+
+Parse.Cloud.job("addCommenterToComments", function(request, status) {
+	Parse.Cloud.useMasterKey();
+
+	Parse.Cloud.useMasterKey();
+  var Comments = Parse.Object.extend("Comments");
+  var query = new Parse.Query(Comments);
+	query.doesNotExist("commenter");
+  query.limit(200);
+
+	query.find({
+		error: function(error){
+			status.error(error.message);
+		},
+		success: function (results){
+			getCommentsAndSetCommenter(results, 0, status);
+		}
+	});
+
+});
+
+
 Parse.Cloud.job("userMigration", function(request, status) {
   // Set up to modify user data
   Parse.Cloud.useMasterKey();
@@ -92,22 +144,22 @@ Parse.Cloud.job("userMigration", function(request, status) {
   var query = new Parse.Query(User);
   query.limit(100);
   query.find({success:function(results){
-    
+
     var map = [];
-    
-    for (var i = 0; i < results.length; i++) { 
+
+    for (var i = 0; i < results.length; i++) {
           var object = results[i];
           var data = object.get('authData');
       //console.log(data["facebook"]["id"]);
       map[data["facebook"]["id"]] = object;
     }
-    
-    
+
+
     var Posts = Parse.Object.extend("Posts");
     var query_p = new Parse.Query(Posts);
     query_p.limit(1000);
     query_p.doesNotExist("owner");
-    query_p.find({error: function(error){status.error(error);}, 
+    query_p.find({error: function(error){status.error(error);},
     success: function(results){
       console.log("Migrating "+results.length+" records");
       for(var k = 0; k < results.length; k++){
@@ -115,7 +167,7 @@ Parse.Cloud.job("userMigration", function(request, status) {
         var owner = map[obj.get("fbId")];
         obj.set("owner", owner);
       }
-      
+
       Parse.Object.saveAll(results , {
           success: function(list) {
             status.success("Migration completed successfully");
@@ -124,42 +176,42 @@ Parse.Cloud.job("userMigration", function(request, status) {
             status.error(error.message);
           },
         });
-      
+
     }
-      
-  
+
+
     });
- 
-    
+
+
   },
   error: function(error){status.error(error.message);}});
-  
-  
+
+
 });
 
 Parse.Cloud.beforeSave("Posts", function(request, response) {
-  
+
   //If owner is not present it is automatically added
   //in this way old version of the app will continue generating valid falgs
   if(!request.object.isNew()){
     response.success();
     return;
   }
-  
-  
+
+
   if(request.object.get("owner") == null){
     request.object.set("owner", Parse.User.current());
   }
   request.object.set("num_comments", 0);
-  
-  if (request.object.get("text").length < 5 
+
+  if (request.object.get("text").length < 5
       && request.object.get("audio") == null
       && request.object.get("picture") == null
       && request.object.get("video") == null
       && request.object.get("phone_media") == null) {
-      
+
       response.error("Please, write something meaningful ;)");
-    
+
     }
      else {
          response.success();
