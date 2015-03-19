@@ -2,6 +2,9 @@
 *.apk
 *.ap_
 
+#Keystore
+*.jks
+
 # Files for the Dalvik VM
 *.dex
 

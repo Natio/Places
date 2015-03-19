@@ -5,7 +5,7 @@ android {
         config {
             keyAlias 'placeskey'
             keyPassword 'Passwordplaces'
-            storeFile file('C:/Users/Simone/Downloads/PlacesKeystore.jks')
+            storeFile file('PlacesKeystore.jks')
             storePassword 'Passwordplaces'
         }
     }
