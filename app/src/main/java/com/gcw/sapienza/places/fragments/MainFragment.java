@@ -271,7 +271,6 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                 this.gMap.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title("**DiscoverMode**\nget closer to see the content")
-                        .snippet("-1")
                         .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
                                 // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
                                 //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
@@ -332,9 +331,11 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
     @Override
     public boolean onMarkerClick(Marker selectedMarker) {
 
-        int index = Integer.parseInt(selectedMarker.getSnippet());
+        String snippet = selectedMarker.getSnippet();
 
-        if(index == -1) return false;
+        if(snippet == null) return false;
+
+        int index = Integer.parseInt(selectedMarker.getSnippet());
 
         List<Fragment> frags = getActivity().getSupportFragmentManager().getFragments();
 
