@@ -47,12 +47,8 @@
     import java.io.FileInputStream;
     import java.io.FileOutputStream;
     import java.io.IOException;
-    import java.text.DateFormat;
-    import java.text.SimpleDateFormat;
     import java.util.ArrayList;
-    import java.util.Date;
     import java.util.List;
-    import java.util.Locale;
     import java.util.StringTokenizer;
 
     /**
@@ -153,7 +149,7 @@
                 weather= st.nextToken().substring(1);
             }
 
-            Log.d(TAG, "weather-"+ weather+"-"+ temperature);
+            Log.d(TAG, "weather-"+ weather+'-'+ temperature);
 
             category = bundle.getString("category");
             inPlace = bundle.getBoolean("inPlace");
@@ -166,7 +162,7 @@
 
             userId = PlacesLoginUtils.getInstance().getCurrentUserId();
 
-            retrieveComments();
+
         }
 
         @Override
@@ -288,7 +284,7 @@
             //final String bottomLineText = "Category: " + category;
             final String inPlaceString = "In Place: " + (inPlace ? "✓" : "✗");
 
-            dateTextView.setText(date+"\n"+inPlaceString);
+            dateTextView.setText(date+'\n'+inPlaceString);
 
             PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(this.id, profilePicimageView, PlacesLoginUtils.PicSize.LARGE);
 
@@ -318,6 +314,7 @@
             });
             */
             updateWowInfo();
+            retrieveComments();
             return view;
         }
 
@@ -438,6 +435,7 @@
             queryPosts.whereEqualTo("objectId", flagId);
 
             queryPosts.findInBackground(new FindCallback<Flag>() {
+                @Override
                 public void done(List<Flag> markers, ParseException e) {
                     if (e == null && markers.size() != 0) {
                         Flag flag = markers.get(0);
@@ -449,10 +447,10 @@
                 }
             });
 
-            wowStatText.setText(wowStatText.getText() + " (" + wowCount + ")");
+            wowStatText.setText(wowStatText.getText() + " (" + wowCount + ')');
 
-            lolButton.setText(lolButton.getText() + " (" + lolCount + ")");
-            booButton.setText(booButton.getText() + " (" + booCount + ")");
+            lolButton.setText(lolButton.getText() + " (" + lolCount + ')');
+            booButton.setText(booButton.getText() + " (" + booCount + ')');
 
             ParseQuery<CustomParseObject> queryW = ParseQuery.getQuery("Wow_Lol_Boo");
             queryW.whereEqualTo("fbId", userId);
@@ -460,6 +458,7 @@
             queryW.whereEqualTo("boolWow", true);
 
             queryW.findInBackground(new FindCallback<CustomParseObject>() {
+                @Override
                 public void done(List<CustomParseObject> markers, ParseException e) {
                     if (e == null && markers.size() != 0) {
                         if(wowCount==1)
@@ -478,9 +477,10 @@
             queryL.whereEqualTo("boolLol", true);
 
             queryL.findInBackground(new FindCallback<CustomParseObject>() {
+                @Override
                 public void done(List<CustomParseObject> markers, ParseException e) {
                     if (e == null && markers.size() != 0) {
-                        lolButton.setText("You lol this." + " (" + lolCount + ")");
+                        lolButton.setText("You lol this." + " (" + lolCount + ')');
                     }
                 }
             });
@@ -491,9 +491,10 @@
             queryB.whereEqualTo("boolBoo", true);
 
             queryB.findInBackground(new FindCallback<CustomParseObject>() {
+                @Override
                 public void done(List<CustomParseObject> markers, ParseException e) {
                     if (e == null && markers.size() != 0) {
-                        booButton.setText("You boo this." + " (" + booCount + ")");
+                        booButton.setText("You boo this." + " (" + booCount + ')');
                     }
                 }
             });
@@ -510,11 +511,11 @@
                 public void done(List<Comment> result, ParseException e) {
 
                     if (result == null || result.size() == 0){
-                        ArrayList<String> commentsNotFoundText = new ArrayList();
+                        ArrayList<String> commentsNotFoundText = new ArrayList<>();
                         commentsAdapter = new CommentsAdapter(getActivity(), R.layout.comment_item_layout, commentsNotFoundText);
                     }
                     else{
-                        comments = new ArrayList<String>();
+                        comments = new ArrayList<>();
                         for(Comment comment: result)
                             comments.add(comment.getObjectId());
 
@@ -540,12 +541,14 @@
                     .setCancelable(true)
                     .setNegativeButton("Cancel",
                             new DialogInterface.OnClickListener() {
+                                @Override
                                 public void onClick(DialogInterface dialog, int id) {
                                     dialog.dismiss();
                                 }
                             })
                     .setPositiveButton("Confirm",
                             new DialogInterface.OnClickListener() {
+                                @Override
                                 public void onClick(DialogInterface dialog, int id) {
                                     newComment = userInput.getText().toString();
                                     if (newComment.length() == 0) {
@@ -675,6 +678,7 @@
                     //wowStatText.setClickable(false);
 
                     queryWLB.findInBackground(new FindCallback<CustomParseObject>() {
+                        @Override
                         public void done(List<CustomParseObject> markers, ParseException e) {
                             if (e == null && markers.size() != 0) {
                                 CustomParseObject obj = markers.get(0);
@@ -725,6 +729,7 @@
                     lolButton.setClickable(false);
 
                     queryWLB.findInBackground(new FindCallback<CustomParseObject>() {
+                        @Override
                         public void done(List<CustomParseObject> markers, ParseException e) {
                             if (e == null && markers.size() != 0) {
                                 CustomParseObject obj = markers.get(0);
@@ -775,6 +780,7 @@
                     booButton.setClickable(false);
 
                     queryWLB.findInBackground(new FindCallback<CustomParseObject>() {
+                        @Override
                         public void done(List<CustomParseObject> markers, ParseException e) {
                             if (e == null && markers.size() != 0) {
                                 CustomParseObject obj = markers.get(0);
@@ -829,6 +835,7 @@
             switch (code) {
                 case WOW_CODE:
                     queryPosts.findInBackground(new FindCallback<Flag>() {
+                        @Override
                         public void done(List<Flag> markers, ParseException e) {
                             if (e == null && markers.size() != 0) {
                                 Flag flag = markers.get(0);
@@ -871,6 +878,7 @@
 
                 case LOL_CODE:
                     queryPosts.findInBackground(new FindCallback<Flag>() {
+                        @Override
                         public void done(List<Flag> markers, ParseException e) {
                             if (e == null && markers.size() != 0) {
                                 Flag flag = markers.get(0);
@@ -913,6 +921,7 @@
 
                 case BOO_CODE:
                     queryPosts.findInBackground(new FindCallback<Flag>() {
+                        @Override
                         public void done(List<Flag> markers, ParseException e) {
                             if (e == null && markers.size() != 0) {
                                 Flag flag = markers.get(0);
@@ -965,19 +974,19 @@
                 }
             }
             else {
-                wowStatText.setText("" + wowCount + " WoWs");
+                wowStatText.setText(wowCount + " WoWs");
                 newWowButton.setChecked(false);
             }
         }
 
         private void updateLolButtonText(boolean lold, int lolCount) {
-            if (lold) lolButton.setText("You lol this. (" + lolCount + ")");
-            else lolButton.setText("LOL (" + lolCount + ")");
+            if (lold) lolButton.setText("You lol this. (" + lolCount + ')');
+            else lolButton.setText("LOL (" + lolCount + ')');
         }
 
         private void updateBooButtonText(boolean booed, int booCount) {
-            if (booed) booButton.setText("You boo this. (" + booCount + ")");
-            else booButton.setText("BOO (" + booCount + ")");
+            if (booed) booButton.setText("You boo this. (" + booCount + ')');
+            else booButton.setText("BOO (" + booCount + ')');
         }
 
         private void changeLayoutAccordingToMediaType() {
@@ -1074,6 +1083,7 @@
             queryWLB.whereEqualTo("flagId", flagId);
 
             queryWLB.findInBackground(new FindCallback<CustomParseObject>() {
+                @Override
                 public void done(List<CustomParseObject> markers, ParseException e) {
                     if (e == null /*  && markers.size() != 0   */) {
                         //with old flags, when markers size is 0

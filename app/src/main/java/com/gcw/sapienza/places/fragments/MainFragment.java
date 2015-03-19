@@ -5,11 +5,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -95,6 +97,10 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                         Log.d(TAG, "Location changed");
                         break;
 
+                    case MainActivity.PREFERENCES_CHANGED_NOTIFICATION:
+                        Log.d(TAG, "Preferences changed");
+                        break;
+
                     default:
                 }
                 updateMarkersOnMap();
@@ -116,6 +122,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.LOCATION_CHANGED_NOTIFICATION));
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(MainActivity.PREFERENCES_CHANGED_NOTIFICATION));
     }
 
     @Override
@@ -249,33 +256,35 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                 index++;
             }
 
-            List<Flag> hiddenFlags = PlacesApplication.getInstance().getHiddenFlags();
+            if(isDiscoverModeEnabled()) {
 
-            Log.d(TAG, "Hidden Flags size: " + hiddenFlags.size());
+                List<Flag> hiddenFlags = PlacesApplication.getInstance().getHiddenFlags();
 
-            for(ParseObject hf: hiddenFlags){
-                Flag f = (Flag) hf;
-                ParseGeoPoint location = f.getLocation();
-                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                builder.include(latLng);
+                Log.d(TAG, "Hidden Flags size: " + hiddenFlags.size());
 
-                //25% size original icon
-                int marker_id = Utils.getIconForCategory(f.getCategory(), getActivity());
-                Bitmap marker = BitmapFactory.decodeResource(getResources(), marker_id);
-                Bitmap halfSizeMarker = Bitmap.createScaledBitmap
-                        (marker,
-                                (int) (marker.getWidth() * 0.25f),
-                                (int) (marker.getHeight() * 0.25f),
-                                false);
+                for (ParseObject hf : hiddenFlags) {
+                    Flag f = (Flag) hf;
+                    ParseGeoPoint location = f.getLocation();
+                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    builder.include(latLng);
 
-                this.gMap.addMarker(new MarkerOptions()
-                        .position(latLng)
-                        .title("**DiscoverMode**\nget closer to see the content")
-                        .snippet("-1")
-                        .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
-                                // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
-                                //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
-                        .alpha(0.25f));
+                    //25% size original icon
+                    int marker_id = Utils.getIconForCategory(f.getCategory(), getActivity());
+                    Bitmap marker = BitmapFactory.decodeResource(getResources(), marker_id);
+                    Bitmap halfSizeMarker = Bitmap.createScaledBitmap
+                            (marker,
+                                    (int) (marker.getWidth() * 0.25f),
+                                    (int) (marker.getHeight() * 0.25f),
+                                    false);
+
+                    this.gMap.addMarker(new MarkerOptions()
+                            .position(latLng)
+                            .title("**DiscoverMode**\nget closer to see the content")
+                            .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
+                                    // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
+                                    //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
+                            .alpha(0.25f));
+                }
             }
 
             Location currentLocation = gMap.getMyLocation();
@@ -329,12 +338,27 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
         }
     }
 
+    /**
+     * check if discover mode is enabled
+     * @return true if discover mode is enabled, false otherwise
+     */
+    private boolean isDiscoverModeEnabled() {
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        boolean discoverMode = preferences.getBoolean("discoverMode", true);
+
+        return  discoverMode;
+    }
+
     @Override
     public boolean onMarkerClick(Marker selectedMarker) {
 
-        int index = Integer.parseInt(selectedMarker.getSnippet());
+        String snippet = selectedMarker.getSnippet();
 
-        if(index == -1) return false;
+        if(snippet == null) return false;
+
+        int index = Integer.parseInt(selectedMarker.getSnippet());
 
         List<Fragment> frags = getActivity().getSupportFragmentManager().getFragments();
 

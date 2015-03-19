@@ -42,6 +42,13 @@
             android:max="4"
             android:progress="1"
             android:title="Max number of visible flags" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="discoverMode"
+            android:title="Discover Mode"
+            android:summary="Enable to see where farther flags are" />
+
     </PreferenceCategory>
 
     <!--

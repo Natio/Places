@@ -360,14 +360,14 @@ public class LocationService extends Service implements
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(TAG, "Interval: " + INTERVAL);
-        Log.d(TAG, "Fastest Interval: " + FASTEST_INTERVAL);
-        Log.d(TAG, "Location accuracy: " + location.getAccuracy());
+        Log.d(TAG, "Location changed");
+//        Log.d(TAG, "Interval: " + INTERVAL);
+//        Log.d(TAG, "Fastest Interval: " + FASTEST_INTERVAL);
+//        Log.d(TAG, "Location accuracy: " + location.getAccuracy());
         if (notificationLocation != null && location.distanceTo(this.notificationLocation) > (Utils.MAP_RADIUS * KM_TO_M)) {
             NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             nManager.cancel(NOTIFICATION_ID);
         }
-        Log.d(TAG, "Location changed");
         long elapsed_time = location.getTime() -
                 (this.location == null ? 0L : this.location.getTime());
         Log.d(TAG, "Elapsed time: " + elapsed_time);
@@ -496,7 +496,7 @@ public class LocationService extends Service implements
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         locationRequest.setInterval(INTERVAL);
         locationRequest.setFastestInterval(FASTEST_INTERVAL);
-        Log.d(TAG, "Smallest displacement: " + Utils.MAP_RADIUS * KM_TO_M / 2);
+//        Log.d(TAG, "Smallest displacement: " + Utils.MAP_RADIUS * KM_TO_M / 2);
         locationRequest.setSmallestDisplacement(Utils.MAP_RADIUS * KM_TO_M / 2);
 
         googleApiClient = new GoogleApiClient.Builder(this)
@@ -506,7 +506,7 @@ public class LocationService extends Service implements
                 .build();
 
         if (googleApiClient != null) {
-            Log.d(TAG, "Google Api Client built");
+//            Log.d(TAG, "Google Api Client built");
             googleApiClient.connect();
         }
     }
