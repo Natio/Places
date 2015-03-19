@@ -22,17 +22,6 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     private boolean sensorEnabled;
     private boolean firstClick;
 
-
-    /*
-    private Preference thoughts_check;
-    private Preference fun_check;
-    private Preference music_check;
-    private Preference landscape_check;
-    private Preference food_check;
-    private Preference none_check;
-    private Preference enableAll;
-    */
-
     private AlertDialog dialog;
 
     @Override
@@ -46,34 +35,18 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         Preference fl_filter = findPreference("flFilter");
         Preference strangers_filter = findPreference("strangersFilter");
         Preference time_filter = findPreference("timeFilter");
-//        Preference seek_bar = findPreference("seekBar");
         Preference max_fetch = findPreference("maxFetch");
         Preference version_label = findPreference("version");
-
-        /*
-        thoughts_check = findPreference("thoughtsCheck");
-        fun_check = findPreference("funCheck");
-        music_check = findPreference("musicCheck");
-        landscape_check = findPreference("landscapeCheck");
-        food_check = findPreference("foodCheck");
-        none_check = findPreference("noneCheck");
-        enableAll = findPreference("enableAll");
-
-        thoughts_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
-        fun_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
-        music_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
-        landscape_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
-        food_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
-        none_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
-        */
+        Preference discover_mode = findPreference("discoverMode");
 
         version_label.setSummary(BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")");
         loneWolf_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
         fl_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
         strangers_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
         time_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
-//        seek_bar.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener)getActivity());
         max_fetch.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
+        max_fetch.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
+        discover_mode.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
 
         version_label.setOnPreferenceClickListener(this);
     }
