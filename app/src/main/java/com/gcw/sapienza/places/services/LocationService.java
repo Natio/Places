@@ -156,6 +156,7 @@ public class LocationService extends Service implements
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
         query.whereEqualTo("fbId", PlacesLoginUtils.getInstance().getCurrentUserId());
         query.orderByDescending("createdAt");
+        query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
         query.findInBackground(new FindCallback<Flag>() {
             @Override
             public void done(List<Flag> flags, ParseException e) {
@@ -188,6 +189,7 @@ public class LocationService extends Service implements
         query.whereEqualTo("commenter", ParseUser.getCurrentUser());
         query.whereNotEqualTo("flagOwner", ParseUser.getCurrentUser());
         query.orderByDescending("createdAt");
+        query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
         query.findInBackground(new FindCallback<Comment>() {
             @Override
             public void done(List<Comment> comments, ParseException e) {
@@ -244,6 +246,8 @@ public class LocationService extends Service implements
         if (PlacesApplication.isRunningOnEmulator) {
             radius = 10.0f;
         }
+
+        query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
 
         query.whereWithinKilometers("location", gp, radius);
 

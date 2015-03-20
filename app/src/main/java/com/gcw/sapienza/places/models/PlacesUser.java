@@ -2,10 +2,15 @@ package com.gcw.sapienza.places.models;
 
 import com.parse.ParseUser;
 
+import java.io.Serializable;
+
 /**
  * Created by mic_head on 01/03/15.
  */
-public class PlacesUser extends ParseUser {
+public class PlacesUser extends ParseUser implements Serializable {
+
+    public PlacesUser(){
+    }
 
     public static final String NAME_KEY = "name";
     public static final String FACEBOOK_ID_KEY = "fbId";

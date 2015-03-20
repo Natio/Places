@@ -6,13 +6,17 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Class that encapsulate the Post table on Parse.com
  */
 @ParseClassName("Posts")
-public class Flag extends ParseObject {
+public class Flag extends ParseObject implements Serializable {
+
+    public Flag(){
+    }
 
     public static final long MAX_FILE_SIZE_BYTES = 10000000;
 
