@@ -11,6 +11,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.util.Log;
 
 import com.gcw.sapienza.places.models.Comment;
@@ -27,6 +28,7 @@ import com.parse.Parse;
 import com.parse.ParseConfig;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
 import com.parse.ParseUser;
@@ -244,6 +246,31 @@ public class PlacesApplication extends Application {
         //Parse push notifications
         ParsePush.subscribeInBackground("Developers"); //TODO developers channel, remove for user version
         subscribeToParseBroadcast();
+
+
+        String android_id = Settings.Secure.getString(getApplicationContext().getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+        boolean hasToSaveInstallation = false;
+        ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+        String installationUniqueId = (String)installation.get("uniqueId");
+
+        if(installationUniqueId == null || !installationUniqueId.equals(android_id)){
+            ParseInstallation.getCurrentInstallation().put("uniqueId", android_id);
+            hasToSaveInstallation = true;
+        }
+
+
+        ParseUser owner = (ParseUser)ParseInstallation.getCurrentInstallation().get("owner");
+        if(ParseUser.getCurrentUser() != null && owner!= null){
+            if(ParseUser.getCurrentUser().getObjectId().equals(owner.getObjectId()))
+            ParseInstallation.getCurrentInstallation().put("owner", ParseUser.getCurrentUser());
+            hasToSaveInstallation = true;
+        }
+        if(hasToSaveInstallation){
+            ParseInstallation.getCurrentInstallation().saveInBackground();
+        }
+
+
 
 
         PlacesApplication.getInstance().startLocationService();

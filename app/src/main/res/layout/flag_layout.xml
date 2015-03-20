@@ -34,7 +34,8 @@
                     android:id="@+id/profile_pic"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:cropToPadding="false" />
+                    android:cropToPadding="false"
+                    android:clickable="true" />
 
                 <LinearLayout
                     android:orientation="vertical"

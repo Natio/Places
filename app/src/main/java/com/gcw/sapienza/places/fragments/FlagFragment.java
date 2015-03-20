@@ -28,6 +28,7 @@
     import android.widget.VideoView;
     import com.gcw.sapienza.places.PlacesApplication;
     import com.gcw.sapienza.places.R;
+    import com.gcw.sapienza.places.activities.MainActivity;
     import com.gcw.sapienza.places.activities.ShareActivity;
     import com.gcw.sapienza.places.adapters.CommentsAdapter;
     import com.gcw.sapienza.places.models.Comment;
@@ -97,6 +98,7 @@
         private LinearLayout audioLayout;
         private LinearLayout imageContainer;
         private LinearLayout imageHolder;
+        private ImageView profilePicImageView;
 
         private FrameLayout videoHolder;
         private ImageView audioHolder;
@@ -230,7 +232,8 @@
 
             flagContainer = (RelativeLayout) view.findViewById(R.id.flag_container);
 
-            ImageView profilePicimageView = (ImageView) view.findViewById(R.id.profile_pic);
+            profilePicImageView = (ImageView) view.findViewById(R.id.profile_pic);
+
             frameLayout = (RelativeLayout) view.findViewById(R.id.frame_layout);
 
             //names need to be changed in a coherent way
@@ -265,6 +268,7 @@
             setWowButton(); // to manage pressed effect when opening flag
             lolButton.setOnClickListener(this);
             booButton.setOnClickListener(this);
+            profilePicImageView.setOnClickListener(this);
 
             commentsHolder.setOnRefreshListener(this);
             addCommentButton = (Button) view.findViewById(R.id.add_comment);
@@ -299,7 +303,7 @@
 
             dateTextView.setText(date+'\n'+inPlaceString);
 
-            PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(this.id, profilePicimageView, PlacesLoginUtils.PicSize.LARGE);
+            PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(this.id, profilePicImageView, PlacesLoginUtils.PicSize.LARGE);
 
             view.setFocusableInTouchMode(true);
             view.requestFocus();
@@ -433,6 +437,7 @@
             else if (v.getId() == R.id.lol_button) wlbFlag(LOL_CODE);
             else if (v.getId() == R.id.boo_button) wlbFlag(BOO_CODE);
             else if (v.getId() == R.id.add_comment) insertComment();
+            else if(v.getId() == R.id.profile_pic) showProfilePage();
         }
 
         @Override
@@ -441,6 +446,11 @@
                 return playVideo();
             }
             return false;
+        }
+
+        private void showProfilePage()
+        {
+            ((MainActivity)getActivity()).switchToOtherFrag(ProfileFragment.newInstance(userId));
         }
 
         private void updateWowInfo() {
@@ -475,15 +485,16 @@
                 public void done(List<CustomParseObject> markers, ParseException e) {
                     if (e == null && markers.size() != 0) {
                         if(wowCount==1)
-                            wowStatText.setText("you WoWed this.");
+                            wowStatText.setText("You WoWed this.");
                         else if(wowCount==2)
-                            wowStatText.setText("you and another placer WoWed this.");
+                            wowStatText.setText("You and another placer WoWed this.");
                         else
-                            wowStatText.setText("you and other "+ wowCount+" WoWed this.");
+                            wowStatText.setText("You and other "+ wowCount+" WoWed this.");
                     }
                 }
             });
 
+            /*
             ParseQuery<CustomParseObject> queryL = ParseQuery.getQuery("Wow_Lol_Boo");
             queryL.whereEqualTo("fbId", userId);
             queryL.whereEqualTo("flagId", flagId);
@@ -511,6 +522,7 @@
                     }
                 }
             });
+            */
         }
 
         private void retrieveComments() {

@@ -48,6 +48,8 @@ import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseInstallation;
+import com.parse.ParsePush;
 import com.parse.ParseUser;
 
 
@@ -417,7 +419,11 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
                         PlacesLoginUtils.loginType = PlacesLoginUtils.LoginType.GPLUS;
                     else PlacesLoginUtils.loginType = PlacesLoginUtils.LoginType.FACEBOOK;
 
-                    PlacesLoginUtils.getInstance().downloadUserInfo(this);
+                    switchToOtherFrag(new MainFragment());
+
+                    PlacesLoginUtils.downloadUserInfo(this);
+                    ParseInstallation.getCurrentInstallation().put("owner", ParseUser.getCurrentUser());
+                    ParseInstallation.getCurrentInstallation().saveInBackground();
                 }
                 break;
             case SHARE_ACTIVITY_REQUEST_CODE:
