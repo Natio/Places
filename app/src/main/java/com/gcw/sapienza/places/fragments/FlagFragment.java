@@ -472,15 +472,16 @@
                 public void done(List<CustomParseObject> markers, ParseException e) {
                     if (e == null && markers.size() != 0) {
                         if(wowCount==1)
-                            wowStatText.setText("you WoWed this.");
+                            wowStatText.setText("You WoWed this.");
                         else if(wowCount==2)
-                            wowStatText.setText("you and another placer WoWed this.");
+                            wowStatText.setText("You and another placer WoWed this.");
                         else
-                            wowStatText.setText("you and other "+ wowCount+" WoWed this.");
+                            wowStatText.setText("You and other "+ wowCount+" WoWed this.");
                     }
                 }
             });
 
+            /*
             ParseQuery<CustomParseObject> queryL = ParseQuery.getQuery("Wow_Lol_Boo");
             queryL.whereEqualTo("fbId", userId);
             queryL.whereEqualTo("flagId", flagId);
@@ -508,6 +509,7 @@
                     }
                 }
             });
+            */
         }
 
         private void retrieveComments() {
