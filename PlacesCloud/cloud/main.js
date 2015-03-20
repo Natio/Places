@@ -64,9 +64,12 @@ Parse.Cloud.afterSave("Comments", function(request, response){
 
 
           var listOfRecipients = filterDuplicates(results);
+
           if(first.id != currentUserID){
             listOfRecipients.push(first.get("owner"));
+            console.log("Aggiungo utente corrente first.id: "+first.id + " currentUserID: "+currentUserID);
           }
+
           console.log(listOfRecipients);
           var query_push = new Parse.Query(Parse.Installation);
           query_push.containedIn("owner", listOfRecipients);
@@ -180,6 +183,55 @@ Parse.Cloud.job("addFbId", function(request, status){
   error: function(error){status.error(error.message);}});
 });
 
+
+function assignFlagsToComments(comments, index, status){
+  if(index >= comments.length){
+		Parse.Object.saveAll(comments , {
+				success: function(list) {
+					status.success("Migration completed successfully");
+				},
+				error: function(error) {
+					status.error(error.message);
+				},
+			});
+		return;
+	}
+  var current = comments[index];
+
+  var Posts = Parse.Object.extend("Posts");
+  var query_p = new Parse.Query(Posts);
+  query_p.equalTo("objectId", current.get("flagId"));
+  query_p.first({
+      success: function(first) {
+        current.set("flag", first);
+        console.log(first);
+        assignFlagsToComments(comments, index+1, status);
+      },
+      error: function(error) {
+        status.error(error.message);
+      },
+    })
+
+
+}
+
+Parse.Cloud.job("addFlagsToComments", function(request, status) {
+  var Comments = Parse.Object.extend("Comments");
+  var query = new Parse.Query(Comments);
+  query.doesNotExist("flag");
+  query.limit(200);
+  query.find({
+		error: function(error){
+			status.error(error.message);
+		},
+		success: function (results){
+      assignFlagsToComments(results, 0, status);
+		}
+	});
+
+});
+
+
 function getCommentsAndSetCommenter(comments, index, status){
 	if(index >= comments.length){
 		Parse.Object.saveAll(comments , {
@@ -210,6 +262,7 @@ function getCommentsAndSetCommenter(comments, index, status){
 
 
 }
+
 
 Parse.Cloud.job("addCommenterToComments", function(request, status) {
 	Parse.Cloud.useMasterKey();
