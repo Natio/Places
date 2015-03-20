@@ -127,7 +127,7 @@ public class ProfileFragment extends Fragment {
 
         cnt=0;
 
-        FacebookUtils.getInstance().loadProfilePicIntoImageView(this.fbId, fbPicView, PlacesLoginUtils.PicSize.LARGE);
+        PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(this.fbId, fbPicView, PlacesLoginUtils.PicSize.LARGE);
 
         String[] categories = getActivity().getResources().getStringArray(R.array.categories);
 

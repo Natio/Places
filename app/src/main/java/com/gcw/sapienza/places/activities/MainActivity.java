@@ -410,6 +410,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
                         PlacesLoginUtils.loginType = PlacesLoginUtils.LoginType.GPLUS;
                     else PlacesLoginUtils.loginType = PlacesLoginUtils.LoginType.FACEBOOK;
 
+                    switchToOtherFrag(new MainFragment());
+
                     PlacesLoginUtils.downloadUserInfo(this);
                     ParseInstallation.getCurrentInstallation().put("owner", ParseUser.getCurrentUser());
                     ParseInstallation.getCurrentInstallation().saveInBackground();
