@@ -19,6 +19,11 @@ function filterDuplicates(array){
     return values;
 }
 
+//courtesy of http://stackoverflow.com/questions/1199352/smart-way-to-shorten-long-strings-with-javascript
+String.prototype.trunc = String.prototype.trunc ||
+      function(n){
+          return this.length>n ? this.substr(0,n-1)+'...' : this;
+      };
 
 
 Parse.Cloud.afterSave("Comments", function(request, response){
@@ -56,19 +61,22 @@ Parse.Cloud.afterSave("Comments", function(request, response){
           if(typeof first === "undefined"){
             return;
           }
-          if(first.id != currentUserID){
-            results.push(first.get("owner"));
-          }
+
 
           var listOfRecipients = filterDuplicates(results);
+          if(first.id != currentUserID){
+            listOfRecipients.push(first.get("owner"));
+          }
           console.log(listOfRecipients);
           var query_push = new Parse.Query(Parse.Installation);
           query_push.containedIn("owner", listOfRecipients);
-
+          var alertText = request.object.get("username") + ": " + request.object.get("text").trunc(30);
           Parse.Push.send({
             where: query_push, // Set our Installation query
             data: {
-              alert: "A Flag has been commented. Check it out!!!"
+              alert: alertText,
+              commented_flag: flagId,
+              type: "comment"
             }
           }, {
             success: function() {
