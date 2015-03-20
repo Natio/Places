@@ -18,4 +18,6 @@ public interface ILocationUpdater {
     public void setMyFlags(List<Flag> myFlags);
 
     public void setHiddenFlags(List<Flag> hiddenFlags);
+
+    public void setBagFlags(List<Flag> bagFlags);
 }

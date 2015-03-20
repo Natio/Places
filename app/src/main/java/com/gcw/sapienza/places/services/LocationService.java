@@ -24,6 +24,7 @@ import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.fragments.CategoriesFragment;
+import com.gcw.sapienza.places.models.Comment;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.notifications.Notifications;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
@@ -38,9 +39,11 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -56,6 +59,8 @@ public class LocationService extends Service implements
     public static final String FOUND_MY_FLAGS_NOTIFICATION = "FOUND_MY_FLAGS_NOTIFICATION";
     public static final String FOUND_NO_MY_FLAGS_NOTIFICATION = "FOUND_NO_MY_FLAGS_NOTIFICATION";
     public static final String LOCATION_CHANGED_NOTIFICATION = "LOCATION_CHANGED_NOTIFICATION";
+    public static final String FOUND_BAG_FLAGS_NOTIFICATION = "FOUND_BAG_FLAGS_NOTIFICATION";
+    public static final String FOUND_NO_BAG_FLAGS_NOTIFICATION = "FOUND_NO_BAG_FLAGS_NOTIFICATION";
     public static final String NO_FLAGS_VISIBLE = "you won't be able to see any flags with these settings";
     private static final String TAG = "LocationService";
     private static final long ONE_MIN = 1000 * 60;
@@ -78,6 +83,8 @@ public class LocationService extends Service implements
     private List<Flag> hiddenFlags;
 
     private List<Flag> myFlags;
+
+    private List<Flag> bagFlags;
 
     private Location notificationLocation;
 
@@ -133,12 +140,18 @@ public class LocationService extends Service implements
         return this.myFlags;
     }
 
+    public List<Flag> getBagFlags() { return this.bagFlags; }
+
     public void setListener(ILocationUpdater app) {
         this.listener = app;
     }
 
     public void resetNoFlagsWarning() { this.noFlagsWarning = false; }
 
+
+    /**
+     * query Parse table for all the Flags of current user
+     */
     public void queryParsewithCurrentUser() {
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
         query.whereEqualTo("fbId", PlacesLoginUtils.getInstance().getCurrentUserId());
@@ -161,6 +174,44 @@ public class LocationService extends Service implements
                     LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_MY_FLAGS_NOTIFICATION));
                 } else {
                     LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION));
+                }
+            }
+        });
+
+    }
+
+    /**
+     * query Parse table for all the Flags in the current user's bag
+     */
+    public void queryParsewithBag() {
+        ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
+        query.whereEqualTo("commenter", ParseUser.getCurrentUser());
+        query.whereNotEqualTo("flagOwner", ParseUser.getCurrentUser());
+        query.orderByDescending("createdAt");
+        query.findInBackground(new FindCallback<Comment>() {
+            @Override
+            public void done(List<Comment> comments, ParseException e) {
+                if (e != null) {
+                    // Log.e(TAG, e.getMessage());
+                    Toast.makeText(getBaseContext(), "Cannot fetch your bag Flags at the moment,\ntry again later", Toast.LENGTH_SHORT);
+                }
+                if (comments == null) {
+                    comments = new ArrayList<Comment>();
+                }
+
+                HashSet<Flag> bagFlagsSet = new HashSet<Flag>();
+                for(Comment c: comments){
+                    bagFlagsSet.add(c.getFlag());
+                }
+                LocationService.this.bagFlags = new ArrayList<Flag>();
+                LocationService.this.bagFlags.addAll(bagFlagsSet);
+
+                updateApplication();
+
+                if (bagFlagsSet.size() > 0) {
+                    LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_BAG_FLAGS_NOTIFICATION));
+                } else {
+                    LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_BAG_FLAGS_NOTIFICATION));
                 }
             }
         });
@@ -475,6 +526,7 @@ public class LocationService extends Service implements
             listener.setFlagsNearby(parseObjects);
             listener.setHiddenFlags(hiddenFlags);
             listener.setMyFlags(myFlags);
+            listener.setBagFlags(bagFlags);
         }
     }
 

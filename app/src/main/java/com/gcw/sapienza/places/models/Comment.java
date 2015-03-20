@@ -1,7 +1,9 @@
 package com.gcw.sapienza.places.models;
 
+import com.gcw.sapienza.places.PlacesApplication;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 import java.util.Date;
 
@@ -15,6 +17,8 @@ public class Comment extends ParseObject {
     public static final String FLAG_ID_KEY = "flagId";
     public static final String TEXT_KEY = "text";
     public static final String USERNAME_KEY = "username";
+    public static final String FLAG_KEY = "flag";
+    public static final String FLAG_OWNER_KEY = "flagOwner";
 
     public String getUserId() {
         return this.getString(USER_ID_KEY);
@@ -31,6 +35,16 @@ public class Comment extends ParseObject {
     public void setFlagId(String flagId) {
         this.put(FLAG_ID_KEY, flagId);
     }
+
+    public Flag getFlag() {
+        return (Flag)this.getParseObject(FLAG_KEY);
+    }
+
+    public void setFlag(Flag flag) { this.put(FLAG_KEY, flag); }
+
+    public PlacesUser getFlagOwner() { return (PlacesUser)this.getParseObject(FLAG_OWNER_KEY); }
+
+    public void setFlagOwner(ParseUser flag) { this.put(FLAG_KEY, flag); }
 
     public String getCommentText() {
         return this.getString(TEXT_KEY);

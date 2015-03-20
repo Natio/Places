@@ -24,6 +24,7 @@ import com.gcw.sapienza.places.utils.CropCircleTransformation;
 import com.gcw.sapienza.places.utils.PlacesUtilCallback;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
+import com.google.gson.Gson;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -281,6 +282,9 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             bundle.putInt("wowCount", mFlag.getWowCount());
             bundle.putInt("lolCount", mFlag.getLolCount());
             bundle.putInt("booCount", mFlag.getBooCount());
+
+            bundle.putString("flag", new Gson().toJson(mFlag));
+            bundle.putString("flagOwner", new Gson().toJson(mFlag.getOwner()));
 
             ParseFile file;
             FlagFragment.MediaType mediaType = FlagFragment.MediaType.NONE;

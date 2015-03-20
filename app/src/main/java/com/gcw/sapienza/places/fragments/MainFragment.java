@@ -371,13 +371,14 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                 int flagCardsCount = flf.getRV().getAdapter().getItemCount();
 //                flf.getRV().getChildAt(index).setBackgroundColor(Color.RED);
                 // TODO item highlight on flag clicked on map?
-                for(Marker marker: this.markers){
-                    marker.setAlpha(0.85f);
-                }
-                selectedMarker.setAlpha(1f);
                 break;
             }
         }
+
+        for(Marker marker: this.markers){
+            marker.setAlpha(0.85f);
+        }
+        selectedMarker.setAlpha(1f);
 
         // by returning false we can show text on flag in the map
         // return false;

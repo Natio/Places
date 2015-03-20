@@ -58,6 +58,7 @@ public class PlacesApplication extends Application {
     private List<Flag> flagsNearby = new ArrayList<>(0);
     private List<Flag> myFlags = new ArrayList<>(0);
     private List<Flag> hiddenFlags = new ArrayList<>(0);
+    private List<Flag> bagFlags = new ArrayList<>(0);
     private ILocationUpdater listener = new ILocationUpdater() {
         @Override
         public void setLocation(Location l) {
@@ -77,6 +78,9 @@ public class PlacesApplication extends Application {
         public void setMyFlags(List<Flag> myFlags) {
             PlacesApplication.this.myFlags = myFlags;
         }
+
+        @Override
+        public void setBagFlags(List<Flag> bagFlags) { PlacesApplication.this.bagFlags = bagFlags; }
     };
     private LocationService mService;
     @SuppressWarnings("UnusedDeclaration")
@@ -193,6 +197,13 @@ public class PlacesApplication extends Application {
      */
     public List<Flag> getHiddenFlags() {
         return this.hiddenFlags;
+    }
+
+    /**
+     * @return returns the list of all the Flags for Bag page
+     */
+    public List<Flag> getBagFlags() {
+        return this.bagFlags;
     }
 
     //method called when the app is launched
