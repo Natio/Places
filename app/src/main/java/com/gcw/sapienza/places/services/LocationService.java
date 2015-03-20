@@ -161,7 +161,6 @@ public class LocationService extends Service implements
             @Override
             public void done(List<Flag> flags, ParseException e) {
                 if (e != null) {
-                    // Log.e(TAG, e.getMessage());
                     Toast.makeText(getBaseContext(), "Cannot fetch your Flags at the moment,\ntry again later", Toast.LENGTH_SHORT);
                 }
                 if (flags == null) {
@@ -416,8 +415,6 @@ public class LocationService extends Service implements
     @Override
     public void onLocationChanged(Location location) {
         Log.d(TAG, "Location changed");
-//        Log.d(TAG, "Interval: " + INTERVAL);
-//        Log.d(TAG, "Fastest Interval: " + FASTEST_INTERVAL);
 //        Log.d(TAG, "Location accuracy: " + location.getAccuracy());
         if (notificationLocation != null && location.distanceTo(this.notificationLocation) > (Utils.MAP_RADIUS * KM_TO_M)) {
             NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -442,8 +439,6 @@ public class LocationService extends Service implements
                 LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.LOCATION_CHANGED_NOTIFICATION));
             }
         }
-//        else
-//        updateApplication();
     }
 
     /**
@@ -552,7 +547,6 @@ public class LocationService extends Service implements
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         locationRequest.setInterval(INTERVAL);
         locationRequest.setFastestInterval(FASTEST_INTERVAL);
-//        Log.d(TAG, "Smallest displacement: " + Utils.MAP_RADIUS * KM_TO_M / 2);
         locationRequest.setSmallestDisplacement(Utils.MAP_RADIUS * KM_TO_M / 2);
 
         googleApiClient = new GoogleApiClient.Builder(this)
@@ -562,7 +556,6 @@ public class LocationService extends Service implements
                 .build();
 
         if (googleApiClient != null) {
-//            Log.d(TAG, "Google Api Client built");
             googleApiClient.connect();
         }
     }
