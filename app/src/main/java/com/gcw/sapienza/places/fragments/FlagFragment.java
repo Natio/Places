@@ -35,10 +35,13 @@
     import com.gcw.sapienza.places.models.Flag;
     import com.gcw.sapienza.places.models.PlacesUser;
     import com.gcw.sapienza.places.utils.PlacesLoginUtils;
+    import com.gcw.sapienza.places.utils.Utils;
+    import com.google.gson.Gson;
     import com.parse.FindCallback;
     import com.parse.GetDataCallback;
     import com.parse.ParseException;
     import com.parse.ParseFile;
+    import com.parse.ParseObject;
     import com.parse.ParseQuery;
     import com.parse.ParseUser;
     import com.parse.SaveCallback;
@@ -47,6 +50,7 @@
     import java.io.FileInputStream;
     import java.io.FileOutputStream;
     import java.io.IOException;
+    import java.io.Serializable;
     import java.util.ArrayList;
     import java.util.List;
     import java.util.StringTokenizer;
@@ -114,6 +118,8 @@
         private View view;
         private StringTokenizer st;
         private ScrollView flagContent;
+        private Flag flag;
+        private PlacesUser flagOwner;
 
         /**
          * Must be called BEFORE adding the fragment to the
@@ -161,6 +167,13 @@
             booCount = bundle.getInt("booCount");
 
             userId = PlacesLoginUtils.getInstance().getCurrentUserId();
+
+            String flagGSon = bundle.getString("flag");
+            flag = new Gson().fromJson(flagGSon, Flag.class);
+
+            String flagOwnerGSon = bundle.getString("flagOwner");
+            flagOwner = new Gson().fromJson(flagOwnerGSon, PlacesUser.class);
+
 
 
         }
@@ -561,6 +574,8 @@
                                     comment.put("userId", PlacesLoginUtils.getInstance().getCurrentUserId());
                                     comment.put("flagId", flagId);
                                     comment.put("accountType", (PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.FACEBOOK) ? "fb" : "g+");
+                                    comment.put("flag", ParseObject.createWithoutData("Posts", flag.getObjectId()));
+                                    comment.put("flagOwner", ParseObject.createWithoutData("_User", flagOwner.getObjectId()));
 
                                     /*
                                     FacebookUtils.getInstance().getFacebookUsernameFromID(PlacesLoginUtils.getInstance().getCurrentUserId(), new FacebookUtilCallback() {
@@ -579,6 +594,10 @@
                                         @Override
                                         public void done(ParseException e)
                                         {
+                                            if(e != null){
+                                                Utils.showToast(getActivity(), "Something went wrong while commenting", Toast.LENGTH_SHORT);
+                                                Log.e(TAG, e.getMessage());
+                                            }
                                             retrieveComments();
                                         }
                                     });

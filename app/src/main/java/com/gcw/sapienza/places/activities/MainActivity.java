@@ -30,6 +30,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.fragments.BagFragment;
 import com.gcw.sapienza.places.fragments.CategoriesFragment;
 import com.gcw.sapienza.places.fragments.MainFragment;
 import com.gcw.sapienza.places.fragments.MyFlagsFragment;
@@ -55,17 +56,21 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
     public static final String TAG = MainActivity.class.getName();
 
-    private static final String[] section_titles = {"Home", "Profile", "My Flags", "Settings", "Logout"};
+    private static final String[] section_titles = {"Home", "Profile", "My Flags", "Bag", "Settings", "Logout"};
+
     private static final int SHARE_ACTIVITY_REQUEST_CODE = 95;
+
     private static final int FLAGS_LIST_POSITION = 0;
     private static final int MY_PROFILE_POSITION = 1;
     private static final int MY_FLAGS_POSITION = 2;
+    private static final int BAG_POSITION = 3;
+    private static final int SETTINGS_POSITION = 4;
+    private static final int LOGOUT_POSITION = 5;
 
-    private static final int SETTINGS_POSITION = 3;
-    // private int currentDrawerListItemIndex = -1;
-    private static final int LOGOUT_POSITION = 4;
     private static final String FRAG_TAG = "FRAG_TAG";
+
     private static boolean isForeground = false;
+
     public Menu mMenu;
     private DrawerLayout drawerLayout;
     private ListView drawerList;
@@ -365,6 +370,10 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
             case SETTINGS_POSITION:
                 switchToNonSupportFrag(new SettingsFragment());
+                break;
+
+            case BAG_POSITION:
+                switchToOtherFrag(new BagFragment());
                 break;
 
             case LOGOUT_POSITION:

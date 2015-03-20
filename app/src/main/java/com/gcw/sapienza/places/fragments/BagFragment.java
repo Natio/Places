@@ -45,16 +45,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by snowblack on 2/19/15.
+ * Created by snowblack on 3/20/15.
  */
-public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener,
-        GoogleMap.OnMarkerClickListener {
-
-    private static final String TAG = "MyFlagsFragment";
+public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener,
+        GoogleMap.OnMarkerClickListener{
+    private static final String TAG = "BagFragment";
 
     private View view;
     private GoogleMap gMap;
@@ -67,8 +65,6 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
     private DrawerLayout drawerLayout;
     private LinearLayout homeHolder;
     private FrameLayout fragHolder;
-
-    private List<Marker> markers;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,15 +79,15 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
                  */
                 switch (intent.getAction()) {
 
-                    case LocationService.FOUND_MY_FLAGS_NOTIFICATION:
+                    case LocationService.FOUND_BAG_FLAGS_NOTIFICATION:
 
-                        Log.d(TAG, "My flags found");
+                        Log.d(TAG, "My bag flags found");
 //                        MyFlagsFragment.this.dismissProgressBar();
                         break;
 
-                    case LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION:
+                    case LocationService.FOUND_NO_BAG_FLAGS_NOTIFICATION:
 
-                        Log.d(TAG, "No my flags found");
+                        Log.d(TAG, "No my bag flags found");
 //                        MyFlagsFragment.this.dismissProgressBar();
                         break;
 
@@ -101,8 +97,8 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
             }
         };
 
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_MY_FLAGS_NOTIFICATION));
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION));
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_BAG_FLAGS_NOTIFICATION));
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_BAG_FLAGS_NOTIFICATION));
     }
 
     @Override
@@ -165,7 +161,7 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
 
         SupportMapFragment mapFragment = new SupportMapFragment();
         myContext.getSupportFragmentManager().beginTransaction().replace(R.id.my_map_holder, mapFragment).commit();
-        mapFragment.getMapAsync(MyFlagsFragment.this);
+        mapFragment.getMapAsync(BagFragment.this);
 
         return view;
     }
@@ -210,28 +206,22 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
     }
 
     @Override
-    public boolean onMarkerClick(Marker selectedMarker) {
-
-        int index = Integer.parseInt(selectedMarker.getSnippet());
+    public boolean onMarkerClick(Marker marker) {
+        int index = Integer.parseInt(marker.getSnippet());
 
         List<Fragment> frags = getActivity().getSupportFragmentManager().getFragments();
 
         if (frags.size() < 1) return false;
 
         for (int i = 0; i < frags.size(); i++) {
-            if (frags.get(i) instanceof MyFlagsListFragment) {
-                MyFlagsListFragment flf = ((MyFlagsListFragment) frags.get(i));
+            if (frags.get(i) instanceof MyBagFlagsListFragment) {
+                MyBagFlagsListFragment flf = ((MyBagFlagsListFragment) frags.get(i));
                 flf.getRV().smoothScrollToPosition(index);
                 // TODO item highlight on flag clicked on map?
 
                 break;
             }
         }
-
-        for(Marker marker: this.markers){
-            marker.setAlpha(0.85f);
-        }
-        selectedMarker.setAlpha(1f);
 
         // by returning false we can show text on flag in the map
         // return false;
@@ -240,9 +230,7 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
 
     private void updateMarkersOnMap() {
 
-        this.flags = PlacesApplication.getInstance().getMyFlags();
-
-        this.markers = new ArrayList<>();
+        this.flags = PlacesApplication.getInstance().getBagFlags();
 
         if (this.flags != null && this.gMap != null) {
             this.gMap.clear();
@@ -268,7 +256,7 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
                                 (int) (marker.getHeight() * 0.25f),
                                 false);
 
-                Marker currMarker = this.gMap.addMarker(new MarkerOptions()
+                this.gMap.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title(text)
                         .snippet(index + "")
@@ -276,8 +264,6 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
                                 // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
                                 //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
                         .alpha(0.85f));
-
-                this.markers.add(currMarker);
 
                 index++;
             }
@@ -305,6 +291,6 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
     }
 
     protected void refresh() {
-        PlacesApplication.getInstance().getLocationService().queryParsewithCurrentUser();
+        PlacesApplication.getInstance().getLocationService().queryParsewithBag();
     }
 }

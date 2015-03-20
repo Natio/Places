@@ -41,7 +41,7 @@ public class Flag extends ParseObject {
         this.put(OWNER_KEY, owner);
     }
 
-    public ParseUser getOnwer() {
+    public ParseUser getOwner() {
         return (ParseUser) this.get(OWNER_KEY);
     }
 
