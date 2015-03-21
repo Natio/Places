@@ -283,8 +283,8 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             bundle.putInt("lolCount", mFlag.getLolCount());
             bundle.putInt("booCount", mFlag.getBooCount());
 
-            bundle.putString("flag", new Gson().toJson(mFlag));
-            bundle.putString("flagOwner", new Gson().toJson(mFlag.getOwner()));
+            //FIXME investigate why serialization works only on selected devices
+//            bundle.putString("flag", new Gson().toJson(mFlag));
 
             ParseFile file;
             FlagFragment.MediaType mediaType = FlagFragment.MediaType.NONE;
