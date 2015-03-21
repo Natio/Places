@@ -38,7 +38,6 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.adapters.MSpinnerAdapter;
@@ -50,7 +49,6 @@ import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParseAnalytics;
 import com.parse.ParseGeoPoint;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -696,7 +694,8 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
      * and shoot upload. Show toast to notify user about
      * success/fail of the upload
      */
-    private void share() {
+    private void share()
+    {
         Location current_location = PlacesApplication.getInstance().getLocation();
         if (PlacesApplication.isRunningOnEmulator) {
             current_location = LocationService.getRandomLocation(current_location, 100);
@@ -709,9 +708,13 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
         final Flag f = new Flag();
 
-        if (isPrivate) {
-            askForPassword();
-            if (password == null || password.length() == 0) return;
+        if (isPrivate)
+        {
+            if(password == null)
+            {
+                askForPassword();
+                return;
+            }
             else f.put("password", password);
         }
 
@@ -877,7 +880,9 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
                                 dialog.dismiss();
 
-                                confirmButton.setVisible(true);
+                                // confirmButton.setVisible(true);
+
+                                share();
                             }
 
                         }
