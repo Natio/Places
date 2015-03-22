@@ -176,28 +176,8 @@
 
             userId = PlacesLoginUtils.getInstance().getCurrentUserId();
 
-            //TODO investigate why serialization works only on selected devices
-//            String flagGSon = bundle.getString("flag");
-//            flag = new Gson().fromJson(flagGSon, Flag.class);
-
             flag = PlacesApplication.getInstance().getFlagWithId(flagId);
-            flagOwner = flag.getOwner();
 
-//            ParseQuery<Flag> flagQuery = new ParseQuery<Flag>("Posts");
-//            flagQuery.whereEqualTo("objectId", flagId);
-//            flagQuery.getFirstInBackground(new GetCallback<Flag>() {
-//                @Override
-//                public void done(Flag flag, ParseException e) {
-//                    if (e == null) {
-//                        FlagFragment.this.flag = flag;
-//                        FlagFragment.this.flagOwner = flag.getOwner();
-//                    } else {
-//                        Log.e(TAG, e.getMessage());
-//                        Utils.showToast(getActivity(), "Something went wrong while retrieving Flag data", Toast.LENGTH_SHORT);
-//                        return;
-//                    }
-//                }
-//            });
         }
 
         @Override
@@ -358,78 +338,6 @@
         @Override
         public void onResume() {
             super.onResume();
-
-            /*
-            ParseQuery<Flag> queryPosts = ParseQuery.getQuery("Posts");
-            queryPosts.whereEqualTo("objectId", flagId);
-
-            queryPosts.findInBackground(new FindCallback<Flag>()
-            {
-                public void done(List<Flag> markers, ParseException e)
-                {
-                    if (e == null && markers.size() != 0)
-                    {
-                        Flag flag = markers.get(0);
-
-                        wowCount = flag.getInt("wowCount");
-                        lolCount = flag.getInt("lolCount");
-                        booCount = flag.getInt("booCount");
-                    }
-                }
-            });
-
-            wowStatText.setText(wowStatText.getText() + " (" + wowCount + ")");
-            lolButton.setText(lolButton.getText() + " (" + lolCount + ")");
-            booButton.setText(booButton.getText() + " (" + booCount + ")");
-
-            ParseQuery<CustomParseObject> queryW = ParseQuery.getQuery("Wow_Lol_Boo");
-            queryW.whereEqualTo("fbId", userId);
-            queryW.whereEqualTo("flagId", flagId);
-            queryW.whereEqualTo("boolWow", true);
-
-            queryW.findInBackground(new FindCallback<CustomParseObject>()
-            {
-                public void done(List<CustomParseObject> markers, ParseException e)
-                {
-                    if (e == null && markers.size() != 0)
-                    {
-                        wowStatText.setText("You wow this." + " (" + wowCount + ")");
-                    }
-                }
-            });
-
-            ParseQuery<CustomParseObject> queryL = ParseQuery.getQuery("Wow_Lol_Boo");
-            queryL.whereEqualTo("fbId", userId);
-            queryL.whereEqualTo("flagId", flagId);
-            queryL.whereEqualTo("boolLol", true);
-
-            queryL.findInBackground(new FindCallback<CustomParseObject>()
-            {
-                public void done(List<CustomParseObject> markers, ParseException e)
-                {
-                    if (e == null && markers.size() != 0)
-                    {
-                        lolButton.setText("You lol this." + " (" + lolCount + ")");
-                    }
-                }
-            });
-
-            ParseQuery<CustomParseObject> queryB = ParseQuery.getQuery("Wow_Lol_Boo");
-            queryB.whereEqualTo("fbId", userId);
-            queryB.whereEqualTo("flagId", flagId);
-            queryB.whereEqualTo("boolBoo", true);
-
-            queryB.findInBackground(new FindCallback<CustomParseObject>()
-            {
-                public void done(List<CustomParseObject> markers, ParseException e)
-                {
-                    if (e == null && markers.size() != 0)
-                    {
-                        booButton.setText("You boo this." + " (" + booCount + ")");
-                    }
-                }
-            });
-            */
         }
 
         @Override
@@ -513,36 +421,6 @@
                     }
                 }
             });
-
-            /*
-            ParseQuery<CustomParseObject> queryL = ParseQuery.getQuery("Wow_Lol_Boo");
-            queryL.whereEqualTo("fbId", userId);
-            queryL.whereEqualTo("flagId", flagId);
-            queryL.whereEqualTo("boolLol", true);
-
-            queryL.findInBackground(new FindCallback<CustomParseObject>() {
-                @Override
-                public void done(List<CustomParseObject> markers, ParseException e) {
-                    if (e == null && markers.size() != 0) {
-                        lolButton.setText("You lol this." + " (" + lolCount + ')');
-                    }
-                }
-            });
-
-            ParseQuery<CustomParseObject> queryB = ParseQuery.getQuery("Wow_Lol_Boo");
-            queryB.whereEqualTo("fbId", userId);
-            queryB.whereEqualTo("flagId", flagId);
-            queryB.whereEqualTo("boolBoo", true);
-
-            queryB.findInBackground(new FindCallback<CustomParseObject>() {
-                @Override
-                public void done(List<CustomParseObject> markers, ParseException e) {
-                    if (e == null && markers.size() != 0) {
-                        booButton.setText("You boo this." + " (" + booCount + ')');
-                    }
-                }
-            });
-            */
         }
 
         private void retrieveComments() {
@@ -596,18 +474,7 @@
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int id) {
-//                                    if(flag == null){
-//                                        ParseQuery<Flag> flagQuery = new ParseQuery<Flag>("Posts");
-//                                        flagQuery.whereEqualTo("flagId", flagId);
-//                                        try {
-//                                            flag = flagQuery.getFirst();
-//                                            flagOwner = flag.getOwner();
-//                                        } catch (ParseException e) {
-//                                            Log.e(TAG, e.getMessage());
-//                                            Toast.makeText(getActivity(), "Something went wrong while posting the comment", Toast.LENGTH_SHORT);
-//                                            return;
-//                                        }
-//                                    }
+
                                     newComment = userInput.getText().toString();
                                     if (newComment.length() == 0) {
                                         Toast.makeText(getActivity(), "Comment cannot be empty!", Toast.LENGTH_LONG).show();
@@ -620,7 +487,6 @@
                                     comment.put("flagId", flagId);
                                     comment.put("accountType", (PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.FACEBOOK) ? "fb" : "g+");
                                     comment.put("flag", ParseObject.createWithoutData("Posts", flag.getObjectId()));
-                                    comment.put("flagOwner", ParseObject.createWithoutData("_User", flagOwner.getObjectId()));
 
                                     /*
                                     FacebookUtils.getInstance().getFacebookUsernameFromID(PlacesLoginUtils.getInstance().getCurrentUserId(), new FacebookUtilCallback() {
