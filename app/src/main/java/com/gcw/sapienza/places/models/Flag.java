@@ -45,9 +45,7 @@ public class Flag extends ParseObject implements Serializable {
         this.put(OWNER_KEY, owner);
     }
 
-    public ParseUser getOwner() {
-        return (ParseUser) this.get(OWNER_KEY);
-    }
+    public PlacesUser getOwner() { return (PlacesUser) this.get(OWNER_KEY); }
 
     public String getFlagId() {
         return this.getObjectId();
