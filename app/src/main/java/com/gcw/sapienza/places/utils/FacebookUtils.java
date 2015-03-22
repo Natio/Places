@@ -10,6 +10,8 @@ import com.facebook.HttpMethod;
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
+import com.facebook.android.Facebook;
+import com.facebook.android.Util;
 import com.facebook.model.GraphObject;
 import com.facebook.model.GraphUser;
 import com.gcw.sapienza.places.PlacesApplication;
@@ -208,7 +210,10 @@ public final class FacebookUtils {
      * @param fb_id FB user id
      * @param cbk   callback parameter. MUST not be null. User Username will be given as a parameter of onResult method
      */
-    public void getFacebookUsernameFromID(final String fb_id, final PlacesUtilCallback cbk) {
+    public void getFacebookUsernameFromID(final String fb_id, final PlacesUtilCallback cbk)
+    {
+        Log.d(TAG, "In getFacebookUsernameFromID");
+
         String username = PlacesLoginUtils.getInstance().getUserNameFromId(fb_id);
         if (username != null) {
             if (cbk != null) {
@@ -240,6 +245,8 @@ public final class FacebookUtils {
                     public void onCompleted(Response response) {
                         try {
                             GraphObject go = response.getGraphObject();
+
+                            Log.d(TAG, "Response in getFacebookUsernameFromID: " + go.toString());
 
                             JSONObject obj = go.getInnerJSONObject();
                             String name = obj.getString("name");
@@ -274,19 +281,48 @@ public final class FacebookUtils {
                 });
 
         req.executeAsync();
-
     }
 
-    protected void loadUsernameIntoTextView(String userId, final TextView tv)
+    protected void loadUsernameIntoTextView(final String userId, final TextView tv)
     {
-        getFacebookUsernameFromID(userId, new PlacesUtilCallback() {
-            @Override
-            public void onResult(String result, Exception e)
-            {
-                Log.d(TAG, "Result in loadUsernameIntoTextView: " + result);
-                tv.setText(result);
-            }
-        });
+        // if(PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.FACEBOOK) {
+            getFacebookUsernameFromID(userId, new PlacesUtilCallback() {
+                @Override
+                public void onResult(String result, Exception e) {
+                    Log.d(TAG, "Result in loadUsernameIntoTextView: " + result);
+                    tv.setText(result);
+                }
+            });
+        /*}
+        else
+        {
+            Bundle bundle = new Bundle();
+            bundle.putString("fields", "name");
+            Request req = new Request(ParseFacebookUtils.getSession(), userId, bundle, HttpMethod.GET,
+                    new Request.Callback() {
+                        @Override
+                        public void onCompleted(Response response) {
+                            try
+                            {
+                                GraphObject go = response.getGraphObject();
+
+                                JSONObject obj = go.getInnerJSONObject();
+                                String name = obj.getString("name");
+
+                                PlacesLoginUtils.getInstance().addEntryToUserIdMap(userId, name);
+                                tv.setText(name);
+
+                            }
+                            catch (JSONException | NullPointerException e)
+                            {
+                                Log.v(TAG, "Couldn't resolve facebook user's name.  Error: " + e.toString());
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+            req.executeAsync();
+        }*/
     }
 
     /**

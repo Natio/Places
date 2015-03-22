@@ -67,7 +67,7 @@ public class CommentsAdapter extends ArrayAdapter<String> {
 
                     //since "getFbProfilePictureURL" could last too much
                     //i'm putting an initial std picture in authorImageView
-                    PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(comment.getUserId(), authorImageView, PlacesLoginUtils.PicSize.SMALL);
+                    PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(comment.getUserId(), authorImageView, PlacesLoginUtils.PicSize.SMALL, comment.getAccountType());
                     commentTextView.setText(comment.getCommentText());
 
                     DateFormat df = new SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault());
@@ -79,7 +79,7 @@ public class CommentsAdapter extends ArrayAdapter<String> {
                         @Override
                         public void onClick(View v)
                         {
-                            ((MainActivity)context).switchToOtherFrag(ProfileFragment.newInstance(comment.getUserId()));
+                            ((MainActivity)context).switchToOtherFrag(ProfileFragment.newInstance(comment.getUserId(), comment.getAccountType()));
                         }
                     });
                 }

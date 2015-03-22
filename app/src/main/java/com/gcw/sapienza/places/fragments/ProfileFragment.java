@@ -39,8 +39,10 @@ public class ProfileFragment extends Fragment {
     private static final String TAG = "ProfileFragment";
 
     private static final String FBID = "FacebookID";
+    private static final String AT = "accountType";
 
     private String fbId;
+    private String accountType;
 
     private ImageView fbPicView;
     private TextView fbNameView;
@@ -70,12 +72,13 @@ public class ProfileFragment extends Fragment {
 
     private int numFlags;
 
-    public static final ProfileFragment newInstance(String fbId) {
+    public static final ProfileFragment newInstance(String fbId, String accountType) {
 
         ProfileFragment fragment = new ProfileFragment();
 
         Bundle bundle = new Bundle();
         bundle.putString(FBID, fbId);
+        bundle.putString(AT, accountType);
 
         fragment.setArguments(bundle);
 
@@ -86,6 +89,7 @@ public class ProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.fbId = getArguments().getString(FBID);
+        this.accountType = getArguments().getString(AT);
     }
 
     @Override
@@ -127,7 +131,7 @@ public class ProfileFragment extends Fragment {
 
         cnt=0;
 
-        PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(this.fbId, fbPicView, PlacesLoginUtils.PicSize.LARGE);
+        PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(this.fbId, fbPicView, PlacesLoginUtils.PicSize.LARGE, accountType);
 
         String[] categories = getActivity().getResources().getStringArray(R.array.categories);
 

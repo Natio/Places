@@ -324,7 +324,13 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 //    {
 
     private void myProfile() {
-        switchToOtherFrag(ProfileFragment.newInstance(PlacesLoginUtils.getInstance().getCurrentUserId()));
+
+        String at;
+
+        if(PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.FACEBOOK) at = "fb";
+        else at = "g+";
+
+        switchToOtherFrag(ProfileFragment.newInstance(PlacesLoginUtils.getInstance().getCurrentUserId(), at));
     }
 
     private void logout() {
