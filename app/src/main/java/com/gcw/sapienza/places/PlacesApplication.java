@@ -291,9 +291,6 @@ public class PlacesApplication extends Application {
         if (hasToSaveInstallation) {
             ParseInstallation.getCurrentInstallation().saveInBackground();
         }
-
-
-        PlacesApplication.getInstance().startLocationService();
     }
 
     public void startLocationService() {
@@ -308,6 +305,13 @@ public class PlacesApplication extends Application {
         } else {
             Log.w("Places Application", "Location Service not started!");
         }
+    }
+
+    public void updatePlacesData(){
+        if(mService != null)
+            mService.updateLocationData();
+        else
+            startLocationService();
     }
 
     private void updateWeatherInfo() {

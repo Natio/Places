@@ -119,9 +119,7 @@ public class LocationService extends Service implements
         return random_loc;
     }
 
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        Log.d(TAG, "Connected to Google Api");
+    public void updateLocationData(){
         Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
         if (currentLocation != null) {
             this.location = currentLocation;
@@ -129,6 +127,13 @@ public class LocationService extends Service implements
             queryParsewithCurrentUser();
             queryParsewithBag();
         }
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        Log.d(TAG, "Connected to Google Api");
+        Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
+        updateLocationData();
         fusedLocationProviderApi.requestLocationUpdates(googleApiClient, locationRequest, this);
     }
 
@@ -200,6 +205,13 @@ public class LocationService extends Service implements
                     if (comments == null) {
                         comments = new ArrayList<Comment>();
                     }
+
+                    ParseUser parseUser = ParseUser.getCurrentUser();
+
+//                    if(parseUser == null){
+//                        Log.e(TAG, "Parse User is null!");
+//                        return;
+//                    }
 
                     String currentUserId = ParseUser.getCurrentUser().getObjectId();
 

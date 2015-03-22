@@ -333,8 +333,12 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
                                 PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString(PlacesLoginUtils.GPLUS_TOKEN_SP, token).commit();
                                 PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString(PlacesLoginUtils.EMAIL_SP, email).commit();
 
-                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                                startActivity(intent);
+//                                Unnecessary to start new activity when the MainActivity is already in background
+//                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+//                                startActivity(intent);
+
+                                finish();
+
                             } else if (e != null) {
                                 Toast.makeText(getApplicationContext(), "There was a problem creating your account.", Toast.LENGTH_SHORT).show();
                                 e.printStackTrace();
