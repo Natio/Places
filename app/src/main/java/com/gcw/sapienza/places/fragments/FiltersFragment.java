@@ -9,12 +9,13 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
 import com.gcw.sapienza.places.R;
 
 /**
  * Created by Simone on 12/30/2014.
  */
-public class FiltersFragment extends PreferenceFragment{
+public class FiltersFragment extends PreferenceFragment {
     @SuppressWarnings("unused")
     private static final String TAG = "SettingsFragment";
 
@@ -29,7 +30,7 @@ public class FiltersFragment extends PreferenceFragment{
 
     }
 
-    private void loadPreferencesAndSetListeners(){
+    private void loadPreferencesAndSetListeners() {
 
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.layout.categories_filter_list);

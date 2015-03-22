@@ -1,19 +1,14 @@
 package com.gcw.sapienza.places.utils;
 
-import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.widget.Button;
 import android.widget.Toast;
 
-import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -175,7 +170,7 @@ public class Utils {
         }
     }
 
-    public static void showToast(Context context, String text, int duration){
+    public static void showToast(Context context, String text, int duration) {
         Toast.makeText(context, text, duration).show();
     }
 }

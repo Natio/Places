@@ -1,22 +1,19 @@
 package com.gcw.sapienza.places.utils;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-import com.gcw.sapienza.places.activities.MainActivity;
+
 import com.gcw.sapienza.places.activities.PlacesLoginActivity;
-import com.gcw.sapienza.places.models.PlacesUser;
-import com.google.android.gms.plus.Plus;
 import com.parse.FunctionCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +37,7 @@ public class PlacesLoginUtils {
     private final HashMap<String, String> userProfilePicMapSmall = new HashMap<>();
     private final HashMap<String, String> userProfilePicMapLarge = new HashMap<>();
     private String userId;
+
     private PlacesLoginUtils() {
     }
 
@@ -52,9 +50,9 @@ public class PlacesLoginUtils {
         return PlacesLoginUtils.shared_instance;
     }
 
-    public static void downloadUserInfo(Activity activity)
-    {
-        if (loginType == LoginType.FACEBOOK) FacebookUtils.getInstance().downloadFacebookInfo(activity);
+    public static void downloadUserInfo(Activity activity) {
+        if (loginType == LoginType.FACEBOOK)
+            FacebookUtils.getInstance().downloadFacebookInfo(activity);
         else if (loginType == LoginType.GPLUS) GPlusUtils.getInstance().downloadGPlusInfo(activity);
     }
 
@@ -86,8 +84,7 @@ public class PlacesLoginUtils {
         return this.getUserProfilePicMapLarge();
     }
 
-    public static void startLoginActivity(Activity activity, boolean canChoose)
-    {
+    public static void startLoginActivity(Activity activity, boolean canChoose) {
         PlacesLoginBuilder builder = new PlacesLoginBuilder(activity);
 
         // builder.setAppLogo(R.drawable.app_logo);
@@ -167,24 +164,19 @@ public class PlacesLoginUtils {
         return this.userProfilePicMapLarge.get(profile_id);
     }
 
-    public void checkForSessionValidityAndStartDownloadingInfo(Activity context)
-    {
+    public void checkForSessionValidityAndStartDownloadingInfo(Activity context) {
         String googleToken = "";
         String email = "";
 
-        if(ParseUser.getCurrentUser() != null)
-        {
-            if (FacebookUtils.isFacebookSessionOpened())
-            {
+        if (ParseUser.getCurrentUser() != null) {
+            if (FacebookUtils.isFacebookSessionOpened()) {
                 loginType = LoginType.FACEBOOK;
 
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString(GPLUS_TOKEN_SP, "").commit();
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString(EMAIL_SP, "").commit();
 
                 PlacesLoginUtils.getInstance().downloadUserInfo(context);
-            }
-            else
-            {
+            } else {
                 loginType = LoginType.GPLUS;
 
                 googleToken = PreferenceManager.getDefaultSharedPreferences(context).getString(GPLUS_TOKEN_SP, "");
@@ -193,20 +185,18 @@ public class PlacesLoginUtils {
                 Log.d(TAG, "Token retrieved in PlacesLoginUtils: " + googleToken);
                 Log.d(TAG, "Email retrieved in PlacesLoginUtils: " + email);
 
-                if(!googleToken.equals("") && !email.equals("")) tryToLoginWithAvailableToken(context, googleToken, email);
+                if (!googleToken.equals("") && !email.equals(""))
+                    tryToLoginWithAvailableToken(context, googleToken, email);
                 else PlacesLoginUtils.startLoginActivity(context, true);
             }
-        }
-        else
-        {
+        } else {
             Log.d(TAG, "currentUser is null");
 
             PlacesLoginUtils.startLoginActivity(context, true);
         }
     }
 
-    private void tryToLoginWithAvailableToken(final Activity context, final String token, String email)
-    {
+    private void tryToLoginWithAvailableToken(final Activity context, final String token, String email) {
         final HashMap<String, Object> params = new HashMap();
         params.put("code", token);
         params.put("email", email);
@@ -216,25 +206,18 @@ public class PlacesLoginUtils {
         //loads the Cloud function to create a Google user
         ParseCloud.callFunctionInBackground("accessGoogleUser", params, new FunctionCallback<Object>() {
             @Override
-            public void done(final Object returnObj, ParseException e)
-            {
-                if (e == null)
-                {
-                    ParseUser.becomeInBackground(returnObj.toString(), new LogInCallback()
-                    {
-                        public void done(ParseUser user, ParseException e)
-                        {
+            public void done(final Object returnObj, ParseException e) {
+                if (e == null) {
+                    ParseUser.becomeInBackground(returnObj.toString(), new LogInCallback() {
+                        public void done(ParseUser user, ParseException e) {
                             Log.d(TAG, "So that's the token: " + token);
 
-                            if (user != null && e == null)
-                            {
-                                 Log.d(TAG, "The Google user validated - WAT");
+                            if (user != null && e == null) {
+                                Log.d(TAG, "The Google user validated - WAT");
 
-                                 GPlusUtils.getInstance().setGoogleApiClient(GPlusUtils.getInstance().getGoogleApiClient());
-                                 PlacesLoginUtils.downloadUserInfo(context);
-                            }
-                            else if (e != null)
-                            {
+                                GPlusUtils.getInstance().setGoogleApiClient(GPlusUtils.getInstance().getGoogleApiClient());
+                                PlacesLoginUtils.downloadUserInfo(context);
+                            } else if (e != null) {
                                 // Toast.makeText(context, "There was a problem creating your account. - WAT", Toast.LENGTH_SHORT).show();
                                 Log.d(TAG, "There was a problem creating your account. - WAT");
                                 e.printStackTrace();
@@ -243,9 +226,7 @@ public class PlacesLoginUtils {
                                 // Token was probably outdated
                                 startLoginActivity(context, true);
 
-                            }
-                            else
-                            {
+                            } else {
                                 Log.d(TAG, "The Google token could not be validated - WAT");
 
                                 // Token was probably outdated
@@ -253,11 +234,9 @@ public class PlacesLoginUtils {
                             }
                         }
                     });
-                }
-                else
-                {
+                } else {
                     // Toast.makeText(context, "There was a problem creating your account. - WAT", Toast.LENGTH_LONG).show();
-                    Log.d(TAG, "There was a problem creating your account. - WAT: "  + e.getMessage());
+                    Log.d(TAG, "There was a problem creating your account. - WAT: " + e.getMessage());
                     e.printStackTrace();
                     // if(GPlusUtils.getInstance().getGoogleApiClient() != null) GPlusUtils.getInstance().getGoogleApiClient().disconnect();
 
@@ -282,18 +261,19 @@ public class PlacesLoginUtils {
         throw new InvalidParameterException("wrong size specified: " + size);
     }
 
-    public void loadUsernameIntoTextView(final String userId, final TextView tv, String lt)
-    {
+    public void loadUsernameIntoTextView(final String userId, final TextView tv, String lt) {
         Log.d(TAG, "Account type in loadUsernameIntoTextView method: " + lt);
 
-        if(lt == null || lt.equals("fb") || lt.equals("")) FacebookUtils.getInstance().loadUsernameIntoTextView(userId, tv);
+        if (lt == null || lt.equals("fb") || lt.equals(""))
+            FacebookUtils.getInstance().loadUsernameIntoTextView(userId, tv);
         else GPlusUtils.getInstance().loadUsernameIntoTextView(userId, tv);
     }
 
     public void getProfilePictureURL(final String user_id, final String account_type, final PlacesLoginUtils.PicSize size, final PlacesUtilCallback cbk) {
         if (account_type == null || account_type.equals("") || account_type.equals("fb"))
             FacebookUtils.getInstance().getFbProfilePictureURL(user_id, size, cbk);
-        else if (account_type.equals("g+")) GPlusUtils.getInstance().getGPlusProfilePictureURL(user_id, size, null, cbk);
+        else if (account_type.equals("g+"))
+            GPlusUtils.getInstance().getGPlusProfilePictureURL(user_id, size, null, cbk);
     }
 
     public void loadProfilePicIntoImageView(final String user_id, final ImageView imageView, final PlacesLoginUtils.PicSize size, String lt) {
@@ -311,9 +291,9 @@ public class PlacesLoginUtils {
 
         public String toString() {
             if (this == SMALL) {
-                return SMALL_PIC_SIZE+"";
+                return SMALL_PIC_SIZE + "";
             }
-            return LARGE_PIC_SIZE+"";
+            return LARGE_PIC_SIZE + "";
         }
     }
 

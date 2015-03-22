@@ -15,16 +15,16 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.fragments.FlagFragment;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.CropCircleTransformation;
-import com.gcw.sapienza.places.utils.PlacesUtilCallback;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
+import com.gcw.sapienza.places.utils.PlacesUtilCallback;
 import com.gcw.sapienza.places.utils.Utils;
-import com.google.gson.Gson;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -33,6 +33,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -97,18 +98,17 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
         String fb_username = f.getFbName(); // checks if Flag has fb username. if there is one use it otherwise ask FB
 
         // FIXME If user is logged in with G+, FB Graph API cannot be used
-        if (fb_username == null) PlacesLoginUtils.getInstance().loadUsernameIntoTextView(user_id, flagViewHolder.username, f.getAccountType());
+        if (fb_username == null)
+            PlacesLoginUtils.getInstance().loadUsernameIntoTextView(user_id, flagViewHolder.username, f.getAccountType());
         else flagViewHolder.username.setText(fb_username);
 
 
         PlacesLoginUtils.getInstance().getProfilePictureURL(user_id, account_type, PlacesLoginUtils.PicSize.SMALL, new PlacesUtilCallback() {
             @Override
-            public void onResult(String result, Exception e)
-            {
+            public void onResult(String result, Exception e) {
                 Log.d(TAG, "Pic path: " + result);
 
-                if(result != null && !result.isEmpty())
-                {
+                if (result != null && !result.isEmpty()) {
                     Log.d(TAG, "Inserting profile pic in card " + i);
 
                     Picasso.with(FlagsAdapter.this.view.getContext()).load(result).transform(transformation).into(flagViewHolder.user_profile_pic);
@@ -116,15 +116,14 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             }
         });
 
-        int numberOfWows= f.getWowCount();
-        flagViewHolder.stats_wow.setText(numberOfWows+" WoW");
+        int numberOfWows = f.getWowCount();
+        flagViewHolder.stats_wow.setText(numberOfWows + " WoW");
 
 
         int numberOfComments = f.getNumberOfComments();
-        if(numberOfComments == 1){
+        if (numberOfComments == 1) {
             flagViewHolder.stats_comment.setText(numberOfComments + " comment");
-        }
-        else{
+        } else {
             flagViewHolder.stats_comment.setText(numberOfComments + " comments");
         }
 /*
@@ -264,8 +263,7 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             else openFlag();
         }
 
-        private void openFlag()
-        {
+        private void openFlag() {
             Date date = mFlag.getDate();
 
             DateFormat df = new SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault());

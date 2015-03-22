@@ -19,20 +19,21 @@ public class Receiver extends ParsePushBroadcastReceiver {
     private static final String TAG = "Receiver";
     public static final String RECEIVED_NOTIF_COMMENT_TYPE = "comment_notification";
     public static final String FLAG_ID = "flagId";
+
     @Override
     public void onPushOpen(Context context, Intent intent) {
         Log.d("Push", "Clicked");
         Log.d(TAG, intent.getExtras().getString("com.parse.Data"));
 
-        try{
+        try {
             JSONObject root = new JSONObject(intent.getExtras().getString("com.parse.Data"));
             String type = root.getString("type");
             String flag_id = root.getString("commented_flag");
-            if(type != null && type.equals("comment") && flag_id != null){
+            if (type != null && type.equals("comment") && flag_id != null) {
 
                 Intent i = new Intent(context, MainActivity.class);
                 Bundle extras = new Bundle();
-                extras.putString("type",RECEIVED_NOTIF_COMMENT_TYPE);
+                extras.putString("type", RECEIVED_NOTIF_COMMENT_TYPE);
                 extras.putString(FLAG_ID, flag_id);
 
                 i.putExtras(intent.getExtras());
@@ -40,8 +41,7 @@ public class Receiver extends ParsePushBroadcastReceiver {
                 context.startActivity(i);
                 //TODO the intent launches MainActivity but the flag is not opened
 
-            }
-            else{
+            } else {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW,
                         Uri.parse("https://drive.google.com/folderview?id=0B1boWbY-47RQdHJnSlpScUNueTQ&usp=drive_web"));
                 browserIntent.putExtras(intent.getExtras());
@@ -50,8 +50,7 @@ public class Receiver extends ParsePushBroadcastReceiver {
             }
 
 
-        }
-        catch (JSONException e){
+        } catch (JSONException e) {
             Log.d(TAG, "Json error", e);
         }
 

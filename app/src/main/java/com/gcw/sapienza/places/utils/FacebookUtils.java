@@ -6,20 +6,21 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.facebook.HttpMethod;
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
-import com.facebook.android.Facebook;
-import com.facebook.android.Util;
 import com.facebook.model.GraphObject;
 import com.facebook.model.GraphUser;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.parse.ParseFacebookUtils;
 import com.squareup.picasso.Picasso;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,7 +35,7 @@ public final class FacebookUtils {
     private final HashMap<String, HashSet<PlacesUtilCallback>> scheduledOperationsQueue = new HashMap<>();
 
     //attempt to solve slow download of profile picture
-    public static final  String DEFAULT_AVATAR_URL = "http://1.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=256";
+    public static final String DEFAULT_AVATAR_URL = "http://1.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=256";
 
     private FacebookUtils() {
     }
@@ -162,10 +163,11 @@ public final class FacebookUtils {
     /**
      * WARNING: FETCHING FRIENDS' FRIENDS IS NOT CURRENTLY SUPPORTED,
      * THEREFORE AT THIS TIME THIS FUNCTION DOESN'T WORK AS EXPECTED
+     *
      * @param fbId Facebook id of the friend
-     * @param cbk callback to be called when response is received
+     * @param cbk  callback to be called when response is received
      */
-    public void getFriendsFriends(String fbId, final FacebookUtilsFriendsCallback cbk){
+    public void getFriendsFriends(String fbId, final FacebookUtilsFriendsCallback cbk) {
         Bundle bundle = new Bundle();
         bundle.putString("fields", "id");
 
@@ -210,8 +212,7 @@ public final class FacebookUtils {
      * @param fb_id FB user id
      * @param cbk   callback parameter. MUST not be null. User Username will be given as a parameter of onResult method
      */
-    public void getFacebookUsernameFromID(final String fb_id, final PlacesUtilCallback cbk)
-    {
+    public void getFacebookUsernameFromID(final String fb_id, final PlacesUtilCallback cbk) {
         Log.d(TAG, "In getFacebookUsernameFromID");
 
         String username = PlacesLoginUtils.getInstance().getUserNameFromId(fb_id);
@@ -283,16 +284,15 @@ public final class FacebookUtils {
         req.executeAsync();
     }
 
-    protected void loadUsernameIntoTextView(final String userId, final TextView tv)
-    {
+    protected void loadUsernameIntoTextView(final String userId, final TextView tv) {
         // if(PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.FACEBOOK) {
-            getFacebookUsernameFromID(userId, new PlacesUtilCallback() {
-                @Override
-                public void onResult(String result, Exception e) {
-                    Log.d(TAG, "Result in loadUsernameIntoTextView: " + result);
-                    tv.setText(result);
-                }
-            });
+        getFacebookUsernameFromID(userId, new PlacesUtilCallback() {
+            @Override
+            public void onResult(String result, Exception e) {
+                Log.d(TAG, "Result in loadUsernameIntoTextView: " + result);
+                tv.setText(result);
+            }
+        });
         /*}
         else
         {
@@ -337,10 +337,9 @@ public final class FacebookUtils {
             @Override
             public void onResult(String result, Exception e) {
                 if (e == null) {
-                    if(result.trim().length() == 0){
+                    if (result.trim().length() == 0) {
                         Picasso.with(PlacesApplication.getPlacesAppContext()).load(DEFAULT_AVATAR_URL).into(imageView);
-                    }
-                    else{
+                    } else {
                         Picasso.with(PlacesApplication.getPlacesAppContext()).load(result).into(imageView);
                     }
                 } else {

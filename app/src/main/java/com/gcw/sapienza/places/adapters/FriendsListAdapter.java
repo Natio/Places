@@ -19,9 +19,7 @@ import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by snowblack on 3/2/15.
@@ -64,8 +62,7 @@ public class FriendsListAdapter extends ArrayAdapter<String> {
             @Override
             public void done(final PlacesUser placesUser, ParseException e) {
 
-                if (e == null)
-                {
+                if (e == null) {
 
                     friendNameView.setText(placesUser.getName());
                     PlacesLoginUtils.getInstance().addEntryToUserIdMap(friendId, placesUser.getName());
@@ -77,9 +74,7 @@ public class FriendsListAdapter extends ArrayAdapter<String> {
                             ((MainActivity) getContext()).switchToOtherFrag(new ProfileFragment().newInstance(friendId, placesUser.getAccountType()));
                         }
                     });
-                }
-                else
-                {
+                } else {
 
                     Log.e(TAG, e.getMessage());
                     Toast.makeText(getContext(), "An error occurred while retrieving friends' data", Toast.LENGTH_SHORT).show();

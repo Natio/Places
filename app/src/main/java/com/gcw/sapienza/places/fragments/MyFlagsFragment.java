@@ -43,7 +43,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -228,7 +227,7 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
             }
         }
 
-        for(Marker marker: this.markers){
+        for (Marker marker : this.markers) {
             marker.setAlpha(Utils.FLAG_ALPHA_NORMAL);
         }
         selectedMarker.setAlpha(Utils.FLAG_ALPHA_FULL);

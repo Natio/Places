@@ -9,7 +9,7 @@ import java.io.Serializable;
  */
 public class PlacesUser extends ParseUser implements Serializable {
 
-    public PlacesUser(){
+    public PlacesUser() {
     }
 
     private static final String TAG = "PlacesUser";
@@ -34,7 +34,11 @@ public class PlacesUser extends ParseUser implements Serializable {
         this.put(FACEBOOK_ID_KEY, fbId);
     }
 
-    public String getAccountType() { return this.getString(LOGIN_TYPE_KEY); }
+    public String getAccountType() {
+        return this.getString(LOGIN_TYPE_KEY);
+    }
 
-    public void setAccountType(String accountType) { this.put(LOGIN_TYPE_KEY, accountType); }
+    public void setAccountType(String accountType) {
+        this.put(LOGIN_TYPE_KEY, accountType);
+    }
 }

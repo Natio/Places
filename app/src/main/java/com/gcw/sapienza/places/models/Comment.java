@@ -1,9 +1,7 @@
 package com.gcw.sapienza.places.models;
 
-import com.gcw.sapienza.places.PlacesApplication;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 
 import java.util.Date;
 
@@ -37,15 +35,25 @@ public class Comment extends ParseObject {
         this.put(FLAG_ID_KEY, flagId);
     }
 
-    public Flag getFlag() { return (Flag)this.getParseObject(FLAG_KEY); }
+    public Flag getFlag() {
+        return (Flag) this.getParseObject(FLAG_KEY);
+    }
 
-    public void setFlag(Flag flag) { this.put(FLAG_KEY, flag); }
+    public void setFlag(Flag flag) {
+        this.put(FLAG_KEY, flag);
+    }
 
-    public String getCommentText() { return this.getString(TEXT_KEY); }
+    public String getCommentText() {
+        return this.getString(TEXT_KEY);
+    }
 
-    public void setCommentText(String text) { this.put(TEXT_KEY, text); }
+    public void setCommentText(String text) {
+        this.put(TEXT_KEY, text);
+    }
 
-    public String getUsername() { return this.getString(USERNAME_KEY); }
+    public String getUsername() {
+        return this.getString(USERNAME_KEY);
+    }
 
     public void setUsername(String username) {
         this.put(USERNAME_KEY, username);
@@ -55,7 +63,11 @@ public class Comment extends ParseObject {
         return this.getCreatedAt();
     }
 
-    public String getAccountType() { return this.getString(LOGIN_TYPE_KEY); }
+    public String getAccountType() {
+        return this.getString(LOGIN_TYPE_KEY);
+    }
 
-    public void setAccountType(String accountType) { this.put(LOGIN_TYPE_KEY, accountType); }
+    public void setAccountType(String accountType) {
+        this.put(LOGIN_TYPE_KEY, accountType);
+    }
 }
