@@ -28,6 +28,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
+
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.fragments.BagFragment;
@@ -49,7 +50,6 @@ import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseInstallation;
-import com.parse.ParsePush;
 import com.parse.ParseUser;
 
 
@@ -57,22 +57,17 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
 
     public static final String TAG = MainActivity.class.getName();
-
+    public static final String PREFERENCES_CHANGED_NOTIFICATION = "Preferences Changed";
     private static final String[] section_titles = {"Home", "Profile", "My Flags", "Bag", "Settings", "Logout"};
-
     private static final int SHARE_ACTIVITY_REQUEST_CODE = 95;
-
     private static final int FLAGS_LIST_POSITION = 0;
     private static final int MY_PROFILE_POSITION = 1;
     private static final int MY_FLAGS_POSITION = 2;
     private static final int BAG_POSITION = 3;
     private static final int SETTINGS_POSITION = 4;
     private static final int LOGOUT_POSITION = 5;
-
     private static final String FRAG_TAG = "FRAG_TAG";
-
     private static boolean isForeground = false;
-
     public Menu mMenu;
     private DrawerLayout drawerLayout;
     private ListView drawerList;
@@ -81,9 +76,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     private LinearLayout homeHolder;
     private FrameLayout fragHolder;
     private Toast radiusToast;
-
-    public static final String PREFERENCES_CHANGED_NOTIFICATION = "Preferences Changed";
-
 
     public static boolean isForeground() {
         return isForeground;
@@ -198,7 +190,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             startActivityForResult(shareIntent, MainActivity.SHARE_ACTIVITY_REQUEST_CODE);
             // item.setVisible(false);
         } //attempt to add filters in homepage
-        else if(item.getItemId() == R.id.filters) {
+        else if (item.getItemId() == R.id.filters) {
 
             switchToNonSupportFrag(new CategoriesFragment());
             //open fragment
@@ -576,17 +568,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         radiusToast.show();
     }
 
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-
-        @Override
-        public void onItemClick(AdapterView parent, View view, int position, long id) {
-            MainActivity.this.selectItem(position);
-        }
-    }
-
     @Override
-    public void onResult(People.LoadPeopleResult loadPeopleResult)
-    {
+    public void onResult(People.LoadPeopleResult loadPeopleResult) {
         Log.d(TAG, "Result from People request:" + loadPeopleResult.getStatus());
 
         if (loadPeopleResult.getStatus().getStatusCode() == CommonStatusCodes.SUCCESS) {
@@ -608,16 +591,14 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult result)
-    {
+    public void onConnectionFailed(ConnectionResult result) {
         // TODO handle this!
         Log.d(TAG, "Login failed");
         Toast.makeText(this, "Login failed", Toast.LENGTH_LONG).show();
     }
 
     @Override
-    public void onConnected(Bundle connectionHint)
-    {
+    public void onConnected(Bundle connectionHint) {
         // We've resolved any connection errors.  mGoogleApiClient can be used to
         // access Google APIs on behalf of the user.
 
@@ -626,8 +607,15 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     }
 
     @Override
-    public void onConnectionSuspended(int cause)
-    {
+    public void onConnectionSuspended(int cause) {
         GPlusUtils.getInstance().getGoogleApiClient().connect();
+    }
+
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView parent, View view, int position, long id) {
+            MainActivity.this.selectItem(position);
+        }
     }
 }

@@ -215,37 +215,6 @@ function assignFlagsToComments(comments, index, status){
 
 }
 
-function assignFlagOwnersToComments(comments, index, status){
-  if(index >= comments.length){
-    Parse.Object.saveAll(comments , {
-        success: function(list) {
-          status.success("Migration completed successfully");
-        },
-        error: function(error) {
-          status.error(error.message);
-        },
-      });
-    return;
-  }
-  var current = comments[index];
-
-  var Users = Parse.Object.extend("_User");
-  var query_p = new Parse.Query(Users);
-  query_p.equalTo("objectId", current.get("flag").get("owner"));
-  query_p.first({
-      success: function(first) {
-        current.set("flagOwner", first);
-        // console.log(first);
-        assignFlagOwnersToComments(comments, index+1, status);
-      },
-      error: function(error) {
-        status.error(error.message);
-      },
-    })
-
-
-}
-
 Parse.Cloud.job("addFlagsToComments", function(request, status) {
   var Comments = Parse.Object.extend("Comments");
   var query = new Parse.Query(Comments);
@@ -259,27 +228,6 @@ Parse.Cloud.job("addFlagsToComments", function(request, status) {
       assignFlagsToComments(results, 0, status);
 		}
 	});
-
-});
-
-Parse.Cloud.job("addFlagOwnersToComments", function(request, status) {
-
-  Parse.Cloud.useMasterKey();
-
-  var Comments = Parse.Object.extend("Comments");
-  var query = new Parse.Query(Comments);
-  //comment the following line to reassing all the flag owners
-  query.doesNotExist("flagOwner");
-  query.limit(200);
-  query.include("flag");
-  query.find({
-    error: function(error){
-      status.error(error.message);
-    },
-    success: function (results){
-      assignFlagOwnersToComments(results, 0, status);
-    }
-  });
 
 });
 

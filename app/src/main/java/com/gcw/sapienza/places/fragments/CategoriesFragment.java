@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 
@@ -26,13 +27,24 @@ import com.gcw.sapienza.places.activities.MainActivity;
 public class CategoriesFragment extends Fragment {
 
     public static final String TAG = CategoriesFragment.class.getName();
-
+    public static final String ENABLE_ALL_CLICKED = "Enable All Clicked";
     private static final String ENABLE_ALL_STRING = "Enable all";
     private static final String DISABLE_ALL_STRING = "Disable all";
-
-    public static final String ENABLE_ALL_CLICKED = "Enable All Clicked";
-
     private View view;
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+
+                case MainActivity.PREFERENCES_CHANGED_NOTIFICATION:
+                    updateEnableAllButton();
+                    break;
+
+                default:
+                    Log.w(CategoriesFragment.class.getName(), intent.getAction() + ": cannot identify the received notification");
+            }
+        }
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -44,7 +56,7 @@ public class CategoriesFragment extends Fragment {
         RelativeLayout categoriesLayout = (RelativeLayout) view.findViewById(R.id.categoriesLayout);
         RelativeLayout categoriesSettings = (RelativeLayout) view.findViewById(R.id.categoriesSettings);
 
-        Button enableAllButton = (Button)view.findViewById(R.id.enableAllButton);
+        Button enableAllButton = (Button) view.findViewById(R.id.enableAllButton);
         enableAllButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,10 +66,10 @@ public class CategoriesFragment extends Fragment {
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
                 SharedPreferences.Editor editor = preferences.edit();
 
-                Button btn = (Button)v;
+                Button btn = (Button) v;
                 CharSequence btnText = btn.getText();
 
-                if(btnText.equals(ENABLE_ALL_STRING)){
+                if (btnText.equals(ENABLE_ALL_STRING)) {
                     editor.putBoolean("noneCheck", true);
                     editor.putBoolean("thoughtsCheck", true);
                     editor.putBoolean("funCheck", true);
@@ -67,7 +79,7 @@ public class CategoriesFragment extends Fragment {
                     editor.commit();
                     LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent(CategoriesFragment.ENABLE_ALL_CLICKED));
                     btn.setText(DISABLE_ALL_STRING);
-                }else{
+                } else {
                     editor.putBoolean("noneCheck", false);
                     editor.putBoolean("thoughtsCheck", false);
                     editor.putBoolean("funCheck", false);
@@ -93,31 +105,16 @@ public class CategoriesFragment extends Fragment {
     private void updateEnableAllButton() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        Button enableAllButton = (Button)view.findViewById(R.id.enableAllButton);
+        Button enableAllButton = (Button) view.findViewById(R.id.enableAllButton);
 
-        if(preferences.getBoolean("noneCheck", true) && preferences.getBoolean("thoughtsCheck", true) &&
+        if (preferences.getBoolean("noneCheck", true) && preferences.getBoolean("thoughtsCheck", true) &&
                 preferences.getBoolean("funCheck", true) && preferences.getBoolean("musicCheck", true) &&
-                preferences.getBoolean("foodCheck", true) && preferences.getBoolean("landscapeCheck", true)){
+                preferences.getBoolean("foodCheck", true) && preferences.getBoolean("landscapeCheck", true)) {
             enableAllButton.setText(DISABLE_ALL_STRING);
-        }else{
+        } else {
             enableAllButton.setText(ENABLE_ALL_STRING);
         }
     }
-
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            switch (intent.getAction()) {
-
-                case MainActivity.PREFERENCES_CHANGED_NOTIFICATION:
-                    updateEnableAllButton();
-                    break;
-
-                default:
-                    Log.w(CategoriesFragment.class.getName(), intent.getAction() + ": cannot identify the received notification");
-            }
-        }
-    };
 
     @Override
     public void onDestroyView() {

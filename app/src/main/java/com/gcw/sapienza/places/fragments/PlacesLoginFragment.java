@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.model.GraphUser;
@@ -68,9 +69,8 @@ public class PlacesLoginFragment extends ParseLoginFragment {
 
         Log.d(TAG, "canChoose: " + canChoose);
 
-        if(!canChoose) v = inflater.inflate(R.layout.blank_screen, parent, false);
-        else
-        {
+        if (!canChoose) v = inflater.inflate(R.layout.blank_screen, parent, false);
+        else {
             config = ParseLoginConfig.fromBundle(getArguments(), getActivity());
 
             v = inflater.inflate(R.layout.places_login_fragment, parent, false);
@@ -110,7 +110,7 @@ public class PlacesLoginFragment extends ParseLoginFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        this.canChoose = ((PlacesLoginActivity)activity).canChoose;
+        this.canChoose = ((PlacesLoginActivity) activity).canChoose;
 
         if (activity instanceof ParseLoginFragmentListener) {
             loginFragmentListener = (ParseLoginFragmentListener) activity;

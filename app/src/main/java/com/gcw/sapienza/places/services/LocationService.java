@@ -91,6 +91,24 @@ public class LocationService extends Service implements
     private boolean noFlagsWarning;
 
     private long lastCacheUpdate;
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+
+                //they behave in the same way
+                case MainActivity.PREFERENCES_CHANGED_NOTIFICATION:
+                case CategoriesFragment.ENABLE_ALL_CLICKED:
+                    LocationService.this.resetNoFlagsWarning();
+                    Location currentLocation = PlacesApplication.getInstance().getLocation();
+                    queryParsewithLocation(currentLocation);
+                    break;
+
+                default:
+                    Log.w(LocationService.class.getName(), intent.getAction() + ": cannot identify the received notification");
+            }
+        }
+    };
 
     //courtesy of http://gis.stackexchange.com/questions/25877/how-to-generate-random-locations-nearby-my-location
     public static Location getRandomLocation(Location center, int radius) {
@@ -137,8 +155,9 @@ public class LocationService extends Service implements
         this.listener = app;
     }
 
-    public void resetNoFlagsWarning() { this.noFlagsWarning = false; }
-
+    public void resetNoFlagsWarning() {
+        this.noFlagsWarning = false;
+    }
 
     /**
      * query Parse table for all the Flags of current user
@@ -158,7 +177,7 @@ public class LocationService extends Service implements
                     flags = new ArrayList<Flag>();
                 }
                 LocationService.this.myFlags = new HashMap<String, Flag>();
-                for(Flag f: flags){
+                for (Flag f : flags) {
                     LocationService.this.myFlags.put(f.getObjectId(), f);
                 }
 
@@ -181,11 +200,6 @@ public class LocationService extends Service implements
         ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
         query.whereEqualTo("commenter", ParseUser.getCurrentUser());
         query.orderByDescending("createdAt");
-
-        //in case some users not exist anymore or for legacy purposes
-        query.whereExists("flagOwner");
-
-        query.whereNotEqualTo("flagOwner", ParseUser.getCurrentUser());
         query.include("flag");
 
         query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
@@ -196,7 +210,7 @@ public class LocationService extends Service implements
                     Log.e(TAG, e.getMessage());
                     Toast.makeText(getBaseContext(), "Cannot fetch your bag Flags at the moment,\ntry again later", Toast.LENGTH_SHORT);
                     return;
-                }else {
+                } else {
                     if (comments == null) {
                         comments = new ArrayList<Comment>();
                     }
@@ -206,13 +220,14 @@ public class LocationService extends Service implements
 //                    String currentUserId =  ParseUser.getCurrentUser().getObjectId();
 
                     for (Comment c : comments) {
-                        String currentFlagOwner = c.getFlagOwner().getObjectId();
-                        Log.d(TAG, "Current Flag owner: " + currentFlagOwner);
-                        bagFlagsSet.add(c.getFlag());
-//                        if(!currentUserId.equals(currentFlagOwner)) {
-//                            bagFlagsSet.add(c.getFlag());
-//                            Log.d(TAG, "Added " + currentFlagOwner);
-//                        }
+
+                        String flagOwnerId = c.getFlag().getOwner().getObjectId();
+
+                        Log.d(TAG, "Curr user: " + ParseUser.getCurrentUser().getObjectId() + ", other: " + flagOwnerId);
+
+                        if (!flagOwnerId.equals(ParseUser.getCurrentUser().getObjectId())) {
+                            bagFlagsSet.add(c.getFlag());
+                        }
                     }
 
                     Log.d(TAG, "BAG FLAGS SIZE: " + bagFlagsSet.size());
@@ -221,6 +236,8 @@ public class LocationService extends Service implements
                     for (Flag f : bagFlagsSet) {
                         LocationService.this.bagFlags.put(f.getObjectId(), f);
                     }
+
+                    Log.d(TAG, "BAG FLAGS SIZE HASH: " + bagFlags.size());
 
                     updateApplication();
 
@@ -316,7 +333,7 @@ public class LocationService extends Service implements
 
         if (!thoughts_check && !fun_check && !landscape_check
                 && !food_check && !none_check && !music_check) {
-            if(!noFlagsWarning) {
+            if (!noFlagsWarning) {
                 Toast.makeText(getApplicationContext(), "No category selected: "
                         + NO_FLAGS_VISIBLE, Toast.LENGTH_LONG).show();
                 this.noFlagsWarning = true;
@@ -349,7 +366,7 @@ public class LocationService extends Service implements
             else if (with_friends_surrounded)
                 query.whereContainedIn("fbId", PlacesLoginUtils.getInstance().getFriends());
             else {
-                if(!noFlagsWarning) {
+                if (!noFlagsWarning) {
                     Toast.makeText(getApplicationContext(), "No filter selected: "
                             + NO_FLAGS_VISIBLE, Toast.LENGTH_LONG).show();
                     this.noFlagsWarning = true;
@@ -393,18 +410,18 @@ public class LocationService extends Service implements
                 }
                 List<Flag> hiddenFlags = new ArrayList<>();
                 Iterator<Flag> iterParseObjects = flags.iterator();
-                while(iterParseObjects.hasNext()){
+                while (iterParseObjects.hasNext()) {
                     Flag currFlag = iterParseObjects.next();
                     Log.d(TAG, "Flags distance: " + currFlag.getLocation().distanceInKilometersTo(gp) + ", while: " + Utils.MAP_RADIUS);
-                    if(currFlag.getLocation().distanceInKilometersTo(gp) > Utils.MAP_RADIUS){
+                    if (currFlag.getLocation().distanceInKilometersTo(gp) > Utils.MAP_RADIUS) {
                         hiddenFlags.add(currFlag);
                         iterParseObjects.remove();
                     }
                 }
-                for(Flag f: flags){
+                for (Flag f : flags) {
                     LocationService.this.flagsNearby.put(f.getObjectId(), f);
                 }
-                for(Flag f: hiddenFlags){
+                for (Flag f : hiddenFlags) {
                     LocationService.this.hiddenFlags.put(f.getObjectId(), f);
                 }
                 Log.d(TAG, "Found " + flags.size() +
@@ -420,7 +437,6 @@ public class LocationService extends Service implements
             }
         });
     }
-
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -450,11 +466,11 @@ public class LocationService extends Service implements
         this.location = location;
         queryParsewithLocation(location);
         if (this.flagsNearby != null && PlacesLoginUtils.getInstance().hasCurrentUserId()) {
-            if(!MainActivity.isForeground()) {
+            if (!MainActivity.isForeground()) {
                 Log.d(TAG, "Notifying user..." +
                         this.flagsNearby.size() + " flags found");
                 notifyUser();
-            }else{
+            } else {
                 Log.d(TAG, "Main Activity in foreground: updating map...");
                 LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.LOCATION_CHANGED_NOTIFICATION));
             }
@@ -549,7 +565,6 @@ public class LocationService extends Service implements
         }
     }
 
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -599,23 +614,4 @@ public class LocationService extends Service implements
             return LocationService.this;
         }
     }
-
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            switch (intent.getAction()) {
-
-                //they behave in the same way
-                case MainActivity.PREFERENCES_CHANGED_NOTIFICATION:
-                case CategoriesFragment.ENABLE_ALL_CLICKED:
-                    LocationService.this.resetNoFlagsWarning();
-                    Location currentLocation = PlacesApplication.getInstance().getLocation();
-                    queryParsewithLocation(currentLocation);
-                    break;
-
-                default:
-                    Log.w(LocationService.class.getName(), intent.getAction() + ": cannot identify the received notification");
-            }
-        }
-    };
 }

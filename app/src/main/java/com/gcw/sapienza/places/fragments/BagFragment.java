@@ -43,7 +43,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +51,7 @@ import java.util.List;
  * Created by snowblack on 3/20/15.
  */
 public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener,
-        GoogleMap.OnMarkerClickListener{
+        GoogleMap.OnMarkerClickListener {
     private static final String TAG = "BagFragment";
 
     private View view;
@@ -226,7 +225,7 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
             }
         }
 
-        for(Marker marker: this.markers){
+        for (Marker marker : this.markers) {
             marker.setAlpha(Utils.FLAG_ALPHA_NORMAL);
         }
         selectedMarker.setAlpha(Utils.FLAG_ALPHA_FULL);

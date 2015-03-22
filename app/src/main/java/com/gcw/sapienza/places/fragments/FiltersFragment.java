@@ -9,14 +9,32 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
 import com.gcw.sapienza.places.R;
 
 /**
  * Created by Simone on 12/30/2014.
  */
-public class FiltersFragment extends PreferenceFragment{
+public class FiltersFragment extends PreferenceFragment {
     @SuppressWarnings("unused")
     private static final String TAG = "SettingsFragment";
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+
+                case CategoriesFragment.ENABLE_ALL_CLICKED:
+                    setPreferenceScreen(null);
+                    loadPreferencesAndSetListeners();
+//                    Preference thoughts_check = findPreference("thoughtsCheck");
+//                    ((CheckBoxPreference)thoughts_check).setChecked(true);
+                    break;
+
+                default:
+                    Log.w(FiltersFragment.class.getName(), intent.getAction() + ": cannot identify the received notification");
+            }
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -29,7 +47,7 @@ public class FiltersFragment extends PreferenceFragment{
 
     }
 
-    private void loadPreferencesAndSetListeners(){
+    private void loadPreferencesAndSetListeners() {
 
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.layout.categories_filter_list);
@@ -48,24 +66,6 @@ public class FiltersFragment extends PreferenceFragment{
         food_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
         none_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
     }
-
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            switch (intent.getAction()) {
-
-                case CategoriesFragment.ENABLE_ALL_CLICKED:
-                    setPreferenceScreen(null);
-                    loadPreferencesAndSetListeners();
-//                    Preference thoughts_check = findPreference("thoughtsCheck");
-//                    ((CheckBoxPreference)thoughts_check).setChecked(true);
-                    break;
-
-                default:
-                    Log.w(FiltersFragment.class.getName(), intent.getAction() + ": cannot identify the received notification");
-            }
-        }
-    };
 
     @Override
     public void onDestroyView() {

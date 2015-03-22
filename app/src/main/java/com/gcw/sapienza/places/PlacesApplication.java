@@ -70,16 +70,24 @@ public class PlacesApplication extends Application {
         }
 
         @Override
-        public void setFlagsNearby(HashMap<String, Flag> l) { if(l != null) PlacesApplication.this.flagsNearby = l; }
+        public void setFlagsNearby(HashMap<String, Flag> l) {
+            if (l != null) PlacesApplication.this.flagsNearby = l;
+        }
 
         @Override
-        public void setHiddenFlags(HashMap<String, Flag> l){ if(l != null) PlacesApplication.this.hiddenFlags = l; }
+        public void setHiddenFlags(HashMap<String, Flag> l) {
+            if (l != null) PlacesApplication.this.hiddenFlags = l;
+        }
 
         @Override
-        public void setMyFlags(HashMap<String, Flag> myFlags) { if(myFlags != null) PlacesApplication.this.myFlags = myFlags; }
+        public void setMyFlags(HashMap<String, Flag> myFlags) {
+            if (myFlags != null) PlacesApplication.this.myFlags = myFlags;
+        }
 
         @Override
-        public void setBagFlags(HashMap<String, Flag> bagFlags) { if(bagFlags != null) PlacesApplication.this.bagFlags = bagFlags; }
+        public void setBagFlags(HashMap<String, Flag> bagFlags) {
+            if (bagFlags != null) PlacesApplication.this.bagFlags = bagFlags;
+        }
     };
     private LocationService mService;
     @SuppressWarnings("UnusedDeclaration")
@@ -180,7 +188,9 @@ public class PlacesApplication extends Application {
     /**
      * @return returns the list of flags around user's location, filtered according to settings
      */
-    public List<Flag> getFlags() { return new ArrayList<>(this.flagsNearby.values()); }
+    public List<Flag> getFlags() {
+        return new ArrayList<>(this.flagsNearby.values());
+    }
 
     /**
      * @return returns the list of all the Flags the user has posted
@@ -192,23 +202,27 @@ public class PlacesApplication extends Application {
     /**
      * @return returns the list of all the Flags hidden for Discover Mode
      */
-    public List<Flag> getHiddenFlags() { return new ArrayList<>(this.hiddenFlags.values()); }
+    public List<Flag> getHiddenFlags() {
+        return new ArrayList<>(this.hiddenFlags.values());
+    }
 
     /**
      * @return returns the list of all the Flags for Bag page
      */
-    public List<Flag> getBagFlags() { return new ArrayList<>(this.bagFlags.values()); }
+    public List<Flag> getBagFlags() {
+        return new ArrayList<>(this.bagFlags.values());
+    }
 
-    public Flag getFlagWithId(String id){
-        if(this.flagsNearby.get(id) != null)
+    public Flag getFlagWithId(String id) {
+        if (this.flagsNearby.get(id) != null)
             return this.flagsNearby.get(id);
-        else if(this.myFlags.get(id) != null)
+        else if (this.myFlags.get(id) != null)
             return this.myFlags.get(id);
-        else if(this.hiddenFlags.get(id) != null)
+        else if (this.hiddenFlags.get(id) != null)
             return this.hiddenFlags.get(id);
-        else if(this.bagFlags.get(id) != null)
+        else if (this.bagFlags.get(id) != null)
             return this.bagFlags.get(id);
-        else{
+        else {
             Utils.showToast(getPlacesAppContext(), "There was a problem retrieving Flag data", Toast.LENGTH_SHORT);
             return null;
         }
@@ -260,25 +274,23 @@ public class PlacesApplication extends Application {
                 Settings.Secure.ANDROID_ID);
         boolean hasToSaveInstallation = false;
         ParseInstallation installation = ParseInstallation.getCurrentInstallation();
-        String installationUniqueId = (String)installation.get("uniqueId");
+        String installationUniqueId = (String) installation.get("uniqueId");
 
-        if(installationUniqueId == null || !installationUniqueId.equals(android_id)){
+        if (installationUniqueId == null || !installationUniqueId.equals(android_id)) {
             ParseInstallation.getCurrentInstallation().put("uniqueId", android_id);
             hasToSaveInstallation = true;
         }
 
 
-        ParseUser owner = (ParseUser)ParseInstallation.getCurrentInstallation().get("owner");
-        if(ParseUser.getCurrentUser() != null && owner!= null){
-            if(ParseUser.getCurrentUser().getObjectId().equals(owner.getObjectId()))
-            ParseInstallation.getCurrentInstallation().put("owner", ParseUser.getCurrentUser());
+        ParseUser owner = (ParseUser) ParseInstallation.getCurrentInstallation().get("owner");
+        if (ParseUser.getCurrentUser() != null && owner != null) {
+            if (ParseUser.getCurrentUser().getObjectId().equals(owner.getObjectId()))
+                ParseInstallation.getCurrentInstallation().put("owner", ParseUser.getCurrentUser());
             hasToSaveInstallation = true;
         }
-        if(hasToSaveInstallation){
+        if (hasToSaveInstallation) {
             ParseInstallation.getCurrentInstallation().saveInBackground();
         }
-
-
 
 
         PlacesApplication.getInstance().startLocationService();

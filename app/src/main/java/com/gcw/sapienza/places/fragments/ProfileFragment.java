@@ -12,24 +12,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.android.Util;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.models.PlacesUser;
-import com.gcw.sapienza.places.utils.FacebookUtils;
-import com.gcw.sapienza.places.utils.FacebookUtilsFriendsCallback;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.CountCallback;
-import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by snowblack on 2/26/15.
@@ -39,21 +33,6 @@ public class ProfileFragment extends Fragment {
     private static final String TAG = "ProfileFragment";
 
     private static final String FBID = "FacebookID";
-
-    private String fbId;
-
-    private ImageView fbPicView;
-    private TextView fbNameView;
-    private TextView memberSinceView;
-    private TextView flagsView;
-    private TextView categoryView;
-    private TextView wowedView;
-    private TextView numFollowersView;
-    private Button friendsView;
-
-    private TextView nonCat,thoughtsCat,funCat,landscapeCat,foodCat ,musicCat;
-    private ImageView nonCatIco,thoughtsCatIco,funCatIco,landscapeCatIco,foodCatIco,musicCatIco;
-
     //a new possible set of categories
     //private String[] category= new String[8];
     //initialized to 8 for new ideas of categories
@@ -67,7 +46,17 @@ public class ProfileFragment extends Fragment {
     //private String ThoughtsCategory;
     //int[] catCnt;
     int cnt;
-
+    private String fbId;
+    private ImageView fbPicView;
+    private TextView fbNameView;
+    private TextView memberSinceView;
+    private TextView flagsView;
+    private TextView categoryView;
+    private TextView wowedView;
+    private TextView numFollowersView;
+    private Button friendsView;
+    private TextView nonCat, thoughtsCat, funCat, landscapeCat, foodCat, musicCat;
+    private ImageView nonCatIco, thoughtsCatIco, funCatIco, landscapeCatIco, foodCatIco, musicCatIco;
     private int numFlags;
 
     public static final ProfileFragment newInstance(String fbId) {
@@ -111,12 +100,12 @@ public class ProfileFragment extends Fragment {
         foodCat = (TextView) view.findViewById(R.id.cntFood);
         musicCat = (TextView) view.findViewById(R.id.cntMusic);
         //icons in image views
-        nonCatIco=(ImageView) view.findViewById(R.id.icoNone);
-        thoughtsCatIco=(ImageView) view.findViewById(R.id.icoThoughts);
-        funCatIco=(ImageView) view.findViewById(R.id.icoFun);
-        landscapeCatIco=(ImageView) view.findViewById(R.id.icoLandscape);
-        foodCatIco=(ImageView) view.findViewById(R.id.icoFood);
-        musicCatIco=(ImageView) view.findViewById(R.id.icoMusic);
+        nonCatIco = (ImageView) view.findViewById(R.id.icoNone);
+        thoughtsCatIco = (ImageView) view.findViewById(R.id.icoThoughts);
+        funCatIco = (ImageView) view.findViewById(R.id.icoFun);
+        landscapeCatIco = (ImageView) view.findViewById(R.id.icoLandscape);
+        foodCatIco = (ImageView) view.findViewById(R.id.icoFood);
+        musicCatIco = (ImageView) view.findViewById(R.id.icoMusic);
 
         nonCatIco.setImageResource(R.drawable.none);
         thoughtsCatIco.setImageResource(R.drawable.thoughts);
@@ -125,14 +114,14 @@ public class ProfileFragment extends Fragment {
         foodCatIco.setImageResource(R.drawable.food);
         musicCatIco.setImageResource(R.drawable.music);
 
-        cnt=0;
+        cnt = 0;
 
         PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(this.fbId, fbPicView, PlacesLoginUtils.PicSize.LARGE);
 
         String[] categories = getActivity().getResources().getStringArray(R.array.categories);
 
 
-        for(final String cat: categories){
+        for (final String cat : categories) {
 
             numFlags = 0;
 
@@ -142,23 +131,23 @@ public class ProfileFragment extends Fragment {
             query.countInBackground(new CountCallback() {
                 @Override
                 public void done(int i, ParseException e) {
-                    if(e == null) {
+                    if (e == null) {
 
-                        if(cnt==0)
-                            nonCat.setText(""+i);
-                        else if(cnt==1)
-                            thoughtsCat.setText(""+i);
-                        else if(cnt==2)
-                            funCat.setText(""+i);
-                        else if(cnt==3)
-                            landscapeCat.setText(""+i);
-                        else if(cnt==4)
-                            foodCat.setText(""+i);
+                        if (cnt == 0)
+                            nonCat.setText("" + i);
+                        else if (cnt == 1)
+                            thoughtsCat.setText("" + i);
+                        else if (cnt == 2)
+                            funCat.setText("" + i);
+                        else if (cnt == 3)
+                            landscapeCat.setText("" + i);
+                        else if (cnt == 4)
+                            foodCat.setText("" + i);
                         else
-                            musicCat.setText(""+i);
+                            musicCat.setText("" + i);
 
-                    cnt++;
-                    numFlags += i;
+                        cnt++;
+                        numFlags += i;
                         /*
                         CharSequence currText = categoryView.getText();
                         if(currText.equals("")){
@@ -168,7 +157,7 @@ public class ProfileFragment extends Fragment {
                         }
                         */
 
-                    flagsView.setText(numFlags + (numFlags != 1 ? " Flags placed" : " Flag placed"));
+                        flagsView.setText(numFlags + (numFlags != 1 ? " Flags placed" : " Flag placed"));
 
                     } else {
                         Log.e(TAG, e.getMessage());
@@ -231,7 +220,7 @@ public class ProfileFragment extends Fragment {
 //        });
 
 
-        ParseQuery<PlacesUser> queryUsers = ParseQuery.getQuery("_User");
+                ParseQuery<PlacesUser> queryUsers = ParseQuery.getQuery("_User");
         queryUsers.whereEqualTo(PlacesUser.FACEBOOK_ID_KEY, this.fbId);
         PlacesUser user = null;
         try {
@@ -262,7 +251,7 @@ public class ProfileFragment extends Fragment {
         if (PlacesLoginUtils.getInstance().getCurrentUserId().equals(this.fbId)) {
             int numFollowers = PlacesLoginUtils.getInstance().getFriends().size();
             numFollowersView.setText(numFollowers + (numFollowers != 1 ? " Placers followed" : " Placer followed"));
-        }else{
+        } else {
             numFollowersView.setHeight(0);
             numFollowersView.setVisibility(View.INVISIBLE);
 

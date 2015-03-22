@@ -5,7 +5,6 @@ import android.location.Location;
 import com.gcw.sapienza.places.models.Flag;
 
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by snowblack on 12/23/14.
