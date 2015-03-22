@@ -92,7 +92,6 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
         } else flagViewHolder.main_text.setText("***Private flag***");
 
 
-        // FIXME When logged in with G+, usernames from FB are null
         String user_id = f.getFbId();
         String account_type = f.getAccountType();
         String fb_username = f.getFbName(); // checks if Flag has fb username. if there is one use it otherwise ask FB

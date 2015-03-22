@@ -545,6 +545,7 @@
         private void retrieveComments() {
             ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
             query.whereEqualTo("flagId", flagId);
+            query.orderByAscending("createdAt");
 
             Log.d(TAG, "Retrieving comments belonging to flag " + flagId);
 
