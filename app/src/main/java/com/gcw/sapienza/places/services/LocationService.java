@@ -178,14 +178,13 @@ public class LocationService extends Service implements
      * query Parse table for all the Flags in the current user's bag
      */
     public void queryParsewithBag() {
+
+        LocationService.this.bagFlags = new HashMap<String, Flag>();
+
         ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
         query.whereEqualTo("commenter", ParseUser.getCurrentUser());
         query.orderByDescending("createdAt");
 
-        //in case some users not exist anymore or for legacy purposes
-        query.whereExists("flagOwner");
-
-        query.whereNotEqualTo("flagOwner", ParseUser.getCurrentUser());
         query.include("flag");
 
         query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
@@ -201,30 +200,22 @@ public class LocationService extends Service implements
                         comments = new ArrayList<Comment>();
                     }
 
-                    HashSet<Flag> bagFlagsSet = new HashSet<Flag>();
-
-//                    String currentUserId =  ParseUser.getCurrentUser().getObjectId();
+                    String currentUserId =  ParseUser.getCurrentUser().getObjectId();
 
                     for (Comment c : comments) {
-                        String currentFlagOwner = c.getFlagOwner().getObjectId();
-                        Log.d(TAG, "Current Flag owner: " + currentFlagOwner);
-                        bagFlagsSet.add(c.getFlag());
-//                        if(!currentUserId.equals(currentFlagOwner)) {
-//                            bagFlagsSet.add(c.getFlag());
-//                            Log.d(TAG, "Added " + currentFlagOwner);
-//                        }
+                        String currentFlagOwner = c.getFlag().getOwner().getObjectId();
+                        Log.d(TAG, "Current Flag owner: " + currentFlagOwner + ", Current user: " + currentUserId);
+                        if(!currentFlagOwner.equals(currentUserId)) {
+                            LocationService.this.bagFlags.put(c.getFlag().getObjectId(), c.getFlag());
+                        }
+
                     }
 
-                    Log.d(TAG, "BAG FLAGS SIZE: " + bagFlagsSet.size());
-
-                    LocationService.this.bagFlags = new HashMap<String, Flag>();
-                    for (Flag f : bagFlagsSet) {
-                        LocationService.this.bagFlags.put(f.getObjectId(), f);
-                    }
+                    Log.d(TAG, "Bag size Hash: " + bagFlags.size());
 
                     updateApplication();
 
-                    if (bagFlagsSet.size() > 0) {
+                    if (LocationService.this.bagFlags.size() > 0) {
                         LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_BAG_FLAGS_NOTIFICATION));
                     } else {
                         LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_BAG_FLAGS_NOTIFICATION));

@@ -40,13 +40,7 @@ public class Comment extends ParseObject {
 
     public void setFlag(Flag flag) { this.put(FLAG_KEY, flag); }
 
-    public PlacesUser getFlagOwner() { return (PlacesUser)this.getParseObject(FLAG_OWNER_KEY); }
-
-    public void setFlagOwner(ParseUser flag) { this.put(FLAG_KEY, flag); }
-
-    public String getCommentText() {
-        return this.getString(TEXT_KEY);
-    }
+    public String getCommentText() { return this.getString(TEXT_KEY); }
 
     public void setCommentText(String text) {
         this.put(TEXT_KEY, text);
