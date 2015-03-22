@@ -40,11 +40,11 @@ public class MyBagFlagsListFragment extends Fragment {
             switch (intent.getAction()) {
 
                 case LocationService.FOUND_BAG_FLAGS_NOTIFICATION:
-                    MyBagFlagsListFragment.this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getLocationService().getBagFlags());
+                    MyBagFlagsListFragment.this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getBagFlags());
                     break;
 
                 case LocationService.FOUND_NO_BAG_FLAGS_NOTIFICATION:
-                    MyBagFlagsListFragment.this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getLocationService().getBagFlags());
+                    MyBagFlagsListFragment.this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getBagFlags());
                     break;
 
                 default:
@@ -74,7 +74,7 @@ public class MyBagFlagsListFragment extends Fragment {
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_BAG_FLAGS_NOTIFICATION));
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_BAG_FLAGS_NOTIFICATION));
 
-        this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getLocationService().getMyFlags());
+        this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getBagFlags());
 
         registerForContextMenu(recycleView);
 

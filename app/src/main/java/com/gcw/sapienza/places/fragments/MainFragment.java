@@ -214,7 +214,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
     private void updateMarkersOnMap() {
 
-        markers = new ArrayList<>();
+        this.markers = new ArrayList<>();
 
         Log.d(TAG, "Updating markers on map...");
 
@@ -228,8 +228,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
             int index = 0;
 
-            for (ParseObject p : flags) {
-                Flag f = (Flag) p;
+            for (Flag f : flags) {
                 ParseGeoPoint location = f.getLocation();
                 String text = f.getText();
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -240,8 +239,8 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                 Bitmap marker = BitmapFactory.decodeResource(getResources(), marker_id);
                 Bitmap halfSizeMarker = Bitmap.createScaledBitmap
                         (marker,
-                                (int) (marker.getWidth() * 0.25f),
-                                (int) (marker.getHeight() * 0.25f),
+                                (int) (marker.getWidth() * Utils.FLAG_SCALE_NORMAL),
+                                (int) (marker.getHeight() * Utils.FLAG_SCALE_NORMAL),
                                 false);
 
                 Marker newMarker = this.gMap.addMarker(new MarkerOptions()
@@ -251,7 +250,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                         .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
                                 // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
                                 //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
-                        .alpha(0.85f));
+                        .alpha(Utils.FLAG_ALPHA_NORMAL));
                 this.markers.add(newMarker);
                 index++;
             }
@@ -273,8 +272,8 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                     Bitmap marker = BitmapFactory.decodeResource(getResources(), marker_id);
                     Bitmap halfSizeMarker = Bitmap.createScaledBitmap
                             (marker,
-                                    (int) (marker.getWidth() * 0.25f),
-                                    (int) (marker.getHeight() * 0.25f),
+                                    (int) (marker.getWidth() * Utils.FLAG_SCALE_NORMAL),
+                                    (int) (marker.getHeight() * Utils.FLAG_SCALE_NORMAL),
                                     false);
 
                     this.gMap.addMarker(new MarkerOptions()
@@ -376,9 +375,9 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
         }
 
         for(Marker marker: this.markers){
-            marker.setAlpha(0.85f);
+            marker.setAlpha(Utils.FLAG_ALPHA_NORMAL);
         }
-        selectedMarker.setAlpha(1f);
+        selectedMarker.setAlpha(Utils.FLAG_ALPHA_FULL);
 
         // by returning false we can show text on flag in the map
         // return false;

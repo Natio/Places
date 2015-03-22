@@ -4,6 +4,7 @@ import android.location.Location;
 
 import com.gcw.sapienza.places.models.Flag;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -13,11 +14,11 @@ public interface ILocationUpdater {
 
     public void setLocation(Location l);
 
-    public void setFlagsNearby(List<Flag> l);
+    public void setFlagsNearby(HashMap<String, Flag> l);
 
-    public void setMyFlags(List<Flag> myFlags);
+    public void setMyFlags(HashMap<String, Flag> myFlags);
 
-    public void setHiddenFlags(List<Flag> hiddenFlags);
+    public void setHiddenFlags(HashMap<String, Flag> hiddenFlags);
 
-    public void setBagFlags(List<Flag> bagFlags);
+    public void setBagFlags(HashMap<String, Flag> bagFlags);
 }

@@ -45,6 +45,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -65,6 +66,8 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
     private DrawerLayout drawerLayout;
     private LinearLayout homeHolder;
     private FrameLayout fragHolder;
+
+    private List<Marker> markers;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -136,8 +139,8 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
                 RecyclerView rv = null;
 
                 for (int i = 0; i < frags.size(); i++) {
-                    if (frags.get(i) instanceof MyFlagsListFragment) {
-                        rv = ((MyFlagsListFragment) frags.get(i)).getRV();
+                    if (frags.get(i) instanceof MyBagFlagsListFragment) {
+                        rv = ((MyBagFlagsListFragment) frags.get(i)).getRV();
                         break;
                     }
                 }
@@ -156,7 +159,7 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
 
 //        showProgressBar();
 
-        Fragment fragment = new MyFlagsListFragment();
+        Fragment fragment = new MyBagFlagsListFragment();
         myContext.getSupportFragmentManager().beginTransaction().replace(R.id.my_swipe_refresh, fragment).commit();
 
         SupportMapFragment mapFragment = new SupportMapFragment();
@@ -206,8 +209,8 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
     }
 
     @Override
-    public boolean onMarkerClick(Marker marker) {
-        int index = Integer.parseInt(marker.getSnippet());
+    public boolean onMarkerClick(Marker selectedMarker) {
+        int index = Integer.parseInt(selectedMarker.getSnippet());
 
         List<Fragment> frags = getActivity().getSupportFragmentManager().getFragments();
 
@@ -223,12 +226,19 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
             }
         }
 
+        for(Marker marker: this.markers){
+            marker.setAlpha(Utils.FLAG_ALPHA_NORMAL);
+        }
+        selectedMarker.setAlpha(Utils.FLAG_ALPHA_FULL);
+
         // by returning false we can show text on flag in the map
         // return false;
         return true;
     }
 
     private void updateMarkersOnMap() {
+
+        this.markers = new ArrayList<>();
 
         this.flags = PlacesApplication.getInstance().getBagFlags();
 
@@ -240,8 +250,11 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
 
             int index = 0;
 
-            for (ParseObject p : this.flags) {
-                Flag f = (Flag) p;
+            for (Flag f : this.flags) {
+//                Log.d(TAG, "===FLAG DATA===");
+//                Log.d(TAG, f.getObjectId());
+//                Log.d(TAG, f.getText());
+//                Log.d(TAG, "===============");
                 ParseGeoPoint location = f.getLocation();
                 String text = f.getText();
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -252,19 +265,19 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
                 Bitmap marker = BitmapFactory.decodeResource(getResources(), marker_id);
                 Bitmap halfSizeMarker = Bitmap.createScaledBitmap
                         (marker,
-                                (int) (marker.getWidth() * 0.25f),
-                                (int) (marker.getHeight() * 0.25f),
+                                (int) (marker.getWidth() * Utils.FLAG_SCALE_NORMAL),
+                                (int) (marker.getHeight() * Utils.FLAG_SCALE_NORMAL),
                                 false);
 
-                this.gMap.addMarker(new MarkerOptions()
+                Marker newMarker = this.gMap.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title(text)
                         .snippet(index + "")
                         .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
                                 // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
                                 //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
-                        .alpha(0.85f));
-
+                        .alpha(Utils.FLAG_ALPHA_NORMAL));
+                this.markers.add(newMarker);
                 index++;
             }
 

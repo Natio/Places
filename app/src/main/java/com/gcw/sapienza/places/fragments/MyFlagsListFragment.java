@@ -40,11 +40,11 @@ public class MyFlagsListFragment extends Fragment {
             switch (intent.getAction()) {
 
                 case LocationService.FOUND_MY_FLAGS_NOTIFICATION:
-                    MyFlagsListFragment.this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getLocationService().getMyFlags());
+                    MyFlagsListFragment.this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getMyFlags());
                     break;
 
                 case LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION:
-                    MyFlagsListFragment.this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getLocationService().getMyFlags());
+                    MyFlagsListFragment.this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getMyFlags());
                     break;
 
                 default:
@@ -74,7 +74,7 @@ public class MyFlagsListFragment extends Fragment {
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_MY_FLAGS_NOTIFICATION));
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION));
 
-        this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getLocationService().getMyFlags());
+        this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getMyFlags());
 
         registerForContextMenu(recycleView);
 

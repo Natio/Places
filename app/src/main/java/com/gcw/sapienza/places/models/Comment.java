@@ -36,9 +36,7 @@ public class Comment extends ParseObject {
         this.put(FLAG_ID_KEY, flagId);
     }
 
-    public Flag getFlag() {
-        return (Flag)this.getParseObject(FLAG_KEY);
-    }
+    public Flag getFlag() { return (Flag)this.getParseObject(FLAG_KEY); }
 
     public void setFlag(Flag flag) { this.put(FLAG_KEY, flag); }
 

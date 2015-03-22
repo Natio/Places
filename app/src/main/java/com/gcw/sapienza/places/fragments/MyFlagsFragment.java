@@ -229,9 +229,9 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
         }
 
         for(Marker marker: this.markers){
-            marker.setAlpha(0.85f);
+            marker.setAlpha(Utils.FLAG_ALPHA_NORMAL);
         }
-        selectedMarker.setAlpha(1f);
+        selectedMarker.setAlpha(Utils.FLAG_ALPHA_FULL);
 
         // by returning false we can show text on flag in the map
         // return false;
@@ -252,8 +252,7 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
 
             int index = 0;
 
-            for (ParseObject p : this.flags) {
-                Flag f = (Flag) p;
+            for (Flag f : this.flags) {
                 ParseGeoPoint location = f.getLocation();
                 String text = f.getText();
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -264,8 +263,8 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
                 Bitmap marker = BitmapFactory.decodeResource(getResources(), marker_id);
                 Bitmap halfSizeMarker = Bitmap.createScaledBitmap
                         (marker,
-                                (int) (marker.getWidth() * 0.25f),
-                                (int) (marker.getHeight() * 0.25f),
+                                (int) (marker.getWidth() * Utils.FLAG_SCALE_NORMAL),
+                                (int) (marker.getHeight() * Utils.FLAG_SCALE_NORMAL),
                                 false);
 
                 Marker currMarker = this.gMap.addMarker(new MarkerOptions()
@@ -275,7 +274,7 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
                         .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
                                 // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
                                 //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
-                        .alpha(0.85f));
+                        .alpha(Utils.FLAG_ALPHA_NORMAL));
 
                 this.markers.add(currMarker);
 

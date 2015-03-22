@@ -79,12 +79,12 @@ public class LocationService extends Service implements
     private Location location;
     private ILocationUpdater listener;
 
-    private List<Flag> parseObjects;
-    private List<Flag> hiddenFlags;
+    private HashMap<String, Flag> flagsNearby;
+    private HashMap<String, Flag> hiddenFlags;
 
-    private List<Flag> myFlags;
+    private HashMap<String, Flag> myFlags;
 
-    private List<Flag> bagFlags;
+    private HashMap<String, Flag> bagFlags;
 
     private Location notificationLocation;
 
@@ -128,19 +128,10 @@ public class LocationService extends Service implements
             this.location = currentLocation;
             queryParsewithLocation(currentLocation);
             queryParsewithCurrentUser();
+            queryParsewithBag();
         }
         fusedLocationProviderApi.requestLocationUpdates(googleApiClient, locationRequest, this);
     }
-
-    public Location getLocation() {
-        return this.location;
-    }
-
-    public List<Flag> getMyFlags() {
-        return this.myFlags;
-    }
-
-    public List<Flag> getBagFlags() { return this.bagFlags; }
 
     public void setListener(ILocationUpdater app) {
         this.listener = app;
@@ -166,7 +157,10 @@ public class LocationService extends Service implements
                 if (flags == null) {
                     flags = new ArrayList<Flag>();
                 }
-                LocationService.this.myFlags = flags;
+                LocationService.this.myFlags = new HashMap<String, Flag>();
+                for(Flag f: flags){
+                    LocationService.this.myFlags.put(f.getObjectId(), f);
+                }
 
                 updateApplication();
 
@@ -186,33 +180,55 @@ public class LocationService extends Service implements
     public void queryParsewithBag() {
         ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
         query.whereEqualTo("commenter", ParseUser.getCurrentUser());
-        query.whereNotEqualTo("flagOwner", ParseUser.getCurrentUser());
         query.orderByDescending("createdAt");
+
+        //in case some users not exist anymore or for legacy purposes
+        query.whereExists("flagOwner");
+
+        query.whereNotEqualTo("flagOwner", ParseUser.getCurrentUser());
+        query.include("flag");
+
         query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
         query.findInBackground(new FindCallback<Comment>() {
             @Override
             public void done(List<Comment> comments, ParseException e) {
                 if (e != null) {
-                    // Log.e(TAG, e.getMessage());
+                    Log.e(TAG, e.getMessage());
                     Toast.makeText(getBaseContext(), "Cannot fetch your bag Flags at the moment,\ntry again later", Toast.LENGTH_SHORT);
-                }
-                if (comments == null) {
-                    comments = new ArrayList<Comment>();
-                }
+                    return;
+                }else {
+                    if (comments == null) {
+                        comments = new ArrayList<Comment>();
+                    }
 
-                HashSet<Flag> bagFlagsSet = new HashSet<Flag>();
-                for(Comment c: comments){
-                    bagFlagsSet.add(c.getFlag());
-                }
-                LocationService.this.bagFlags = new ArrayList<Flag>();
-                LocationService.this.bagFlags.addAll(bagFlagsSet);
+                    HashSet<Flag> bagFlagsSet = new HashSet<Flag>();
 
-                updateApplication();
+//                    String currentUserId =  ParseUser.getCurrentUser().getObjectId();
 
-                if (bagFlagsSet.size() > 0) {
-                    LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_BAG_FLAGS_NOTIFICATION));
-                } else {
-                    LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_BAG_FLAGS_NOTIFICATION));
+                    for (Comment c : comments) {
+                        String currentFlagOwner = c.getFlagOwner().getObjectId();
+                        Log.d(TAG, "Current Flag owner: " + currentFlagOwner);
+                        bagFlagsSet.add(c.getFlag());
+//                        if(!currentUserId.equals(currentFlagOwner)) {
+//                            bagFlagsSet.add(c.getFlag());
+//                            Log.d(TAG, "Added " + currentFlagOwner);
+//                        }
+                    }
+
+                    Log.d(TAG, "BAG FLAGS SIZE: " + bagFlagsSet.size());
+
+                    LocationService.this.bagFlags = new HashMap<String, Flag>();
+                    for (Flag f : bagFlagsSet) {
+                        LocationService.this.bagFlags.put(f.getObjectId(), f);
+                    }
+
+                    updateApplication();
+
+                    if (bagFlagsSet.size() > 0) {
+                        LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_BAG_FLAGS_NOTIFICATION));
+                    } else {
+                        LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_BAG_FLAGS_NOTIFICATION));
+                    }
                 }
             }
         });
@@ -236,6 +252,13 @@ public class LocationService extends Service implements
             return;
         }
 
+        if (flagsNearby == null) {
+            flagsNearby = new HashMap<>(0);
+            hiddenFlags = new HashMap<>(0);
+        } else {
+            flagsNearby.clear();
+            hiddenFlags.clear();
+        }
 
         final ParseGeoPoint gp = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
@@ -284,7 +307,7 @@ public class LocationService extends Service implements
                     if (PlacesLoginUtils.getInstance().hasCurrentUserId() == false) {
                         handler.postDelayed(this, Utils.UPDATE_DELAY);
                     } else {
-                        queryParsewithLocation(getLocation());
+                        queryParsewithLocation(LocationService.this.location);
                     }
                 }
             });
@@ -299,13 +322,6 @@ public class LocationService extends Service implements
                 this.noFlagsWarning = true;
             }
 
-            if (parseObjects == null) {
-                parseObjects = new ArrayList<>(0);
-                hiddenFlags = new ArrayList<>(0);
-            } else {
-                parseObjects.clear();
-                hiddenFlags.clear();
-            }
             updateApplication();
             LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
 
@@ -339,11 +355,11 @@ public class LocationService extends Service implements
                     this.noFlagsWarning = true;
                 }
 
-                if (parseObjects == null) {
-                    parseObjects = new ArrayList<>(0);
-                    hiddenFlags = new ArrayList<>(0);
+                if (flagsNearby == null) {
+                    flagsNearby = new HashMap<>(0);
+                    hiddenFlags = new HashMap<>(0);
                 } else {
-                    parseObjects.clear();
+                    flagsNearby.clear();
                     hiddenFlags.clear();
                 }
 
@@ -371,12 +387,12 @@ public class LocationService extends Service implements
 
         query.findInBackground(new FindCallback<Flag>() {
             @Override
-            public void done(List<Flag> parseObjects, ParseException e) {
-                if (parseObjects == null) {
-                    parseObjects = new ArrayList<>();
+            public void done(List<Flag> flags, ParseException e) {
+                if (flags == null) {
+                    flags = new ArrayList<>();
                 }
                 List<Flag> hiddenFlags = new ArrayList<>();
-                Iterator<Flag> iterParseObjects = parseObjects.iterator();
+                Iterator<Flag> iterParseObjects = flags.iterator();
                 while(iterParseObjects.hasNext()){
                     Flag currFlag = iterParseObjects.next();
                     Log.d(TAG, "Flags distance: " + currFlag.getLocation().distanceInKilometersTo(gp) + ", while: " + Utils.MAP_RADIUS);
@@ -385,13 +401,17 @@ public class LocationService extends Service implements
                         iterParseObjects.remove();
                     }
                 }
-                LocationService.this.parseObjects = parseObjects;
-                LocationService.this.hiddenFlags = hiddenFlags;
-                Log.d(TAG, "Found " + parseObjects.size() +
+                for(Flag f: flags){
+                    LocationService.this.flagsNearby.put(f.getObjectId(), f);
+                }
+                for(Flag f: hiddenFlags){
+                    LocationService.this.hiddenFlags.put(f.getObjectId(), f);
+                }
+                Log.d(TAG, "Found " + flags.size() +
                         " flags within " + Utils.DISCOVER_MODE_RADIUS + " km");
                 updateApplication();
 
-                if (parseObjects.size() > 0) {
+                if (flags.size() > 0) {
                     LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
                 } else {
                     LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
@@ -429,10 +449,10 @@ public class LocationService extends Service implements
         }
         this.location = location;
         queryParsewithLocation(location);
-        if (this.parseObjects != null && PlacesLoginUtils.getInstance().hasCurrentUserId()) {
+        if (this.flagsNearby != null && PlacesLoginUtils.getInstance().hasCurrentUserId()) {
             if(!MainActivity.isForeground()) {
                 Log.d(TAG, "Notifying user..." +
-                        this.parseObjects.size() + " flags found");
+                        this.flagsNearby.size() + " flags found");
                 notifyUser();
             }else{
                 Log.d(TAG, "Main Activity in foreground: updating map...");
@@ -449,9 +469,9 @@ public class LocationService extends Service implements
         int newFlags = updateCachedPostsAndRet();
         if (newFlags > 0) {
             Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            int numFlags = this.parseObjects.size();
+            int numFlags = this.flagsNearby.size();
             String textIfOne = "A flag for you!";
-            String textMoreThanOne = "Hey, " + this.parseObjects.size() + " new Flags around!";
+            String textMoreThanOne = "Hey, " + this.flagsNearby.size() + " new Flags around!";
 
             NotificationCompat.Builder builder =
                     new NotificationCompat.Builder(this)
@@ -487,11 +507,11 @@ public class LocationService extends Service implements
             removeCachedPosts();
         }
 
-        int nonCachedFlags = parseObjects.size();
+        int nonCachedFlags = flagsNearby.size();
 
         Set<String> cachedKeys = this.cachedFlags.keySet();
 
-        for (Flag f : parseObjects) {
+        for (Flag f : flagsNearby.values()) {
             if (cachedKeys.contains(f.getObjectId())) {
                 //Flag already cached.
                 nonCachedFlags--;
@@ -522,7 +542,7 @@ public class LocationService extends Service implements
     private void updateApplication() {
         if (listener != null) {
             listener.setLocation(location);
-            listener.setFlagsNearby(parseObjects);
+            listener.setFlagsNearby(flagsNearby);
             listener.setHiddenFlags(hiddenFlags);
             listener.setMyFlags(myFlags);
             listener.setBagFlags(bagFlags);

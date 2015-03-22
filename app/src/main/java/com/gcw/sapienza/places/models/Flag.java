@@ -47,13 +47,9 @@ public class Flag extends ParseObject implements Serializable {
 
     public PlacesUser getOwner() { return (PlacesUser) this.get(OWNER_KEY); }
 
-    public String getFlagId() {
-        return this.getObjectId();
-    }
+    public String getFlagId() { return this.getObjectId(); }
 
-    public String getText() {
-        return (String) this.get(TEXT_KEY);
-    }
+    public String getText() { return (String) this.get(TEXT_KEY); }
 
     public void setText(String text) {
         this.put(TEXT_KEY, text);
@@ -75,9 +71,7 @@ public class Flag extends ParseObject implements Serializable {
         this.put(FB_ID_KEY, fbId);
     }
 
-    public ParseGeoPoint getLocation() {
-        return (ParseGeoPoint) this.get(LOCATION_KEY);
-    }
+    public ParseGeoPoint getLocation() { return (ParseGeoPoint) this.get(LOCATION_KEY); }
 
     public void setLocation(ParseGeoPoint location) {
         this.put(LOCATION_KEY, location);

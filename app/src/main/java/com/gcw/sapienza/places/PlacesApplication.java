@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.gcw.sapienza.places.models.Comment;
 import com.gcw.sapienza.places.models.CustomParseObject;
@@ -23,6 +24,7 @@ import com.gcw.sapienza.places.services.ILocationUpdater;
 import com.gcw.sapienza.places.services.JSONWeatherTask;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.services.LocationService.LocalBinder;
+import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ConfigCallback;
 import com.parse.Parse;
 import com.parse.ParseConfig;
@@ -37,6 +39,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -55,10 +58,10 @@ public class PlacesApplication extends Application {
     private static PlacesApplication placesApplication;
     //current location
     private Location currentLocation = null;
-    private List<Flag> flagsNearby = new ArrayList<>(0);
-    private List<Flag> myFlags = new ArrayList<>(0);
-    private List<Flag> hiddenFlags = new ArrayList<>(0);
-    private List<Flag> bagFlags = new ArrayList<>(0);
+    private HashMap<String, Flag> flagsNearby = new HashMap<>(0);
+    private HashMap<String, Flag> myFlags = new HashMap<>(0);
+    private HashMap<String, Flag> hiddenFlags = new HashMap<>(0);
+    private HashMap<String, Flag> bagFlags = new HashMap<>(0);
     private ILocationUpdater listener = new ILocationUpdater() {
         @Override
         public void setLocation(Location l) {
@@ -67,20 +70,16 @@ public class PlacesApplication extends Application {
         }
 
         @Override
-        public void setFlagsNearby(List<Flag> l) {
-            PlacesApplication.this.flagsNearby = l;
-        }
+        public void setFlagsNearby(HashMap<String, Flag> l) { if(l != null) PlacesApplication.this.flagsNearby = l; }
 
         @Override
-        public void setHiddenFlags(List<Flag> l){ PlacesApplication.this.hiddenFlags = l; }
+        public void setHiddenFlags(HashMap<String, Flag> l){ if(l != null) PlacesApplication.this.hiddenFlags = l; }
 
         @Override
-        public void setMyFlags(List<Flag> myFlags) {
-            PlacesApplication.this.myFlags = myFlags;
-        }
+        public void setMyFlags(HashMap<String, Flag> myFlags) { if(myFlags != null) PlacesApplication.this.myFlags = myFlags; }
 
         @Override
-        public void setBagFlags(List<Flag> bagFlags) { PlacesApplication.this.bagFlags = bagFlags; }
+        public void setBagFlags(HashMap<String, Flag> bagFlags) { if(bagFlags != null) PlacesApplication.this.bagFlags = bagFlags; }
     };
     private LocationService mService;
     @SuppressWarnings("UnusedDeclaration")
@@ -181,29 +180,38 @@ public class PlacesApplication extends Application {
     /**
      * @return returns the list of flags around user's location, filtered according to settings
      */
-    public List<Flag> getFlags() {
-        return this.flagsNearby;
-    }
+    public List<Flag> getFlags() { return new ArrayList<>(this.flagsNearby.values()); }
 
     /**
      * @return returns the list of all the Flags the user has posted
      */
     public List<Flag> getMyFlags() {
-        return this.myFlags;
+        return new ArrayList<>(this.myFlags.values());
     }
 
     /**
      * @return returns the list of all the Flags hidden for Discover Mode
      */
-    public List<Flag> getHiddenFlags() {
-        return this.hiddenFlags;
-    }
+    public List<Flag> getHiddenFlags() { return new ArrayList<>(this.hiddenFlags.values()); }
 
     /**
      * @return returns the list of all the Flags for Bag page
      */
-    public List<Flag> getBagFlags() {
-        return this.bagFlags;
+    public List<Flag> getBagFlags() { return new ArrayList<>(this.bagFlags.values()); }
+
+    public Flag getFlagWithId(String id){
+        if(this.flagsNearby.get(id) != null)
+            return this.flagsNearby.get(id);
+        else if(this.myFlags.get(id) != null)
+            return this.myFlags.get(id);
+        else if(this.hiddenFlags.get(id) != null)
+            return this.hiddenFlags.get(id);
+        else if(this.bagFlags.get(id) != null)
+            return this.bagFlags.get(id);
+        else{
+            Utils.showToast(getPlacesAppContext(), "There was a problem retrieving Flag data", Toast.LENGTH_SHORT);
+            return null;
+        }
     }
 
     //method called when the app is launched

@@ -177,21 +177,24 @@
 //            String flagGSon = bundle.getString("flag");
 //            flag = new Gson().fromJson(flagGSon, Flag.class);
 
-            ParseQuery<Flag> flagQuery = new ParseQuery<Flag>("Posts");
-            flagQuery.whereEqualTo("flagId", flagId);
-            flagQuery.getFirstInBackground(new GetCallback<Flag>() {
-                @Override
-                public void done(Flag flag, ParseException e) {
-                    if (e != null) {
-                        FlagFragment.this.flag = flag;
-                        FlagFragment.this.flagOwner = flag.getOwner();
-                    } else {
-                        Log.e(TAG, e.getMessage());
-                        Utils.showToast(getActivity(), "Something went wrong while retrieving Flag data", Toast.LENGTH_SHORT);
-                        return;
-                    }
-                }
-            });
+            flag = PlacesApplication.getInstance().getFlagWithId(flagId);
+            flagOwner = flag.getOwner();
+
+//            ParseQuery<Flag> flagQuery = new ParseQuery<Flag>("Posts");
+//            flagQuery.whereEqualTo("objectId", flagId);
+//            flagQuery.getFirstInBackground(new GetCallback<Flag>() {
+//                @Override
+//                public void done(Flag flag, ParseException e) {
+//                    if (e == null) {
+//                        FlagFragment.this.flag = flag;
+//                        FlagFragment.this.flagOwner = flag.getOwner();
+//                    } else {
+//                        Log.e(TAG, e.getMessage());
+//                        Utils.showToast(getActivity(), "Something went wrong while retrieving Flag data", Toast.LENGTH_SHORT);
+//                        return;
+//                    }
+//                }
+//            });
         }
 
         @Override
@@ -589,18 +592,18 @@
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int id) {
-                                    if(flag == null){
-                                        ParseQuery<Flag> flagQuery = new ParseQuery<Flag>("Posts");
-                                        flagQuery.whereEqualTo("flagId", flagId);
-                                        try {
-                                            flag = flagQuery.getFirst();
-                                            flagOwner = flag.getOwner();
-                                        } catch (ParseException e) {
-                                            Log.e(TAG, e.getMessage());
-                                            Toast.makeText(getActivity(), "Something went wrong while posting the comment", Toast.LENGTH_SHORT);
-                                            return;
-                                        }
-                                    }
+//                                    if(flag == null){
+//                                        ParseQuery<Flag> flagQuery = new ParseQuery<Flag>("Posts");
+//                                        flagQuery.whereEqualTo("flagId", flagId);
+//                                        try {
+//                                            flag = flagQuery.getFirst();
+//                                            flagOwner = flag.getOwner();
+//                                        } catch (ParseException e) {
+//                                            Log.e(TAG, e.getMessage());
+//                                            Toast.makeText(getActivity(), "Something went wrong while posting the comment", Toast.LENGTH_SHORT);
+//                                            return;
+//                                        }
+//                                    }
                                     newComment = userInput.getText().toString();
                                     if (newComment.length() == 0) {
                                         Toast.makeText(getActivity(), "Comment cannot be empty!", Toast.LENGTH_LONG).show();
