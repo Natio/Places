@@ -10,23 +10,19 @@ public class PlacesToken extends ParseObject {
     private static final String ACCOUNT_ID_KEY = "accountId";
     private static final String USER_KEY = "user";
 
-    public String getAccountId()
-    {
+    public String getAccountId() {
         return this.getString(ACCOUNT_ID_KEY);
     }
 
-    public PlacesUser getUser()
-    {
-        return (PlacesUser)this.get("user");
-    }
-
-    public void setAccountId(String accountId)
-    {
+    public void setAccountId(String accountId) {
         this.put(ACCOUNT_ID_KEY, accountId);
     }
 
-    public void setUser(PlacesUser user)
-    {
+    public PlacesUser getUser() {
+        return (PlacesUser) this.get("user");
+    }
+
+    public void setUser(PlacesUser user) {
         this.put(USER_KEY, user);
     }
 }

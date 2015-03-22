@@ -15,11 +15,7 @@ import java.util.Date;
 @ParseClassName("Posts")
 public class Flag extends ParseObject implements Serializable {
 
-    public Flag(){
-    }
-
     public static final long MAX_FILE_SIZE_BYTES = 10000000;
-
     public static final String AUDIO_KEY = "audio";
     public static final String VIDEO_KEY = "video";
     public static final String PICTURE_KEY = "picture";
@@ -39,17 +35,24 @@ public class Flag extends ParseObject implements Serializable {
     public static final String PASSWORD_KEY = "password";
     public static final String ACCOUNT_TYPE_KEY = "accountType";
     public static final String COMMENTS_COUNT_KEY = "num_comments";
+    public Flag() {
+    }
 
+    public PlacesUser getOwner() {
+        return (PlacesUser) this.get(OWNER_KEY);
+    }
 
     public void setOwner(ParseUser owner) {
         this.put(OWNER_KEY, owner);
     }
 
-    public PlacesUser getOwner() { return (PlacesUser) this.get(OWNER_KEY); }
+    public String getFlagId() {
+        return this.getObjectId();
+    }
 
-    public String getFlagId() { return this.getObjectId(); }
-
-    public String getText() { return (String) this.get(TEXT_KEY); }
+    public String getText() {
+        return (String) this.get(TEXT_KEY);
+    }
 
     public void setText(String text) {
         this.put(TEXT_KEY, text);
@@ -71,7 +74,9 @@ public class Flag extends ParseObject implements Serializable {
         this.put(FB_ID_KEY, fbId);
     }
 
-    public ParseGeoPoint getLocation() { return (ParseGeoPoint) this.get(LOCATION_KEY); }
+    public ParseGeoPoint getLocation() {
+        return (ParseGeoPoint) this.get(LOCATION_KEY);
+    }
 
     public void setLocation(ParseGeoPoint location) {
         this.put(LOCATION_KEY, location);
@@ -125,7 +130,7 @@ public class Flag extends ParseObject implements Serializable {
         return this.getInt(WOW_COUNT_KEY);
     }
 
-    public int getNumberOfComments(){
+    public int getNumberOfComments() {
         return this.getInt(COMMENTS_COUNT_KEY);
     }
 
@@ -141,12 +146,16 @@ public class Flag extends ParseObject implements Serializable {
         return this.getString(PASSWORD_KEY);
     }
 
-    public String getAccountType() { return this.getString(ACCOUNT_TYPE_KEY); }
-
-    public void setAccountType(String accountType) { this.put(ACCOUNT_TYPE_KEY, accountType); }
-
     public void setPassword(String psw) {
         this.put(PASSWORD_KEY, psw);
+    }
+
+    public String getAccountType() {
+        return this.getString(ACCOUNT_TYPE_KEY);
+    }
+
+    public void setAccountType(String accountType) {
+        this.put(ACCOUNT_TYPE_KEY, accountType);
     }
 
     public void setThumbnailFile(ParseFile pic) {

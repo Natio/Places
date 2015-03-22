@@ -1,9 +1,7 @@
 package com.gcw.sapienza.places.models;
 
-import com.gcw.sapienza.places.PlacesApplication;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 
 import java.util.Date;
 

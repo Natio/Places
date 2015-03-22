@@ -9,12 +9,11 @@ import java.io.Serializable;
  */
 public class PlacesUser extends ParseUser implements Serializable {
 
-    public PlacesUser(){
-    }
-
     public static final String NAME_KEY = "name";
     public static final String FACEBOOK_ID_KEY = "fbId";
     private final static String TAG = "PlacesUser";
+    public PlacesUser() {
+    }
 
     public String getName() {
         return this.getString(NAME_KEY);

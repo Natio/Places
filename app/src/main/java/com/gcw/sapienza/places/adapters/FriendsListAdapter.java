@@ -19,9 +19,7 @@ import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by snowblack on 3/2/15.
@@ -60,8 +58,7 @@ public class FriendsListAdapter extends ArrayAdapter<String> {
         final ImageView friendImageView = (ImageView) v.findViewById(R.id.friend_card_profile_pic);
 
 
-
-        if(!PlacesLoginUtils.getInstance().isUserNameCached(friendId)) {
+        if (!PlacesLoginUtils.getInstance().isUserNameCached(friendId)) {
 
             ParseQuery<PlacesUser> queryUsers = ParseQuery.getQuery("_User");
             queryUsers.whereEqualTo(PlacesUser.FACEBOOK_ID_KEY, friendId);
@@ -83,7 +80,7 @@ public class FriendsListAdapter extends ArrayAdapter<String> {
                 }
             });
 
-        }else{
+        } else {
             String friendName = PlacesLoginUtils.getInstance().getUserNameFromId(friendId);
             friendNameView.setText(friendName);
         }

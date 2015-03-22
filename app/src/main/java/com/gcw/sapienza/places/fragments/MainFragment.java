@@ -27,11 +27,9 @@ import android.view.ViewGroup;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
-import com.gcw.sapienza.places.adapters.FlagsAdapter;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.services.LocationService;
-import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -255,7 +253,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                 index++;
             }
 
-            if(isDiscoverModeEnabled()) {
+            if (isDiscoverModeEnabled()) {
 
                 List<Flag> hiddenFlags = PlacesApplication.getInstance().getHiddenFlags();
 
@@ -288,7 +286,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
             Location currentLocation = gMap.getMyLocation();
 
-            if(currentLocation != null) {
+            if (currentLocation != null) {
                 LatLng currentLocationLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
                 builder.include(currentLocationLatLng);
                 this.gMap.addCircle(new CircleOptions()
@@ -311,12 +309,9 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
                         }
                     });
                 else*/
-                try
-                {
+                try {
                     gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
-                }
-                catch(IllegalStateException ise)
-                {
+                } catch (IllegalStateException ise) {
                     this.gMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
                         @Override
                         public void onCameraChange(CameraPosition cameraPosition) {
@@ -339,6 +334,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
     /**
      * check if discover mode is enabled
+     *
      * @return true if discover mode is enabled, false otherwise
      */
     private boolean isDiscoverModeEnabled() {
@@ -347,7 +343,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
         boolean discoverMode = preferences.getBoolean("discoverMode", true);
 
-        return  discoverMode;
+        return discoverMode;
     }
 
     @Override
@@ -355,7 +351,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
         String snippet = selectedMarker.getSnippet();
 
-        if(snippet == null) return false;
+        if (snippet == null) return false;
 
         int index = Integer.parseInt(selectedMarker.getSnippet());
 
@@ -374,7 +370,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
             }
         }
 
-        for(Marker marker: this.markers){
+        for (Marker marker : this.markers) {
             marker.setAlpha(Utils.FLAG_ALPHA_NORMAL);
         }
         selectedMarker.setAlpha(Utils.FLAG_ALPHA_FULL);
