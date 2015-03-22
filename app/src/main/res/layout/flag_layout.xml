@@ -66,8 +66,6 @@
 
                 </LinearLayout>
 
-
-
             </LinearLayout>
 
             <TextView
@@ -75,20 +73,15 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_gravity="end"
-
                 android:layout_marginRight="62dp"
                 android:layout_marginEnd="62dp"
-
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-
                 android:layout_width="wrap_content"
                 android:textColor="@color/black"
                 android:layout_toLeftOf="@+id/meteo"
                 android:layout_toStartOf="@+id/meteo"
-                android:layout_centerVertical="true"
-
-                />
+                android:layout_centerVertical="true"/>
 
             <ImageView
                 android:id="@+id/meteo"
@@ -100,8 +93,6 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_gravity="end" />
-
-
 
             </RelativeLayout>
 
@@ -210,7 +201,7 @@
                             android:clickable="false"
                             android:src="@drawable/play_video_button"/>
 
-                </FrameLayout>
+                    </FrameLayout>
 
                 </LinearLayout>
 
@@ -320,17 +311,14 @@
                 android:textColor="@color/dark_grey"
                 android:text="@string/category"/>
 
-
             <ImageView
                 android:id="@+id/categoryIcon"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_toEndOf="@id/category"
                 android:layout_toRightOf="@id/category"
-
                 android:layout_marginStart="3dp"
                 android:layout_marginLeft="3dp"
-
                 android:background="@drawable/button_model1"/>
 
         </RelativeLayout>
@@ -340,7 +328,6 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/light_grey"/>
-
 
     <!-- comments -->
     <LinearLayout
@@ -367,7 +354,6 @@
 
     </LinearLayout>
 
-
     <!--  Big preview of media  -->
     <RelativeLayout
         android:id="@+id/frame_layout"
@@ -382,7 +368,6 @@
             android:id="@+id/focused_pic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
             android:adjustViewBounds="true"
@@ -393,7 +378,6 @@
     </RelativeLayout>
 
     <!-- unused buttons -->
-
     <Button
         android:id="@+id/lol_button"
         android:layout_width="wrap_content"
@@ -402,7 +386,6 @@
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-
         android:background="@drawable/my_border_3"
         android:text="LOL"
         android:textSize="14sp"
@@ -422,18 +405,5 @@
         android:textSize="14sp"
         android:visibility="gone" />
     <!-- end Of unused -->
-
-    <!--
-        <Button
-            android:id="@+id/comments_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/wow_button"
-            android:layout_centerHorizontal="true"
-            android:background="@drawable/my_border_3"
-            android:text="comments"
-            android:textSize="16sp"
-            android:visibility="gone" />
--->
 
 </LinearLayout>
