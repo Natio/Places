@@ -78,6 +78,7 @@
         private boolean inPlace;
         private String flagId;
         private String author;
+        private String accountType;
 
         private int wowCount;
         private int lolCount;
@@ -167,6 +168,8 @@
             wowCount = bundle.getInt("wowCount");
             lolCount = bundle.getInt("lolCount");
             booCount = bundle.getInt("booCount");
+
+            accountType = bundle.getString("accountType");
 
             userId = PlacesLoginUtils.getInstance().getCurrentUserId();
 
@@ -303,7 +306,7 @@
 
             dateTextView.setText(date+'\n'+inPlaceString);
 
-            PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(this.id, profilePicImageView, PlacesLoginUtils.PicSize.LARGE);
+            PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(this.id, profilePicImageView, PlacesLoginUtils.PicSize.LARGE, accountType);
 
             view.setFocusableInTouchMode(true);
             view.requestFocus();
@@ -450,7 +453,7 @@
 
         private void showProfilePage()
         {
-            ((MainActivity)getActivity()).switchToOtherFrag(ProfileFragment.newInstance(userId));
+            ((MainActivity)getActivity()).switchToOtherFrag(ProfileFragment.newInstance(userId, accountType));
         }
 
         private void updateWowInfo() {

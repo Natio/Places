@@ -114,7 +114,7 @@ public class Flag extends ParseObject implements Serializable {
     }
 
     public String getFbName() {
-        return (String) this.get(FB_NAME_KEY);
+        return this.getString(FB_NAME_KEY);
     }
 
     public void setFbName(String name) {

@@ -91,10 +91,14 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
 
         } else flagViewHolder.main_text.setText("***Private flag***");
 
+
+        // FIXME When logged in with G+, usernames from FB are null
         String user_id = f.getFbId();
         String account_type = f.getAccountType();
         String fb_username = f.getFbName(); // checks if Flag has fb username. if there is one use it otherwise ask FB
-        if (fb_username == null) PlacesLoginUtils.getInstance().loadUsernameIntoTextView(user_id, flagViewHolder.username);
+
+        // FIXME If user is logged in with G+, FB Graph API cannot be used
+        if (fb_username == null) PlacesLoginUtils.getInstance().loadUsernameIntoTextView(user_id, flagViewHolder.username, f.getAccountType());
         else flagViewHolder.username.setText(fb_username);
 
 
@@ -285,6 +289,8 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
 
             bundle.putString("flag", new Gson().toJson(mFlag));
             bundle.putString("flagOwner", new Gson().toJson(mFlag.getOwner()));
+
+            bundle.putString("accountType", mFlag.getAccountType());
 
             ParseFile file;
             FlagFragment.MediaType mediaType = FlagFragment.MediaType.NONE;

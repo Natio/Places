@@ -30,6 +30,8 @@ public class FriendsListAdapter extends ArrayAdapter<String> {
 
     private static final String TAG = "FriendsListAdapter";
 
+    private View v;
+
     public FriendsListAdapter(Context context, int resource, List<String> friends) {
         super(context, resource, friends);
     }
@@ -37,7 +39,7 @@ public class FriendsListAdapter extends ArrayAdapter<String> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        View v = convertView;
+        v = convertView;
 
         if (v == null) {
 
@@ -49,48 +51,50 @@ public class FriendsListAdapter extends ArrayAdapter<String> {
 
         final String friendId = getItem(position);
 
-        v.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((MainActivity) getContext()).switchToOtherFrag(new ProfileFragment().newInstance(friendId));
-            }
-        });
-
         final TextView friendNameView = (TextView) v.findViewById(R.id.friend_card_textView_username);
         final ImageView friendImageView = (ImageView) v.findViewById(R.id.friend_card_profile_pic);
 
 
+        // FIXME Caching temporarily disabled
+        // if(!PlacesLoginUtils.getInstance().isUserNameCached(friendId)) {
 
-        if(!PlacesLoginUtils.getInstance().isUserNameCached(friendId)) {
+        ParseQuery<PlacesUser> queryUsers = ParseQuery.getQuery("_User");
+        queryUsers.whereEqualTo(PlacesUser.FACEBOOK_ID_KEY, friendId);
+        queryUsers.getFirstInBackground(new GetCallback<PlacesUser>() {
+            @Override
+            public void done(final PlacesUser placesUser, ParseException e) {
 
-            ParseQuery<PlacesUser> queryUsers = ParseQuery.getQuery("_User");
-            queryUsers.whereEqualTo(PlacesUser.FACEBOOK_ID_KEY, friendId);
-            queryUsers.getFirstInBackground(new GetCallback<PlacesUser>() {
-                @Override
-                public void done(PlacesUser placesUser, ParseException e) {
+                if (e == null)
+                {
 
-                    if (e == null) {
+                    friendNameView.setText(placesUser.getName());
+                    PlacesLoginUtils.getInstance().addEntryToUserIdMap(friendId, placesUser.getName());
+                    PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(friendId, friendImageView, PlacesLoginUtils.PicSize.LARGE, placesUser.getAccountType());
 
-                        friendNameView.setText(placesUser.getName());
-                        PlacesLoginUtils.getInstance().addEntryToUserIdMap(friendId, placesUser.getName());
-
-                    } else {
-
-                        Log.e(TAG, e.getMessage());
-                        Toast.makeText(getContext(), "An error occurred while retrieving friends' data", Toast.LENGTH_SHORT).show();
-
-                    }
+                    v.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            ((MainActivity) getContext()).switchToOtherFrag(new ProfileFragment().newInstance(friendId, placesUser.getAccountType()));
+                        }
+                    });
                 }
-            });
+                else
+                {
 
+                    Log.e(TAG, e.getMessage());
+                    Toast.makeText(getContext(), "An error occurred while retrieving friends' data", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+        });
+
+        /*
         }else{
             String friendName = PlacesLoginUtils.getInstance().getUserNameFromId(friendId);
             friendNameView.setText(friendName);
         }
-
-        PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(friendId, friendImageView, PlacesLoginUtils.PicSize.LARGE);
+        */
 
         return v;
     }
-
 }

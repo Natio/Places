@@ -19,6 +19,7 @@ public class Comment extends ParseObject {
     public static final String USERNAME_KEY = "username";
     public static final String FLAG_KEY = "flag";
     public static final String FLAG_OWNER_KEY = "flagOwner";
+    public static final String LOGIN_TYPE_KEY = "accountType";
 
     public String getUserId() {
         return this.getString(USER_ID_KEY);
@@ -65,4 +66,8 @@ public class Comment extends ParseObject {
     public Date getTimestamp() {
         return this.getCreatedAt();
     }
+
+    public String getAccountType() { return this.getString(LOGIN_TYPE_KEY); }
+
+    public void setAccountType(String accountType) { this.put(LOGIN_TYPE_KEY, accountType); }
 }
