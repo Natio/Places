@@ -97,10 +97,14 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
         String account_type = f.getAccountType();
         String fb_username = f.getFbName(); // checks if Flag has fb username. if there is one use it otherwise ask FB
 
-        // FIXME If user is logged in with G+, FB Graph API cannot be used
+        // If user is logged in with G+, FB Graph API cannot be used
         if (fb_username == null)
             PlacesLoginUtils.getInstance().loadUsernameIntoTextView(user_id, flagViewHolder.username, f.getAccountType());
-        else flagViewHolder.username.setText(fb_username);
+        else
+        {
+            if(!PlacesLoginUtils.getInstance().getUserIdMap().containsKey(user_id)) PlacesLoginUtils.getInstance().addEntryToUserIdMap(user_id, fb_username);
+            flagViewHolder.username.setText(fb_username);
+        }
 
 
         PlacesLoginUtils.getInstance().getProfilePictureURL(user_id, account_type, PlacesLoginUtils.PicSize.SMALL, new PlacesUtilCallback() {

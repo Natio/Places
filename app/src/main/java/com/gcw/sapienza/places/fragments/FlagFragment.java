@@ -75,10 +75,12 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private String temperature;
     private String weatherInfo;
     private String category;
-    private boolean inPlace;
     private String flagId;
     private String author;
     private String accountType;
+    private String newComment;
+
+    private boolean inPlace;
 
     private int wowCount;
     private int lolCount;
@@ -88,34 +90,32 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private ImageView iw;
     private ImageView weatherIco;
     private ImageView categoryIco;
+    private ImageView playVideoButton;
+    private ImageView profilePicImageView;
+    private ImageView audioHolder;
+
     private TextView authorTextView;
     private TextView dateTextView;
     private TextView flagText;
     private TextView temperatureView;
+    private TextView wowStatText;
 
-    private ImageView playVideoButton;
     private RelativeLayout flagContainer;
     private RelativeLayout frameLayout;
     private LinearLayout audioLayout;
     private LinearLayout imageContainer;
     private LinearLayout imageHolder;
-    private ImageView profilePicImageView;
-
     private FrameLayout videoHolder;
-    private ImageView audioHolder;
-
-    private TextView wowStatText;
-    private ToggleButton newWowButton;
 
     private Button lolButton;
     private Button booButton;
     private Button commentsButton;
     private Button addCommentButton;
+    private ToggleButton newWowButton;
     private SwipeRefreshLayout commentsHolder;
     private ListView commentsList;
     private CommentsAdapter commentsAdapter;
     private ArrayList<String> comments;
-    private String newComment;
     private MediaType mediaType;
     private ParseFile mediaFile;
     private View view;
@@ -146,8 +146,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         date = bundle.getString("date");
 
         weatherInfo = bundle.getString("weather");
-        //Log.d(TAG,"phantomWeather: "+weatherInfo);
-        //temporal bypass of a weather bug, IF to be deleted and keep only the else content
+
+        //temporal bypass of a weather bug, "IF" to be deleted and keep only the else content
         if (weatherInfo.equals("")) {
             temperature = "" + 20;
             weather = "Cloud";
@@ -157,29 +157,24 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             weather = st.nextToken().substring(1);
         }
 
-        Log.d(TAG, "weather-" + weather + '-' + temperature);
+        //Log.d(TAG, "weather-" + weather + '-' + temperature);
 
         category = bundle.getString("category");
         inPlace = bundle.getBoolean("inPlace");
         flagId = bundle.getString("flagId");
         author = bundle.getString("author");
-
         wowCount = bundle.getInt("wowCount");
         lolCount = bundle.getInt("lolCount");
         booCount = bundle.getInt("booCount");
-
         accountType = bundle.getString("accountType");
 
         userId = PlacesLoginUtils.getInstance().getCurrentUserId();
-
         flag = PlacesApplication.getInstance().getFlagWithId(flagId);
-
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-
         if (mediaPlayer != null) mediaPlayer.release();
     }
 
@@ -232,7 +227,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         frameLayout = (RelativeLayout) view.findViewById(R.id.frame_layout);
 
-        //names need to be changed in a coherent way
+        //names need to be changed in a coherent way, holder,container, iw vv ... etcetc
         imageHolder = (LinearLayout) view.findViewById(R.id.imageContainer);
         iw = (ImageView) view.findViewById(R.id.pic);
 
@@ -390,7 +385,10 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             }
         });
 
-        wowStatText.setText(wowStatText.getText() + " (" + wowCount + ')');
+        //if(wowCount!=0){
+        //    wowStatText.setText(wowStatText.getText() + "" + wowCount + ')');
+        //}
+
 
         lolButton.setText(lolButton.getText() + " (" + lolCount + ')');
         booButton.setText(booButton.getText() + " (" + booCount + ')');
@@ -594,8 +592,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         switch (code) {
             case WOW_CODE:
-                //wowStatText.setClickable(false);
-
                 queryWLB.findInBackground(new FindCallback<CustomParseObject>() {
                     @Override
                     public void done(List<CustomParseObject> markers, ParseException e) {
@@ -636,8 +632,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                         } else {
                             Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
                             Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
-
-                            //wowStatText.setClickable(true);
                         }
                     }
                 });
@@ -763,38 +757,30 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
                             if (increment) {
                                 flag.increment("wowCount");
-
                                 flag.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
-                                        updateWowButtonText(true, wowCount + 1);
-
-                                        //wowStatText.setClickable(true);
+                                        updateWowStats(true, wowCount + 1);
                                     }
                                 });
                             } else {
                                 flag.increment("wowCount", -1);
-
                                 flag.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
-                                        updateWowButtonText(false, wowCount - 1);
-
-                                        //wowStatText.setClickable(true);
+                                        updateWowStats(false, wowCount - 1);
                                     }
                                 });
                             }
                         } else {
-                            Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
-                            Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
-
-                            //wowStatText.setClickable(true);
+                            Toast.makeText(getActivity(), "Error encountered while accessing database", Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "Error encountered while retrieving table entry on Parse.com");
                         }
                     }
                 });
-
                 break;
 
+            /*
             case LOL_CODE:
                 queryPosts.findInBackground(new FindCallback<Flag>() {
                     @Override
@@ -830,8 +816,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                         } else {
                             Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
                             Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
-
-                            //wowStatText.setClickable(true);
                         }
                     }
                 });
@@ -878,10 +862,11 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                         }
                     }
                 });
+                */
         }
     }
 
-    private void updateWowButtonText(boolean wowed, int wowCount) {
+    private void updateWowStats(boolean wowed, int wowCount) {
         if (wowed) {
             if (wowCount == 1) {
                 wowStatText.setText("You WoWed this.");
@@ -891,11 +876,20 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 newWowButton.setChecked(true);
             }
         } else {
-            wowStatText.setText(wowCount + " WoWs");
             newWowButton.setChecked(false);
+            if (wowCount==0){
+                wowStatText.setText("");
+            }
+            else{
+                if(wowCount==1){
+                    wowStatText.setText("1 WoW");
+                }
+                else
+                    wowStatText.setText(wowCount + " WoWs");
+            }
         }
     }
-
+/*
     private void updateLolButtonText(boolean lold, int lolCount) {
         if (lold) lolButton.setText("You lol this. (" + lolCount + ')');
         else lolButton.setText("LOL (" + lolCount + ')');
@@ -905,11 +899,11 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         if (booed) booButton.setText("You boo this. (" + booCount + ')');
         else booButton.setText("BOO (" + booCount + ')');
     }
-
+*/
     private void changeLayoutAccordingToMediaType() {
         if (mediaType == MediaType.NONE) {
             // TODO managing resizing of flags with very short text
-
+            //maybe i'll do a swipe up and down...as googleMap effect
         } else if (mediaType == MediaType.AUDIO) {
             audioLayout.setVisibility(View.VISIBLE);
         } else if (mediaType == MediaType.PIC) {
@@ -932,7 +926,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                     }
                     if (e == null) {
                         try {
-
                             MediaType mediaType = FlagFragment.this.mediaType;
                             File tempFile = FlagFragment.this.tempFileForMediaType(mediaType);
                             FileOutputStream outputStream = new FileOutputStream(tempFile);
@@ -979,7 +972,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             default:
                 return null;
         }
-
         try {
             Log.d(TAG, "name " + fileName);
             Log.d(TAG, "format " + fileFormat);
@@ -988,7 +980,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             Log.d(TAG, "Cannot create temp file", e);
             return null;
         }
-
     }
 
     public static enum MediaType {PIC, AUDIO, VIDEO, NONE}
@@ -998,7 +989,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         ParseQuery<CustomParseObject> queryWLB = ParseQuery.getQuery("Wow_Lol_Boo");
         queryWLB.whereEqualTo("fbId", userId);
         queryWLB.whereEqualTo("flagId", flagId);
-
         queryWLB.findInBackground(new FindCallback<CustomParseObject>() {
             @Override
             public void done(List<CustomParseObject> markers, ParseException e) {
@@ -1007,7 +997,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                     if (markers.size() == 0)
                         newWowButton.setChecked(false);
                     else {
-
                         CustomParseObject obj = markers.get(0);
 
                         boolean boolWow = obj.getBoolean("boolWow");
@@ -1055,10 +1044,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                     //wowStatText.setClickable(true);
                 }
             }
-
         });
     }
-
-
 }
-
