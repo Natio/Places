@@ -240,7 +240,12 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
                 && !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             promptForLocationServices();
         } else if(loggedIn){
-            PlacesApplication.getInstance().startLocationService();
+            if(PlacesApplication.getInstance().isLocationServiceRunning()){
+                PlacesApplication.getInstance().updatePlacesData();
+            }
+            else{
+                PlacesApplication.getInstance().startLocationService();
+            }
         }
 
         isForeground = true;

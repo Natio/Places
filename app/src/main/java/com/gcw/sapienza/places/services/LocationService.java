@@ -126,6 +126,8 @@ public class LocationService extends Service implements
             queryParsewithLocation(currentLocation);
             queryParsewithCurrentUser();
             queryParsewithBag();
+        }else{
+            Log.d(TAG, "Last location is null!");
         }
     }
 
@@ -133,7 +135,7 @@ public class LocationService extends Service implements
     public void onConnected(Bundle connectionHint) {
         Log.d(TAG, "Connected to Google Api");
         Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
-        updateLocationData();
+//        updateLocationData();
         fusedLocationProviderApi.requestLocationUpdates(googleApiClient, locationRequest, this);
     }
 
@@ -150,6 +152,8 @@ public class LocationService extends Service implements
      * query Parse table for all the Flags of current user
      */
     public void queryParsewithCurrentUser() {
+        Log.d(TAG, "Running queryParsewithCurrentUser...");
+
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
         query.whereEqualTo("fbId", PlacesLoginUtils.getInstance().getCurrentUserId());
         query.orderByDescending("createdAt");
@@ -184,6 +188,7 @@ public class LocationService extends Service implements
      * query Parse table for all the Flags in the current user's bag
      */
     public void queryParsewithBag() {
+        Log.d(TAG, "Running queryParsewithBag...");
 
         bagFlags = new HashMap<>();
 
@@ -248,6 +253,7 @@ public class LocationService extends Service implements
      * @param location the location we want to find Flags nearby to
      */
     public void queryParsewithLocation(Location location) {
+        Log.d(TAG, "Running queryParsewithLocation...");
         //creates a fake location for testing if it is running on simulator
         if (PlacesApplication.isRunningOnEmulator) {
             location = PlacesApplication.getInstance().getLocation();

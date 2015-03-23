@@ -207,7 +207,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
         this.gMap.setOnMarkerClickListener(this);
         this.gMap.setMyLocationEnabled(true);
 
-        this.updateMarkersOnMap();
+        PlacesApplication.getInstance().updatePlacesData();
     }
 
     private void updateMarkersOnMap() {

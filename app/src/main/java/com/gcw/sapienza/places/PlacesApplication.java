@@ -130,6 +130,8 @@ public class PlacesApplication extends Application {
         return PlacesApplication.PLACES_CONTEXT;
     }
 
+    public boolean isLocationServiceRunning(){ return this.mBound; }
+
     private static void subscribeToParseBroadcast() {
         ParsePush.subscribeInBackground("", new SaveCallback() {
             @Override
