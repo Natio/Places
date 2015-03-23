@@ -457,10 +457,17 @@ public class LocationService extends Service implements
         this.location = location;
         queryParsewithLocation(location);
         if (this.flagsNearby != null && PlacesLoginUtils.getInstance().hasCurrentUserId()) {
+
+
             if (!MainActivity.isForeground()) {
-                Log.d(TAG, "Notifying user..." +
-                        this.flagsNearby.size() + " flags found");
-                notifyUser();
+
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                boolean areNotificationsEnabled = preferences.getBoolean("notificationsCheck", true);
+
+                if(areNotificationsEnabled) {
+                    Log.d(TAG, "Notifying user..." + this.flagsNearby.size() + " flags found");
+                    notifyUser();
+                }
             } else {
                 Log.d(TAG, "Main Activity in foreground: updating map...");
                 LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.LOCATION_CHANGED_NOTIFICATION));
@@ -616,8 +623,7 @@ public class LocationService extends Service implements
                 case MainActivity.PREFERENCES_CHANGED_NOTIFICATION:
                 case CategoriesFragment.ENABLE_ALL_CLICKED:
                     LocationService.this.resetNoFlagsWarning();
-                    Location currentLocation = PlacesApplication.getInstance().getLocation();
-                    queryParsewithLocation(currentLocation);
+                    updateLocationData();
                     break;
 
                 default:

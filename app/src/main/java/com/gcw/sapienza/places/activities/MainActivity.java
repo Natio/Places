@@ -547,7 +547,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
                 preference.getKey().equals("landscapeCheck") ||
                 preference.getKey().equals("foodCheck") ||
                 preference.getKey().equals("noneCheck") ||
-                preference.getKey().equals("discoverMode")) {
+                preference.getKey().equals("discoverMode") ||
+                preference.getKey().equals("notificationsCheck")) {
             Log.d(TAG, "Called onPreferenceChange for: " + preference.getKey());
             editor.putBoolean(preference.getKey(), (boolean) newValue);
             editor.commit();
