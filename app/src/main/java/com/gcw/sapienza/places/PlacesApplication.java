@@ -188,9 +188,7 @@ public class PlacesApplication extends Application {
     /**
      * @return returns the list of flags around user's location, filtered according to settings
      */
-    public List<Flag> getFlags() {
-        return new ArrayList<>(this.flagsNearby.values());
-    }
+    public List<Flag> getFlags() { return new ArrayList<>(this.flagsNearby.values()); }
 
     /**
      * @return returns the list of all the Flags the user has posted

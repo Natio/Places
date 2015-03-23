@@ -88,12 +88,14 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     private ImageButton vidButton;
     private ImageButton phoneButton;
     private CheckBox privateCheckbox;
+    private CheckBox socialCheckbox;
     private LinearLayout linearLayout;
     private boolean isPicTaken = false;
     private boolean isVideoShoot = false;
     private boolean isSoundCaptured = false;
     private boolean isPhoneMediaSelected = false;
     private boolean isPrivate;
+    private boolean onSocial;
     private File pic;
     private File video;
     private File audio;
@@ -448,6 +450,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         this.vidButton = (ImageButton) findViewById(R.id.vid_button);
         this.phoneButton = (ImageButton) findViewById(R.id.phone_button);
         this.privateCheckbox = (CheckBox) findViewById(R.id.private_checkbox);
+        this.socialCheckbox = (CheckBox) findViewById(R.id.social_checkbox);
         this.linearLayout = (LinearLayout) findViewById(R.id.share_holder);
         this.getSupportActionBar().setTitle("Places");
 
@@ -478,8 +481,10 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         this.micButton.setOnClickListener(this);
 
         this.privateCheckbox.setOnCheckedChangeListener(this);
+        this.socialCheckbox.setOnCheckedChangeListener(this);
 
         this.isPrivate = false;
+        this.onSocial = false;
 
 //        registerForContextMenu(this.phoneButton);
 //        this.phoneButton.setOnCreateContextMenuListener(this);
@@ -594,7 +599,18 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (buttonView.getId() == R.id.private_checkbox) isPrivate = isChecked;
+        switch (buttonView.getId()){
+
+            case R.id.private_checkbox:
+                isPrivate = isChecked;
+                break;
+
+            case R.id.social_checkbox:
+                onSocial = isChecked;
+                break;
+
+            default:
+        }
     }
 
     @Override
@@ -928,42 +944,59 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     protected void onShareSucceeded(final String toastText) {
 
 
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
+//        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+//
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                switch (which) {
+//                    case DialogInterface.BUTTON_POSITIVE:
+//
+//                        Location current_location = PlacesApplication.getInstance().getLocation();
+//                        String flag_marker_url = "http://maps.google.com/maps?q=" + current_location.getLatitude() + ',' + current_location.getLongitude();
+//                        Intent sendIntent = new Intent();
+//                        sendIntent.setAction(Intent.ACTION_SEND);
+//                        sendIntent.putExtra(Intent.EXTRA_TEXT, "I've just left my mark in history!! Check it out on Places (" + flag_marker_url + ')');
+//                        sendIntent.setType("text/plain");
+//                        startActivityForResult(sendIntent, Utils.SHARE_SOCIAL_REQUEST_CODE);
+//
+//                        break;
+//
+//                    case DialogInterface.BUTTON_NEGATIVE:
+//                        Intent returnIntent = new Intent();
+//                        returnIntent.putExtra("result", toastText);
+//                        setResult(RESULT_OK, returnIntent);
+//                        ShareActivity.this.finish();
+//
+//                }
+//            }
+//        };
 
-                        Location current_location = PlacesApplication.getInstance().getLocation();
-                        String flag_marker_url = "http://maps.google.com/maps?q=" + current_location.getLatitude() + ',' + current_location.getLongitude();
-                        Intent sendIntent = new Intent();
-                        sendIntent.setAction(Intent.ACTION_SEND);
-                        sendIntent.putExtra(Intent.EXTRA_TEXT, "I've just left my mark in history!! Check it out on Places (" + flag_marker_url + ')');
-                        sendIntent.setType("text/plain");
-                        startActivityForResult(sendIntent, Utils.SHARE_SOCIAL_REQUEST_CODE);
 
-                        break;
+        //not sharing through dialog anymore
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        AlertDialog dialog = builder.setMessage("Share on Social?")
+//                .setPositiveButton("Yes", dialogClickListener)
+//                .setNegativeButton("No", dialogClickListener).show();
+//
+//        dialog.show();
 
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        Intent returnIntent = new Intent();
-                        returnIntent.putExtra("result", toastText);
-                        setResult(RESULT_OK, returnIntent);
-                        ShareActivity.this.finish();
-
-                }
-            }
-        };
-
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        AlertDialog dialog = builder.setMessage("Share on Social?")
-                .setPositiveButton("Yes", dialogClickListener)
-                .setNegativeButton("No", dialogClickListener).show();
-
-        dialog.show();
+        if(onSocial){
+            shareOnSocial();
+        }
 
 
     }
+
+    private void shareOnSocial() {
+        Location current_location = PlacesApplication.getInstance().getLocation();
+        String flag_marker_url = "http://maps.google.com/maps?q=" + current_location.getLatitude() + ',' + current_location.getLongitude();
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "I've just left my mark in history!! Check it out on Places (" + flag_marker_url + ')');
+        sendIntent.setType("text/plain");
+        startActivityForResult(sendIntent, Utils.SHARE_SOCIAL_REQUEST_CODE);
+    }
+
 
     //from the open source library aFileChooser: https://github.com/iPaulPro/aFileChooser
 
