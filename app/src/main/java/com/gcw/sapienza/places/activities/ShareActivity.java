@@ -89,7 +89,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     private ImageButton phoneButton;
     private CheckBox privateCheckbox;
     private CheckBox socialCheckbox;
-    private LinearLayout linearLayout;
     private boolean isPicTaken = false;
     private boolean isVideoShoot = false;
     private boolean isSoundCaptured = false;
@@ -451,7 +450,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         this.phoneButton = (ImageButton) findViewById(R.id.phone_button);
         this.privateCheckbox = (CheckBox) findViewById(R.id.private_checkbox);
         this.socialCheckbox = (CheckBox) findViewById(R.id.social_checkbox);
-        this.linearLayout = (LinearLayout) findViewById(R.id.share_holder);
         this.getSupportActionBar().setTitle("Places");
 
         //these lines are necessary for a correct visualization
@@ -813,7 +811,6 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             return;
         }
 
-
         AlphaAnimation inAnim = new AlphaAnimation(0, 1);
         inAnim.setDuration(Utils.ANIMATION_DURATION);
         progressBarHolder.setAnimation(inAnim);
@@ -837,6 +834,8 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 this.dismissProgressBar();
 
                 confirmButton.setVisible(true);
+
+                finish();
             }
 
             @Override
@@ -851,6 +850,8 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 this.dismissProgressBar();
 
                 confirmButton.setVisible(true);
+
+                finish();
             }
 
             void dismissProgressBar() {

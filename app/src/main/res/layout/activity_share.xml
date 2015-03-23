@@ -3,8 +3,7 @@
     android:id="@+id/share_holder"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:weightSum="1">
+    android:orientation="vertical">
 
     <!--0.6-->
     <EditText
@@ -20,14 +19,16 @@
         android:textSize="25sp" />
 
     <LinearLayout
+        android:id="@+id/share_settings_layout"
+        android:layout_height="0dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_weight="0.1">
 
         <CheckBox
             android:id="@+id/social_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
+            android:layout_weight="0.8"
             android:checked="false"
             android:text="@string/share_social"
             android:textColor="@color/grey"
@@ -37,7 +38,7 @@
             android:id="@+id/private_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.075"
+            android:layout_weight="0.2"
             android:checked="false"
             android:text="@string/topsecret"
             android:button="@drawable/button_lock_selector"
