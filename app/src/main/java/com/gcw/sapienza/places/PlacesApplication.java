@@ -131,6 +131,8 @@ public class PlacesApplication extends Application {
         return PlacesApplication.PLACES_CONTEXT;
     }
 
+    public boolean isLocationServiceRunning(){ return this.mBound; }
+
     private static void subscribeToParseBroadcast() {
         ParsePush.subscribeInBackground("", new SaveCallback() {
             @Override
@@ -189,9 +191,7 @@ public class PlacesApplication extends Application {
     /**
      * @return returns the list of flags around user's location, filtered according to settings
      */
-    public List<Flag> getFlags() {
-        return new ArrayList<>(this.flagsNearby.values());
-    }
+    public List<Flag> getFlags() { return new ArrayList<>(this.flagsNearby.values()); }
 
     /**
      * @return returns the list of all the Flags the user has posted
@@ -293,9 +293,6 @@ public class PlacesApplication extends Application {
         if (hasToSaveInstallation) {
             ParseInstallation.getCurrentInstallation().saveInBackground();
         }
-
-
-        PlacesApplication.getInstance().startLocationService();
     }
 
     public void startLocationService() {
@@ -310,6 +307,13 @@ public class PlacesApplication extends Application {
         } else {
             Log.w("Places Application", "Location Service not started!");
         }
+    }
+
+    public void updatePlacesData(){
+        if(mService != null)
+            mService.updateLocationData();
+        else
+            startLocationService();
     }
 
     private void updateWeatherInfo() {

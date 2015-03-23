@@ -119,16 +119,23 @@ public class LocationService extends Service implements
         return random_loc;
     }
 
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        Log.d(TAG, "Connected to Google Api");
+    public void updateLocationData(){
         Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
         if (currentLocation != null) {
             this.location = currentLocation;
             queryParsewithLocation(currentLocation);
             queryParsewithCurrentUser();
             queryParsewithBag();
+        }else{
+            Log.d(TAG, "Last location is null!");
         }
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        Log.d(TAG, "Connected to Google Api");
+        Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
+//        updateLocationData();
         fusedLocationProviderApi.requestLocationUpdates(googleApiClient, locationRequest, this);
     }
 
@@ -145,6 +152,8 @@ public class LocationService extends Service implements
      * query Parse table for all the Flags of current user
      */
     public void queryParsewithCurrentUser() {
+        Log.d(TAG, "Running queryParsewithCurrentUser...");
+
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
         query.whereEqualTo("fbId", PlacesLoginUtils.getInstance().getCurrentUserId());
         query.orderByDescending("createdAt");
@@ -179,6 +188,7 @@ public class LocationService extends Service implements
      * query Parse table for all the Flags in the current user's bag
      */
     public void queryParsewithBag() {
+        Log.d(TAG, "Running queryParsewithBag...");
 
         bagFlags = new HashMap<>();
 
@@ -206,6 +216,7 @@ public class LocationService extends Service implements
 
                     String currentUserId = null;
 
+                    // TODO This needs to be checked properly
                     try
                     {
                         currentUserId = ParseUser.getCurrentUser().getObjectId();
@@ -215,6 +226,8 @@ public class LocationService extends Service implements
                         Log.d(TAG, npe.getMessage());
                         return;
                     }
+
+                    // ParseUser parseUser = ParseUser.getCurrentUser();
 
                     for (Comment c : comments) {
 
@@ -249,6 +262,7 @@ public class LocationService extends Service implements
      * @param location the location we want to find Flags nearby to
      */
     public void queryParsewithLocation(Location location) {
+        Log.d(TAG, "Running queryParsewithLocation...");
         //creates a fake location for testing if it is running on simulator
         if (PlacesApplication.isRunningOnEmulator) {
             location = PlacesApplication.getInstance().getLocation();
@@ -458,10 +472,17 @@ public class LocationService extends Service implements
         this.location = location;
         queryParsewithLocation(location);
         if (this.flagsNearby != null && PlacesLoginUtils.getInstance().hasCurrentUserId()) {
+
+
             if (!MainActivity.isForeground()) {
-                Log.d(TAG, "Notifying user..." +
-                        this.flagsNearby.size() + " flags found");
-                notifyUser();
+
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                boolean areNotificationsEnabled = preferences.getBoolean("notificationsCheck", true);
+
+                if(areNotificationsEnabled) {
+                    Log.d(TAG, "Notifying user..." + this.flagsNearby.size() + " flags found");
+                    notifyUser();
+                }
             } else {
                 Log.d(TAG, "Main Activity in foreground: updating map...");
                 LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.LOCATION_CHANGED_NOTIFICATION));
@@ -617,8 +638,7 @@ public class LocationService extends Service implements
                 case MainActivity.PREFERENCES_CHANGED_NOTIFICATION:
                 case CategoriesFragment.ENABLE_ALL_CLICKED:
                     LocationService.this.resetNoFlagsWarning();
-                    Location currentLocation = PlacesApplication.getInstance().getLocation();
-                    queryParsewithLocation(currentLocation);
+                    updateLocationData();
                     break;
 
                 default:

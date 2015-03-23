@@ -72,6 +72,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     private static final String FRAG_TAG = "FRAG_TAG";
 
     private static boolean isForeground = false;
+    private boolean loggedIn;
 
     public Menu mMenu;
     private DrawerLayout drawerLayout;
@@ -171,12 +172,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
     public void refresh() {
         Log.d(TAG, "Refreshing application");
-        Location currentLocation = PlacesApplication.getInstance().getLocation();
-        if (currentLocation != null) {
-            PlacesApplication.getInstance().getLocationService().queryParsewithLocation(currentLocation);
-        } else
-            Toast.makeText(this, "No location data available\n" +
-                    "Are Location Services enabled?", Toast.LENGTH_LONG).show();
+        PlacesApplication.getInstance().updatePlacesData();
     }
 
     @Override
@@ -243,8 +239,13 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 && !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             promptForLocationServices();
-        } else {
-            PlacesApplication.getInstance().startLocationService();
+        } else if(loggedIn){
+            if(PlacesApplication.getInstance().isLocationServiceRunning()){
+                PlacesApplication.getInstance().updatePlacesData();
+            }
+            else{
+                PlacesApplication.getInstance().startLocationService();
+            }
         }
 
         isForeground = true;
@@ -344,6 +345,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
         PlacesLoginUtils.getInstance().clearUserData();
 
+        this.loggedIn = false;
+
         // Go to the login view
         PlacesLoginUtils.startLoginActivity(this, true);
     }
@@ -417,6 +420,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
                 if (resultCode == RESULT_OK) {
                     //this.startDownloadingFacebookInfo();
+
+                    this.loggedIn = true;
 
                     // TODO At this time, if G+ login is being used, this code block won't be executed
                     Log.d(TAG, "Login was successful");
@@ -547,7 +552,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
                 preference.getKey().equals("landscapeCheck") ||
                 preference.getKey().equals("foodCheck") ||
                 preference.getKey().equals("noneCheck") ||
-                preference.getKey().equals("discoverMode")) {
+                preference.getKey().equals("discoverMode") ||
+                preference.getKey().equals("notificationsCheck")) {
             Log.d(TAG, "Called onPreferenceChange for: " + preference.getKey());
             editor.putBoolean(preference.getKey(), (boolean) newValue);
             editor.commit();

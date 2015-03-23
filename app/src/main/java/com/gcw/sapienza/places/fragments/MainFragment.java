@@ -207,7 +207,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
         this.gMap.setOnMarkerClickListener(this);
         this.gMap.setMyLocationEnabled(true);
 
-        this.updateMarkersOnMap();
+        PlacesApplication.getInstance().updatePlacesData();
     }
 
     private void updateMarkersOnMap() {
@@ -339,7 +339,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
      */
     private boolean isDiscoverModeEnabled() {
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(PlacesApplication.getPlacesAppContext());
 
         boolean discoverMode = preferences.getBoolean("discoverMode", true);
 

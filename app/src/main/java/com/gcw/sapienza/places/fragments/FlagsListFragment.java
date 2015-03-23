@@ -4,7 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
@@ -22,6 +24,7 @@ import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.adapters.FlagsAdapter;
 import com.gcw.sapienza.places.models.Flag;
+import com.gcw.sapienza.places.models.FlagComparator;
 import com.gcw.sapienza.places.models.FlagReport;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.Utils;
@@ -33,6 +36,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -41,6 +45,7 @@ import java.util.List;
 public class FlagsListFragment extends Fragment {
 
     private static final String TAG = "FlagsListFragment";
+
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -49,7 +54,7 @@ public class FlagsListFragment extends Fragment {
                 //handled in the same way
                 case LocationService.FOUND_NEW_FLAGS_NOTIFICATION:
                 case LocationService.FOUND_NO_FLAGS_NOTIFICATION:
-                    FlagsListFragment.this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getFlags());
+                    FlagsListFragment.this.updateRecycleViewWithNewContents(getOrderedFlags());
                     break;
 
                 default:
@@ -77,7 +82,9 @@ public class FlagsListFragment extends Fragment {
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
 
-        this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getFlags());
+
+
+        this.updateRecycleViewWithNewContents(getOrderedFlags());
 
         registerForContextMenu(recycleView);
 
@@ -191,6 +198,21 @@ public class FlagsListFragment extends Fragment {
                 }
             }
         });
+    }
+
+    public List<Flag> getOrderedFlags() {
+
+        List<Flag> flags = PlacesApplication.getInstance().getFlags();
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        boolean archaeologist = preferences.getBoolean("timeFilter", false);
+
+        if(archaeologist){
+            Collections.sort(flags, new FlagComparator(true));
+        }else{
+            Collections.sort(flags, new FlagComparator(false));
+        }
+        return flags;
     }
 }
 

@@ -39,6 +39,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         Preference max_fetch = findPreference("maxFetch");
         Preference version_label = findPreference("version");
         Preference discover_mode = findPreference("discoverMode");
+        Preference notifications_check = findPreference("notificationsCheck");
 
         version_label.setSummary(BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")");
         loneWolf_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
@@ -48,6 +49,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         max_fetch.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
         max_fetch.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
         discover_mode.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
+        notifications_check.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
 
         version_label.setOnPreferenceClickListener(this);
     }
