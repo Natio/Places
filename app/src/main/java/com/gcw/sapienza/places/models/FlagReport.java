@@ -20,7 +20,7 @@ public class FlagReport extends ParseObject {
     }
 
     /**
-     * Creates a Flag's report. The reporter is current user
+     * Creates a flag's report. The reporter is current user
      *
      * @param f the flag to report
      * @return the configured instance

@@ -9,11 +9,15 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -26,19 +30,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.widget.VideoView;
-
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.activities.ShareActivity;
 import com.gcw.sapienza.places.adapters.CommentsAdapter;
+import com.gcw.sapienza.places.adapters.FlagsAdapter;
 import com.gcw.sapienza.places.models.Comment;
+import com.gcw.sapienza.places.models.CommentReport;
 import com.gcw.sapienza.places.models.CustomParseObject;
 import com.gcw.sapienza.places.models.Flag;
+import com.gcw.sapienza.places.models.FlagReport;
 import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
+import com.parse.DeleteCallback;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -47,7 +55,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -93,6 +100,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private ImageView playVideoButton;
     private ImageView profilePicImageView;
     private ImageView audioHolder;
+    private SwipeRefreshLayout commentsHolder;
 
     private TextView authorTextView;
     private TextView dateTextView;
@@ -106,14 +114,11 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private LinearLayout imageContainer;
     private LinearLayout imageHolder;
     private FrameLayout videoHolder;
-
+    private RecyclerView rv;
     private Button lolButton;
     private Button booButton;
-    private Button commentsButton;
     private Button addCommentButton;
     private ToggleButton newWowButton;
-    private SwipeRefreshLayout commentsHolder;
-    private ListView commentsList;
     private CommentsAdapter commentsAdapter;
     private ArrayList<String> comments;
     private MediaType mediaType;
@@ -122,7 +127,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private StringTokenizer st;
     private ScrollView flagContent;
     private Flag flag;
-    private PlacesUser flagOwner;
+    private ArrayList<Comment> commentObjs;
 
     /**
      * Must be called BEFORE adding the fragment to the
@@ -168,7 +173,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         booCount = bundle.getInt("booCount");
         accountType = bundle.getString("accountType");
 
-        userId = PlacesLoginUtils.getInstance().getCurrentUserId();
+        userId = id;
         flag = PlacesApplication.getInstance().getFlagWithId(flagId);
     }
 
@@ -183,7 +188,12 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         super.onCreateView(inflater, container, savedInstanceState);
 
         view = inflater.inflate(R.layout.flag_layout, container, false);
-        flagContent = (ScrollView) view.findViewById(R.id.FlagContent);
+        flagContent = (ScrollView)view.findViewById(R.id.FlagContent);
+
+        rv = (RecyclerView)view.findViewById(R.id.comments_holder);
+        LinearLayoutManager llm = new LinearLayoutManager(this.getActivity());
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        rv.setLayoutManager(llm);
 
         flagText = (TextView) view.findViewById(R.id.text);
         authorTextView = (TextView) view.findViewById(R.id.author);
@@ -231,6 +241,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         imageHolder = (LinearLayout) view.findViewById(R.id.imageContainer);
         iw = (ImageView) view.findViewById(R.id.pic);
 
+        commentsHolder = (SwipeRefreshLayout)view.findViewById(R.id.comments);
+
         playVideoButton = (ImageView) view.findViewById(R.id.play_video_button);
         videoHolder = (FrameLayout) view.findViewById(R.id.video_holder);
         vv = (VideoView) view.findViewById(R.id.vid);
@@ -245,10 +257,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         lolButton = (Button) view.findViewById(R.id.lol_button);
         booButton = (Button) view.findViewById(R.id.boo_button);
-
-        //commentsButton = (Button) view.findViewById(R.id.comments_button);
-        commentsHolder = (SwipeRefreshLayout) view.findViewById(R.id.comments_holder);
-        commentsList = (ListView) view.findViewById(R.id.comments_list);
 
         iw.setOnClickListener(this);
         vv.setOnTouchListener(this);
@@ -413,31 +421,96 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         });
     }
 
-    private void retrieveComments() {
+    private void retrieveComments()
+    {
         ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
         query.whereEqualTo("flagId", flagId);
         query.orderByAscending("createdAt");
 
-        Log.d(TAG, "Retrieving comments belonging to flag " + flagId);
-
-        query.findInBackground(new FindCallback<Comment>() {
+        query.findInBackground(new FindCallback<Comment>()
+        {
             @Override
-            public void done(List<Comment> result, ParseException e) {
+            public void done(List<Comment> result, ParseException e)
+            {
+                if (result == null || result.size() == 0)
+                {
+                    ArrayList<Comment> emptyCommentList = new ArrayList();
+                    commentsAdapter = new CommentsAdapter(emptyCommentList, rv, getActivity());
+                }
+                else
+                {
+                    comments = new ArrayList();
+                    commentObjs = new ArrayList();
 
-                if (result == null || result.size() == 0) {
-                    ArrayList<String> commentsNotFoundText = new ArrayList<>();
-                    commentsAdapter = new CommentsAdapter(getActivity(), R.layout.comment_item_layout, commentsNotFoundText);
-                } else {
-                    comments = new ArrayList<>();
                     for (Comment comment : result)
+                    {
                         comments.add(comment.getObjectId());
+                        commentObjs.add(comment);
+                    }
 
-                    commentsAdapter = new CommentsAdapter(getActivity(), R.layout.comment_item_layout, comments);
+                    commentsAdapter = new CommentsAdapter(commentObjs, rv, getActivity());
                 }
 
-                commentsList.setAdapter(commentsAdapter);
+                rv.setAdapter(commentsAdapter);
             }
         });
+    }
+
+    // @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+    {
+        Log.d(TAG, "Comment at position " + position + " long clicked!");
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+
+        Comment comment = commentObjs.get(position);
+
+        String fb_id = comment.getUserId();
+        //        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        //        Flag sel_usr = (Flag)(recycleView.getItemAtPosition(info.position));
+        //        String fb_id = sel_usr.getFbId();
+        //
+        if (PlacesLoginUtils.getInstance().getCurrentUserId().equals(fb_id))
+        {
+            builder.setView(inflater.inflate(R.layout.custom_dialog_layout, null))
+                    .setTitle("Edit")
+                    .setPositiveButton("Delete", null)
+                    .setNegativeButton("Cancel", null)
+                    .setCancelable(true);
+
+            // menu.add(Utils.FLAG_LIST_GROUP, Utils.DELETE_FLAG, 0, "Delete Flag");
+        }
+        else
+        {
+            builder.setView(inflater.inflate(R.layout.custom_dialog_layout, null))
+                    .setTitle("Edit")
+                    .setPositiveButton("Report", null)
+                    .setNegativeButton("Cancel", null)
+                    .setCancelable(true);
+
+                            /*
+                            ParseQuery<ParseObject> queryDelete = ParseQuery.getQuery("Reported_Posts");
+
+                            queryDelete.whereEqualTo("reported_by", ParseUser.getCurrentUser());
+                            queryDelete.whereEqualTo("reported_flag", mFlag);
+
+                            try {
+                                if (queryDelete.count() == 0) {
+                                    menu.add(Utils.FLAG_LIST_GROUP, Utils.REPORT_FLAG, 0, "Report Flag as inappropriate");
+                                } else {
+                                    menu.add(Utils.FLAG_LIST_GROUP, Utils.DELETE_REPORT_FLAG, 0, "Revoke Flag report");
+                                }
+                            } catch (ParseException e) {
+                                Log.e(TAG, e.getMessage());
+                            }
+                            */
+        }
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        return true;
     }
 
     private void insertComment() {
@@ -488,7 +561,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                     });
                                     */
 
-                                comment.setUsername(((PlacesUser) ParseUser.getCurrentUser()).getName());
+                                String username = ((PlacesUser) ParseUser.getCurrentUser()).getName();
+                                if(username == null) username = PlacesLoginUtils.getInstance().getUserNameFromId(userId);
+                                if(username != null) comment.setUsername(username);
                                 comment.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
@@ -1042,6 +1117,105 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                     Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
                     newWowButton.setChecked(false);
                     //wowStatText.setClickable(true);
+                }
+            }
+        });
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        CommentsAdapter fa = (CommentsAdapter) rv.getAdapter();
+        Comment sel_usr = fa.getSelectedComment();
+
+        if (sel_usr == null)
+            Toast.makeText(getActivity(), Utils.NO_VALID_COMMENT_SELECTED, Toast.LENGTH_SHORT).show();
+
+        switch (item.getItemId()) {
+
+            case Utils.DELETE_COMMENT:
+                deleteComment(sel_usr);
+                fa.setSelectedCommentIndex(-1);
+                return true;
+
+            case Utils.REPORT_COMMENT:
+                this.reportComment(sel_usr);
+                fa.setSelectedCommentIndex(-1);
+                return true;
+
+            case Utils.DELETE_REPORT_COMMENT:
+                this.deleteReportComment(sel_usr);
+                fa.setSelectedCommentIndex(-1);
+                return true;
+
+            default:
+                fa.setSelectedCommentIndex(-1);
+                return super.onContextItemSelected(item);
+        }
+    }
+
+    /**
+     * Deletes the comment
+     *
+     * @param f comment to delete
+     */
+    private void deleteComment(Comment f) {
+        f.deleteInBackground(new DeleteCallback() {
+            @Override
+            public void done(com.parse.ParseException e) {
+                if (e == null) {
+                    Toast.makeText(rv.getContext(), Utils.COMMENT_DELETED, Toast.LENGTH_SHORT).show();
+                    retrieveComments();
+                } else
+                    Toast.makeText(rv.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Reports a comment
+     *
+     * @param f comment to report
+     */
+    private void reportComment(final Comment f) {
+
+        CommentReport report = CommentReport.createFlagReportFromFlag(f);
+        report.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Toast.makeText(rv.getContext(), Utils.COMMENT_REPORTED, Toast.LENGTH_SHORT).show();
+                } else
+                    Toast.makeText(rv.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Deletes an entry from the Reported_Comments table
+     *
+     * @param f comment related to the entry to be deleted
+     */
+    private void deleteReportComment(Comment f) {
+        ParseQuery<ParseObject> queryDelete = ParseQuery.getQuery("Reported_Comments");
+
+        queryDelete.whereEqualTo("reported_by", ParseUser.getCurrentUser());
+        queryDelete.whereEqualTo("reported_flag", f);
+
+        queryDelete.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject p, ParseException e) {
+                if (e == null) {
+                    p.deleteInBackground(new DeleteCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e == null) {
+                                Toast.makeText(rv.getContext(), Utils.FLAG_REPORT_REVOKED, Toast.LENGTH_SHORT).show();
+                            } else
+                                Toast.makeText(rv.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    Toast.makeText(rv.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });

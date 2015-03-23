@@ -130,18 +130,6 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
         } else {
             flagViewHolder.stats_comment.setText(numberOfComments + " comments");
         }
-/*
-        ParseQuery<Comment> countQuery = ParseQuery.getQuery("Comments");
-        countQuery.whereEqualTo("flagId", f.getFlagId());
-        countQuery.countInBackground(new CountCallback() {
-            @Override
-            public void done(int i, ParseException e)
-            {
-                if(i == 1) flagViewHolder.stats_comment.setText(i + " comment");
-                else flagViewHolder.stats_comment.setText(i + " comments");
-            }
-        });
-*/
 
         ParseFile pic = f.getThumbnail();
         if (pic != null && f.getPassword() == null) {

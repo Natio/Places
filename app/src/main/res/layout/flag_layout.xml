@@ -330,29 +330,19 @@
         android:background="@color/light_grey"/>
 
     <!-- comments -->
-    <LinearLayout
+    <android.support.v4.widget.SwipeRefreshLayout xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/comments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@color/light_grey1">
 
-        <android.support.v4.widget.SwipeRefreshLayout xmlns:tools="http://schemas.android.com/tools"
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/comments_holder"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="100dp"
-            android:visibility="visible"
-            tools:context="com.gcw.sapienza.places.activities.MainActivity">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-            <ListView
-               android:id="@+id/comments_list"
-               android:layout_width="fill_parent"
-               android:layout_height="wrap_content" />
-
-        </android.support.v4.widget.SwipeRefreshLayout>
-
-    </LinearLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <!--  Big preview of media  -->
     <RelativeLayout

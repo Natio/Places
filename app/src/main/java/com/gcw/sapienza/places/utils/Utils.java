@@ -38,10 +38,25 @@ public class Utils {
     public static final int VIBRATION_DURATION = 0; // I didn't like it that much
     public static final int FLAG_LIST_GROUP = 0;
     public static final int PHONE_MEDIA_GROUP = 1;
+    protected static final int CHUNK_SIZE = 4096;
+
+    public static final String NO_VALID_FLAG_SELECTED = "No valid flag selected";
+    public static final String FLAG_DELETED = "Flag deleted";
+    public static final String FLAG_REPORTED = "Flag reported";
+    public static final String FLAG_REPORT_REVOKED = "Flag report revoked";
     public static final int DELETE_FLAG = 0;
     public static final int REPORT_FLAG = 1;
     public static final int DELETE_REPORT_FLAG = 2;
-    protected static final int CHUNK_SIZE = 4096;
+
+    public static final String NO_VALID_COMMENT_SELECTED = "No valid comment selected";
+    public static final String COMMENT_DELETED = "Comment deleted";
+    public static final String COMMENT_REPORTED = "Comment reported";
+    public static final String COMMENT_REPORT_REVOKED = "Comment report revoked";
+    public static final int DELETE_COMMENT = 3;
+    public static final int REPORT_COMMENT = 4;
+    public static final int DELETE_REPORT_COMMENT = 5;
+    public static final int COMMENT_LIST_GROUP = 6;
+
     @SuppressWarnings("unused")
     private static final String TAG = "Utils";
     /**

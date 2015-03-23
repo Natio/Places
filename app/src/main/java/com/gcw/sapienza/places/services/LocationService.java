@@ -196,12 +196,25 @@ public class LocationService extends Service implements
                     Log.e(TAG, e.getMessage());
                     Toast.makeText(getBaseContext(), "Cannot fetch your bag Flags at the moment,\ntry again later", Toast.LENGTH_SHORT);
                     return;
-                } else {
-                    if (comments == null) {
-                        comments = new ArrayList<Comment>();
+                }
+                else
+                {
+                    if (comments == null)
+                    {
+                        comments = new ArrayList();
                     }
 
-                    String currentUserId = ParseUser.getCurrentUser().getObjectId();
+                    String currentUserId = null;
+
+                    try
+                    {
+                        currentUserId = ParseUser.getCurrentUser().getObjectId();
+                    }
+                    catch(NullPointerException npe)
+                    {
+                        Log.d(TAG, npe.getMessage());
+                        return;
+                    }
 
                     for (Comment c : comments) {
 

@@ -58,10 +58,7 @@ public class FlagsListFragment extends Fragment {
             Log.d(TAG, intent.getAction());
         }
     };
-    private static final String NO_VALID_FLAG_SELECTED = "No valid Flag selected";
-    private static final String FLAG_DELETED = "Flag deleted";
-    private static final String FLAG_REPORTED = "Flag reported";
-    private static final String FLAG_REPORT_REVOKED = "Flag report revoked";
+
     private RecyclerView recycleView;
 
     public RecyclerView getRV() {
@@ -103,7 +100,7 @@ public class FlagsListFragment extends Fragment {
         Flag sel_usr = fa.getSelectedFlag();
 
         if (sel_usr == null)
-            Toast.makeText(getActivity(), NO_VALID_FLAG_SELECTED, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), Utils.NO_VALID_FLAG_SELECTED, Toast.LENGTH_SHORT).show();
 
         switch (item.getItemId()) {
 
@@ -129,7 +126,7 @@ public class FlagsListFragment extends Fragment {
     }
 
     /**
-     * Deletes the Flag
+     * Deletes the comment
      *
      * @param f flag to delete
      */
@@ -138,7 +135,7 @@ public class FlagsListFragment extends Fragment {
             @Override
             public void done(com.parse.ParseException e) {
                 if (e == null) {
-                    Toast.makeText(recycleView.getContext(), FLAG_DELETED, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(recycleView.getContext(), Utils.FLAG_DELETED, Toast.LENGTH_SHORT).show();
                     ((MainActivity) getActivity()).refresh();
                 } else
                     Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -158,7 +155,7 @@ public class FlagsListFragment extends Fragment {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-                    Toast.makeText(recycleView.getContext(), FLAG_REPORTED, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(recycleView.getContext(), Utils.FLAG_REPORTED, Toast.LENGTH_SHORT).show();
                 } else
                     Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -184,7 +181,7 @@ public class FlagsListFragment extends Fragment {
                         @Override
                         public void done(ParseException e) {
                             if (e == null) {
-                                Toast.makeText(recycleView.getContext(), FLAG_REPORT_REVOKED, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(recycleView.getContext(), Utils.FLAG_REPORT_REVOKED, Toast.LENGTH_SHORT).show();
                             } else
                                 Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                         }

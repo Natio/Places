@@ -16,6 +16,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.gcw.sapienza.places.models.Comment;
+import com.gcw.sapienza.places.models.CommentReport;
 import com.gcw.sapienza.places.models.CustomParseObject;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.models.FlagReport;
@@ -247,6 +248,7 @@ public class PlacesApplication extends Application {
         ParseObject.registerSubclass(CustomParseObject.class);
         ParseObject.registerSubclass(Comment.class);
         ParseUser.registerSubclass(PlacesUser.class);
+        ParseUser.registerSubclass(CommentReport.class);
 
         // initialize Parse.com
         Parse.initialize(this, PARSE_COM_APP_KEY, PARSE_COM_CLIENT_KEY);
