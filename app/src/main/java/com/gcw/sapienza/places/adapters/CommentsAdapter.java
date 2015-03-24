@@ -1,7 +1,6 @@
 package com.gcw.sapienza.places.adapters;
 
 import android.app.Activity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -21,8 +20,6 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Transformation;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -39,8 +36,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     private Activity mainActivity;
     private List<Comment> comments;
     private View view;
-
-    private final Transformation transformation = new CropCircleTransformation();
 
     private int selectedCommentIndex;
 
@@ -93,7 +88,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
             {
                 if (result != null && !result.isEmpty())
                 {
-                    Picasso.with(view.getContext()).load(result).transform(transformation).into(commentViewHolder.profile_pic);
+                    Picasso.with(view.getContext()).load(result).into(commentViewHolder.profile_pic);
                 }
             }
         });
@@ -105,7 +100,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
         commentViewHolder.comment_text.setText(f.getCommentText());
 
-        ((CardView) commentViewHolder.itemView).setShadowPadding(0, 0, 7, 7);
+        // ((CardView) commentViewHolder.itemView).setShadowPadding(0, 0, 7, 7);
     }
 
     @Override

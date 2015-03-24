@@ -17,6 +17,7 @@ public class Comment extends ParseObject {
     public static final String USERNAME_KEY = "username";
     public static final String FLAG_KEY = "flag";
     public static final String FLAG_OWNER_KEY = "flagOwner";
+    public static final String COMMENT_OWNER_KEY = "commenter";
     public static final String LOGIN_TYPE_KEY = "accountType";
 
     public String getUserId() {
@@ -69,5 +70,16 @@ public class Comment extends ParseObject {
 
     public void setAccountType(String accountType) {
         this.put(LOGIN_TYPE_KEY, accountType);
+    }
+
+    // TODO The following getter needs to be implemented
+    public String getFlagOwner()
+    {
+        return null;
+    }
+
+    public void setFlagOwner(PlacesUser owner)
+    {
+        this.put(FLAG_OWNER_KEY, owner);
     }
 }

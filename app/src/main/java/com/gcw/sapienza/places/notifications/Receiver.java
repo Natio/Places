@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.gcw.sapienza.places.activities.MainActivity;
+import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParsePushBroadcastReceiver;
 
 import org.json.JSONException;
@@ -16,9 +17,8 @@ import org.json.JSONObject;
  * Created by snowblack on 1/4/15.
  */
 public class Receiver extends ParsePushBroadcastReceiver {
+
     private static final String TAG = "Receiver";
-    public static final String RECEIVED_NOTIF_COMMENT_TYPE = "comment_notification";
-    public static final String FLAG_ID = "flagId";
     private static final String UPDATES_REPO = "https://drive.google.com/folderview?id=0B1boWbY-47RQdHJnSlpScUNueTQ&usp=drive_web";
 
     @Override
@@ -34,10 +34,10 @@ public class Receiver extends ParsePushBroadcastReceiver {
 
                 Intent i = new Intent(context, MainActivity.class);
                 Bundle extras = new Bundle();
-                extras.putString("type", RECEIVED_NOTIF_COMMENT_TYPE);
-                extras.putString(FLAG_ID, flag_id);
+                extras.putString("type", Utils.RECEIVED_NOTIF_COMMENT_TYPE);
+                extras.putString(Utils.FLAG_ID, flag_id);
 
-                i.putExtras(intent.getExtras());
+                i.putExtras(extras);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(i);
                 //TODO the intent launches MainActivity but the flag is not opened

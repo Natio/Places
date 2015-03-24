@@ -27,16 +27,17 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.fragments.BagFragment;
 import com.gcw.sapienza.places.fragments.CategoriesFragment;
+import com.gcw.sapienza.places.fragments.FlagFragment;
 import com.gcw.sapienza.places.fragments.MainFragment;
 import com.gcw.sapienza.places.fragments.MyFlagsFragment;
 import com.gcw.sapienza.places.fragments.ProfileFragment;
 import com.gcw.sapienza.places.fragments.SettingsFragment;
 import com.gcw.sapienza.places.services.ILocationServiceListener;
+import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.GPlusUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
@@ -48,9 +49,17 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
+import com.parse.GetCallback;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseFile;
 import com.parse.ParseInstallation;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 
 public class MainActivity extends ActionBarActivity implements Preference.OnPreferenceChangeListener, ResultCallback<People.LoadPeopleResult>,
@@ -95,9 +104,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // if (PlacesLoginUtils.getInstance().isSessionValid(this)) PlacesLoginUtils.getInstance().downloadUserInfo(this);
-        // else PlacesLoginUtils.startLoginActivity(this, true);
-
         PlacesLoginUtils.getInstance().checkForSessionValidityAndStartDownloadingInfo(this);
 
         setContentView(R.layout.activity_main_drawer_layout);
@@ -135,19 +141,37 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         this.getSupportActionBar().setHomeButtonEnabled(true);
         this.getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
 
-//        this.selectItem(0);
-
         this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.green)));
 
+        // If app is opened by clicking of comment notification, go straight to the flag for which you've been notified
+        Intent intent = getIntent();
+        if(intent != null)
+        {
+            Log.d(TAG, "Bundle is not null.");
 
-        //animate().translationY(2);
-        //applied to a view will allow the animation of google map app up and down
+            String bundleContentType = intent.getStringExtra("type");
+            if(bundleContentType != null && bundleContentType.equals(Utils.RECEIVED_NOTIF_COMMENT_TYPE))
+            {
+                Log.d(TAG, "String 'type' in bundle is not null.");
 
-        //this.getSupportActionBar().getCustomView().findViewById(R.id.filters).
+                String flagId = intent.getStringExtra(Utils.FLAG_ID);
+                openFlagFromHome(flagId);
+            }
+            else{
+                Log.d(TAG, "String 'type' in bundle is null. Triggering default Activity behavior.");
 
-        PlacesApplication.getInstance().startLocationService();
+                PlacesApplication.getInstance().startLocationService();
 
-        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
+                this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
+            }
+        }
+        else{
+            Log.d(TAG, "Bundle is null. Triggering default Activity behavior.");
+
+            PlacesApplication.getInstance().startLocationService();
+
+            this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
+        }
     }
 
     @Deprecated
@@ -200,40 +224,10 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         } else if (item.getItemId() == R.id.action_add_flag) {
             Intent shareIntent = new Intent(this, ShareActivity.class);
             startActivityForResult(shareIntent, MainActivity.SHARE_ACTIVITY_REQUEST_CODE);
-            // item.setVisible(false);
         } //attempt to add filters in homepage
-        else if (item.getItemId() == R.id.filters) {
-
+        else if (item.getItemId() == R.id.filters)
+        {
             switchToNonSupportFrag(new CategoriesFragment());
-            //open fragment
-
-
-
-
-            /* new menu testing
-            PopupMenu popup = new PopupMenu(MainActivity.this, (Button)item);
-            //Inflating the Popup using xml file
-            popup.getMenuInflater()
-                    .inflate(R.menu.filters_list_home, popup.getMenu());
-
-            //registering popup with OnMenuItemClickListener
-            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                public boolean onMenuItemClick(MenuItem item) {
-                    Toast.makeText(
-                            MainActivity.this,
-                            "You Clicked : " + item.getTitle(),
-                            Toast.LENGTH_SHORT
-                    ).show();
-                    return true;
-                }
-            });
-
-            popup.show(); //showing popup menu
-
-        //SPINNER
-            Toast.makeText(this, "DropDown menu for filters", Toast.LENGTH_SHORT).show();
-            */
-
         }
 
         return super.onOptionsItemSelected(item);
@@ -304,30 +298,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         menu.findItem(R.id.action_add_flag).setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
     }
-
-    //    }
-//        }
-//            switchToListMapFrags();
-//        {
-//        if(homeHolder.getVisibility() == View.INVISIBLE)
-//    {
-//    public void onBackPressed()
-//    }
-//        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).addToBackStack(null).commit();
-//
-//        showSupportFrag();
-//        mapFragment.getMapAsync(this);
-//        this.getSupportFragmentManager().beginTransaction().replace(R.id.map_holder, mapFragment).commit();
-//        SupportMapFragment mapFragment = new SupportMapFragment();
-//
-//        this.getSupportFragmentManager().beginTransaction().replace(R.id.swipe_refresh, fragment).commit();
-//        Fragment fragment = new FlagsListFragment();
-//
-//        fragHolder.setVisibility(View.INVISIBLE);
-//        homeHolder.setVisibility(View.VISIBLE);
-//
-//        getRidOfUnusedFrag();
-//    {
 
     private void myProfile() {
 
@@ -474,7 +444,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
     private void switchToNonSupportFrag(android.app.Fragment frag) {
         Log.d(TAG, "Switching to FilterListFragment");
-//        getRidOfUnusedFrag();
         android.app.Fragment f = this.getFragmentManager().findFragmentById(R.id.frag_container);
         if (isNonSupportFragmentVisible() && f != null && f.getClass() == frag.getClass()) {
             Log.w(TAG, "Hiding non-support fragment: " + f.getClass());
@@ -487,14 +456,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         this.getFragmentManager().beginTransaction().replace(R.id.frag_container, frag).commit();
     }
 
-//    private void switchToListMapFrags()
-
-//        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new Fragment()).commit();
-
     public void switchToOtherFrag(Fragment frag) {
         Log.d(TAG, "Switching to other fragment: " + frag.getClass());
-//        getRidOfUnusedFrag();
-//        switchToFragOtherThanHome();
         Fragment f = this.getSupportFragmentManager().findFragmentById(R.id.home_container);
         if (!isNonSupportFragmentVisible() && f != null && f.getClass() == frag.getClass()) {
             Log.w(TAG, "Switching to the same fragment: " + f.getClass());
@@ -519,14 +482,9 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             finish();
             return;
         }
+
         FragmentManager fm = getFragmentManager();
-//        if (fm.getBackStackEntryCount() > 0) {
-//            Log.i("MainActivity", "popping backstack: " +
-//                    fm.getBackStackEntryCount() + ", while support: " +
-//                    getSupportFragmentManager().getBackStackEntryCount());
-//            fm.popBackStack();
-//        }
-//        else
+
         if (isNonSupportFragmentVisible()) {
             showSupportFrag();
         } else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
@@ -563,16 +521,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             editor.putBoolean(preference.getKey(), (boolean) newValue);
             editor.commit();
         }
-        /*
-        else if(preference.getKey().equals("seekBar"))
-        {
-            preference.setDefaultValue(newValue);
-            int value = (int)newValue + 1;
-            Utils.MAP_RADIUS = value / 10f;
-            showToast("Radius set to " + value * 100 + " meters.");
-            Log.d(TAG, "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
-        }
-        */
         else if (preference.getKey().equals("maxFetch")) {
             preference.setDefaultValue(newValue);
             int value = Utils.stepValues[(int) newValue];
@@ -668,5 +616,68 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     @Override
     public void onConnectionSuspended(int cause) {
         GPlusUtils.getInstance().getGoogleApiClient().connect();
+    }
+
+    private void openFlagFromHome(String flagId)
+    {
+        ParseQuery<Flag> q = ParseQuery.getQuery("Posts");
+        q.whereEqualTo("objectId", flagId);
+        q.getFirstInBackground(new GetCallback<Flag>() {
+            @Override
+            public void done(Flag flag, com.parse.ParseException e)
+            {
+                if(e != null)
+                {
+                    Log.d(TAG, e.getMessage());
+                    return;
+                }
+                else
+                {
+                    openFlag(flag);
+                }
+            }
+        });
+    }
+
+    private void openFlag(Flag f)
+    {
+        Date date = f.getDate();
+
+        DateFormat df = new SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault());
+        String sDate = df.format(date);
+
+        Bundle bundle = new Bundle();
+
+        bundle.putString("text", f.getText());
+        bundle.putString("id", f.getFbId());
+        bundle.putString("date", sDate);
+        bundle.putString("weather", f.getWeather());
+        bundle.putString("category", f.getCategory());
+        bundle.putBoolean("inPlace", f.getInPlace());
+        bundle.putString("flagId", f.getFlagId());
+        bundle.putString("author", f.getFbName());
+
+        bundle.putInt("wowCount", f.getWowCount());
+        bundle.putInt("lolCount", f.getLolCount());
+        bundle.putInt("booCount", f.getBooCount());
+
+        bundle.putString("accountType", f.getAccountType());
+
+        ParseFile file;
+        FlagFragment.MediaType mediaType = FlagFragment.MediaType.NONE;
+        if ((file = f.getPic()) != null) {
+            mediaType = FlagFragment.MediaType.PIC;
+        } else if ((file = f.getVideo()) != null) {
+            mediaType = FlagFragment.MediaType.VIDEO;
+        } else if ((file = f.getAudio()) != null) {
+            mediaType = FlagFragment.MediaType.AUDIO;
+        }
+
+        FlagFragment frag = new FlagFragment();
+        frag.setFlag(f);
+        frag.setMedia(file, mediaType);
+        frag.setArguments(bundle);
+
+        switchToOtherFrag(frag);
     }
 }

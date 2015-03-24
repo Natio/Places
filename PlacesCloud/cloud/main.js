@@ -7,9 +7,9 @@
 
 function filterDuplicates(array){
     var set = [];
-
+    //console.log(array);
     for(var i = 0; i < array.length; i++){
-      var commenter = array[i].get("commenter");
+      var commenter = array[i];
       set[commenter.id] = commenter;
     }
     var values = [];
@@ -42,33 +42,50 @@ Parse.Cloud.afterSave("Comments", function(request, response){
 	var query = new Parse.Query(Comments);
   query.equalTo("flagId", flagId);
   query.notEqualTo("commenter", currentUser);
+  //query.include("flag");
+  //query.include("owner");
   query.find({
     error: function(error){
-			response.error(error.message);
+			response.error(error);
 		},
     success: function(results){
+      /*
       console.log("Trovati "+results.length+" destinatari");
       if(results.length == 0){
         //response.success();
         return;
       }
+      */
 
       var Posts = Parse.Object.extend("Posts");
     	var query_post_owner = new Parse.Query(Posts);
-      query_post_owner.equalTo("objectId", request.object.get("flagId"));
+      query_post_owner.equalTo("objectId", request.object.get("flag").id);
       query_post_owner.first({
         success: function(first) {
           if(typeof first === "undefined"){
             return;
           }
 
-
-          var listOfRecipients = filterDuplicates(results);
-
-          if(first.id != currentUserID){
-            listOfRecipients.push(first.get("owner"));
-            console.log("Aggiungo utente corrente first.id: "+first.id + " currentUserID: "+currentUserID);
+          var users = [];
+          for(var i in results){
+            users.push(results[i].get("commenter"));
           }
+
+
+
+          if(first.get("owner").id != currentUserID){
+            users.push(first.get("owner"));
+            console.log("Aggiungo utente corrente first.id: "+first.get("owner") + " currentUserID: "+currentUserID);
+          }
+
+          var listOfRecipients = filterDuplicates(users);
+
+          if(listOfRecipients.length == 0){
+            console.log("Nessuno a cui inviare le notifiche!!!");
+            return;
+          }
+
+
 
           console.log(listOfRecipients);
           var query_push = new Parse.Query(Parse.Installation);
