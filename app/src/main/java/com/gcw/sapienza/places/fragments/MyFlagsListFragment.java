@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.facebook.android.Util;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
@@ -40,11 +41,11 @@ public class MyFlagsListFragment extends Fragment {
             switch (intent.getAction()) {
 
                 case LocationService.FOUND_MY_FLAGS_NOTIFICATION:
-                    MyFlagsListFragment.this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getMyFlags());
+                    MyFlagsListFragment.this.updateRecycleViewWithNewContents(Utils.getOrderedFlags(getActivity(), Utils.MY_FLAGS_CODE));
                     break;
 
                 case LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION:
-                    MyFlagsListFragment.this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getMyFlags());
+                    MyFlagsListFragment.this.updateRecycleViewWithNewContents(Utils.getOrderedFlags(getActivity(), Utils.MY_FLAGS_CODE));
                     break;
 
                 default:
@@ -74,7 +75,7 @@ public class MyFlagsListFragment extends Fragment {
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_MY_FLAGS_NOTIFICATION));
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION));
 
-        this.updateRecycleViewWithNewContents(PlacesApplication.getInstance().getMyFlags());
+        this.updateRecycleViewWithNewContents(Utils.getOrderedFlags(getActivity(), Utils.MY_FLAGS_CODE));
 
         registerForContextMenu(recycleView);
 

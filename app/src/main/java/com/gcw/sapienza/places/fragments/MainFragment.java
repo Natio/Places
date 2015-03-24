@@ -216,7 +216,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
         Log.d(TAG, "Updating markers on map...");
 
-        List<Flag> flags = PlacesApplication.getInstance().getFlags();
+        List<Flag> flags = Utils.getOrderedFlags(getActivity(), Utils.NEARBY_FLAGS_CODE);
 
         if (flags != null && this.gMap != null) {
             this.gMap.clear();

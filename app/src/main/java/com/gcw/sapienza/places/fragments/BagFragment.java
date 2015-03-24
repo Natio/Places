@@ -239,7 +239,7 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
 
         this.markers = new ArrayList<>();
 
-        this.flags = PlacesApplication.getInstance().getBagFlags();
+        this.flags = Utils.getOrderedFlags(getActivity(), Utils.BAG_FLAGS_CODE);
 
         if (this.flags != null && this.gMap != null) {
             this.gMap.clear();

@@ -1,16 +1,25 @@
 package com.gcw.sapienza.places.utils;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.models.Flag;
+import com.gcw.sapienza.places.models.FlagComparator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -72,6 +81,10 @@ public class Utils {
     public static final float FLAG_ALPHA_FULL = 1f;
     public static final float FLAG_APLHA_HIDDEN = 0.25f;
     public static final float FLAG_SCALE_NORMAL = 0.25f;
+
+    public static final int NEARBY_FLAGS_CODE = 51;
+    public static final int MY_FLAGS_CODE = 52;
+    public static final int BAG_FLAGS_CODE = 53;
 
     /**
      * Returns a string containing the name of the file without the extension
@@ -187,5 +200,36 @@ public class Utils {
 
     public static void showToast(Context context, String text, int duration) {
         Toast.makeText(context, text, duration).show();
+    }
+
+    public static List<Flag> getOrderedFlags(Context context, int flagsCode) {
+
+        List<Flag> flags;
+        switch (flagsCode){
+            case NEARBY_FLAGS_CODE:
+                flags = PlacesApplication.getInstance().getFlags();
+                break;
+            case MY_FLAGS_CODE:
+                flags = PlacesApplication.getInstance().getMyFlags();
+                break;
+            case BAG_FLAGS_CODE:
+                flags = PlacesApplication.getInstance().getBagFlags();
+                break;
+            default:
+                Log.e(TAG, "Cannot find requested flags");
+                Utils.showToast(context, "Something went wrong while retrieving Flags", Toast.LENGTH_SHORT);
+                return new ArrayList<>();
+        }
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean archaeologist = preferences.getBoolean("timeFilter", false);
+
+        //we make the 'archeologist' setting work also for MyFlag and Bag pages
+        if(archaeologist){
+            Collections.sort(flags, new FlagComparator(true));
+        }else{
+            Collections.sort(flags, new FlagComparator(false));
+        }
+        return flags;
     }
 }
