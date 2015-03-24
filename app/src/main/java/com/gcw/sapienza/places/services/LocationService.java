@@ -61,6 +61,7 @@ public class LocationService extends Service implements
     public static final String FOUND_BAG_FLAGS_NOTIFICATION = "FOUND_BAG_FLAGS_NOTIFICATION";
     public static final String FOUND_NO_BAG_FLAGS_NOTIFICATION = "FOUND_NO_BAG_FLAGS_NOTIFICATION";
     public static final String NO_FLAGS_VISIBLE = "you won't be able to see any flags with these settings";
+    public static final String SERVICE_CONNECTED = "SERVICE_CONNECTED";
     private static final String TAG = "LocationService";
     private static final long ONE_MIN = 1000 * 60;
     private static final long ONE_HOUR = ONE_MIN * 60;

@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -37,6 +36,7 @@ import com.gcw.sapienza.places.fragments.MainFragment;
 import com.gcw.sapienza.places.fragments.MyFlagsFragment;
 import com.gcw.sapienza.places.fragments.ProfileFragment;
 import com.gcw.sapienza.places.fragments.SettingsFragment;
+import com.gcw.sapienza.places.services.ILocationServiceListener;
 import com.gcw.sapienza.places.utils.GPlusUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
@@ -53,7 +53,8 @@ import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 
 
-public class MainActivity extends ActionBarActivity implements Preference.OnPreferenceChangeListener, ResultCallback<People.LoadPeopleResult>, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends ActionBarActivity implements Preference.OnPreferenceChangeListener, ResultCallback<People.LoadPeopleResult>,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ILocationServiceListener {
 
 
     public static final String TAG = MainActivity.class.getName();
@@ -174,12 +175,12 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
     public void refresh() {
         Log.d(TAG, "Refreshing application");
-        PlacesApplication.getInstance().updatePlacesData();
+        PlacesApplication.getInstance().updatePlacesData(this);
     }
 
     public void refresh(int updateCode) {
         Log.d(TAG, "Refreshing application");
-        PlacesApplication.getInstance().updatePlacesData(updateCode);
+        PlacesApplication.getInstance().updatePlacesData(this, updateCode);
     }
 
     @Override
@@ -590,6 +591,32 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         radiusToast = Toast.makeText(getBaseContext(), text,
                 Toast.LENGTH_SHORT);
         radiusToast.show();
+    }
+
+    @Override
+    public void onServiceConnected(int updateCode) {
+        Log.d(TAG, "LocationService is connected! Callback is called");
+        switch (updateCode){
+            case Utils.NEARBY_FLAGS_CODE:
+                Log.d(TAG, "Service Connected. Updating Nearby Flags");
+                PlacesApplication.getInstance().updatePlacesData(this, Utils.NEARBY_FLAGS_CODE);
+                break;
+            case Utils.MY_FLAGS_CODE:
+                Log.d(TAG, "Service Connected. Updating My Flags");
+                PlacesApplication.getInstance().updatePlacesData(this, Utils.MY_FLAGS_CODE);
+                break;
+            case Utils.BAG_FLAGS_CODE:
+                Log.d(TAG, "Service Connected. Updating Bag Flags");
+                PlacesApplication.getInstance().updatePlacesData(this, Utils.BAG_FLAGS_CODE);
+                break;
+            case Utils.DEFAULT_FLAGS_CODE:
+                Log.d(TAG, "Triggering default behavior: Updating whole Flag data");
+                PlacesApplication.getInstance().updatePlacesData(this);
+                break;
+            default:
+                Log.d(TAG, "Triggering default behavior: Updating whole Flag data");
+                PlacesApplication.getInstance().updatePlacesData(this);
+        }
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {

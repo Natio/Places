@@ -27,10 +27,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.models.Flag;
+import com.gcw.sapienza.places.services.ILocationServiceListener;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -51,7 +52,7 @@ import java.util.List;
  * Created by snowblack on 3/20/15.
  */
 public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener,
-        GoogleMap.OnMarkerClickListener {
+        GoogleMap.OnMarkerClickListener{
     private static final String TAG = "BagFragment";
 
     private View view;
@@ -204,7 +205,7 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
         this.gMap.setOnMarkerClickListener(this);
         this.gMap.setMyLocationEnabled(true);
 
-        this.updateMarkersOnMap();
+        ((MainActivity) getActivity()).refresh(Utils.BAG_FLAGS_CODE);
     }
 
     @Override
@@ -303,6 +304,6 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
     }
 
     protected void refresh() {
-        PlacesApplication.getInstance().getLocationService().queryParsewithBag();
+        ((MainActivity) getActivity()).refresh(Utils.BAG_FLAGS_CODE);
     }
 }

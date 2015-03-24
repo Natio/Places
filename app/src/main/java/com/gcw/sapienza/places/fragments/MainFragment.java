@@ -29,6 +29,7 @@ import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.models.Flag;
+import com.gcw.sapienza.places.services.ILocationServiceListener;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -51,7 +52,8 @@ import java.util.List;
 /**
  * Created by snowblack on 2/19/15.
  */
-public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener, GoogleMap.OnMarkerClickListener {
+public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener,
+        GoogleMap.OnMarkerClickListener{
 
     private static final String TAG = "MainFragment";
 
@@ -207,16 +209,16 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
         this.gMap.setOnMarkerClickListener(this);
         this.gMap.setMyLocationEnabled(true);
 
-        PlacesApplication.getInstance().updatePlacesData(Utils.NEARBY_FLAGS_CODE);
+        ((MainActivity) getActivity()).refresh(Utils.NEARBY_FLAGS_CODE);
     }
 
     private void updateMarkersOnMap() {
 
         this.markers = new ArrayList<>();
 
-        Log.d(TAG, "Updating markers on map...");
-
         List<Flag> flags = Utils.getOrderedFlags(getActivity(), Utils.NEARBY_FLAGS_CODE);
+
+        Log.d(TAG, "Updating markers on map...flags size: " + flags.size());
 
         if (flags != null && this.gMap != null) {
             this.gMap.clear();
