@@ -31,10 +31,13 @@ import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.fragments.BagFragment;
 import com.gcw.sapienza.places.fragments.CategoriesFragment;
+import com.gcw.sapienza.places.fragments.FlagFragment;
 import com.gcw.sapienza.places.fragments.MainFragment;
 import com.gcw.sapienza.places.fragments.MyFlagsFragment;
 import com.gcw.sapienza.places.fragments.ProfileFragment;
 import com.gcw.sapienza.places.fragments.SettingsFragment;
+import com.gcw.sapienza.places.models.Comment;
+import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.GPlusUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
@@ -46,9 +49,20 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseFile;
 import com.parse.ParseInstallation;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 
 public class MainActivity extends ActionBarActivity implements Preference.OnPreferenceChangeListener, ResultCallback<People.LoadPeopleResult>, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -132,6 +146,17 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.green)));
 
         this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
+
+        // If app is opened by clicking of comment notification, go straight to the flag for which you've been notified
+        if(savedInstanceState !=null)
+        {
+            String bundleContentType = savedInstanceState.getString("type");
+            if(bundleContentType != null && bundleContentType.equals(Utils.RECEIVED_NOTIF_COMMENT_TYPE))
+            {
+                String flagId = savedInstanceState.getString(Utils.FLAG_ID);
+                openFlagFromHome(flagId);
+            }
+        }
     }
 
     @Deprecated
@@ -548,5 +573,68 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     @Override
     public void onConnectionSuspended(int cause) {
         GPlusUtils.getInstance().getGoogleApiClient().connect();
+    }
+
+    private void openFlagFromHome(String flagId)
+    {
+        ParseQuery<Flag> q = ParseQuery.getQuery("Posts");
+        q.whereEqualTo("objectId", flagId);
+        q.whereEqualTo("fbId", PlacesLoginUtils.getInstance().getCurrentUserId());
+        q.getFirstInBackground(new GetCallback<Flag>() {
+            @Override
+            public void done(Flag flag, com.parse.ParseException e)
+            {
+                if(e != null)
+                {
+                    Log.d(TAG, e.getMessage());
+                    return;
+                }
+                else
+                {
+                    openFlag(flag);
+                }
+            }
+        });
+    }
+
+    private void openFlag(Flag f)
+    {
+        Date date = f.getDate();
+
+        DateFormat df = new SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault());
+        String sDate = df.format(date);
+
+        Bundle bundle = new Bundle();
+
+        bundle.putString("text", f.getText());
+        bundle.putString("id", f.getFbId());
+        bundle.putString("date", sDate);
+        bundle.putString("weather", f.getWeather());
+        bundle.putString("category", f.getCategory());
+        bundle.putBoolean("inPlace", f.getInPlace());
+        bundle.putString("flagId", f.getFlagId());
+        bundle.putString("author", f.getFbName());
+
+        bundle.putInt("wowCount", f.getWowCount());
+        bundle.putInt("lolCount", f.getLolCount());
+        bundle.putInt("booCount", f.getBooCount());
+
+        bundle.putString("accountType", f.getAccountType());
+
+        ParseFile file;
+        FlagFragment.MediaType mediaType = FlagFragment.MediaType.NONE;
+        if ((file = f.getPic()) != null) {
+            mediaType = FlagFragment.MediaType.PIC;
+        } else if ((file = f.getVideo()) != null) {
+            mediaType = FlagFragment.MediaType.VIDEO;
+        } else if ((file = f.getAudio()) != null) {
+            mediaType = FlagFragment.MediaType.AUDIO;
+        }
+
+        FlagFragment frag = new FlagFragment();
+        frag.setMedia(file, mediaType);
+        frag.setArguments(bundle);
+
+        switchToOtherFrag(frag);
     }
 }
