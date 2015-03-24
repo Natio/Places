@@ -239,7 +239,7 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
 
     private void updateMarkersOnMap() {
 
-        this.flags = PlacesApplication.getInstance().getMyFlags();
+        this.flags = Utils.getOrderedFlags(getActivity(), Utils.MY_FLAGS_CODE);
 
         this.markers = new ArrayList<>();
 

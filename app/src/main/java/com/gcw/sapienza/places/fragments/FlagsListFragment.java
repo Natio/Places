@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.facebook.android.Util;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
@@ -54,7 +55,7 @@ public class FlagsListFragment extends Fragment {
                 //handled in the same way
                 case LocationService.FOUND_NEW_FLAGS_NOTIFICATION:
                 case LocationService.FOUND_NO_FLAGS_NOTIFICATION:
-                    FlagsListFragment.this.updateRecycleViewWithNewContents(getOrderedFlags());
+                    FlagsListFragment.this.updateRecycleViewWithNewContents(Utils.getOrderedFlags(getActivity(), Utils.NEARBY_FLAGS_CODE));
                     break;
 
                 default:
@@ -84,7 +85,7 @@ public class FlagsListFragment extends Fragment {
 
 
 
-        this.updateRecycleViewWithNewContents(getOrderedFlags());
+        this.updateRecycleViewWithNewContents(Utils.getOrderedFlags(getActivity(), Utils.NEARBY_FLAGS_CODE));
 
         registerForContextMenu(recycleView);
 
@@ -198,21 +199,6 @@ public class FlagsListFragment extends Fragment {
                 }
             }
         });
-    }
-
-    public List<Flag> getOrderedFlags() {
-
-        List<Flag> flags = PlacesApplication.getInstance().getFlags();
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        boolean archaeologist = preferences.getBoolean("timeFilter", false);
-
-        if(archaeologist){
-            Collections.sort(flags, new FlagComparator(true));
-        }else{
-            Collections.sort(flags, new FlagComparator(false));
-        }
-        return flags;
     }
 }
 
