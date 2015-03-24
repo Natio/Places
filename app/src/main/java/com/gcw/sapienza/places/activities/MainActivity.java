@@ -148,15 +148,22 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
 
         // If app is opened by clicking of comment notification, go straight to the flag for which you've been notified
-        if(savedInstanceState !=null)
+        Intent intent = getIntent();
+        if(intent != null)
         {
-            String bundleContentType = savedInstanceState.getString("type");
+            Log.d(TAG, "Bundle is not null.");
+
+            String bundleContentType = intent.getStringExtra("type");
             if(bundleContentType != null && bundleContentType.equals(Utils.RECEIVED_NOTIF_COMMENT_TYPE))
             {
-                String flagId = savedInstanceState.getString(Utils.FLAG_ID);
+                Log.d(TAG, "String 'type' in bundle is not null.");
+
+                String flagId = intent.getStringExtra(Utils.FLAG_ID);
                 openFlagFromHome(flagId);
             }
+            else Log.d(TAG, "String 'type' in bundle is null.");
         }
+        else Log.d(TAG, "Bundle is null.");
     }
 
     @Deprecated
@@ -579,7 +586,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     {
         ParseQuery<Flag> q = ParseQuery.getQuery("Posts");
         q.whereEqualTo("objectId", flagId);
-        q.whereEqualTo("fbId", PlacesLoginUtils.getInstance().getCurrentUserId());
         q.getFirstInBackground(new GetCallback<Flag>() {
             @Override
             public void done(Flag flag, com.parse.ParseException e)

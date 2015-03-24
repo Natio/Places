@@ -35,7 +35,7 @@ public class Receiver extends ParsePushBroadcastReceiver {
                 extras.putString("type", Utils.RECEIVED_NOTIF_COMMENT_TYPE);
                 extras.putString(Utils.FLAG_ID, flag_id);
 
-                i.putExtras(intent.getExtras());
+                i.putExtras(extras);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(i);
                 //TODO the intent launches MainActivity but the flag is not opened
