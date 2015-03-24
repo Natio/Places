@@ -207,7 +207,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
         this.gMap.setOnMarkerClickListener(this);
         this.gMap.setMyLocationEnabled(true);
 
-        PlacesApplication.getInstance().updatePlacesData();
+        PlacesApplication.getInstance().updatePlacesData(Utils.NEARBY_FLAGS_CODE);
     }
 
     private void updateMarkersOnMap() {
@@ -383,7 +383,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
     @Override
     public void onRefresh() {
         Log.d(TAG, "Swipe refreshing");
-        ((MainActivity) getActivity()).refresh();
+        ((MainActivity) getActivity()).refresh(Utils.NEARBY_FLAGS_CODE);
         srl.setRefreshing(false);
     }
 }

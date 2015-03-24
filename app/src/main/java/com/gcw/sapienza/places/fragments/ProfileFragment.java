@@ -257,6 +257,11 @@ public class ProfileFragment extends Fragment {
                 }
             }
         });
+        String currUserId = PlacesLoginUtils.getInstance().getCurrentUserId();
+        if(currUserId == null){
+            Utils.showToast(getActivity(), "User data not ready", Toast.LENGTH_SHORT);
+            return view;
+        }
         if (PlacesLoginUtils.getInstance().getCurrentUserId().equals(this.fbId)) {
             int numFollowers = PlacesLoginUtils.getInstance().getFriends().size();
             numFollowersView.setText(numFollowers + (numFollowers != 1 ? " Placers followed" : " Placer followed"));

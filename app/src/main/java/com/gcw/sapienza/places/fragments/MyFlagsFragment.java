@@ -29,6 +29,7 @@ import android.widget.TextView;
 
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.services.LocationService;
@@ -298,11 +299,7 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
 
     @Override
     public void onRefresh() {
-        refresh();
+        ((MainActivity) getActivity()).refresh(Utils.MY_FLAGS_CODE);
         srl.setRefreshing(false);
-    }
-
-    protected void refresh() {
-        PlacesApplication.getInstance().getLocationService().queryParsewithCurrentUser();
     }
 }

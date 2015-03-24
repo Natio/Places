@@ -123,7 +123,7 @@ public class MyBagFlagsListFragment extends Fragment {
             public void done(com.parse.ParseException e) {
                 if (e == null) {
                     Toast.makeText(recycleView.getContext(), FLAG_DELETED, Toast.LENGTH_SHORT).show();
-                    ((MainActivity) getActivity()).refresh();
+                    ((MainActivity) getActivity()).refresh(Utils.BAG_FLAGS_CODE);
                 } else
                     Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }

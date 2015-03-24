@@ -221,7 +221,16 @@ public class Utils {
                 return new ArrayList<>();
         }
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences preferences;
+
+        try {
+            preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        }catch (NullPointerException e){
+            Log.e(TAG, e.getMessage());
+            Utils.showToast(context, "There was a problem retrieving Flags data", Toast.LENGTH_SHORT);
+            return flags;
+        }
+
         boolean archaeologist = preferences.getBoolean("timeFilter", false);
 
         //we make the 'archeologist' setting work also for MyFlag and Bag pages

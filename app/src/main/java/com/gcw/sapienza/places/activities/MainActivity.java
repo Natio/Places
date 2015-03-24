@@ -144,6 +144,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
         //this.getSupportActionBar().getCustomView().findViewById(R.id.filters).
 
+        PlacesApplication.getInstance().startLocationService();
+
         this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
     }
 
@@ -173,6 +175,11 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     public void refresh() {
         Log.d(TAG, "Refreshing application");
         PlacesApplication.getInstance().updatePlacesData();
+    }
+
+    public void refresh(int updateCode) {
+        Log.d(TAG, "Refreshing application");
+        PlacesApplication.getInstance().updatePlacesData(updateCode);
     }
 
     @Override
@@ -240,10 +247,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
                 && !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             promptForLocationServices();
         } else if(loggedIn){
-            if(PlacesApplication.getInstance().isLocationServiceRunning()){
-                PlacesApplication.getInstance().updatePlacesData();
-            }
-            else{
+            if(!PlacesApplication.getInstance().isLocationServiceRunning()){
                 PlacesApplication.getInstance().startLocationService();
             }
         }
@@ -441,7 +445,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
                 if (resultCode == RESULT_OK) {
                     Toast.makeText(this, data.getExtras().getString("result"), Toast.LENGTH_LONG).show();
-                    this.refresh();
+                    this.refresh(Utils.NEARBY_FLAGS_CODE);
                 }
                 break;
         }

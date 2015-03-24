@@ -312,8 +312,27 @@ public class PlacesApplication extends Application {
     public void updatePlacesData(){
         if(mService != null)
             mService.updateLocationData();
-        else
+        else {
             startLocationService();
+            if(mService != null) {
+                updatePlacesData();
+            }else{
+                Log.w(TAG, "LocationService still not started!");
+            }
+        }
+    }
+
+    public void updatePlacesData(int updateCode){
+        if(mService != null)
+            mService.updateLocationData(updateCode);
+        else {
+            startLocationService();
+            if (mService != null) {
+                updatePlacesData(updateCode);
+            } else {
+                Log.w(TAG, "LocationService still not started!");
+            }
+        }
     }
 
     private void updateWeatherInfo() {
@@ -331,8 +350,11 @@ public class PlacesApplication extends Application {
                 task.execute(locality + ',' + cc);
             }
         } catch (IOException e) {
-            Log.e(TAG, "No locality found! Error: " + e.toString());
+            Log.e(TAG, "No locality found! Error: " + e.getMessage());
+        } catch (NullPointerException e){
+            Log.e(TAG, "No locality found! Error: " + e.getMessage());
         }
+
     }
 
 /*

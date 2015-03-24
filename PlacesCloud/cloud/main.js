@@ -183,6 +183,26 @@ Parse.Cloud.job("addFbId", function(request, status){
   error: function(error){status.error(error.message);}});
 });
 
+// Parse.Cloud.job("updateCommenter", function(request, status){
+//   Parse.Cloud.useMasterKey();
+//   var User = Parse.Object.extend("_User");
+//   var query = new Parse.Query(User);
+//   query.equalTo("objectId", "AnqfSWzvH3");
+//   query.find({success:function(results){
+//     var Comments = Parse.Object.extend("Comments");
+//     var query_comments = new Parse.Query(Comments);
+//     query_comments.incude("flag");
+//     query_comments.find({success:function(results){
+//       for (var i = 0; i < results.length; i++) {
+//         //TODO implement here the user update functionality  
+//       }  
+//     },
+//     error: function(error){status.error(error.message);}
+//     });
+//   },
+//   error: function(error){status.error(error.message);}});
+// });
+
 
 function assignFlagsToComments(comments, index, status){
   if(index >= comments.length){
