@@ -216,7 +216,6 @@ public class LocationService extends Service implements
 
                     String currentUserId = null;
 
-                    // TODO This needs to be checked properly
                     try
                     {
                         currentUserId = ParseUser.getCurrentUser().getObjectId();
@@ -226,8 +225,6 @@ public class LocationService extends Service implements
                         Log.d(TAG, npe.getMessage());
                         return;
                     }
-
-                    // ParseUser parseUser = ParseUser.getCurrentUser();
 
                     for (Comment c : comments) {
 

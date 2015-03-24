@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -28,7 +27,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.fragments.BagFragment;
@@ -94,9 +92,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // if (PlacesLoginUtils.getInstance().isSessionValid(this)) PlacesLoginUtils.getInstance().downloadUserInfo(this);
-        // else PlacesLoginUtils.startLoginActivity(this, true);
-
         PlacesLoginUtils.getInstance().checkForSessionValidityAndStartDownloadingInfo(this);
 
         setContentView(R.layout.activity_main_drawer_layout);
@@ -134,15 +129,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         this.getSupportActionBar().setHomeButtonEnabled(true);
         this.getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
 
-//        this.selectItem(0);
-
         this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.green)));
-
-
-        //animate().translationY(2);
-        //applied to a view will allow the animation of google map app up and down
-
-        //this.getSupportActionBar().getCustomView().findViewById(R.id.filters).
 
         this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
     }
@@ -192,40 +179,10 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         } else if (item.getItemId() == R.id.action_add_flag) {
             Intent shareIntent = new Intent(this, ShareActivity.class);
             startActivityForResult(shareIntent, MainActivity.SHARE_ACTIVITY_REQUEST_CODE);
-            // item.setVisible(false);
         } //attempt to add filters in homepage
-        else if (item.getItemId() == R.id.filters) {
-
+        else if (item.getItemId() == R.id.filters)
+        {
             switchToNonSupportFrag(new CategoriesFragment());
-            //open fragment
-
-
-
-
-            /* new menu testing
-            PopupMenu popup = new PopupMenu(MainActivity.this, (Button)item);
-            //Inflating the Popup using xml file
-            popup.getMenuInflater()
-                    .inflate(R.menu.filters_list_home, popup.getMenu());
-
-            //registering popup with OnMenuItemClickListener
-            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                public boolean onMenuItemClick(MenuItem item) {
-                    Toast.makeText(
-                            MainActivity.this,
-                            "You Clicked : " + item.getTitle(),
-                            Toast.LENGTH_SHORT
-                    ).show();
-                    return true;
-                }
-            });
-
-            popup.show(); //showing popup menu
-
-        //SPINNER
-            Toast.makeText(this, "DropDown menu for filters", Toast.LENGTH_SHORT).show();
-            */
-
         }
 
         return super.onOptionsItemSelected(item);
@@ -299,30 +256,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         menu.findItem(R.id.action_add_flag).setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
     }
-
-    //    }
-//        }
-//            switchToListMapFrags();
-//        {
-//        if(homeHolder.getVisibility() == View.INVISIBLE)
-//    {
-//    public void onBackPressed()
-//    }
-//        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).addToBackStack(null).commit();
-//
-//        showSupportFrag();
-//        mapFragment.getMapAsync(this);
-//        this.getSupportFragmentManager().beginTransaction().replace(R.id.map_holder, mapFragment).commit();
-//        SupportMapFragment mapFragment = new SupportMapFragment();
-//
-//        this.getSupportFragmentManager().beginTransaction().replace(R.id.swipe_refresh, fragment).commit();
-//        Fragment fragment = new FlagsListFragment();
-//
-//        fragHolder.setVisibility(View.INVISIBLE);
-//        homeHolder.setVisibility(View.VISIBLE);
-//
-//        getRidOfUnusedFrag();
-//    {
 
     private void myProfile() {
 
@@ -469,7 +402,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
     private void switchToNonSupportFrag(android.app.Fragment frag) {
         Log.d(TAG, "Switching to FilterListFragment");
-//        getRidOfUnusedFrag();
         android.app.Fragment f = this.getFragmentManager().findFragmentById(R.id.frag_container);
         if (isNonSupportFragmentVisible() && f != null && f.getClass() == frag.getClass()) {
             Log.w(TAG, "Hiding non-support fragment: " + f.getClass());
@@ -482,14 +414,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         this.getFragmentManager().beginTransaction().replace(R.id.frag_container, frag).commit();
     }
 
-//    private void switchToListMapFrags()
-
-//        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new Fragment()).commit();
-
     public void switchToOtherFrag(Fragment frag) {
         Log.d(TAG, "Switching to other fragment: " + frag.getClass());
-//        getRidOfUnusedFrag();
-//        switchToFragOtherThanHome();
         Fragment f = this.getSupportFragmentManager().findFragmentById(R.id.home_container);
         if (!isNonSupportFragmentVisible() && f != null && f.getClass() == frag.getClass()) {
             Log.w(TAG, "Switching to the same fragment: " + f.getClass());
@@ -514,14 +440,9 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             finish();
             return;
         }
+
         FragmentManager fm = getFragmentManager();
-//        if (fm.getBackStackEntryCount() > 0) {
-//            Log.i("MainActivity", "popping backstack: " +
-//                    fm.getBackStackEntryCount() + ", while support: " +
-//                    getSupportFragmentManager().getBackStackEntryCount());
-//            fm.popBackStack();
-//        }
-//        else
+
         if (isNonSupportFragmentVisible()) {
             showSupportFrag();
         } else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
@@ -558,16 +479,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             editor.putBoolean(preference.getKey(), (boolean) newValue);
             editor.commit();
         }
-        /*
-        else if(preference.getKey().equals("seekBar"))
-        {
-            preference.setDefaultValue(newValue);
-            int value = (int)newValue + 1;
-            Utils.MAP_RADIUS = value / 10f;
-            showToast("Radius set to " + value * 100 + " meters.");
-            Log.d(TAG, "SeekBar changed! New radius value: " + Utils.MAP_RADIUS);
-        }
-        */
         else if (preference.getKey().equals("maxFetch")) {
             preference.setDefaultValue(newValue);
             int value = Utils.stepValues[(int) newValue];

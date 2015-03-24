@@ -13,10 +13,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.utils.Utils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
