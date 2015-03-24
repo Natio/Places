@@ -54,8 +54,10 @@ public class FlagsListFragment extends Fragment {
 
                 //handled in the same way
                 case LocationService.FOUND_NEW_FLAGS_NOTIFICATION:
-                case LocationService.FOUND_NO_FLAGS_NOTIFICATION:
                     FlagsListFragment.this.updateRecycleViewWithNewContents(Utils.getOrderedFlags(getActivity(), Utils.NEARBY_FLAGS_CODE));
+                    break;
+                case LocationService.FOUND_NO_FLAGS_NOTIFICATION:
+                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.my_swipe_refresh, new NoFlagsFragment()).commit();
                     break;
 
                 default:

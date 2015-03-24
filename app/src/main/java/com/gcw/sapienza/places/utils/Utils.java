@@ -79,10 +79,12 @@ public class Utils {
     public static final float DISCOVER_MODE_RADIUS = MAP_RADIUS * 2;
     public static int MAX_FLAGS = 10;
     public static final int[] stepValues = {1, 5, 10, 15, 20};
-    public static final float FLAG_ALPHA_NORMAL = 0.85f;
 
-    public static final float FLAG_ALPHA_FULL = 1f;
+    public static final float FLAG_ALPHA_NORMAL = 0.75f;
+    public static final float FLAG_ALPHA_UNSELECTED = 0.4f;
+    public static final float FLAG_ALPHA_SELECTED = 1f;
     public static final float FLAG_APLHA_HIDDEN = 0.25f;
+
     public static final float FLAG_SCALE_NORMAL = 0.25f;
 
     public static final int NEARBY_FLAGS_CODE = 51;

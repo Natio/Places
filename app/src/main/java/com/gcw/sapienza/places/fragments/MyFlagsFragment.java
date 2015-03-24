@@ -31,7 +31,6 @@ import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.models.Flag;
-import com.gcw.sapienza.places.services.ILocationServiceListener;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -228,10 +227,16 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
             }
         }
 
-        for (Marker marker : this.markers) {
-            marker.setAlpha(Utils.FLAG_ALPHA_NORMAL);
+        if(selectedMarker.getAlpha() == Utils.FLAG_ALPHA_SELECTED){
+            for (Marker marker : this.markers) {
+                marker.setAlpha(Utils.FLAG_ALPHA_NORMAL);
+            }
+        }else {
+            for (Marker marker : this.markers) {
+                marker.setAlpha(Utils.FLAG_ALPHA_UNSELECTED);
+            }
+            selectedMarker.setAlpha(Utils.FLAG_ALPHA_SELECTED);
         }
-        selectedMarker.setAlpha(Utils.FLAG_ALPHA_FULL);
 
         // by returning false we can show text on flag in the map
         // return false;
