@@ -223,7 +223,7 @@ public class LocationService extends Service implements
                     }
                     catch(NullPointerException npe)
                     {
-                        Log.d(TAG, npe.getMessage());
+                        Log.e(TAG, npe.getMessage());
                         return;
                     }
 
@@ -232,9 +232,23 @@ public class LocationService extends Service implements
                     for (Comment c : comments) {
 
                         Flag currFlag = c.getFlag();
-                        String currentFlagOwner = currFlag.getOwner().getObjectId();
 
-                        Log.d(TAG, "Current Flag owner: " + currentFlagOwner + ", Currend User: " + currentUserId);
+                        String currentFlagOwner;
+
+                        //TODO Investigate why some owners are null.
+                        // Probably old users whose pointer is pointing to null objects
+                        try {
+
+                            currentFlagOwner = currFlag.getOwner().getObjectId();
+
+                        }catch (NullPointerException ex2){
+
+                            Log.e(TAG, ex2.getMessage());
+
+                            continue;
+                        }
+
+                        Log.d(TAG, "Current Flag owner: " + currentFlagOwner + ", Current User: " + currentUserId);
 
                         if (!currentFlagOwner.equals(currentUserId)) {
                             bagFlags.put(currFlag.getObjectId(), currFlag);
