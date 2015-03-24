@@ -289,6 +289,7 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             }
 
             FlagFragment frag = new FlagFragment();
+            frag.setFlag(this.mFlag);
             frag.setMedia(file, mediaType);
             frag.setArguments(bundle);
 

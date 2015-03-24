@@ -638,6 +638,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         }
 
         FlagFragment frag = new FlagFragment();
+        frag.setFlag(f);
         frag.setMedia(file, mediaType);
         frag.setArguments(bundle);
 

@@ -35,12 +35,10 @@ import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.activities.ShareActivity;
 import com.gcw.sapienza.places.adapters.CommentsAdapter;
-import com.gcw.sapienza.places.adapters.FlagsAdapter;
 import com.gcw.sapienza.places.models.Comment;
 import com.gcw.sapienza.places.models.CommentReport;
 import com.gcw.sapienza.places.models.CustomParseObject;
 import com.gcw.sapienza.places.models.Flag;
-import com.gcw.sapienza.places.models.FlagReport;
 import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
@@ -54,6 +52,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.io.FileInputStream;
@@ -174,7 +173,10 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         accountType = bundle.getString("accountType");
 
         userId = id;
-        flag = PlacesApplication.getInstance().getFlagWithId(flagId);
+    }
+
+    public void setFlag(Flag f){
+        this.flag = f;
     }
 
     @Override
@@ -434,13 +436,13 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             {
                 if (result == null || result.size() == 0)
                 {
-                    ArrayList<Comment> emptyCommentList = new ArrayList();
+                    ArrayList<Comment> emptyCommentList = new ArrayList<>();
                     commentsAdapter = new CommentsAdapter(emptyCommentList, rv, getActivity());
                 }
                 else
                 {
-                    comments = new ArrayList();
-                    commentObjs = new ArrayList();
+                    comments = new ArrayList<>();
+                    commentObjs = new ArrayList<>();
 
                     for (Comment comment : result)
                     {
@@ -983,9 +985,32 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             audioLayout.setVisibility(View.VISIBLE);
         } else if (mediaType == MediaType.PIC) {
             imageHolder.setVisibility(View.VISIBLE);
-            Picasso.with(this.getActivity()).load(this.mediaFile.getUrl()).into(this.iw);
-            ImageView focused_imageView = (ImageView) this.view.findViewById(R.id.focused_pic);
-            Picasso.with(this.getActivity()).load(this.mediaFile.getUrl()).into(focused_imageView);
+
+
+            ParseFile thumbnail = this.flag.getThumbnail();
+            final ParseFile picture = this.flag.getPic();
+            if(thumbnail != null){
+                Picasso.with(this.getActivity()).load(thumbnail.getUrl()).into(this.iw, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Picasso.with(FlagFragment.this.getActivity()).load(picture.getUrl()).into(FlagFragment.this.iw);
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
+            }
+            else{
+                Picasso.with(this.getActivity()).load(picture.getUrl()).into(this.iw);
+            }
+            //ImageView focused_imageView = (ImageView) this.view.findViewById(R.id.focused_pic);
+            //Picasso.with(this.getActivity()).load(picture.getUrl()).into(focused_imageView);
+
+
+
+
         } else {
             videoHolder.setVisibility(View.VISIBLE);
         }
