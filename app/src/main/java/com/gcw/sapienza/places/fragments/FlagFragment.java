@@ -1,6 +1,7 @@
 package com.gcw.sapienza.places.fragments;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -18,6 +19,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -517,6 +520,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                     }
                                 });
 
+                                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                imm.hideSoftInputFromWindow(userInput.getWindowToken(), 0);
+
                                 dialog.dismiss();
                             }
 
@@ -526,6 +532,12 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
+
+        userInput.requestFocus();
+        alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+
+        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
 
     private void playRecording() {

@@ -21,6 +21,8 @@
         android:ems="@integer/max_text_size"
         android:gravity="center_vertical|center_horizontal"
         android:inputType="textMultiLine|textCapSentences"
-        android:textSize="22sp" />
+        android:textSize="22sp">
+        <requestFocus />
+    </EditText>
 
 </LinearLayout>
