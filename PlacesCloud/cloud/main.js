@@ -436,7 +436,6 @@ Parse.Cloud.beforeSave(Parse.Installation, function(request, response) {
 
 });
 
-
 Parse.Cloud.beforeDelete("Posts", function(request, response) {
   query = new Parse.Query("Posts");
   query.equalTo("objectId", request.object.id);
@@ -471,6 +470,47 @@ Parse.Cloud.beforeDelete("Posts", function(request, response) {
     error: function() {
       response.error("An error occurred while deleting the Flag");
     }
+  });
+});
+
+Parse.Cloud.afterDelete("Posts", function(request) {
+  var query = new Parse.Query("Comments");
+  query.equalTo("flag", {
+        __type: "Pointer",
+        className: "Posts",
+        objectId: request.object.id
+    });
+ 
+  query.find().then(function(comments) {
+    console.log("Comments being deleted: " + comments.length);
+    return Parse.Object.destroyAll(comments);
+  }).then(function(success) {
+    console.log("Successfully deleted posts");
+  }, function(error) {
+    console.error("Error deleting related comments " + error.code + ": " + error.message);
+  });
+});
+
+Parse.Cloud.afterDelete("Comments", function(request) {
+  var Deleted_Comments = Parse.Object.extend("Deleted_Comments");
+  var delcomments = new Deleted_Comments();
+  var delcomment_original = request.object;
+  delcomments.set("previousObjectId", delcomment_original.id);
+  delcomments.set("text", delcomment_original.get("text"));
+  delcomments.set("userId", delcomment_original.get("userId"));
+  delcomments.set("username", delcomment_original.get("username"));
+  delcomments.set("commenter", delcomment_original.get("commenter"));
+  delcomments.set("flag", delcomment_original.get("flag"));
+  delcomments.save(null, {
+      success: function(post) {
+          // Execute any logic that should take place after the object is saved.
+          alert('New deleted comment entry created with objectId: ' + post.id);
+      },
+      error: function(post, error) {
+          // Execute any logic that should take place if the save fails.
+          // error is a Parse.Error with an error code and message.
+          alert('Failed to create new deleted comment entry, with error code: ' + error.message);
+      }
   });
 });
 
