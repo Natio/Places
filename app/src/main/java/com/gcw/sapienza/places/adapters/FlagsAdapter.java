@@ -34,11 +34,7 @@ import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by paolo on 18/02/15.
@@ -256,42 +252,9 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
         }
 
         private void openFlag() {
-            Date date = mFlag.getDate();
-
-            DateFormat df = new SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault());
-            String sDate = df.format(date);
-
-            Bundle bundle = new Bundle();
-
-            bundle.putString("text", mFlag.getText());
-            bundle.putString("id", mFlag.getFbId());
-            bundle.putString("date", sDate);
-            bundle.putString("weather", mFlag.getWeather());
-            bundle.putString("category", mFlag.getCategory());
-            bundle.putBoolean("inPlace", mFlag.getInPlace());
-            bundle.putString("flagId", mFlag.getFlagId());
-            bundle.putString("author", mFlag.getFbName());
-
-            bundle.putInt("wowCount", mFlag.getWowCount());
-            bundle.putInt("lolCount", mFlag.getLolCount());
-            bundle.putInt("booCount", mFlag.getBooCount());
-
-            bundle.putString("accountType", mFlag.getAccountType());
-
-            ParseFile file;
-            FlagFragment.MediaType mediaType = FlagFragment.MediaType.NONE;
-            if ((file = this.mFlag.getPic()) != null) {
-                mediaType = FlagFragment.MediaType.PIC;
-            } else if ((file = this.mFlag.getVideo()) != null) {
-                mediaType = FlagFragment.MediaType.VIDEO;
-            } else if ((file = this.mFlag.getAudio()) != null) {
-                mediaType = FlagFragment.MediaType.AUDIO;
-            }
 
             FlagFragment frag = new FlagFragment();
             frag.setFlag(this.mFlag);
-            frag.setMedia(file, mediaType);
-            frag.setArguments(bundle);
 
             ((MainActivity) mainActivity).switchToOtherFrag(frag);
         }
@@ -372,11 +335,7 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
                 } catch (ParseException e) {
                     Log.e(TAG, e.getMessage());
                 }
-            }/*else{
-                menu.add(Utils.FLAG_LIST_GROUP, Utils.DELETE_REPORT_FLAG, 0, "Revoke Flag report");
-
-            }*/
-            //        inflater.inflate(R.menu.context_menu, menu);
+            }
         }
 
         //this is as updateWowInfo in the FlagFragment, but only for wow and used for counter in the

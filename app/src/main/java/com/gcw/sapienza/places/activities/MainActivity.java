@@ -51,15 +51,10 @@ import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
 import com.parse.GetCallback;
 import com.parse.ParseFacebookUtils;
-import com.parse.ParseFile;
 import com.parse.ParseInstallation;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 
 public class MainActivity extends ActionBarActivity implements Preference.OnPreferenceChangeListener, ResultCallback<People.LoadPeopleResult>,
@@ -671,43 +666,9 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
     private void openFlag(Flag f)
     {
-        Date date = f.getDate();
-
-        DateFormat df = new SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault());
-        String sDate = df.format(date);
-
-        Bundle bundle = new Bundle();
-
-        bundle.putString("text", f.getText());
-        bundle.putString("id", f.getFbId());
-        bundle.putString("date", sDate);
-        bundle.putString("weather", f.getWeather());
-        bundle.putString("category", f.getCategory());
-        bundle.putBoolean("inPlace", f.getInPlace());
-        bundle.putString("flagId", f.getFlagId());
-        bundle.putString("author", f.getFbName());
-
-        bundle.putInt("wowCount", f.getWowCount());
-        bundle.putInt("lolCount", f.getLolCount());
-        bundle.putInt("booCount", f.getBooCount());
-        bundle.putBoolean("scrollToLastComment", true);
-
-        bundle.putString("accountType", f.getAccountType());
-
-        ParseFile file;
-        FlagFragment.MediaType mediaType = FlagFragment.MediaType.NONE;
-        if ((file = f.getPic()) != null) {
-            mediaType = FlagFragment.MediaType.PIC;
-        } else if ((file = f.getVideo()) != null) {
-            mediaType = FlagFragment.MediaType.VIDEO;
-        } else if ((file = f.getAudio()) != null) {
-            mediaType = FlagFragment.MediaType.AUDIO;
-        }
-
         FlagFragment frag = new FlagFragment();
+        frag.setScrollToLastComment(true);
         frag.setFlag(f);
-        frag.setMedia(file, mediaType);
-        frag.setArguments(bundle);
 
         switchToOtherFrag(frag);
     }
