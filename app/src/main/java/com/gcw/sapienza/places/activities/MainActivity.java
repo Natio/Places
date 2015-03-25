@@ -261,6 +261,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             }
         }
 
+        /*
         Intent intent = getIntent();
 
         Log.d(TAG, "Is intent null? " + (intent==null));
@@ -274,7 +275,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             openFlagFromHome(flagId);
         }
         else Log.d(TAG, "String 'type' in bundle is null");
-
+        */
+        
         isForeground = true;
     }
 
