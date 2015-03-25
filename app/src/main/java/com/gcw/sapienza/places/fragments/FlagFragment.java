@@ -1,3 +1,6 @@
+/*
+ * Copyright 2015-present Places®.
+ */
 package com.gcw.sapienza.places.fragments;
 
 import android.app.AlertDialog;
@@ -67,7 +70,8 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 
 /**
- * Created by mic_head on 02/02/15.
+ * This class represents the fragment that contains informations regarding a flag like author,
+ * meteo, text, comments, wow, and the interface overall behavior(ex.: media management)
  */
 
 public class FlagFragment extends Fragment implements View.OnClickListener, View.OnTouchListener, SwipeRefreshLayout.OnRefreshListener {
@@ -75,32 +79,30 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private static final String TAG = "FlagFragment";
     private static final int WOW_CODE = 0;
 
-
     private String newComment;
-
     private boolean scrollToLastComment = false;
-
-
     private MediaPlayer mediaPlayer;
-    private VideoView vv;
-    private ImageView iw;
+    private VideoView videoView;
+    private ImageView imageView;
     private ImageView playVideoButton;
     private ImageView audioHolder;
-    private SwipeRefreshLayout commentsHolder;
     private TextView wowStatText;
-    private LinearLayout wholeFlagContainer;
+
     private RelativeLayout frameLayout;
+    private LinearLayout wholeFlagContainer;
     private LinearLayout audioLayout;
     private LinearLayout imageHolder;
     private FrameLayout videoHolder;
     private RecyclerView commentsRecyclerView;
+    private SwipeRefreshLayout commentsHolder;
+
     private ToggleButton newWowButton;
 
     private MediaType mediaType;
     private ParseFile mediaFile;
     private Flag flag;
 
-    /**
+    /*
      * Must be called BEFORE adding the fragment to the
      *
      * @param mediaFile the file to display
@@ -111,12 +113,13 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         this.mediaFile = mediaFile;
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
- //       Bundle bundle = getArguments();
-
+        //TODO do we need the commented part?
+//       Bundle bundle = getArguments();
 //        this.scrollToLastComment = bundle.getBoolean("scrollToLastComment");
 /*
         text = bundle.getString("text");
@@ -170,7 +173,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         } else if ((file = this.flag.getAudio()) != null) {
             mediaType = FlagFragment.MediaType.AUDIO;
         }
-
         this.setMedia(file, mediaType);
     }
 
@@ -185,25 +187,25 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         super.onCreateView(inflater, container, savedInstanceState);
 
         View view = inflater.inflate(R.layout.flag_layout, container, false);
-        //ScrollView flagContent = (ScrollView)view.findViewById(R.id.FlagContent);
 
-        commentsRecyclerView = (RecyclerView)view.findViewById(R.id.comments_holder);
         LinearLayoutManager llm = new LinearLayoutManager(this.getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
+        commentsRecyclerView = (RecyclerView) view.findViewById(R.id.comments_holder);
         commentsRecyclerView.setLayoutManager(llm);
 
         TextView flagText = (TextView) view.findViewById(R.id.text);
         TextView authorTextView = (TextView) view.findViewById(R.id.author);
         TextView dateTextView = (TextView) view.findViewById(R.id.dateInfo);
-
+        TextView temperatureView = (TextView) view.findViewById(R.id.temperature);
         ImageView categoryIco = (ImageView) view.findViewById(R.id.categoryIcon);
         ImageView weatherIco = (ImageView) view.findViewById(R.id.meteo);
-        TextView temperatureView = (TextView) view.findViewById(R.id.temperature);
-
+        ImageView profilePicImageView = (ImageView) view.findViewById(R.id.profile_pic);
 
         String weatherInfo = this.flag.getWeather();
         String temperature;
         String weather;
+
+        //temporary quiack solution to manage openweathermap when didn't work, and make app working all the same
         if (weatherInfo.isEmpty()) {
             temperature = "" + 20;
             weather = "Cloud";
@@ -243,49 +245,36 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             categoryIco.setImageResource(R.drawable.food);
         }
 
-        //RelativeLayout flagContainer = (RelativeLayout) view.findViewById(R.id.flag_container);
-
-        ImageView profilePicImageView = (ImageView) view.findViewById(R.id.profile_pic);
-
         frameLayout = (RelativeLayout) view.findViewById(R.id.frame_layout);
         wholeFlagContainer = (LinearLayout) view.findViewById(R.id.whole_flag_container);
-
-        //names need to be changed in a coherent way, holder,container, iw vv ... etcetc
         imageHolder = (LinearLayout) view.findViewById(R.id.imageContainer);
-        iw = (ImageView) view.findViewById(R.id.pic);
-
+        imageView = (ImageView) view.findViewById(R.id.pic);
         commentsHolder = (SwipeRefreshLayout)view.findViewById(R.id.comments);
-
         playVideoButton = (ImageView) view.findViewById(R.id.play_video_button);
         videoHolder = (FrameLayout) view.findViewById(R.id.video_holder);
-        vv = (VideoView) view.findViewById(R.id.vid);
-
+        videoView = (VideoView) view.findViewById(R.id.vid);
         audioLayout = (LinearLayout) view.findViewById(R.id.audioContainer);
         audioHolder = (ImageView) view.findViewById(R.id.audio);
-
         wowStatText = (TextView) view.findViewById(R.id.wow_stats);
         newWowButton = (ToggleButton) view.findViewById(R.id.wow_button);
-        //to avoid capital letters in lollipop
-        newWowButton.setTransformationMethod(null);
+        newWowButton.setTransformationMethod(null); //to avoid capital letters in lollipop
 
-        iw.setOnClickListener(this);
-        vv.setOnTouchListener(this);
+        imageView.setOnClickListener(this);
+        videoView.setOnTouchListener(this);
         audioHolder.setOnClickListener(this);
         frameLayout.setOnClickListener(this);
-
         newWowButton.setOnClickListener(this);
         setWowButton(); // to manage pressed effect when opening flag
         profilePicImageView.setOnClickListener(this);
-
         commentsHolder.setOnRefreshListener(this);
         Button addCommentButton = (Button) view.findViewById(R.id.add_comment);
         addCommentButton.setOnClickListener(this);
-        //to avoid capital letters in lollipop
-        addCommentButton.setTransformationMethod(null);
+        addCommentButton.setTransformationMethod(null);//to avoid capital letters in lollipop
 
         this.changeLayoutAccordingToMediaType();
         flagText.setText(this.flag.getText());
 
+        //TODO still necessary?
             /*
             FacebookUtils.getInstance().getFacebookUsernameFromID(this.id, new FacebookUtilCallback() {
                 @Override
@@ -310,7 +299,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         DateFormat df = new SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault());
         String sDate = df.format(this.flag.getDate());
-
         dateTextView.setText(sDate + '\n' + inPlaceString);
 
         PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(this.flag.getFbId(), profilePicImageView, PlacesLoginUtils.PicSize.LARGE, this.flag.getAccountType());
@@ -323,24 +311,19 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event)
             {
-                if (keyCode == KeyEvent.KEYCODE_BACK)
-                {
-                    if (frameLayout.getVisibility() == View.VISIBLE)
-                    {
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    if (frameLayout.getVisibility() == View.VISIBLE) {
                         frameLayout.setVisibility(View.GONE);
                         wholeFlagContainer.setVisibility(View.VISIBLE);
                         // getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
                         return true;
                     }
                 }
                 return false;
             }
         });
-
         updateWowInfo();
         retrieveComments();
-
         return view;
     }
 
@@ -386,14 +369,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        //this code is equal to the code in the comment below but is more concise
-        //and i've silenced a warning in AndroidStudio
-        return v.getId() == vv.getId() && event.getAction() == MotionEvent.ACTION_DOWN && playVideo();
-        /*
-        if (v.getId() == vv.getId() && event.getAction() == MotionEvent.ACTION_DOWN) {
-            return playVideo();
-        }
-        return false;*/
+        return v.getId() == videoView.getId() && event.getAction() == MotionEvent.ACTION_DOWN && playVideo();
     }
 
     private void showProfilePage() {
@@ -407,8 +383,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         queryPosts.getFirstInBackground(new GetCallback<Flag>() {
             @Override
             public void done(Flag flag, ParseException e) {
-                if (e == null)
-                {
+                if (e == null) {
                     int wowCount = flag.getInt("wowCount");
                     if (wowCount == 1) wowStatText.setText("You WoWed this.");
                     else if (wowCount == 2) wowStatText.setText("You and another placer WoWed this.");
@@ -417,6 +392,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 }
             }
         });
+
+        //TODO still useful?
 /*
         ParseQuery<CustomParseObject> queryW = ParseQuery.getQuery("Wow_Lol_Boo");
         queryW.whereEqualTo("fbId", userId);
@@ -442,8 +419,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
        */
     }
 
-    private void retrieveComments()
-    {
+    private void retrieveComments() {
         ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
         query.whereEqualTo("flag", this.flag);
         query.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
@@ -455,19 +431,14 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             public void done(List<Comment> result, ParseException e)
             {
 
-
-
                 if (result == null || result.size() == 0)
-                {
                     result = new ArrayList<>();
-                }
+
                 CommentsAdapter commentsAdapter = new CommentsAdapter(result, commentsRecyclerView, getActivity());
 
                 commentsRecyclerView.setAdapter(commentsAdapter);
                 if(scrollToLastComment && result.size() > 0)
-                {
                     commentsRecyclerView.scrollToPosition(result.size() - 1);
-                }
 
                 scrollToLastComment = false;
             }
@@ -492,7 +463,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                             public void onClick(DialogInterface dialog, int id) {
                                 InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                                 imm.hideSoftInputFromWindow(userInput.getWindowToken(), 0);
-
                                 dialog.dismiss();
                             }
                         })
@@ -500,7 +470,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-
                                 newComment = userInput.getText().toString();
                                 if (newComment.length() == 0) {
                                     Toast.makeText(getActivity(), "Comment cannot be empty!", Toast.LENGTH_LONG).show();
@@ -542,12 +511,10 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
                                 InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                                 imm.hideSoftInputFromWindow(userInput.getWindowToken(), 0);
-
                                 dialog.dismiss();
                             }
 
                         }
-
                 );
 
         AlertDialog alertDialog = alertDialogBuilder.create();
@@ -571,24 +538,23 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     }
 
     private boolean playVideo() {
-        if (vv.isPlaying()) {
-            vv.pause();
+        if (videoView.isPlaying()) {
+            videoView.pause();
             playVideoButton.setVisibility(View.VISIBLE);
         } else {
-            // vv.resume();
-            vv.start();
+            // videoView.resume();
+            videoView.start();
             playVideoButton.setVisibility(View.GONE);
         }
-
         return true;
     }
 
     private void onVideoDownloaded(String videoPath) {
         Uri videoUri = Uri.parse(videoPath);
-        vv.setVideoURI(videoUri);
+        videoView.setVideoURI(videoUri);
 
         try {
-            vv.seekTo(10);
+            videoView.seekTo(10);
         } catch (RuntimeException re) {
             Log.d(TAG, "Video is too short to show preview");
         }
@@ -596,7 +562,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         playVideoButton.setVisibility(View.VISIBLE);
         // playVideo();
 
-        vv.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+        videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 playVideoButton.setVisibility(View.VISIBLE);
@@ -606,14 +572,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
     private void onAudioDownloaded(String audioPath) {
         try {
-            //audioHolder.setVisibility(View.VISIBLE);
             audioLayout.setVisibility(View.VISIBLE);
-
-            //videoHolder.setVisibility(View.GONE);
-
-
             File temp = new File(audioPath);
-
             mediaPlayer = new MediaPlayer();
 
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -624,10 +584,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             });
 
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
             FileInputStream inStream = new FileInputStream(temp);
             mediaPlayer.setDataSource(inStream.getFD());
-
             mediaPlayer.prepare();
         } catch (IOException ioe) {
             ioe.printStackTrace();
@@ -666,9 +624,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                     }
                                 });
                             }
-                        }
-                        else if (obj == null)
-                        {
+                        } else if (obj == null) {
                             obj = new CustomParseObject();
                             obj.setUser(PlacesUser.getCurrentUser());
                             obj.setFlagId(FlagFragment.this.flag.getObjectId());
@@ -682,15 +638,12 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                             });
 
                             Log.d(TAG, "No suitable entry found in wow table: " + e.getMessage());
-                        }
-                        else
-                        {
+                        } else {
                             Toast.makeText(getActivity(), "Error encountered while accessing database", Toast.LENGTH_SHORT).show();
                             Log.d(TAG, "Error encountered while retrieving table entry on Parse.com");
                         }
                     }
                 });
-
                 break;
 
             default:
@@ -709,8 +662,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                     @Override
                     public void done(Flag flag, ParseException e)
                     {
-                        if (e == null)
-                        {
+                        if (e == null) {
                             final int wowCount = flag.getInt("wowCount");
 
                             if (increment) {
@@ -743,8 +695,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         }
     }
 
-    private void updateWowStats(boolean wowed, int wowCount)
-    {
+    private void updateWowStats(boolean wowed, int wowCount) {
         Log.d(TAG, "wowed: " + wowed + ", wowCount: " + wowCount);
 
         wowStatText.setVisibility(View.VISIBLE);
@@ -759,16 +710,14 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             }
         } else {
             newWowButton.setChecked(false);
-            if (wowCount==0)
-            {
+            if (wowCount == 0) {
                 Log.d(TAG, "wowCount is 0");
                 wowStatText.setText("");
                 wowStatText.setVisibility(View.INVISIBLE);
             }
             else{
-                if(wowCount==1){
+                if (wowCount == 1)
                     wowStatText.setText("1 WoW");
-                }
                 else
                     wowStatText.setText(wowCount + " WoWs");
             }
@@ -798,22 +747,20 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             ParseFile thumbnail = this.flag.getThumbnail();
             final ParseFile picture = this.flag.getPic();
             if(thumbnail != null){
-                Picasso.with(this.getActivity()).load(thumbnail.getUrl()).into(this.iw, new Callback() {
+                Picasso.with(this.getActivity()).load(thumbnail.getUrl()).into(this.imageView, new Callback() {
                     @Override
                     public void onSuccess() {
-                        Picasso.with(FlagFragment.this.getActivity()).load(picture.getUrl()).into(FlagFragment.this.iw);
+                        Picasso.with(FlagFragment.this.getActivity()).load(picture.getUrl()).into(FlagFragment.this.imageView);
                     }
-
                     @Override
                     public void onError() {
-
                     }
                 });
             }
             else{
-                Picasso.with(this.getActivity()).load(picture.getUrl()).into(this.iw);
+                Picasso.with(this.getActivity()).load(picture.getUrl()).into(this.imageView);
             }
-            if(this.getView() != null){
+            if (this.getView() != null) {
                 ImageView focused_imageView = (ImageView) this.getView().findViewById(R.id.focused_pic);
                 Picasso.with(this.getActivity()).load(picture.getUrl()).into(focused_imageView);
             }
@@ -986,13 +933,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         }
     }
 
-    /**
-     * Deletes the comment
-     *
-     * @param f comment to delete
-     */
-    private void deleteComment(Comment f) {
-        f.deleteInBackground(new DeleteCallback() {
+    private void deleteComment(Comment comment) {
+        comment.deleteInBackground(new DeleteCallback() {
             @Override
             public void done(com.parse.ParseException e) {
                 if (e == null) {
@@ -1004,14 +946,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         });
     }
 
-    /**
-     * Reports a comment
-     *
-     * @param f comment to report
-     */
-    private void reportComment(final Comment f) {
-
-        CommentReport report = CommentReport.createFlagReportFromFlag(f);
+    private void reportComment(final Comment comment) {
+        CommentReport report = CommentReport.createFlagReportFromFlag(comment);
         report.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -1023,16 +959,12 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         });
     }
 
-    /**
-     * Deletes an entry from the Reported_Comments table
-     *
-     * @param f comment related to the entry to be deleted
-     */
-    private void deleteReportComment(Comment f) {
+    //Deletes the entry related to @param comment, from the Reported_Comments table
+    private void deleteReportComment(Comment comment) {
         ParseQuery<ParseObject> queryDelete = ParseQuery.getQuery("Reported_Comments");
 
         queryDelete.whereEqualTo("reported_by", ParseUser.getCurrentUser());
-        queryDelete.whereEqualTo("reported_flag", f);
+        queryDelete.whereEqualTo("reported_flag", comment);
 
         queryDelete.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
