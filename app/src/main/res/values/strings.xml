@@ -24,7 +24,7 @@
     <string name="deleted">Flag Deleted</string>
     <string name="reported">Flag Reported</string>
     <string name="hint_text">Add text</string>
-    <string name="no_flags">No Flags nearby</string>
+    <string name="no_flags">No Flags nearby :(</string>
     <string name="loading_my_flags">Loading My Flags...</string>
 
     <string name="wow">WoW!</string>

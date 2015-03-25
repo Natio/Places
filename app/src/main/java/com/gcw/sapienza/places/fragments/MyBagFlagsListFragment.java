@@ -15,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gcw.sapienza.places.PlacesApplication;
@@ -40,11 +42,15 @@ public class MyBagFlagsListFragment extends Fragment {
             switch (intent.getAction()) {
 
                 case LocationService.FOUND_BAG_FLAGS_NOTIFICATION:
+                    noFlagLayout.setVisibility(View.GONE);
+                    recycleView.setVisibility(View.VISIBLE);
                     MyBagFlagsListFragment.this.updateRecycleViewWithNewContents(Utils.getOrderedFlags(getActivity(), Utils.BAG_FLAGS_CODE));
                     break;
 
                 case LocationService.FOUND_NO_BAG_FLAGS_NOTIFICATION:
-                    MyBagFlagsListFragment.this.updateRecycleViewWithNewContents(Utils.getOrderedFlags(getActivity(), Utils.BAG_FLAGS_CODE));
+                    noFlagsText.setText("Sigh! No Flags in your Bag (yet!) :(");
+                    recycleView.setVisibility(View.GONE);
+                    noFlagLayout.setVisibility(View.VISIBLE);
                     break;
 
                 default:
@@ -56,7 +62,10 @@ public class MyBagFlagsListFragment extends Fragment {
     private static final String FLAG_DELETED = "Flag deleted";
     private static final String FLAG_REPORTED = "Flag reported";
     private static final String FLAG_REPORT_REVOKED = "Flag report revoked";
+
     private RecyclerView recycleView;
+    private RelativeLayout noFlagLayout;
+    private TextView noFlagsText;
 
     public RecyclerView getRV() {
         return recycleView;
@@ -70,6 +79,9 @@ public class MyBagFlagsListFragment extends Fragment {
         LinearLayoutManager llm = new LinearLayoutManager(this.getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         this.recycleView.setLayoutManager(llm);
+
+        noFlagLayout = (RelativeLayout)view.findViewById(R.id.no_flags_found_layout);
+        noFlagsText = (TextView)noFlagLayout.findViewById(R.id.no_flags_text);
 
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_BAG_FLAGS_NOTIFICATION));
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_BAG_FLAGS_NOTIFICATION));

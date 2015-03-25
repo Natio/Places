@@ -17,6 +17,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.android.Util;
@@ -54,20 +56,26 @@ public class FlagsListFragment extends Fragment {
 
                 //handled in the same way
                 case LocationService.FOUND_NEW_FLAGS_NOTIFICATION:
+                    noFlagLayout.setVisibility(View.GONE);
+                    recycleView.setVisibility(View.VISIBLE);
                     FlagsListFragment.this.updateRecycleViewWithNewContents(Utils.getOrderedFlags(getActivity(), Utils.NEARBY_FLAGS_CODE));
                     break;
                 case LocationService.FOUND_NO_FLAGS_NOTIFICATION:
-                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.my_swipe_refresh, new NoFlagsFragment()).commit();
+                    noFlagsText.setText("Sigh! No Flags nearbly (yet!) :(");
+                    recycleView.setVisibility(View.GONE);
+                    noFlagLayout.setVisibility(View.VISIBLE);
                     break;
 
                 default:
-                    Log.w(TAG, "Unknown broadcast message identifier");
+                    Log.w(TAG, intent.getAction() + ": cannot identify the received notification");
             }
             Log.d(TAG, intent.getAction());
         }
     };
 
     private RecyclerView recycleView;
+    private RelativeLayout noFlagLayout;
+    private TextView noFlagsText;
 
     public RecyclerView getRV() {
         return recycleView;
@@ -81,6 +89,9 @@ public class FlagsListFragment extends Fragment {
         LinearLayoutManager llm = new LinearLayoutManager(this.getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         this.recycleView.setLayoutManager(llm);
+
+        noFlagLayout = (RelativeLayout)view.findViewById(R.id.no_flags_found_layout);
+        noFlagsText = (TextView)noFlagLayout.findViewById(R.id.no_flags_text);
 
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
