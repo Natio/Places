@@ -276,7 +276,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         }
         else Log.d(TAG, "String 'type' in bundle is null");
         */
-        
+
         isForeground = true;
     }
 

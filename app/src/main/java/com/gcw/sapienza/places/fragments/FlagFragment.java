@@ -449,11 +449,12 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 }
 
                 rv.setAdapter(commentsAdapter);
-                if(scrollToLastComment)
+                if(scrollToLastComment && commentObjs.size() > 0)
                 {
                     rv.scrollToPosition(commentObjs.size() - 1);
-                    scrollToLastComment = false;
                 }
+
+                scrollToLastComment = false;
             }
         });
     }
