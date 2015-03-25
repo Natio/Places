@@ -61,6 +61,7 @@ public class LocationService extends Service implements
     public static final String FOUND_BAG_FLAGS_NOTIFICATION = "FOUND_BAG_FLAGS_NOTIFICATION";
     public static final String FOUND_NO_BAG_FLAGS_NOTIFICATION = "FOUND_NO_BAG_FLAGS_NOTIFICATION";
     public static final String NO_FLAGS_VISIBLE = "you won't be able to see any flags with these settings";
+    public static final String SERVICE_CONNECTED = "SERVICE_CONNECTED";
     private static final String TAG = "LocationService";
     private static final long ONE_MIN = 1000 * 60;
     private static final long ONE_HOUR = ONE_MIN * 60;
@@ -131,6 +132,34 @@ public class LocationService extends Service implements
         }
     }
 
+    public void updateLocationData(int updateCode){
+        switch (updateCode){
+
+            case Utils.NEARBY_FLAGS_CODE:
+                Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
+                if (currentLocation != null) {
+                    this.location = currentLocation;
+                    queryParsewithLocation(currentLocation);
+                }
+                else{
+                    Log.d(TAG, "Last location is null!");
+                }
+                break;
+
+            case Utils.MY_FLAGS_CODE:
+                queryParsewithCurrentUser();
+                break;
+
+            case Utils.BAG_FLAGS_CODE:
+                queryParsewithBag();
+                break;
+
+            default:
+                Log.w(TAG, "Unrecognized Flag request code. Triggering default behavior...");
+                updateLocationData();
+        }
+    }
+
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.d(TAG, "Connected to Google Api");
@@ -172,7 +201,7 @@ public class LocationService extends Service implements
                     LocationService.this.myFlags.put(f.getObjectId(), f);
                 }
 
-                updateApplication();
+                updateMyFlags();
 
                 if (flags.size() > 0) {
                     LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_MY_FLAGS_NOTIFICATION));
@@ -254,7 +283,7 @@ public class LocationService extends Service implements
 
                     Log.d(TAG, "Bag size Hash: " + bagFlags.size());
 
-                    updateApplication();
+                    updateBagFlags();
 
                     if (bagFlags.size() > 0) {
                         LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_BAG_FLAGS_NOTIFICATION));
@@ -355,7 +384,7 @@ public class LocationService extends Service implements
                 this.noFlagsWarning = true;
             }
 
-            updateApplication();
+            updateNearbyFlagsAndLocation();
             LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
 
             return;
@@ -396,7 +425,7 @@ public class LocationService extends Service implements
                     hiddenFlags.clear();
                 }
 
-                updateApplication();
+                updateNearbyFlagsAndLocation();
 
                 LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
 
@@ -442,7 +471,8 @@ public class LocationService extends Service implements
                 }
                 Log.d(TAG, "Found " + flags.size() +
                         " flags within " + Utils.DISCOVER_MODE_RADIUS + " km");
-                updateApplication();
+
+                updateNearbyFlagsAndLocation();
 
                 if (flags.size() > 0) {
                     LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
@@ -585,6 +615,25 @@ public class LocationService extends Service implements
             listener.setFlagsNearby(flagsNearby);
             listener.setHiddenFlags(hiddenFlags);
             listener.setMyFlags(myFlags);
+            listener.setBagFlags(bagFlags);
+        }
+    }
+
+    private void updateNearbyFlagsAndLocation(){
+        if (listener != null) {
+            listener.setLocation(location);
+            listener.setFlagsNearby(flagsNearby);
+        }
+    }
+
+    private void updateMyFlags(){
+        if (listener != null) {
+            listener.setMyFlags(myFlags);
+        }
+    }
+
+    private void updateBagFlags(){
+        if (listener != null) {
             listener.setBagFlags(bagFlags);
         }
     }

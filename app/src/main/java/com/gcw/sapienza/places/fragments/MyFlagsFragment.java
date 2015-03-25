@@ -27,8 +27,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.services.LocationService;
@@ -51,7 +51,7 @@ import java.util.List;
  * Created by snowblack on 2/19/15.
  */
 public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener,
-        GoogleMap.OnMarkerClickListener {
+        GoogleMap.OnMarkerClickListener{
 
     private static final String TAG = "MyFlagsFragment";
 
@@ -205,7 +205,7 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
         this.gMap.setOnMarkerClickListener(this);
         this.gMap.setMyLocationEnabled(true);
 
-        this.updateMarkersOnMap();
+        ((MainActivity) getActivity()).refresh(Utils.MY_FLAGS_CODE);
     }
 
     @Override
@@ -227,10 +227,16 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
             }
         }
 
-        for (Marker marker : this.markers) {
-            marker.setAlpha(Utils.FLAG_ALPHA_NORMAL);
+        if(selectedMarker.getAlpha() == Utils.FLAG_ALPHA_SELECTED){
+            for (Marker marker : this.markers) {
+                marker.setAlpha(Utils.FLAG_ALPHA_NORMAL);
+            }
+        }else {
+            for (Marker marker : this.markers) {
+                marker.setAlpha(Utils.FLAG_ALPHA_UNSELECTED);
+            }
+            selectedMarker.setAlpha(Utils.FLAG_ALPHA_SELECTED);
         }
-        selectedMarker.setAlpha(Utils.FLAG_ALPHA_FULL);
 
         // by returning false we can show text on flag in the map
         // return false;
@@ -298,11 +304,7 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
 
     @Override
     public void onRefresh() {
-        refresh();
+        ((MainActivity) getActivity()).refresh(Utils.MY_FLAGS_CODE);
         srl.setRefreshing(false);
-    }
-
-    protected void refresh() {
-        PlacesApplication.getInstance().getLocationService().queryParsewithCurrentUser();
     }
 }

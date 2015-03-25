@@ -36,7 +36,7 @@ import com.gcw.sapienza.places.fragments.MainFragment;
 import com.gcw.sapienza.places.fragments.MyFlagsFragment;
 import com.gcw.sapienza.places.fragments.ProfileFragment;
 import com.gcw.sapienza.places.fragments.SettingsFragment;
-import com.gcw.sapienza.places.models.Comment;
+import com.gcw.sapienza.places.services.ILocationServiceListener;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.GPlusUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
@@ -49,7 +49,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
-import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseFile;
@@ -58,14 +57,13 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 
-public class MainActivity extends ActionBarActivity implements Preference.OnPreferenceChangeListener, ResultCallback<People.LoadPeopleResult>, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends ActionBarActivity implements Preference.OnPreferenceChangeListener, ResultCallback<People.LoadPeopleResult>,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ILocationServiceListener {
 
 
     public static final String TAG = MainActivity.class.getName();
@@ -145,8 +143,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
         this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.green)));
 
-        this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
-
         // If app is opened by clicking of comment notification, go straight to the flag for which you've been notified
         Intent intent = getIntent();
         if(intent != null)
@@ -161,9 +157,21 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
                 String flagId = intent.getStringExtra(Utils.FLAG_ID);
                 openFlagFromHome(flagId);
             }
-            else Log.d(TAG, "String 'type' in bundle is null.");
+            else{
+                Log.d(TAG, "String 'type' in bundle is null. Triggering default Activity behavior.");
+
+                PlacesApplication.getInstance().startLocationService();
+
+                this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
+            }
         }
-        else Log.d(TAG, "Bundle is null.");
+        else{
+            Log.d(TAG, "Bundle is null. Triggering default Activity behavior.");
+
+            PlacesApplication.getInstance().startLocationService();
+
+            this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
+        }
     }
 
     @Deprecated
@@ -191,7 +199,12 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
     public void refresh() {
         Log.d(TAG, "Refreshing application");
-        PlacesApplication.getInstance().updatePlacesData();
+        PlacesApplication.getInstance().updatePlacesData(this);
+    }
+
+    public void refresh(int updateCode) {
+        Log.d(TAG, "Refreshing application");
+        PlacesApplication.getInstance().updatePlacesData(this, updateCode);
     }
 
     @Override
@@ -229,10 +242,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
                 && !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             promptForLocationServices();
         } else if(loggedIn){
-            if(PlacesApplication.getInstance().isLocationServiceRunning()){
-                PlacesApplication.getInstance().updatePlacesData();
-            }
-            else{
+            if(!PlacesApplication.getInstance().isLocationServiceRunning()){
                 PlacesApplication.getInstance().startLocationService();
             }
         }
@@ -406,7 +416,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
                 if (resultCode == RESULT_OK) {
                     Toast.makeText(this, data.getExtras().getString("result"), Toast.LENGTH_LONG).show();
-                    this.refresh();
+                    this.refresh(Utils.NEARBY_FLAGS_CODE);
                 }
                 break;
         }
@@ -529,6 +539,32 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         radiusToast = Toast.makeText(getBaseContext(), text,
                 Toast.LENGTH_SHORT);
         radiusToast.show();
+    }
+
+    @Override
+    public void onServiceConnected(int updateCode) {
+        Log.d(TAG, "LocationService is connected! Callback is called");
+        switch (updateCode){
+            case Utils.NEARBY_FLAGS_CODE:
+                Log.d(TAG, "Service Connected. Updating Nearby Flags");
+                PlacesApplication.getInstance().updatePlacesData(this, Utils.NEARBY_FLAGS_CODE);
+                break;
+            case Utils.MY_FLAGS_CODE:
+                Log.d(TAG, "Service Connected. Updating My Flags");
+                PlacesApplication.getInstance().updatePlacesData(this, Utils.MY_FLAGS_CODE);
+                break;
+            case Utils.BAG_FLAGS_CODE:
+                Log.d(TAG, "Service Connected. Updating Bag Flags");
+                PlacesApplication.getInstance().updatePlacesData(this, Utils.BAG_FLAGS_CODE);
+                break;
+            case Utils.DEFAULT_FLAGS_CODE:
+                Log.d(TAG, "Triggering default behavior: Updating whole Flag data");
+                PlacesApplication.getInstance().updatePlacesData(this);
+                break;
+            default:
+                Log.d(TAG, "Triggering default behavior: Updating whole Flag data");
+                PlacesApplication.getInstance().updatePlacesData(this);
+        }
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {

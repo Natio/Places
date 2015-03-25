@@ -15,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.android.Util;
@@ -41,11 +43,15 @@ public class MyFlagsListFragment extends Fragment {
             switch (intent.getAction()) {
 
                 case LocationService.FOUND_MY_FLAGS_NOTIFICATION:
+                    noFlagLayout.setVisibility(View.GONE);
+                    recycleView.setVisibility(View.VISIBLE);
                     MyFlagsListFragment.this.updateRecycleViewWithNewContents(Utils.getOrderedFlags(getActivity(), Utils.MY_FLAGS_CODE));
                     break;
 
                 case LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION:
-                    MyFlagsListFragment.this.updateRecycleViewWithNewContents(Utils.getOrderedFlags(getActivity(), Utils.MY_FLAGS_CODE));
+                    noFlagsText.setText("No Flags from you (yet!) :(");
+                    recycleView.setVisibility(View.GONE);
+                    noFlagLayout.setVisibility(View.VISIBLE);
                     break;
 
                 default:
@@ -57,7 +63,10 @@ public class MyFlagsListFragment extends Fragment {
     private static final String FLAG_DELETED = "Flag deleted";
     private static final String FLAG_REPORTED = "Flag reported";
     private static final String FLAG_REPORT_REVOKED = "Flag report revoked";
+
     private RecyclerView recycleView;
+    private RelativeLayout noFlagLayout;
+    private TextView noFlagsText;
 
     public RecyclerView getRV() {
         return recycleView;
@@ -71,6 +80,9 @@ public class MyFlagsListFragment extends Fragment {
         LinearLayoutManager llm = new LinearLayoutManager(this.getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         this.recycleView.setLayoutManager(llm);
+
+        noFlagLayout = (RelativeLayout)view.findViewById(R.id.no_flags_found_layout);
+        noFlagsText = (TextView)noFlagLayout.findViewById(R.id.no_flags_text);
 
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_MY_FLAGS_NOTIFICATION));
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION));
@@ -124,7 +136,7 @@ public class MyFlagsListFragment extends Fragment {
             public void done(com.parse.ParseException e) {
                 if (e == null) {
                     Toast.makeText(recycleView.getContext(), FLAG_DELETED, Toast.LENGTH_SHORT).show();
-                    ((MainActivity) getActivity()).refresh();
+                    ((MainActivity) getActivity()).refresh(Utils.MY_FLAGS_CODE);
                 } else
                     Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }

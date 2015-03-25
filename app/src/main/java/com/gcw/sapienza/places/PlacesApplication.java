@@ -1,6 +1,7 @@
 package com.gcw.sapienza.places;
 
 import android.app.Application;
+import android.app.IntentService;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +21,7 @@ import com.gcw.sapienza.places.models.CommentReport;
 import com.gcw.sapienza.places.models.CustomParseObject;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.models.FlagReport;
+import com.gcw.sapienza.places.services.ILocationServiceListener;
 import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.services.ILocationUpdater;
 import com.gcw.sapienza.places.services.JSONWeatherTask;
@@ -41,6 +43,8 @@ import com.squareup.picasso.Picasso;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -63,6 +67,7 @@ public class PlacesApplication extends Application {
     private HashMap<String, Flag> myFlags = new HashMap<>(0);
     private HashMap<String, Flag> hiddenFlags = new HashMap<>(0);
     private HashMap<String, Flag> bagFlags = new HashMap<>(0);
+    private HashMap<ILocationServiceListener, Integer> serviceListeners = new HashMap<>();
     private ILocationUpdater listener = new ILocationUpdater() {
         @Override
         public void setLocation(Location l) {
@@ -103,6 +108,14 @@ public class PlacesApplication extends Application {
             mService = binder.getService();
             mService.setListener(listener);
             PlacesApplication.this.mBound = true;
+            Iterator<ILocationServiceListener> iter = serviceListeners.keySet().iterator();
+            while(iter.hasNext()){
+                ILocationServiceListener currListener = iter.next();
+                if(currListener != null) {
+                    currListener.onServiceConnected(serviceListeners.get(currListener));
+                }
+                iter.remove();
+            }
         }
 
         @Override
@@ -300,20 +313,35 @@ public class PlacesApplication extends Application {
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             Intent locInt = new Intent(this, LocationService.class);
-            Log.d("Places Application", "Starting Location Service");
+            Log.d(TAG, "Starting Location Service");
             //        stopService(locInt);
             startService(locInt);
             bindService(locInt, this.mConnection, BIND_AUTO_CREATE);
         } else {
-            Log.w("Places Application", "Location Service not started!");
+            Log.w(TAG, "Location Service not started!");
         }
     }
 
-    public void updatePlacesData(){
-        if(mService != null)
+    public boolean updatePlacesData(ILocationServiceListener serviceListener){
+        if(mService != null){
             mService.updateLocationData();
-        else
+            return true;
+        } else {
+            serviceListeners.put(serviceListener, Utils.DEFAULT_FLAGS_CODE);
             startLocationService();
+            return false;
+        }
+    }
+
+    public boolean updatePlacesData(ILocationServiceListener serviceListener, int updateCode){
+        if(mService != null) {
+            mService.updateLocationData(updateCode);
+            return true;
+        } else {
+            serviceListeners.put(serviceListener, updateCode);
+            startLocationService();
+            return false;
+        }
     }
 
     private void updateWeatherInfo() {
@@ -331,8 +359,11 @@ public class PlacesApplication extends Application {
                 task.execute(locality + ',' + cc);
             }
         } catch (IOException e) {
-            Log.e(TAG, "No locality found! Error: " + e.toString());
+            Log.e(TAG, "No locality found! Error: " + e.getMessage());
+        } catch (NullPointerException e){
+            Log.e(TAG, "No locality found! Error: " + e.getMessage());
         }
+
     }
 
 /*

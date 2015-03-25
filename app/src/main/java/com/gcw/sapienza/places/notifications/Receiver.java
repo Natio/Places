@@ -17,7 +17,9 @@ import org.json.JSONObject;
  * Created by snowblack on 1/4/15.
  */
 public class Receiver extends ParsePushBroadcastReceiver {
+
     private static final String TAG = "Receiver";
+    private static final String UPDATES_REPO = "https://drive.google.com/folderview?id=0B1boWbY-47RQdHJnSlpScUNueTQ&usp=drive_web";
 
     @Override
     public void onPushOpen(Context context, Intent intent) {
@@ -42,7 +44,7 @@ public class Receiver extends ParsePushBroadcastReceiver {
 
             } else {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse("https://drive.google.com/folderview?id=0B1boWbY-47RQdHJnSlpScUNueTQ&usp=drive_web"));
+                        Uri.parse(UPDATES_REPO));
                 browserIntent.putExtras(intent.getExtras());
                 browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(browserIntent);

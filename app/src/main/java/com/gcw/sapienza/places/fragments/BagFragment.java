@@ -27,8 +27,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.services.LocationService;
@@ -51,7 +51,7 @@ import java.util.List;
  * Created by snowblack on 3/20/15.
  */
 public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener,
-        GoogleMap.OnMarkerClickListener {
+        GoogleMap.OnMarkerClickListener{
     private static final String TAG = "BagFragment";
 
     private View view;
@@ -204,7 +204,7 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
         this.gMap.setOnMarkerClickListener(this);
         this.gMap.setMyLocationEnabled(true);
 
-        this.updateMarkersOnMap();
+        ((MainActivity) getActivity()).refresh(Utils.BAG_FLAGS_CODE);
     }
 
     @Override
@@ -225,10 +225,16 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
             }
         }
 
-        for (Marker marker : this.markers) {
-            marker.setAlpha(Utils.FLAG_ALPHA_NORMAL);
+        if(selectedMarker.getAlpha() == Utils.FLAG_ALPHA_SELECTED){
+            for (Marker marker : this.markers) {
+                marker.setAlpha(Utils.FLAG_ALPHA_NORMAL);
+            }
+        }else {
+            for (Marker marker : this.markers) {
+                marker.setAlpha(Utils.FLAG_ALPHA_UNSELECTED);
+            }
+            selectedMarker.setAlpha(Utils.FLAG_ALPHA_SELECTED);
         }
-        selectedMarker.setAlpha(Utils.FLAG_ALPHA_FULL);
 
         // by returning false we can show text on flag in the map
         // return false;
@@ -303,6 +309,6 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
     }
 
     protected void refresh() {
-        PlacesApplication.getInstance().getLocationService().queryParsewithBag();
+        ((MainActivity) getActivity()).refresh(Utils.BAG_FLAGS_CODE);
     }
 }

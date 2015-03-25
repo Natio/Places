@@ -51,7 +51,8 @@ import java.util.List;
 /**
  * Created by snowblack on 2/19/15.
  */
-public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener, GoogleMap.OnMarkerClickListener {
+public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener,
+        GoogleMap.OnMarkerClickListener{
 
     private static final String TAG = "MainFragment";
 
@@ -207,16 +208,16 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
         this.gMap.setOnMarkerClickListener(this);
         this.gMap.setMyLocationEnabled(true);
 
-        PlacesApplication.getInstance().updatePlacesData();
+        ((MainActivity) getActivity()).refresh(Utils.NEARBY_FLAGS_CODE);
     }
 
     private void updateMarkersOnMap() {
 
         this.markers = new ArrayList<>();
 
-        Log.d(TAG, "Updating markers on map...");
-
         List<Flag> flags = Utils.getOrderedFlags(getActivity(), Utils.NEARBY_FLAGS_CODE);
+
+        Log.d(TAG, "Updating markers on map...flags size: " + flags.size());
 
         if (flags != null && this.gMap != null) {
             this.gMap.clear();
@@ -370,10 +371,16 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
             }
         }
 
-        for (Marker marker : this.markers) {
-            marker.setAlpha(Utils.FLAG_ALPHA_NORMAL);
+        if(selectedMarker.getAlpha() == Utils.FLAG_ALPHA_SELECTED){
+            for (Marker marker : this.markers) {
+                marker.setAlpha(Utils.FLAG_ALPHA_NORMAL);
+            }
+        }else {
+            for (Marker marker : this.markers) {
+                marker.setAlpha(Utils.FLAG_ALPHA_UNSELECTED);
+            }
+            selectedMarker.setAlpha(Utils.FLAG_ALPHA_SELECTED);
         }
-        selectedMarker.setAlpha(Utils.FLAG_ALPHA_FULL);
 
         // by returning false we can show text on flag in the map
         // return false;
@@ -383,7 +390,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
     @Override
     public void onRefresh() {
         Log.d(TAG, "Swipe refreshing");
-        ((MainActivity) getActivity()).refresh();
+        ((MainActivity) getActivity()).refresh(Utils.NEARBY_FLAGS_CODE);
         srl.setRefreshing(false);
     }
 }
