@@ -49,7 +49,7 @@ public class MyFlagsListFragment extends Fragment {
                     break;
 
                 case LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION:
-                    noFlagsText.setText("Sigh! No Flags from you (yet!) :(");
+                    noFlagsText.setText("No Flags from you (yet!) :(");
                     recycleView.setVisibility(View.GONE);
                     noFlagLayout.setVisibility(View.VISIBLE);
                     break;

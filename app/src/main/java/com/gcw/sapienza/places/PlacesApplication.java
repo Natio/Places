@@ -326,7 +326,7 @@ public class PlacesApplication extends Application {
         if(mService != null){
             mService.updateLocationData();
             return true;
-        }else{
+        } else {
             serviceListeners.put(serviceListener, Utils.DEFAULT_FLAGS_CODE);
             startLocationService();
             return false;
@@ -337,8 +337,7 @@ public class PlacesApplication extends Application {
         if(mService != null) {
             mService.updateLocationData(updateCode);
             return true;
-        }
-        else {
+        } else {
             serviceListeners.put(serviceListener, updateCode);
             startLocationService();
             return false;

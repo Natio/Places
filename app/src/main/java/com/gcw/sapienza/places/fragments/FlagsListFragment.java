@@ -61,7 +61,7 @@ public class FlagsListFragment extends Fragment {
                     FlagsListFragment.this.updateRecycleViewWithNewContents(Utils.getOrderedFlags(getActivity(), Utils.NEARBY_FLAGS_CODE));
                     break;
                 case LocationService.FOUND_NO_FLAGS_NOTIFICATION:
-                    noFlagsText.setText("Sigh! No Flags nearbly (yet!) :(");
+                    noFlagsText.setText("No Flags nearbly (yet!) :(");
                     recycleView.setVisibility(View.GONE);
                     noFlagLayout.setVisibility(View.VISIBLE);
                     break;

@@ -48,7 +48,7 @@ public class MyBagFlagsListFragment extends Fragment {
                     break;
 
                 case LocationService.FOUND_NO_BAG_FLAGS_NOTIFICATION:
-                    noFlagsText.setText("Sigh! No Flags in your Bag (yet!) :(");
+                    noFlagsText.setText("No Flags in your Bag (yet!) :(");
                     recycleView.setVisibility(View.GONE);
                     noFlagLayout.setVisibility(View.VISIBLE);
                     break;
