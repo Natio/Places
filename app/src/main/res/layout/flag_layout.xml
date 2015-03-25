@@ -2,10 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/light_grey1"
-    android:weightSum="1">
+    android:orientation="vertical" >
 <!-- general layout changed from relative to linear to manage weights-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/light_grey1"
+        android:weightSum="1"
+        android:id="@+id/whole_flag_container" >
 
     <RelativeLayout
         android:id="@+id/flag_container"
@@ -344,15 +350,17 @@
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
+    </LinearLayout>
+
     <!--  Big preview of media  -->
     <RelativeLayout
         android:id="@+id/frame_layout"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="@color/transparent_green"
+        android:orientation="vertical"
         android:clickable="true"
-        android:visibility="gone"
-        android:layout_weight="1">
+        android:visibility="gone" >
 
         <ImageView
             android:id="@+id/focused_pic"
@@ -363,12 +371,14 @@
             android:adjustViewBounds="true"
             android:background="@drawable/my_border"
             android:maxHeight="390dp"
-            android:maxWidth="390dp" />
+            android:maxWidth="390dp"
+            />
+        <requestFocus></requestFocus>
 
     </RelativeLayout>
 
     <!-- unused buttons -->
-    <Button
+    <!-- <Button
         android:id="@+id/lol_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -393,7 +403,7 @@
         android:background="@drawable/my_border_3"
         android:text="BOO"
         android:textSize="14sp"
-        android:visibility="gone" />
+        android:visibility="gone" /> -->
     <!-- end Of unused -->
 
 </LinearLayout>

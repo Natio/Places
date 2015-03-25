@@ -12,6 +12,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -87,10 +88,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private String newComment;
 
     private boolean inPlace;
+    private boolean scrollToLastComment;
 
     private int wowCount;
-    private int lolCount;
-    private int booCount;
     private MediaPlayer mediaPlayer;
     private VideoView vv;
     private ImageView iw;
@@ -100,13 +100,12 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private ImageView profilePicImageView;
     private ImageView audioHolder;
     private SwipeRefreshLayout commentsHolder;
-
     private TextView authorTextView;
     private TextView dateTextView;
     private TextView flagText;
     private TextView temperatureView;
     private TextView wowStatText;
-
+    private LinearLayout wholeFlagContainer;
     private RelativeLayout flagContainer;
     private RelativeLayout frameLayout;
     private LinearLayout audioLayout;
@@ -114,12 +113,11 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private LinearLayout imageHolder;
     private FrameLayout videoHolder;
     private RecyclerView rv;
-    private Button lolButton;
-    private Button booButton;
     private Button addCommentButton;
     private ToggleButton newWowButton;
     private CommentsAdapter commentsAdapter;
     private ArrayList<String> comments;
+
     private MediaType mediaType;
     private ParseFile mediaFile;
     private View view;
@@ -145,6 +143,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         Bundle bundle = getArguments();
 
+        scrollToLastComment = bundle.getBoolean("scrollToLastComment");
+
         text = bundle.getString("text");
         id = bundle.getString("id");
         date = bundle.getString("date");
@@ -168,8 +168,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         flagId = bundle.getString("flagId");
         author = bundle.getString("author");
         wowCount = bundle.getInt("wowCount");
-        lolCount = bundle.getInt("lolCount");
-        booCount = bundle.getInt("booCount");
         accountType = bundle.getString("accountType");
 
         userId = id;
@@ -238,6 +236,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         profilePicImageView = (ImageView) view.findViewById(R.id.profile_pic);
 
         frameLayout = (RelativeLayout) view.findViewById(R.id.frame_layout);
+        wholeFlagContainer = (LinearLayout) view.findViewById(R.id.whole_flag_container);
 
         //names need to be changed in a coherent way, holder,container, iw vv ... etcetc
         imageHolder = (LinearLayout) view.findViewById(R.id.imageContainer);
@@ -257,9 +256,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         //to avoid capital letters in lollipop
         newWowButton.setTransformationMethod(null);
 
-        lolButton = (Button) view.findViewById(R.id.lol_button);
-        booButton = (Button) view.findViewById(R.id.boo_button);
-
         iw.setOnClickListener(this);
         vv.setOnTouchListener(this);
         audioHolder.setOnClickListener(this);
@@ -267,8 +263,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         newWowButton.setOnClickListener(this);
         setWowButton(); // to manage pressed effect when opening flag
-        lolButton.setOnClickListener(this);
-        booButton.setOnClickListener(this);
         profilePicImageView.setOnClickListener(this);
 
         commentsHolder.setOnRefreshListener(this);
@@ -308,31 +302,30 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         view.setFocusableInTouchMode(true);
         view.requestFocus();
-        //TODO can the following be deleted?
-            /*
-            view.setOnKeyListener(new View.OnKeyListener() {
-                @Override
-                public boolean onKey(View v, int keyCode, KeyEvent event) {
-                    if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        if (frameLayout.getVisibility() == View.VISIBLE) {
-                            frameLayout.setVisibility(View.GONE);
-                            // getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-                            return true;
-                        } else if (commentsHolder.getVisibility() == View.VISIBLE) {
-                            commentsHolder.setVisibility(View.GONE);
-                            commentsButton.setVisibility(View.VISIBLE);
-                            wowStatText.setVisibility(View.VISIBLE);
+        view.setOnKeyListener(new View.OnKeyListener()
+        {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event)
+            {
+                if (keyCode == KeyEvent.KEYCODE_BACK)
+                {
+                    if (frameLayout.getVisibility() == View.VISIBLE)
+                    {
+                        frameLayout.setVisibility(View.GONE);
+                        wholeFlagContainer.setVisibility(View.VISIBLE);
+                        // getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-                            return true;
-                        }
+                        return true;
                     }
-                    return false;
                 }
-            });
-            */
+                return false;
+            }
+        });
+
         updateWowInfo();
         retrieveComments();
+
         return view;
     }
 
@@ -349,21 +342,31 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(View v)
+    {
+        Log.d(TAG, "1) frame_layout visibility: " + ((frameLayout.getVisibility() == View.VISIBLE) ? "VISIBLE" : "NOT VISIBLE"));
+
         if (v.getId() == R.id.frame_layout) {
+            Log.d(TAG, "frame_layout clicked!");
             // getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             frameLayout.setVisibility(View.GONE);
+            wholeFlagContainer.setVisibility(View.VISIBLE);
         } else if (v.getId() == R.id.pic) {
+            Log.d(TAG, "pic clicked!");
             // getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
             frameLayout.setVisibility(View.VISIBLE);
+            wholeFlagContainer.setVisibility(View.GONE);
         }
         // else if(v.getId() == playVideoButton.getId()) playVideo();
         else if (v.getId() == R.id.audio) playRecording();
         else if (v.getId() == R.id.wow_button) wlbFlag(WOW_CODE);
-        else if (v.getId() == R.id.lol_button) wlbFlag(LOL_CODE);
-        else if (v.getId() == R.id.boo_button) wlbFlag(BOO_CODE);
+        // else if (v.getId() == R.id.lol_button) wlbFlag(LOL_CODE);
+        // else if (v.getId() == R.id.boo_button) wlbFlag(BOO_CODE);
         else if (v.getId() == R.id.add_comment) insertComment();
         else if (v.getId() == R.id.profile_pic) showProfilePage();
+        else Log.d(TAG, "don't really know what's been clicked!");
+
+        Log.d(TAG, "2) frame_layout visibility: " + ((frameLayout.getVisibility() == View.VISIBLE) ? "VISIBLE" : "NOT VISIBLE"));
     }
 
     @Override
@@ -382,42 +385,31 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         ParseQuery<Flag> queryPosts = ParseQuery.getQuery("Posts");
         queryPosts.whereEqualTo("objectId", flagId);
 
-        queryPosts.findInBackground(new FindCallback<Flag>() {
+        queryPosts.getFirstInBackground(new GetCallback<Flag>() {
             @Override
-            public void done(List<Flag> markers, ParseException e) {
-                if (e == null && markers.size() != 0) {
-                    Flag flag = markers.get(0);
-
+            public void done(Flag flag, ParseException e) {
+                if (e == null)
+                {
                     wowCount = flag.getInt("wowCount");
-                    lolCount = flag.getInt("lolCount");
-                    booCount = flag.getInt("booCount");
                 }
             }
         });
-
-        //if(wowCount!=0){
-        //    wowStatText.setText(wowStatText.getText() + "" + wowCount + ')');
-        //}
-
-
-        lolButton.setText(lolButton.getText() + " (" + lolCount + ')');
-        booButton.setText(booButton.getText() + " (" + booCount + ')');
 
         ParseQuery<CustomParseObject> queryW = ParseQuery.getQuery("Wow_Lol_Boo");
         queryW.whereEqualTo("fbId", userId);
         queryW.whereEqualTo("flagId", flagId);
         queryW.whereEqualTo("boolWow", true);
 
-        queryW.findInBackground(new FindCallback<CustomParseObject>() {
+        queryW.getFirstInBackground(new GetCallback<CustomParseObject>()
+        {
             @Override
-            public void done(List<CustomParseObject> markers, ParseException e) {
-                if (e == null && markers.size() != 0) {
-                    if (wowCount == 1)
-                        wowStatText.setText("You WoWed this.");
-                    else if (wowCount == 2)
-                        wowStatText.setText("You and another placer WoWed this.");
-                    else
-                        wowStatText.setText("You and other " + wowCount + " WoWed this.");
+            public void done(CustomParseObject obj, ParseException e)
+            {
+                if (e == null && obj != null)
+                {
+                    if (wowCount == 1) wowStatText.setText("You WoWed this.");
+                    else if (wowCount == 2) wowStatText.setText("You and another placer WoWed this.");
+                    else wowStatText.setText("You and other " + wowCount + " WoWed this.");
                 }
             }
         });
@@ -454,65 +446,13 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 }
 
                 rv.setAdapter(commentsAdapter);
+                if(scrollToLastComment)
+                {
+                    rv.scrollToPosition(commentObjs.size() - 1);
+                    scrollToLastComment = false;
+                }
             }
         });
-    }
-
-    // @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
-    {
-        Log.d(TAG, "Comment at position " + position + " long clicked!");
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-
-        Comment comment = commentObjs.get(position);
-
-        String fb_id = comment.getUserId();
-        //        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        //        Flag sel_usr = (Flag)(recycleView.getItemAtPosition(info.position));
-        //        String fb_id = sel_usr.getFbId();
-        //
-        if (PlacesLoginUtils.getInstance().getCurrentUserId().equals(fb_id))
-        {
-            builder.setView(inflater.inflate(R.layout.custom_dialog_layout, null))
-                    .setTitle("Edit")
-                    .setPositiveButton("Delete", null)
-                    .setNegativeButton("Cancel", null)
-                    .setCancelable(true);
-
-            // menu.add(Utils.FLAG_LIST_GROUP, Utils.DELETE_FLAG, 0, "Delete Flag");
-        }
-        else
-        {
-            builder.setView(inflater.inflate(R.layout.custom_dialog_layout, null))
-                    .setTitle("Edit")
-                    .setPositiveButton("Report", null)
-                    .setNegativeButton("Cancel", null)
-                    .setCancelable(true);
-
-                            /*
-                            ParseQuery<ParseObject> queryDelete = ParseQuery.getQuery("Reported_Posts");
-
-                            queryDelete.whereEqualTo("reported_by", ParseUser.getCurrentUser());
-                            queryDelete.whereEqualTo("reported_flag", mFlag);
-
-                            try {
-                                if (queryDelete.count() == 0) {
-                                    menu.add(Utils.FLAG_LIST_GROUP, Utils.REPORT_FLAG, 0, "Report Flag as inappropriate");
-                                } else {
-                                    menu.add(Utils.FLAG_LIST_GROUP, Utils.DELETE_REPORT_FLAG, 0, "Revoke Flag report");
-                                }
-                            } catch (ParseException e) {
-                                Log.e(TAG, e.getMessage());
-                            }
-                            */
-        }
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-
-        return true;
     }
 
     private void insertComment() {
@@ -664,17 +604,17 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
     private void wlbFlag(int code) {
         ParseQuery<CustomParseObject> queryWLB = ParseQuery.getQuery("Wow_Lol_Boo");
-        queryWLB.whereEqualTo("fbId", userId);
+        queryWLB.whereEqualTo("user", PlacesUser.getCurrentUser());
         queryWLB.whereEqualTo("flagId", flagId);
 
         switch (code) {
             case WOW_CODE:
-                queryWLB.findInBackground(new FindCallback<CustomParseObject>() {
+                queryWLB.getFirstInBackground(new GetCallback<CustomParseObject>() {
                     @Override
-                    public void done(List<CustomParseObject> markers, ParseException e) {
-                        if (e == null && markers.size() != 0) {
-                            CustomParseObject obj = markers.get(0);
-
+                    public void done(CustomParseObject obj, ParseException e)
+                    {
+                        if (e == null)
+                        {
                             boolean boolWow = obj.getBoolean("boolWow");
 
                             if (!boolWow) {
@@ -694,9 +634,11 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                     }
                                 });
                             }
-                        } else if (markers.size() == 0) {
-                            CustomParseObject obj = new CustomParseObject();
-                            obj.setUser(ParseUser.getCurrentUser());
+                        }
+                        else if (obj == null)
+                        {
+                            obj = new CustomParseObject();
+                            obj.setUser(PlacesUser.getCurrentUser());
                             obj.setFlagId(flagId);
                             obj.setFacebookId(PlacesLoginUtils.getInstance().getCurrentUserId());
                             obj.setWowBoolean(true);
@@ -706,130 +648,37 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                     updateWLBCount(WOW_CODE, true);
                                 }
                             });
-                        } else {
-                            Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
-                            Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
+
+                            Log.d(TAG, "No suitable entry found in wow table: " + e.getMessage());
+                        }
+                        else
+                        {
+                            Toast.makeText(getActivity(), "Error encountered while accessing database", Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "Error encountered while retrieving table entry on Parse.com");
                         }
                     }
                 });
 
                 break;
 
-            case LOL_CODE:
-                lolButton.setClickable(false);
-
-                queryWLB.findInBackground(new FindCallback<CustomParseObject>() {
-                    @Override
-                    public void done(List<CustomParseObject> markers, ParseException e) {
-                        if (e == null && markers.size() != 0) {
-                            CustomParseObject obj = markers.get(0);
-
-                            boolean boolLol = obj.getBoolean("boolLol");
-
-                            if (!boolLol) {
-                                obj.setLolBoolean(true);
-                                obj.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        updateWLBCount(LOL_CODE, true);
-                                    }
-                                });
-                            } else {
-                                obj.setLolBoolean(false);
-                                obj.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        updateWLBCount(LOL_CODE, false);
-                                    }
-                                });
-                            }
-                        } else if (markers.size() == 0) {
-                            CustomParseObject obj = new CustomParseObject();
-                            obj.setUser(ParseUser.getCurrentUser());
-                            obj.setFlagId(flagId);
-                            obj.setFacebookId(PlacesLoginUtils.getInstance().getCurrentUserId());
-                            obj.setLolBoolean(true);
-                            obj.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    updateWLBCount(LOL_CODE, true);
-                                }
-                            });
-                        } else {
-                            Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
-                            Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
-
-                            lolButton.setClickable(true);
-                        }
-                    }
-                });
-
+            default:
                 break;
-
-            case BOO_CODE:
-                booButton.setClickable(false);
-
-                queryWLB.findInBackground(new FindCallback<CustomParseObject>() {
-                    @Override
-                    public void done(List<CustomParseObject> markers, ParseException e) {
-                        if (e == null && markers.size() != 0) {
-                            CustomParseObject obj = markers.get(0);
-
-                            boolean boolBoo = obj.getBoolean("boolBoo");
-
-                            if (!boolBoo) {
-                                obj.setBooBoolean(true);
-                                obj.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        updateWLBCount(BOO_CODE, true);
-                                    }
-                                });
-                            } else {
-                                obj.setBooBoolean(false);
-                                obj.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        updateWLBCount(BOO_CODE, false);
-                                    }
-                                });
-                            }
-                        } else if (markers.size() == 0) {
-                            CustomParseObject obj = new CustomParseObject();
-                            obj.setUser(ParseUser.getCurrentUser());
-                            obj.setFlagId(flagId);
-                            obj.setFacebookId(PlacesLoginUtils.getInstance().getCurrentUserId());
-                            obj.setBooBoolean(true);
-                            obj.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    updateWLBCount(BOO_CODE, true);
-                                }
-                            });
-                        } else {
-                            Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
-                            Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
-
-                            booButton.setClickable(true);
-                        }
-                    }
-                });
-
         }
     }
 
-    private void updateWLBCount(int code, final boolean increment) {
+    private void updateWLBCount(int code, final boolean increment)
+    {
         ParseQuery<Flag> queryPosts = ParseQuery.getQuery("Posts");
         queryPosts.whereEqualTo("objectId", flagId);
 
         switch (code) {
             case WOW_CODE:
-                queryPosts.findInBackground(new FindCallback<Flag>() {
+                queryPosts.getFirstInBackground(new GetCallback<Flag>() {
                     @Override
-                    public void done(List<Flag> markers, ParseException e) {
-                        if (e == null && markers.size() != 0) {
-                            Flag flag = markers.get(0);
-
+                    public void done(Flag flag, ParseException e)
+                    {
+                        if (e == null)
+                        {
                             final int wowCount = flag.getInt("wowCount");
 
                             if (increment) {
@@ -857,93 +706,17 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 });
                 break;
 
-            /*
-            case LOL_CODE:
-                queryPosts.findInBackground(new FindCallback<Flag>() {
-                    @Override
-                    public void done(List<Flag> markers, ParseException e) {
-                        if (e == null && markers.size() != 0) {
-                            Flag flag = markers.get(0);
-
-                            final int lolCount = flag.getInt("lolCount");
-
-                            if (increment) {
-                                flag.increment("lolCount");
-
-                                flag.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        updateLolButtonText(true, lolCount + 1);
-
-                                        lolButton.setClickable(true);
-                                    }
-                                });
-                            } else {
-                                flag.increment("lolCount", -1);
-
-                                flag.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        updateLolButtonText(false, lolCount - 1);
-
-                                        lolButton.setClickable(true);
-                                    }
-                                });
-                            }
-                        } else {
-                            Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
-                            Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
-                        }
-                    }
-                });
-
+            default:
                 break;
-
-            case BOO_CODE:
-                queryPosts.findInBackground(new FindCallback<Flag>() {
-                    @Override
-                    public void done(List<Flag> markers, ParseException e) {
-                        if (e == null && markers.size() != 0) {
-                            Flag flag = markers.get(0);
-
-                            final int booCount = flag.getInt("booCount");
-
-                            if (increment) {
-                                flag.increment("booCount");
-
-                                flag.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        updateBooButtonText(true, booCount + 1);
-
-                                        booButton.setClickable(true);
-                                    }
-                                });
-                            } else {
-                                flag.increment("booCount", -1);
-
-                                flag.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        updateBooButtonText(false, booCount - 1);
-
-                                        booButton.setClickable(true);
-                                    }
-                                });
-                            }
-                        } else {
-                            Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
-                            Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
-
-                            booButton.setClickable(true);
-                        }
-                    }
-                });
-                */
         }
     }
 
-    private void updateWowStats(boolean wowed, int wowCount) {
+    private void updateWowStats(boolean wowed, int wowCount)
+    {
+        Log.d(TAG, "wowed: " + wowed + ", wowCount: " + wowCount);
+
+        wowStatText.setVisibility(View.VISIBLE);
+
         if (wowed) {
             if (wowCount == 1) {
                 wowStatText.setText("You WoWed this.");
@@ -954,8 +727,11 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             }
         } else {
             newWowButton.setChecked(false);
-            if (wowCount==0){
+            if (wowCount==0)
+            {
+                Log.d(TAG, "wowCount is 0");
                 wowStatText.setText("");
+                wowStatText.setVisibility(View.INVISIBLE);
             }
             else{
                 if(wowCount==1){
@@ -1005,11 +781,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             else{
                 Picasso.with(this.getActivity()).load(picture.getUrl()).into(this.iw);
             }
-            //ImageView focused_imageView = (ImageView) this.view.findViewById(R.id.focused_pic);
-            //Picasso.with(this.getActivity()).load(picture.getUrl()).into(focused_imageView);
-
-
-
+            ImageView focused_imageView = (ImageView) this.view.findViewById(R.id.focused_pic);
+            Picasso.with(this.getActivity()).load(picture.getUrl()).into(focused_imageView);
 
         } else {
             videoHolder.setVisibility(View.VISIBLE);

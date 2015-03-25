@@ -660,6 +660,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         bundle.putInt("wowCount", f.getWowCount());
         bundle.putInt("lolCount", f.getLolCount());
         bundle.putInt("booCount", f.getBooCount());
+        bundle.putBoolean("scrollToLastComment", true);
 
         bundle.putString("accountType", f.getAccountType());
 
