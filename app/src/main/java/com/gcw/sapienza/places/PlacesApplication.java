@@ -112,6 +112,7 @@ public class PlacesApplication extends Application {
             while(iter.hasNext()){
                 ILocationServiceListener currListener = iter.next();
                 if(currListener != null) {
+                    Log.d(TAG, "onServiceConnected, firing callback on: " + currListener.getClass());
                     currListener.onServiceConnected(serviceListeners.get(currListener));
                 }
                 iter.remove();

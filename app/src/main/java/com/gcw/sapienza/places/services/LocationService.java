@@ -43,6 +43,7 @@ import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -86,6 +87,9 @@ public class LocationService extends Service implements
 
     private HashMap<String, Flag> bagFlags;
 
+    //we store only one suspended request
+    private Integer suspendedRequest;
+
     private Location notificationLocation;
 
     private boolean noFlagsWarning;
@@ -128,6 +132,7 @@ public class LocationService extends Service implements
             queryParsewithCurrentUser();
             queryParsewithBag();
         }else{
+            suspendedRequest = Utils.DEFAULT_FLAGS_CODE;
             Log.d(TAG, "Last location is null!");
         }
     }
@@ -142,6 +147,7 @@ public class LocationService extends Service implements
                     queryParsewithLocation(currentLocation);
                 }
                 else{
+                    suspendedRequest = updateCode;
                     Log.d(TAG, "Last location is null!");
                 }
                 break;
@@ -154,6 +160,10 @@ public class LocationService extends Service implements
                 queryParsewithBag();
                 break;
 
+            case Utils.DEFAULT_FLAGS_CODE:
+                updateLocationData();
+                break;
+
             default:
                 Log.w(TAG, "Unrecognized Flag request code. Triggering default behavior...");
                 updateLocationData();
@@ -162,9 +172,13 @@ public class LocationService extends Service implements
 
     @Override
     public void onConnected(Bundle connectionHint) {
+
         Log.d(TAG, "Connected to Google Api");
+
         Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
-//        updateLocationData();
+        if(currentLocation != null && suspendedRequest != null){
+            updateLocationData(suspendedRequest);
+        }
         fusedLocationProviderApi.requestLocationUpdates(googleApiClient, locationRequest, this);
     }
 
