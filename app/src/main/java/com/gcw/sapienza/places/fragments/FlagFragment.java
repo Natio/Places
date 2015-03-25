@@ -474,6 +474,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
+                                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                imm.hideSoftInputFromWindow(userInput.getWindowToken(), 0);
+                                
                                 dialog.dismiss();
                             }
                         })
