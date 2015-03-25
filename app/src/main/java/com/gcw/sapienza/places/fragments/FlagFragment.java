@@ -410,8 +410,11 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             {
                 if (e == null && obj != null)
                 {
+                    String emptyString = "";
+
                     if (wowCount == 1) wowStatText.setText("You WoWed this.");
                     else if (wowCount == 2) wowStatText.setText("You and another placer WoWed this.");
+                    else if (wowCount == 0) wowStatText.setText(emptyString);
                     else wowStatText.setText("You and other " + wowCount + " WoWed this.");
                 }
             }
