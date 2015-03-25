@@ -38,10 +38,8 @@ public class Receiver extends ParsePushBroadcastReceiver {
                 extras.putString(Utils.FLAG_ID, flag_id);
 
                 i.putExtras(extras);
-                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(i);
-                //TODO the intent launches MainActivity but the flag is not opened
-
             } else {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW,
                         Uri.parse(UPDATES_REPO));
@@ -49,8 +47,6 @@ public class Receiver extends ParsePushBroadcastReceiver {
                 browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(browserIntent);
             }
-
-
         } catch (JSONException e) {
             Log.d(TAG, "Json error", e);
         }

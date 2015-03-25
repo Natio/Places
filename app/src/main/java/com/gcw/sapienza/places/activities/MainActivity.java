@@ -150,14 +150,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             Log.d(TAG, "Bundle is not null.");
 
             String bundleContentType = intent.getStringExtra("type");
-            if(bundleContentType != null && bundleContentType.equals(Utils.RECEIVED_NOTIF_COMMENT_TYPE))
+            if(bundleContentType == null || !bundleContentType.equals(Utils.RECEIVED_NOTIF_COMMENT_TYPE))
             {
-                Log.d(TAG, "String 'type' in bundle is not null.");
-
-                String flagId = intent.getStringExtra(Utils.FLAG_ID);
-                openFlagFromHome(flagId);
-            }
-            else{
                 Log.d(TAG, "String 'type' in bundle is null. Triggering default Activity behavior.");
 
                 PlacesApplication.getInstance().startLocationService();
@@ -172,6 +166,26 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
             this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
         }
+
+        // setIntent(null);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent)
+    {
+        super.onNewIntent(intent);
+
+        Log.d(TAG, "Is intent null? " + (intent==null));
+
+        String bundleContentType = intent.getStringExtra("type");
+        if(bundleContentType != null && bundleContentType.equals(Utils.RECEIVED_NOTIF_COMMENT_TYPE))
+        {
+            Log.d(TAG, "String 'type' in bundle is not null");
+
+            String flagId = intent.getStringExtra(Utils.FLAG_ID);
+            openFlagFromHome(flagId);
+        }
+        else Log.d(TAG, "String 'type' in bundle is null");
     }
 
     @Deprecated
@@ -246,6 +260,20 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
                 PlacesApplication.getInstance().startLocationService();
             }
         }
+
+        Intent intent = getIntent();
+
+        Log.d(TAG, "Is intent null? " + (intent==null));
+
+        String bundleContentType = intent.getStringExtra("type");
+        if(bundleContentType != null && bundleContentType.equals(Utils.RECEIVED_NOTIF_COMMENT_TYPE))
+        {
+            Log.d(TAG, "String 'type' in bundle is not null");
+
+            String flagId = intent.getStringExtra(Utils.FLAG_ID);
+            openFlagFromHome(flagId);
+        }
+        else Log.d(TAG, "String 'type' in bundle is null");
 
         isForeground = true;
     }

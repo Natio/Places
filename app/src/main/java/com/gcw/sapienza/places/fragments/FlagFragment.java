@@ -476,7 +476,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                             public void onClick(DialogInterface dialog, int id) {
                                 InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                                 imm.hideSoftInputFromWindow(userInput.getWindowToken(), 0);
-                                
+
                                 dialog.dismiss();
                             }
                         })
@@ -519,6 +519,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                             Utils.showToast(getActivity(), "Something went wrong while commenting", Toast.LENGTH_SHORT);
                                             Log.e(TAG, e.getMessage());
                                         }
+                                        scrollToLastComment = true;
                                         retrieveComments();
                                     }
                                 });
