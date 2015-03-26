@@ -483,17 +483,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                 comment.put("accountType", (PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.FACEBOOK) ? "fb" : "g+");
                                 comment.put("flag", FlagFragment.this.flag);
 
-                                    /*
-                                    FacebookUtils.getInstance().getFacebookUsernameFromID(PlacesLoginUtils.getInstance().getCurrentUserId(), new FacebookUtilCallback() {
-                                        @Override
-                                        public void onResult(String result, Exception e)
-                                        {
-                                            comment.setUsername(result);
-                                            comment.saveInBackground();
-                                        }
-                                    });
-                                    */
-
                                 String username = ((PlacesUser) ParseUser.getCurrentUser()).getName();
                                 if(username == null) username = PlacesLoginUtils.getInstance().getUserNameFromId(FlagFragment.this.flag.getFbId());
                                 if(username != null) comment.setUsername(username);
@@ -542,7 +531,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             videoView.pause();
             playVideoButton.setVisibility(View.VISIBLE);
         } else {
-            // videoView.resume();
             videoView.start();
             playVideoButton.setVisibility(View.GONE);
         }
@@ -723,17 +711,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             }
         }
     }
-/*
-    private void updateLolButtonText(boolean lold, int lolCount) {
-        if (lold) lolButton.setText("You lol this. (" + lolCount + ')');
-        else lolButton.setText("LOL (" + lolCount + ')');
-    }
 
-    private void updateBooButtonText(boolean booed, int booCount) {
-        if (booed) booButton.setText("You boo this. (" + booCount + ')');
-        else booButton.setText("BOO (" + booCount + ')');
-    }
-*/
     private void changeLayoutAccordingToMediaType() {
         if (mediaType == MediaType.NONE) {
             // TODO managing resizing of flags with very short text

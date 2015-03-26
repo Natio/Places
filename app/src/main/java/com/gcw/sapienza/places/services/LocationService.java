@@ -43,7 +43,6 @@ import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -288,14 +287,10 @@ public class LocationService extends Service implements
                             continue;
                         }
 
-                        Log.d(TAG, "Current Flag owner: " + currentFlagOwner + ", Current User: " + currentUserId);
-
                         if (!currentFlagOwner.equals(currentUserId)) {
                             bagFlags.put(currFlag.getObjectId(), currFlag);
                         }
                     }
-
-                    Log.d(TAG, "Bag size Hash: " + bagFlags.size());
 
                     updateBagFlags();
 
@@ -362,18 +357,6 @@ public class LocationService extends Service implements
         boolean food_check = preferences.getBoolean("foodCheck", true);
         boolean none_check = preferences.getBoolean("noneCheck", true);
         boolean music_check = preferences.getBoolean("musicCheck", true);
-
-        Log.v(TAG, "Lone Wolf enabled: " + lone_wolf);
-        Log.v(TAG, "With Friends Surrounded enabled: " + with_friends_surrounded);
-        Log.v(TAG, "Storytellers In The Dark enabled: " + storytellers_in_the_dark);
-        Log.v(TAG, "Archaeologist enabled: " + archaeologist);
-
-        Log.v(TAG, "Thoughts enabled: " + thoughts_check);
-        Log.v(TAG, "Fun enabled: " + fun_check);
-        Log.v(TAG, "Landscape: " + landscape_check);
-        Log.v(TAG, "Food: " + food_check);
-        Log.v(TAG, "None: " + none_check);
-        Log.v(TAG, "Music: " + music_check);
 
         if (PlacesLoginUtils.getInstance().hasCurrentUserId() == false) {
             final android.os.Handler handler = new android.os.Handler();
@@ -471,7 +454,6 @@ public class LocationService extends Service implements
                 Iterator<Flag> iterParseObjects = flags.iterator();
                 while (iterParseObjects.hasNext()) {
                     Flag currFlag = iterParseObjects.next();
-                    Log.d(TAG, "Flags distance: " + currFlag.getLocation().distanceInKilometersTo(gp) + ", while: " + Utils.MAP_RADIUS);
                     if (currFlag.getLocation().distanceInKilometersTo(gp) > Utils.MAP_RADIUS) {
                         hiddenFlags.add(currFlag);
                         iterParseObjects.remove();
@@ -483,9 +465,6 @@ public class LocationService extends Service implements
                 for (Flag f : hiddenFlags) {
                     LocationService.this.hiddenFlags.put(f.getObjectId(), f);
                 }
-                Log.d(TAG, "Found " + flags.size() +
-                        " flags within " + Utils.DISCOVER_MODE_RADIUS + " km");
-
                 updateNearbyFlagsAndLocation();
 
                 if (flags.size() > 0) {
@@ -519,10 +498,8 @@ public class LocationService extends Service implements
         }
         long elapsed_time = location.getTime() -
                 (this.location == null ? 0L : this.location.getTime());
-        Log.d(TAG, "Elapsed time: " + elapsed_time);
         if (this.location != null) {
             float distance = location.distanceTo(this.location) / KM_TO_M;
-            Log.d(TAG, "Distance from last known location: " + distance);
         }
         this.location = location;
         queryParsewithLocation(location);
