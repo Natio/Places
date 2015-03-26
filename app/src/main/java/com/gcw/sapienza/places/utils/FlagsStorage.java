@@ -34,7 +34,7 @@ public final class FlagsStorage {
 
     public enum Type{
         NEARBY, // nearby flags
-        MY, ///my flags
+        MY, //my flags
         HIDDEN, //hidden flags
         BAG// bag flags
     }
@@ -87,7 +87,6 @@ public final class FlagsStorage {
     public List<Flag> getOrderedFlags(Context context, Type type) {
 
         List<Flag> flags = this.fetchFlagsWithType(type);
-
 
         SharedPreferences preferences;
 
