@@ -199,7 +199,7 @@ public class LocationService extends Service implements
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
         query.whereEqualTo("fbId", PlacesLoginUtils.getInstance().getCurrentUserId());
         query.orderByDescending("createdAt");
-        query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE);
+        query.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
         query.findInBackground(new FindCallback<Flag>() {
             @Override
             public void done(List<Flag> flags, ParseException e) {
@@ -240,23 +240,23 @@ public class LocationService extends Service implements
 
         query.include("flag");
 
-        query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE);
+        query.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
         query.findInBackground(new FindCallback<Comment>() {
             @Override
             public void done(List<Comment> comments, ParseException e) {
                 if (e != null) {
                     Log.e(TAG, e.getMessage());
-                    Toast.makeText(getBaseContext(), "Cannot fetch your bag Flags at the moment,\ntry again later", Toast.LENGTH_SHORT);
+                    Toast.makeText(getBaseContext(), "Cannot fetch your bag Flags at the moment,\ntry again later", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 else
                 {
                     if (comments == null)
                     {
-                        comments = new ArrayList();
+                        comments = new ArrayList<>();
                     }
 
-                    String currentUserId = null;
+                    String currentUserId;
 
                     try
                     {
@@ -358,12 +358,12 @@ public class LocationService extends Service implements
         boolean none_check = preferences.getBoolean("noneCheck", true);
         boolean music_check = preferences.getBoolean("musicCheck", true);
 
-        if (PlacesLoginUtils.getInstance().hasCurrentUserId() == false) {
+        if (!PlacesLoginUtils.getInstance().hasCurrentUserId()) {
             final android.os.Handler handler = new android.os.Handler();
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (PlacesLoginUtils.getInstance().hasCurrentUserId() == false) {
+                    if (!PlacesLoginUtils.getInstance().hasCurrentUserId()) {
                         handler.postDelayed(this, Utils.UPDATE_DELAY);
                     } else {
                         queryParsewithLocation(LocationService.this.location);
