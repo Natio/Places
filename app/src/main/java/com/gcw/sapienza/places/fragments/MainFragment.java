@@ -63,7 +63,7 @@ public class MainFragment extends PlacesMapListFragment{
      */
     @Override
     protected  List<Flag> getData(){
-        return FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), Type.NEARBY );
+        return FlagsStorage.getSharedStorage().fetchFlagsWithType(Type.NEARBY);
     }
 
     @Override

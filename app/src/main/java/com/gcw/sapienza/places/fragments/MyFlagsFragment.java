@@ -61,7 +61,7 @@ public class MyFlagsFragment extends PlacesMapListFragment{
      */
     @Override
     protected  List<Flag> getData(){
-       return FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), FlagsStorage.Type.MY);
+       return FlagsStorage.getSharedStorage().fetchFlagsWithType(FlagsStorage.Type.MY);
     }
 
     @Override
