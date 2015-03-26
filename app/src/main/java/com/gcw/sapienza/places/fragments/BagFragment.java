@@ -13,7 +13,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,10 +21,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
@@ -55,17 +51,11 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
         GoogleMap.OnMarkerClickListener{
     private static final String TAG = "BagFragment";
 
-    private View view;
     private GoogleMap gMap;
     private BroadcastReceiver receiver;
     private RelativeLayout progressBarHolder;
     private MSwipeRefreshLayout srl;
     private FragmentActivity myContext;
-    private List<Flag> flags;
-    private TextView progressTextView;
-    private DrawerLayout drawerLayout;
-    private LinearLayout homeHolder;
-    private FrameLayout fragHolder;
 
     private List<Marker> markers;
 
@@ -114,13 +104,9 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        view = inflater.inflate(R.layout.my_flags_layout, container, false);
+        View view = inflater.inflate(R.layout.my_flags_layout, container, false);
 
         this.progressBarHolder = (RelativeLayout) view.findViewById(R.id.frame_layout);
-        this.progressTextView = (TextView) view.findViewById(R.id.share_progress_text_view);
-
-        this.homeHolder = (LinearLayout) view.findViewById(R.id.my_home_container);
-        this.fragHolder = (FrameLayout) view.findViewById(R.id.my_frag_container);
 
         srl = (MSwipeRefreshLayout) view.findViewById(R.id.my_swipe_refresh);
         srl.setOnRefreshListener(this);
@@ -246,9 +232,9 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
 
         this.markers = new ArrayList<>();
 
-        this.flags = FlagsStorage.getSharedStorage().fetchFlagsWithType(FlagsStorage.Type.BAG );
+        List<Flag> flags = FlagsStorage.getSharedStorage().fetchFlagsWithType(FlagsStorage.Type.BAG);
 
-        if (this.flags != null && this.gMap != null) {
+        if (flags != null && this.gMap != null) {
             this.gMap.clear();
 
             //zooms around all the Flags
@@ -256,7 +242,7 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
 
             int index = 0;
 
-            for (Flag f : this.flags) {
+            for (Flag f : flags) {
 //                Log.d(TAG, "===FLAG DATA===");
 //                Log.d(TAG, f.getObjectId());
 //                Log.d(TAG, f.getText());
@@ -278,7 +264,7 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
                 Marker newMarker = this.gMap.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title(text)
-                        .snippet(index + "")
+                        .snippet( String.valueOf(index) )
                         .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
                                 // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
                                 //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
@@ -287,7 +273,7 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
                 index++;
             }
 
-            if (this.flags.size() > 0) {
+            if (flags.size() > 0) {
                 LatLngBounds bounds = builder.build();
 //                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
                 this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
