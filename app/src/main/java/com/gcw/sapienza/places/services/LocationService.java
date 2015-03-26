@@ -282,7 +282,7 @@ public class LocationService extends Service implements
 
                         }catch (NullPointerException ex2){
 
-                            Log.e(TAG, ex2.getMessage());
+                            Log.e(TAG, "Error", ex2);
 
                             continue;
                         }
