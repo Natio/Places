@@ -28,7 +28,7 @@ public class BagFragment extends PlacesMapListFragment{
      */
     @Override
     protected  void onBroadcastReceived(Context context, Intent intent) {
-        Log.d(TAG, "Intent broadcast ricevuto: " + intent.getAction());
+        Log.d(TAG, "Broadcast intent received: " + intent.getAction());
     }
 
     /**

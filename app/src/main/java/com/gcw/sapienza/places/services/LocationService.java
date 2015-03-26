@@ -86,7 +86,7 @@ public class LocationService extends Service implements
 
     private List<Flag> myFlags;
 
-    private HashSet<Flag> bagFlags;
+    private HashMap<String, Flag> bagFlags;
 
     //we store only one suspended request
     private Integer suspendedRequest;
@@ -231,11 +231,10 @@ public class LocationService extends Service implements
     public void queryParsewithBag() {
         Log.d(TAG, "Running queryParsewithBag...");
 
-        bagFlags = new HashSet<>();
+        bagFlags = new HashMap<>();
 
         ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
         query.whereEqualTo("commenter", ParseUser.getCurrentUser());
-        query.orderByDescending("createdAt");
         query.include("flag");
         query.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
         query.findInBackground(new FindCallback<Comment>() {
@@ -285,7 +284,7 @@ public class LocationService extends Service implements
                         }
 
                         if (!currentFlagOwner.equals(currentUserId)) {
-                            bagFlags.add(currFlag);
+                            bagFlags.put(currFlag.getObjectId(), currFlag);
                         }
                     }
 
@@ -601,7 +600,7 @@ public class LocationService extends Service implements
             listener.setFlagsNearby(flagsNearby);
             listener.setHiddenFlags(hiddenFlags);
             listener.setMyFlags(myFlags);
-            listener.setBagFlags(bagFlags);
+            listener.setBagFlags(bagFlags.values());
         }
     }
 
@@ -620,7 +619,7 @@ public class LocationService extends Service implements
 
     private void updateBagFlags(){
         if (listener != null) {
-            listener.setBagFlags(bagFlags);
+            listener.setBagFlags(bagFlags.values());
         }
     }
 
