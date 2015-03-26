@@ -373,7 +373,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     }
 
     private void showProfilePage() {
-        ((MainActivity) getActivity()).switchToOtherFrag(ProfileFragment.newInstance(this.flag.getFbId(), this.flag.getAccountType()));
+        ((MainActivity) getActivity()).switchToOtherFrag(ProfileFragment.newInstance(this.flag.getOwner()));
     }
 
     private void updateWowInfo() {

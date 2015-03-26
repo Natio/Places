@@ -36,6 +36,7 @@ import com.gcw.sapienza.places.fragments.MainFragment;
 import com.gcw.sapienza.places.fragments.MyFlagsFragment;
 import com.gcw.sapienza.places.fragments.ProfileFragment;
 import com.gcw.sapienza.places.fragments.SettingsFragment;
+import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.services.ILocationServiceListener;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.GPlusUtils;
@@ -325,13 +326,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     }
 
     private void myProfile() {
-
-        String at;
-
-        if (PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.FACEBOOK) at = "fb";
-        else at = "g+";
-
-        switchToOtherFrag(ProfileFragment.newInstance(PlacesLoginUtils.getInstance().getCurrentUserId(), at));
+        switchToOtherFrag(ProfileFragment.newInstance((PlacesUser)PlacesUser.getCurrentUser()));
     }
 
     private void logout() {
@@ -651,13 +646,10 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             @Override
             public void done(Flag flag, com.parse.ParseException e)
             {
-                if(e != null)
-                {
+                if(e != null){
                     Log.d(TAG, e.getMessage());
-                    return;
                 }
-                else
-                {
+                else{
                     openFlag(flag);
                 }
             }

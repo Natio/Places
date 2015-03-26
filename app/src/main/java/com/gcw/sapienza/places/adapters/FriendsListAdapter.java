@@ -11,8 +11,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gcw.sapienza.places.R;
-import com.gcw.sapienza.places.activities.MainActivity;
-import com.gcw.sapienza.places.fragments.ProfileFragment;
 import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.parse.GetCallback;
@@ -58,22 +56,25 @@ public class FriendsListAdapter extends ArrayAdapter<String> {
 
         ParseQuery<PlacesUser> queryUsers = ParseQuery.getQuery("_User");
         queryUsers.whereEqualTo(PlacesUser.FACEBOOK_ID_KEY, friendId);
+        queryUsers.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
         queryUsers.getFirstInBackground(new GetCallback<PlacesUser>() {
             @Override
             public void done(final PlacesUser placesUser, ParseException e) {
 
                 if (e == null) {
-
+                    Log.d(TAG, placesUser.getName());
                     friendNameView.setText(placesUser.getName());
                     PlacesLoginUtils.getInstance().addEntryToUserIdMap(friendId, placesUser.getName());
                     PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(friendId, friendImageView, PlacesLoginUtils.PicSize.LARGE, placesUser.getAccountType());
-
+/*
                     v.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            ((MainActivity) getContext()).switchToOtherFrag(new ProfileFragment().newInstance(friendId, placesUser.getAccountType()));
+                            Log.d(TAG, "Click");
+                            ((MainActivity) getContext()).switchToOtherFrag(ProfileFragment.newInstance(placesUser));
                         }
                     });
+                    */
                 } else {
 
                     Log.e(TAG, e.getMessage());
@@ -83,12 +84,6 @@ public class FriendsListAdapter extends ArrayAdapter<String> {
             }
         });
 
-        /*
-        }else{
-            String friendName = PlacesLoginUtils.getInstance().getUserNameFromId(friendId);
-            friendNameView.setText(friendName);
-        }
-        */
 
         return v;
     }
