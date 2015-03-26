@@ -1,7 +1,6 @@
 package com.gcw.sapienza.places;
 
 import android.app.Application;
-import android.app.IntentService;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +13,6 @@ import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.gcw.sapienza.places.models.Comment;
 import com.gcw.sapienza.places.models.CommentReport;
@@ -28,9 +26,7 @@ import com.gcw.sapienza.places.services.JSONWeatherTask;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.services.LocationService.LocalBinder;
 import com.gcw.sapienza.places.utils.Utils;
-import com.parse.ConfigCallback;
 import com.parse.Parse;
-import com.parse.ParseConfig;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseInstallation;
@@ -43,7 +39,6 @@ import com.squareup.picasso.Picasso;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -164,6 +159,7 @@ public class PlacesApplication extends Application {
     /**
      * @return returns LocationService instance
      */
+    @SuppressWarnings("unused declaration")
     public LocationService getLocationService() {
         return this.mService;
     }
@@ -228,6 +224,7 @@ public class PlacesApplication extends Application {
         return new ArrayList<>(this.bagFlags.values());
     }
 
+    /*
     public Flag getFlagWithId(String id) {
         if (this.flagsNearby.get(id) != null)
             return this.flagsNearby.get(id);
@@ -238,10 +235,10 @@ public class PlacesApplication extends Application {
         else if (this.bagFlags.get(id) != null)
             return this.bagFlags.get(id);
         else {
-            Utils.showToast(getPlacesAppContext(), "There was a problem retrieving Flag data", Toast.LENGTH_SHORT);
+            Utils.showToast(PLACES_CONTEXT, "There was a problem retrieving Flag data", Toast.LENGTH_SHORT);
             return null;
         }
-    }
+    }*/
 
     //method called when the app is launched
     @Override
@@ -267,17 +264,7 @@ public class PlacesApplication extends Application {
         // initialize Parse.com
         Parse.initialize(this, PARSE_COM_APP_KEY, PARSE_COM_CLIENT_KEY);
         ParseFacebookUtils.initialize(getString(R.string.app_id));
-        ParseConfig.getInBackground(new ConfigCallback() {
-            @Override
-            public void done(ParseConfig parseConfig, ParseException e) {
-                if (e != null) {
-                    // Log.d(TAG, "Error while configuring: "+e.getMessage());
-                    Log.d(TAG, "Error while configuring Parse");
-                } else {
-                    Log.d(TAG, "Got new Configuration");
-                }
-            }
-        });
+
 //        PushService.setDefaultPushCallback(this, MainActivity.class);
 
 
@@ -307,6 +294,7 @@ public class PlacesApplication extends Application {
         if (hasToSaveInstallation) {
             ParseInstallation.getCurrentInstallation().saveInBackground();
         }
+
     }
 
     public void startLocationService() {
@@ -359,9 +347,7 @@ public class PlacesApplication extends Application {
                 JSONWeatherTask task = new JSONWeatherTask();
                 task.execute(locality + ',' + cc);
             }
-        } catch (IOException e) {
-            Log.e(TAG, "No locality found! Error: " + e.getMessage());
-        } catch (NullPointerException e){
+        } catch (IOException | NullPointerException e) {
             Log.e(TAG, "No locality found! Error: " + e.getMessage());
         }
 
