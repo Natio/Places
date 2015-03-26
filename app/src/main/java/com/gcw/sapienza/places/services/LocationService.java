@@ -601,29 +601,29 @@ public class LocationService extends Service implements
     private void updateApplication() {
         if (listener != null) {
             listener.setLocation(location);
-            listener.setFlagsNearby(flagsNearby);
-            listener.setHiddenFlags(hiddenFlags);
-            listener.setMyFlags(myFlags);
-            listener.setBagFlags(bagFlags);
+            listener.setFlagsNearby(flagsNearby.values());
+            listener.setHiddenFlags(hiddenFlags.values());
+            listener.setMyFlags(myFlags.values());
+            listener.setBagFlags(bagFlags.values());
         }
     }
 
     private void updateNearbyFlagsAndLocation(){
         if (listener != null) {
             listener.setLocation(location);
-            listener.setFlagsNearby(flagsNearby);
+            listener.setFlagsNearby(flagsNearby.values());
         }
     }
 
     private void updateMyFlags(){
         if (listener != null) {
-            listener.setMyFlags(myFlags);
+            listener.setMyFlags(myFlags.values());
         }
     }
 
     private void updateBagFlags(){
         if (listener != null) {
-            listener.setBagFlags(bagFlags);
+            listener.setBagFlags(bagFlags.values());
         }
     }
 

@@ -32,6 +32,7 @@ import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.services.LocationService;
+import com.gcw.sapienza.places.utils.FlagsStorage;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -245,7 +246,7 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
 
         this.markers = new ArrayList<>();
 
-        this.flags = Utils.getOrderedFlags(getActivity(), Utils.BAG_FLAGS_CODE);
+        this.flags = FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), FlagsStorage.Type.BAG );
 
         if (this.flags != null && this.gMap != null) {
             this.gMap.clear();

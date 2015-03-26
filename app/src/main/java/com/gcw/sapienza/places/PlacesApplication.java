@@ -25,6 +25,7 @@ import com.gcw.sapienza.places.services.ILocationUpdater;
 import com.gcw.sapienza.places.services.JSONWeatherTask;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.services.LocationService.LocalBinder;
+import com.gcw.sapienza.places.utils.FlagsStorage;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.Parse;
 import com.parse.ParseException;
@@ -37,7 +38,7 @@ import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -58,10 +59,7 @@ public class PlacesApplication extends Application {
     private static PlacesApplication placesApplication;
     //current location
     private Location currentLocation = null;
-    private HashMap<String, Flag> flagsNearby = new HashMap<>(0);
-    private HashMap<String, Flag> myFlags = new HashMap<>(0);
-    private HashMap<String, Flag> hiddenFlags = new HashMap<>(0);
-    private HashMap<String, Flag> bagFlags = new HashMap<>(0);
+
     private HashMap<ILocationServiceListener, Integer> serviceListeners = new HashMap<>();
     private ILocationUpdater listener = new ILocationUpdater() {
         @Override
@@ -71,23 +69,23 @@ public class PlacesApplication extends Application {
         }
 
         @Override
-        public void setFlagsNearby(HashMap<String, Flag> l) {
-            if (l != null) PlacesApplication.this.flagsNearby = l;
+        public void setFlagsNearby(Collection<Flag> l) {
+            if (l != null) FlagsStorage.getSharedStorage().storeFlagsWithType(l, FlagsStorage.Type.NEARBY);
         }
 
         @Override
-        public void setHiddenFlags(HashMap<String, Flag> l) {
-            if (l != null) PlacesApplication.this.hiddenFlags = l;
+        public void setHiddenFlags(Collection<Flag> l) {
+            if (l != null) FlagsStorage.getSharedStorage().storeFlagsWithType(l, FlagsStorage.Type.HIDDEN);
         }
 
         @Override
-        public void setMyFlags(HashMap<String, Flag> myFlags) {
-            if (myFlags != null) PlacesApplication.this.myFlags = myFlags;
+        public void setMyFlags(Collection<Flag> myFlags) {
+            if (myFlags != null) FlagsStorage.getSharedStorage().storeFlagsWithType(myFlags, FlagsStorage.Type.MY);
         }
 
         @Override
-        public void setBagFlags(HashMap<String, Flag> bagFlags) {
-            if (bagFlags != null) PlacesApplication.this.bagFlags = bagFlags;
+        public void setBagFlags(Collection<Flag> bagFlags) {
+            if (bagFlags != null) FlagsStorage.getSharedStorage().storeFlagsWithType(bagFlags, FlagsStorage.Type.BAG);
         }
     };
     private LocationService mService;
@@ -198,31 +196,7 @@ public class PlacesApplication extends Application {
         return this.currentLocation;
     }
 
-    /**
-     * @return returns the list of flags around user's location, filtered according to settings
-     */
-    public List<Flag> getFlags() { return new ArrayList<>(this.flagsNearby.values()); }
 
-    /**
-     * @return returns the list of all the Flags the user has posted
-     */
-    public List<Flag> getMyFlags() {
-        return new ArrayList<>(this.myFlags.values());
-    }
-
-    /**
-     * @return returns the list of all the Flags hidden for Discover Mode
-     */
-    public List<Flag> getHiddenFlags() {
-        return new ArrayList<>(this.hiddenFlags.values());
-    }
-
-    /**
-     * @return returns the list of all the Flags for Bag page
-     */
-    public List<Flag> getBagFlags() {
-        return new ArrayList<>(this.bagFlags.values());
-    }
 
     /*
     public Flag getFlagWithId(String id) {

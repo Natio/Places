@@ -1,25 +1,18 @@
 package com.gcw.sapienza.places.utils;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
-import com.gcw.sapienza.places.models.Flag;
-import com.gcw.sapienza.places.models.FlagComparator;
+
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+
 
 
 /**
@@ -208,43 +201,4 @@ public class Utils {
         Toast.makeText(context, text, duration).show();
     }
 
-    public static List<Flag> getOrderedFlags(Context context, int flagsCode) {
-
-        List<Flag> flags;
-        switch (flagsCode){
-            case NEARBY_FLAGS_CODE:
-                flags = PlacesApplication.getInstance().getFlags();
-                break;
-            case MY_FLAGS_CODE:
-                flags = PlacesApplication.getInstance().getMyFlags();
-                break;
-            case BAG_FLAGS_CODE:
-                flags = PlacesApplication.getInstance().getBagFlags();
-                break;
-            default:
-                Log.e(TAG, "Cannot find requested flags");
-                Utils.showToast(context, "Something went wrong while retrieving Flags", Toast.LENGTH_SHORT);
-                return new ArrayList<>();
-        }
-
-        SharedPreferences preferences;
-
-        try {
-            preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        }catch (NullPointerException e){
-            Log.e(TAG, e.getMessage());
-            Utils.showToast(context, "There was a problem retrieving Flags data", Toast.LENGTH_SHORT);
-            return flags;
-        }
-
-        boolean archaeologist = preferences.getBoolean("timeFilter", false);
-
-        //we make the 'archeologist' setting work also for MyFlag and Bag pages
-        if(archaeologist){
-            Collections.sort(flags, new FlagComparator(true));
-        }else{
-            Collections.sort(flags, new FlagComparator(false));
-        }
-        return flags;
-    }
 }

@@ -19,13 +19,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.android.Util;
-import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.adapters.FlagsAdapter;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.services.LocationService;
+import com.gcw.sapienza.places.utils.FlagsStorage;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.DeleteCallback;
 
@@ -45,7 +44,8 @@ public class MyFlagsListFragment extends Fragment {
                 case LocationService.FOUND_MY_FLAGS_NOTIFICATION:
                     noFlagLayout.setVisibility(View.GONE);
                     recycleView.setVisibility(View.VISIBLE);
-                    MyFlagsListFragment.this.updateRecycleViewWithNewContents(Utils.getOrderedFlags(getActivity(), Utils.MY_FLAGS_CODE));
+                    List<Flag> sorted = FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), FlagsStorage.Type.MY);
+                    MyFlagsListFragment.this.updateRecycleViewWithNewContents(sorted);
                     break;
 
                 case LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION:
@@ -87,7 +87,8 @@ public class MyFlagsListFragment extends Fragment {
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_MY_FLAGS_NOTIFICATION));
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION));
 
-        this.updateRecycleViewWithNewContents(Utils.getOrderedFlags(getActivity(), Utils.MY_FLAGS_CODE));
+        List<Flag> sorted = FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), FlagsStorage.Type.MY);
+        this.updateRecycleViewWithNewContents(sorted);
 
         registerForContextMenu(recycleView);
 

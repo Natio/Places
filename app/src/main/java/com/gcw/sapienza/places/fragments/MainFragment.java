@@ -30,6 +30,8 @@ import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.services.LocationService;
+import com.gcw.sapienza.places.utils.FlagsStorage;
+import com.gcw.sapienza.places.utils.FlagsStorage.Type;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -215,7 +217,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
         this.markers = new ArrayList<>();
 
-        List<Flag> flags = Utils.getOrderedFlags(getActivity(), Utils.NEARBY_FLAGS_CODE);
+        List<Flag> flags = FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), Type.NEARBY);
 
         Log.d(TAG, "Updating markers on map...flags size: " + flags.size());
 
@@ -256,7 +258,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
             if (isDiscoverModeEnabled()) {
 
-                List<Flag> hiddenFlags = PlacesApplication.getInstance().getHiddenFlags();
+                List<Flag> hiddenFlags = FlagsStorage.getSharedStorage().fetchFlagsWithType(Type.HIDDEN);
 
                 Log.d(TAG, "Hidden Flags size: " + hiddenFlags.size());
 

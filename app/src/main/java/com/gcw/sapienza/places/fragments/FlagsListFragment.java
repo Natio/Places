@@ -4,9 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
@@ -21,15 +19,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.android.Util;
-import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.adapters.FlagsAdapter;
 import com.gcw.sapienza.places.models.Flag;
-import com.gcw.sapienza.places.models.FlagComparator;
 import com.gcw.sapienza.places.models.FlagReport;
 import com.gcw.sapienza.places.services.LocationService;
+import com.gcw.sapienza.places.utils.FlagsStorage;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.DeleteCallback;
 import com.parse.GetCallback;
@@ -39,7 +35,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -58,7 +53,8 @@ public class FlagsListFragment extends Fragment {
                 case LocationService.FOUND_NEW_FLAGS_NOTIFICATION:
                     noFlagLayout.setVisibility(View.GONE);
                     recycleView.setVisibility(View.VISIBLE);
-                    FlagsListFragment.this.updateRecycleViewWithNewContents(Utils.getOrderedFlags(getActivity(), Utils.NEARBY_FLAGS_CODE));
+                    List<Flag> ordered = FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), FlagsStorage.Type.NEARBY);
+                    FlagsListFragment.this.updateRecycleViewWithNewContents(ordered);
                     break;
                 case LocationService.FOUND_NO_FLAGS_NOTIFICATION:
                     noFlagsText.setText("No Flags nearbly (yet!) :(");
@@ -98,7 +94,8 @@ public class FlagsListFragment extends Fragment {
 
 
 
-        this.updateRecycleViewWithNewContents(Utils.getOrderedFlags(getActivity(), Utils.NEARBY_FLAGS_CODE));
+        List<Flag> ordered = FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), FlagsStorage.Type.NEARBY);
+        this.updateRecycleViewWithNewContents(ordered);
 
         registerForContextMenu(recycleView);
 

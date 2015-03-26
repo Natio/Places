@@ -19,12 +19,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.adapters.FlagsAdapter;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.services.LocationService;
+import com.gcw.sapienza.places.utils.FlagsStorage;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.DeleteCallback;
 
@@ -44,7 +44,8 @@ public class MyBagFlagsListFragment extends Fragment {
                 case LocationService.FOUND_BAG_FLAGS_NOTIFICATION:
                     noFlagLayout.setVisibility(View.GONE);
                     recycleView.setVisibility(View.VISIBLE);
-                    MyBagFlagsListFragment.this.updateRecycleViewWithNewContents(Utils.getOrderedFlags(getActivity(), Utils.BAG_FLAGS_CODE));
+                    List<Flag> sorted = FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), FlagsStorage.Type.BAG);
+                    MyBagFlagsListFragment.this.updateRecycleViewWithNewContents(sorted);
                     break;
 
                 case LocationService.FOUND_NO_BAG_FLAGS_NOTIFICATION:
@@ -86,7 +87,8 @@ public class MyBagFlagsListFragment extends Fragment {
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_BAG_FLAGS_NOTIFICATION));
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_BAG_FLAGS_NOTIFICATION));
 
-        this.updateRecycleViewWithNewContents(Utils.getOrderedFlags(getActivity(), Utils.BAG_FLAGS_CODE));
+        List<Flag> sorted = FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), FlagsStorage.Type.BAG);
+        this.updateRecycleViewWithNewContents(sorted);
 
         registerForContextMenu(recycleView);
 
