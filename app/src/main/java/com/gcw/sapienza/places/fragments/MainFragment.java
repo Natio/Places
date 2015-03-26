@@ -217,7 +217,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, SwipeR
 
         this.markers = new ArrayList<>();
 
-        List<Flag> flags = FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), Type.NEARBY);
+        List<Flag> flags = FlagsStorage.getSharedStorage().fetchFlagsWithType(Type.NEARBY);
 
         Log.d(TAG, "Updating markers on map...flags size: " + flags.size());
 

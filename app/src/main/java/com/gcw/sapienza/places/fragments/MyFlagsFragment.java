@@ -246,7 +246,7 @@ public class MyFlagsFragment extends Fragment implements OnMapReadyCallback, Swi
 
     private void updateMarkersOnMap() {
 
-        this.flags = FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), FlagsStorage.Type.MY);
+        this.flags = FlagsStorage.getSharedStorage().fetchFlagsWithType(FlagsStorage.Type.MY);
 
         this.markers = new ArrayList<>();
 

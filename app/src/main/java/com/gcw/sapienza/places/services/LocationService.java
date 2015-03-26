@@ -75,16 +75,17 @@ public class LocationService extends Service implements
     private static GoogleApiClient googleApiClient;
     private static FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
     private final IBinder mBinder = new LocalBinder();
-    private HashMap<String, Long> cachedFlags = new HashMap<>();
     private Location location;
     private ILocationUpdater listener;
 
-    private HashMap<String, Flag> flagsNearby;
-    private HashMap<String, Flag> hiddenFlags;
+    private HashMap<String, Long> cachedFlags;
 
-    private HashMap<String, Flag> myFlags;
+    private List<Flag> flagsNearby;
+    private List<Flag> hiddenFlags;
 
-    private HashMap<String, Flag> bagFlags;
+    private List<Flag> myFlags;
+
+    private List<Flag> bagFlags;
 
     //we store only one suspended request
     private Integer suspendedRequest;
@@ -207,12 +208,9 @@ public class LocationService extends Service implements
                     Toast.makeText(getBaseContext(), "Cannot fetch your Flags at the moment,\ntry again later", Toast.LENGTH_SHORT);
                 }
                 if (flags == null) {
-                    flags = new ArrayList<Flag>();
+                    flags = new ArrayList<>();
                 }
-                LocationService.this.myFlags = new HashMap<String, Flag>();
-                for (Flag f : flags) {
-                    LocationService.this.myFlags.put(f.getObjectId(), f);
-                }
+                LocationService.this.myFlags = flags;
 
                 updateMyFlags();
 
@@ -232,14 +230,12 @@ public class LocationService extends Service implements
     public void queryParsewithBag() {
         Log.d(TAG, "Running queryParsewithBag...");
 
-        bagFlags = new HashMap<>();
+        bagFlags = new ArrayList<>();
 
         ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
         query.whereEqualTo("commenter", ParseUser.getCurrentUser());
         query.orderByDescending("createdAt");
-
         query.include("flag");
-
         query.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
         query.findInBackground(new FindCallback<Comment>() {
             @Override
@@ -288,7 +284,7 @@ public class LocationService extends Service implements
                         }
 
                         if (!currentFlagOwner.equals(currentUserId)) {
-                            bagFlags.put(currFlag.getObjectId(), currFlag);
+                            bagFlags.add(currFlag);
                         }
                     }
 
@@ -324,8 +320,8 @@ public class LocationService extends Service implements
         }
 
         if (flagsNearby == null) {
-            flagsNearby = new HashMap<>(0);
-            hiddenFlags = new HashMap<>(0);
+            flagsNearby = new ArrayList<>();
+            hiddenFlags = new ArrayList<>();
         } else {
             flagsNearby.clear();
             hiddenFlags.clear();
@@ -413,8 +409,8 @@ public class LocationService extends Service implements
                 }
 
                 if (flagsNearby == null) {
-                    flagsNearby = new HashMap<>(0);
-                    hiddenFlags = new HashMap<>(0);
+                    flagsNearby = new ArrayList<>();
+                    hiddenFlags = new ArrayList<>();
                 } else {
                     flagsNearby.clear();
                     hiddenFlags.clear();
@@ -458,10 +454,10 @@ public class LocationService extends Service implements
                     }
                 }
                 for (Flag f : flags) {
-                    LocationService.this.flagsNearby.put(f.getObjectId(), f);
+                    LocationService.this.flagsNearby.add(f);
                 }
                 for (Flag f : hiddenFlags) {
-                    LocationService.this.hiddenFlags.put(f.getObjectId(), f);
+                    LocationService.this.hiddenFlags.add(f);
                 }
                 updateNearbyFlagsAndLocation();
 
@@ -570,7 +566,7 @@ public class LocationService extends Service implements
 
         Set<String> cachedKeys = this.cachedFlags.keySet();
 
-        for (Flag f : flagsNearby.values()) {
+        for (Flag f : flagsNearby) {
             if (cachedKeys.contains(f.getObjectId())) {
                 //Flag already cached.
                 nonCachedFlags--;
@@ -601,29 +597,29 @@ public class LocationService extends Service implements
     private void updateApplication() {
         if (listener != null) {
             listener.setLocation(location);
-            listener.setFlagsNearby(flagsNearby.values());
-            listener.setHiddenFlags(hiddenFlags.values());
-            listener.setMyFlags(myFlags.values());
-            listener.setBagFlags(bagFlags.values());
+            listener.setFlagsNearby(flagsNearby);
+            listener.setHiddenFlags(hiddenFlags);
+            listener.setMyFlags(myFlags);
+            listener.setBagFlags(bagFlags);
         }
     }
 
     private void updateNearbyFlagsAndLocation(){
         if (listener != null) {
             listener.setLocation(location);
-            listener.setFlagsNearby(flagsNearby.values());
+            listener.setFlagsNearby(flagsNearby);
         }
     }
 
     private void updateMyFlags(){
         if (listener != null) {
-            listener.setMyFlags(myFlags.values());
+            listener.setMyFlags(myFlags);
         }
     }
 
     private void updateBagFlags(){
         if (listener != null) {
-            listener.setBagFlags(bagFlags.values());
+            listener.setBagFlags(bagFlags);
         }
     }
 
@@ -631,8 +627,11 @@ public class LocationService extends Service implements
     @Override
     public void onCreate() {
         super.onCreate();
+        cachedFlags = new HashMap<>();
+
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(this.receiver, new IntentFilter(MainActivity.PREFERENCES_CHANGED_NOTIFICATION));
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(this.receiver, new IntentFilter(CategoriesFragment.ENABLE_ALL_CLICKED));
+
         connectToGoogleAPI();
     }
 

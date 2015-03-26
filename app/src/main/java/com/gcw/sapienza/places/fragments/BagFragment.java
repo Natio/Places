@@ -246,7 +246,7 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
 
         this.markers = new ArrayList<>();
 
-        this.flags = FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), FlagsStorage.Type.BAG );
+        this.flags = FlagsStorage.getSharedStorage().fetchFlagsWithType(FlagsStorage.Type.BAG );
 
         if (this.flags != null && this.gMap != null) {
             this.gMap.clear();

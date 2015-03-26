@@ -53,7 +53,7 @@ public class FlagsListFragment extends Fragment {
                 case LocationService.FOUND_NEW_FLAGS_NOTIFICATION:
                     noFlagLayout.setVisibility(View.GONE);
                     recycleView.setVisibility(View.VISIBLE);
-                    List<Flag> ordered = FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), FlagsStorage.Type.NEARBY);
+                    List<Flag> ordered = FlagsStorage.getSharedStorage().fetchFlagsWithType(FlagsStorage.Type.NEARBY);
                     FlagsListFragment.this.updateRecycleViewWithNewContents(ordered);
                     break;
                 case LocationService.FOUND_NO_FLAGS_NOTIFICATION:
@@ -94,7 +94,7 @@ public class FlagsListFragment extends Fragment {
 
 
 
-        List<Flag> ordered = FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), FlagsStorage.Type.NEARBY);
+        List<Flag> ordered = FlagsStorage.getSharedStorage().fetchFlagsWithType(FlagsStorage.Type.NEARBY);
         this.updateRecycleViewWithNewContents(ordered);
 
         registerForContextMenu(recycleView);

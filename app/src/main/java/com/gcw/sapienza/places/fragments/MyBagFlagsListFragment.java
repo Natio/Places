@@ -44,7 +44,7 @@ public class MyBagFlagsListFragment extends Fragment {
                 case LocationService.FOUND_BAG_FLAGS_NOTIFICATION:
                     noFlagLayout.setVisibility(View.GONE);
                     recycleView.setVisibility(View.VISIBLE);
-                    List<Flag> sorted = FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), FlagsStorage.Type.BAG);
+                    List<Flag> sorted = FlagsStorage.getSharedStorage().fetchFlagsWithType(FlagsStorage.Type.BAG);
                     MyBagFlagsListFragment.this.updateRecycleViewWithNewContents(sorted);
                     break;
 
@@ -87,7 +87,7 @@ public class MyBagFlagsListFragment extends Fragment {
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_BAG_FLAGS_NOTIFICATION));
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(this.receiver, new IntentFilter(LocationService.FOUND_NO_BAG_FLAGS_NOTIFICATION));
 
-        List<Flag> sorted = FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), FlagsStorage.Type.BAG);
+        List<Flag> sorted = FlagsStorage.getSharedStorage().fetchFlagsWithType(FlagsStorage.Type.BAG);
         this.updateRecycleViewWithNewContents(sorted);
 
         registerForContextMenu(recycleView);
