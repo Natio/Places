@@ -287,8 +287,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     private void promptForLocationServices() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Location Services disabled");
-        builder.setCancelable(false);
-        builder.setMessage("Places requires Location Services to be turned on in order to work properly.\n" +
+        builder.setCancelable(true);
+        builder.setMessage("Places requires Location Services to be turned on to provide the best experience.\n" +
                 "Edit Location Settings?");
         builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
             @Override
@@ -297,10 +297,16 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
                         (android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), Utils.GPS_ENABLE_REQUEST_CODE);
             }
         });
+        /**
+         * Allow users to use Places with no Location Services turned on
+         */
         builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                finish();
+                /**
+                 * if 'NO' is clicked, back to MainActivity focus
+                 */
+                //finish();
             }
         });
         builder.create().show();

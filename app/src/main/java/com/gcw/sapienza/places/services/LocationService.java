@@ -340,8 +340,6 @@ public class LocationService extends Service implements
             radius = 10.0f;
         }
 
-        query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE);
-
         query.whereWithinKilometers("location", gp, radius);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
