@@ -232,7 +232,7 @@ public class BagFragment extends Fragment implements OnMapReadyCallback, SwipeRe
 
         this.markers = new ArrayList<>();
 
-        List<Flag> flags = FlagsStorage.getSharedStorage().fetchFlagsWithType(FlagsStorage.Type.BAG);
+        List<Flag> flags = FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), FlagsStorage.Type.BAG);
 
         if (flags != null && this.gMap != null) {
             this.gMap.clear();

@@ -43,6 +43,7 @@ import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -85,7 +86,7 @@ public class LocationService extends Service implements
 
     private List<Flag> myFlags;
 
-    private List<Flag> bagFlags;
+    private HashSet<Flag> bagFlags;
 
     //we store only one suspended request
     private Integer suspendedRequest;
@@ -230,7 +231,7 @@ public class LocationService extends Service implements
     public void queryParsewithBag() {
         Log.d(TAG, "Running queryParsewithBag...");
 
-        bagFlags = new ArrayList<>();
+        bagFlags = new HashSet<>();
 
         ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
         query.whereEqualTo("commenter", ParseUser.getCurrentUser());
