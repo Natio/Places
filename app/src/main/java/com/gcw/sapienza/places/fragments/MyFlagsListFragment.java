@@ -33,6 +33,7 @@ import java.util.List;
 /**
  * Created by paolo  on 10/01/15.
  */
+@Deprecated
 public class MyFlagsListFragment extends Fragment {
 
     private static final String TAG = "MyFlagsListFragment";

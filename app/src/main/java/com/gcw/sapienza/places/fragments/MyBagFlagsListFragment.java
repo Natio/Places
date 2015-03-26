@@ -33,6 +33,7 @@ import java.util.List;
 /**
  * Created by paolo  on 10/01/15.
  */
+@Deprecated
 public class MyBagFlagsListFragment extends Fragment {
 
     private static final String TAG = "MyFlagsListFragment";
@@ -74,6 +75,7 @@ public class MyBagFlagsListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.flags_list_new_layout, container, false);
 
         this.recycleView = (RecyclerView) view.findViewById(R.id.cardList);
