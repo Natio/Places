@@ -142,7 +142,7 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
      * is supported by the device
      *
      * @param videoFpsHd the frame rate we are interested in
-     * @return
+     * @return true if videoFpsHd is a supported frame rate
      */
     private boolean isSupportedFrameRate(int videoFpsHd) {
         List<int[]> supportedFps = camera.getParameters().getSupportedPreviewFpsRange();

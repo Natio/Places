@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.models.Comment;
-import com.gcw.sapienza.places.utils.CropCircleTransformation;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.PlacesUtilCallback;
 import com.gcw.sapienza.places.utils.Utils;

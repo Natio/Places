@@ -127,7 +127,7 @@ public class GPlusUtils {
         getGPlusProfilePictureURL(user_id, size, imageView, cbk);
     }
 
-    class GetPicTask extends AsyncTask<String, String, String> {
+    static class GetPicTask extends AsyncTask<String, String, String> {
         private String userId;
         private ImageView imageView;
         private PlacesUtilCallback cbk;
@@ -144,14 +144,14 @@ public class GPlusUtils {
             HttpURLConnection conn;
             BufferedReader rd;
             String line;
-            String result = "";
+            StringBuilder result = new StringBuilder();
             try {
                 url = new URL(uri[0]).openConnection();
                 conn = (HttpURLConnection) url;
                 // conn.setRequestMethod("GET");
                 rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 while ((line = rd.readLine()) != null) {
-                    result += line;
+                    result.append(line);
                 }
                 rd.close();
             } catch (IOException e) {
@@ -159,7 +159,7 @@ public class GPlusUtils {
                 Log.e(TAG, "IOException: " + e.getMessage());
             }
 
-            return result;
+            return result.toString();
         }
 
         @Override
@@ -183,7 +183,7 @@ public class GPlusUtils {
             Log.d(TAG, "Profile pic URL: " + url);
             Log.d(TAG, "Pic size: " + size);
 
-            if (imageView != null && s != null && !s.equals(""))
+            if (imageView != null && s != null && !s.isEmpty())
                 Picasso.with(PlacesApplication.getPlacesAppContext()).load(url).into(imageView);
 
             if (size == PlacesLoginUtils.LARGE_PIC_SIZE)
@@ -194,7 +194,7 @@ public class GPlusUtils {
         }
     }
 
-    class GetUsernameTask extends AsyncTask<String, String, String> {
+    static class GetUsernameTask extends AsyncTask<String, String, String> {
         private String userId;
         private TextView tv;
 
@@ -209,13 +209,13 @@ public class GPlusUtils {
             HttpURLConnection conn;
             BufferedReader rd;
             String line;
-            String result = "";
+            StringBuilder result = new StringBuilder();
             try {
                 url = new URL(uri[0]).openConnection();
                 conn = (HttpURLConnection) url;
                 rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 while ((line = rd.readLine()) != null) {
-                    result += line;
+                    result.append(line);
                 }
                 rd.close();
             } catch (IOException e) {
@@ -223,7 +223,7 @@ public class GPlusUtils {
                 Log.e(TAG, "IOException: " + e.getMessage());
             }
 
-            return result;
+            return result.toString();
         }
 
         @Override

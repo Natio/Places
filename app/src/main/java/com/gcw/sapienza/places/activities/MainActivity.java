@@ -171,7 +171,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     {
         super.onNewIntent(intent);
 
-        Log.d(TAG, "Is intent null? " + (intent==null));
+        //Log.d(TAG, "Is intent null? " + (intent==null));
 
         String bundleContentType = intent.getStringExtra("type");
         if(bundleContentType != null && bundleContentType.equals(Utils.RECEIVED_NOTIF_COMMENT_TYPE))
@@ -207,10 +207,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         else return BitmapDescriptorFactory.HUE_MAGENTA; // 'Food' category
     }
 
-    public void refresh() {
-        Log.d(TAG, "Refreshing application");
-        PlacesApplication.getInstance().updatePlacesData(this);
-    }
 
     public void refresh(int updateCode) {
         Log.d(TAG, "Refreshing application");

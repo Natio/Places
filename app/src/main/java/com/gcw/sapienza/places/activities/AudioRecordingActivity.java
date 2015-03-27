@@ -26,8 +26,8 @@ public class AudioRecordingActivity extends ActionBarActivity implements View.On
 
     private static final String TAG = "AudioRecordingActivity";
     private static final String ERROR_WHILE_RECORDING_TEXT = "Error encountered while recording";
-    protected static MediaRecorder audioRec;
-    protected static String audio_filename;
+    private MediaRecorder audioRec;
+    private String audio_filename;
     private ImageView bigMicButton;
     private ImageView confirmButton;
     private ImageView cancelButton;

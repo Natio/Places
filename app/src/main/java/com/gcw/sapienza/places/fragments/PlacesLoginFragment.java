@@ -65,7 +65,7 @@ public class PlacesLoginFragment extends ParseLoginFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup parent,
                              Bundle savedInstanceState) {
 
-        View v = null;
+        View v;
 
         Log.d(TAG, "canChoose: " + canChoose);
 

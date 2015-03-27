@@ -33,7 +33,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -851,6 +850,11 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
                 confirmButton.setVisible(true);
 
+                Intent resultIntent = new Intent();
+                Bundle bundle = new Bundle();
+                bundle.putString("result", ShareActivity.FLAG_PLACED_TEXT);
+                resultIntent.putExtras(bundle);
+                setResult(RESULT_OK, resultIntent);
                 finish();
             }
 
@@ -880,6 +884,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 .setCancelable(false)
                 .setNegativeButton("Cancel",
                         new DialogInterface.OnClickListener() {
+                            @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.dismiss();
 
@@ -888,6 +893,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                         })
                 .setPositiveButton("Confirm",
                         new DialogInterface.OnClickListener() {
+                            @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 password = userInput.getText().toString();
                                 if (password.length() == 0)
