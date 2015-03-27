@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:isScrollContainer="false"
     android:id="@+id/share_holder"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical">
 
-    <!--0.6-->
+    <!--0.7-->
     <EditText
         android:id="@+id/share_text_field"
         android:layout_width="match_parent"
@@ -110,7 +111,7 @@
         android:layout_height="1dip"
         android:background="@color/grey" />
 
-    <!--0.125-->
+    <!--0.15-->
     <Spinner
         android:id="@+id/spinner"
         android:layout_width="match_parent"
