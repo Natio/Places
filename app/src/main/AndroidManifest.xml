@@ -83,6 +83,7 @@
 
         <activity
             android:name=".activities.ShareActivity"
+            android:windowSoftInputMode="adjustPan"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/CustomActionBarTheme">
