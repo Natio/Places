@@ -18,7 +18,7 @@ import com.gcw.sapienza.places.R;
 public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceClickListener {
     @SuppressWarnings("unused")
     private static final String TAG = "SettingsFragment";
-    private final int AR_THRESHOLD = 10;
+    private static final int AR_THRESHOLD = 10;
     private int ar_sensor;
     private boolean sensorEnabled;
     private boolean firstClick;
@@ -41,7 +41,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         Preference discover_mode = findPreference("discoverMode");
         Preference notifications_check = findPreference("notificationsCheck");
 
-        version_label.setSummary(BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")");
+        version_label.setSummary(BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ')');
         loneWolf_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
         fl_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());
         strangers_filter.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) getActivity());

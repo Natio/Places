@@ -14,6 +14,8 @@ import java.lang.reflect.Type;
  * Created by mic_head on 03/03/15.
  */
 final class InterfaceAdapter<T> implements JsonSerializer<T>, JsonDeserializer<T> {
+
+    @Override
     public JsonElement serialize(T object, Type interfaceType, JsonSerializationContext context) {
         final JsonObject wrapper = new JsonObject();
         wrapper.addProperty("type", object.getClass().getName());
@@ -21,6 +23,7 @@ final class InterfaceAdapter<T> implements JsonSerializer<T>, JsonDeserializer<T
         return wrapper;
     }
 
+    @Override
     public T deserialize(JsonElement elem, Type interfaceType, JsonDeserializationContext context) throws JsonParseException {
         final JsonObject wrapper = (JsonObject) elem;
         final JsonElement typeName = get(wrapper, "type");

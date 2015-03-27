@@ -55,7 +55,7 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
     private static final int RC_SIGN_IN = 0;
 
     private static final int REQUEST_CODE_TOKEN_AUTH = 1;
-    private final int fragmentContainer = android.R.id.content;
+    private static final int fragmentContainer = android.R.id.content;
     /* A flag indicating that a PendingIntent is in progress and prevents
      * us from starting further intents.
      */
@@ -219,6 +219,7 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
         }
     }
 
+    @Override
     public void onConnectionSuspended(int cause) {
         GPlusUtils.getInstance().getGoogleApiClient().connect();
     }
@@ -260,7 +261,7 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
         AsyncTask<Void, Void, String> task = new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
-                String accessToken = null;
+                String accessToken;
                 try {
                     accessToken = GoogleAuthUtil.getToken(getApplicationContext(),
                             Plus.AccountApi.getAccountName(GPlusUtils.getInstance().getGoogleApiClient()),
@@ -298,7 +299,7 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
 
     private void completeLoginWithParse(final String token) {
         final String email = Plus.AccountApi.getAccountName(GPlusUtils.getInstance().getGoogleApiClient());
-        final HashMap<String, Object> params = new HashMap();
+        final HashMap<String, Object> params = new HashMap<>();
         params.put("code", token);
         params.put("email", email);
 
@@ -310,6 +311,8 @@ public class PlacesLoginActivity extends ParseLoginActivity implements com.googl
             public void done(final Object returnObj, ParseException e) {
                 if (e == null) {
                     ParseUser.becomeInBackground(returnObj.toString(), new LogInCallback() {
+
+                        @Override
                         public void done(ParseUser user, ParseException e) {
                             if (user != null && e == null) {
                                 Log.i(TAG, "The Google user validated");

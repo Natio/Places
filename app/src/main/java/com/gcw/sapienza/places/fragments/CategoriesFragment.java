@@ -15,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.RelativeLayout;
 
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
@@ -42,8 +41,8 @@ public class CategoriesFragment extends Fragment {
 
         view = inflater.inflate(R.layout.categories_screen, container, false);
 
-        RelativeLayout categoriesLayout = (RelativeLayout) view.findViewById(R.id.categoriesLayout);
-        RelativeLayout categoriesSettings = (RelativeLayout) view.findViewById(R.id.categoriesSettings);
+        //RelativeLayout categoriesLayout = (RelativeLayout) view.findViewById(R.id.categoriesLayout);
+        //RelativeLayout categoriesSettings = (RelativeLayout) view.findViewById(R.id.categoriesSettings);
 
         Button enableAllButton = (Button) view.findViewById(R.id.enableAllButton);
         enableAllButton.setOnClickListener(new View.OnClickListener() {

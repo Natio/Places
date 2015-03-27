@@ -43,7 +43,6 @@ import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -490,11 +489,10 @@ public class LocationService extends Service implements
             NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             nManager.cancel(NOTIFICATION_ID);
         }
-        long elapsed_time = location.getTime() -
-                (this.location == null ? 0L : this.location.getTime());
+        /*long elapsed_time = location.getTime() - (this.location == null ? 0L : this.location.getTime());
         if (this.location != null) {
             float distance = location.distanceTo(this.location) / KM_TO_M;
-        }
+        }*/
         this.location = location;
         queryParsewithLocation(location);
         if (this.flagsNearby != null && PlacesLoginUtils.getInstance().hasCurrentUserId()) {

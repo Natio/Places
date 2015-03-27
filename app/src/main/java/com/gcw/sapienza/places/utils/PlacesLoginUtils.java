@@ -77,11 +77,11 @@ public class PlacesLoginUtils {
     }
 
     public HashMap<String, String> getUserProfilePicMapSmall() {
-        return this.getUserProfilePicMapSmall();
+        return this.userProfilePicMapSmall;
     }
 
     public HashMap<String, String> getUserProfilePicMapLarge() {
-        return this.getUserProfilePicMapLarge();
+        return this.userProfilePicMapLarge;
     }
 
     public static void startLoginActivity(Activity activity, boolean canChoose) {
@@ -175,7 +175,7 @@ public class PlacesLoginUtils {
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString(GPLUS_TOKEN_SP, "").commit();
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString(EMAIL_SP, "").commit();
 
-                PlacesLoginUtils.getInstance().downloadUserInfo(context);
+                PlacesLoginUtils.downloadUserInfo(context);
             } else {
                 loginType = LoginType.GPLUS;
 
@@ -185,7 +185,7 @@ public class PlacesLoginUtils {
                 Log.d(TAG, "Token retrieved in PlacesLoginUtils: " + googleToken);
                 Log.d(TAG, "Email retrieved in PlacesLoginUtils: " + email);
 
-                if (!googleToken.equals("") && !email.equals(""))
+                if (!googleToken.isEmpty() && !email.isEmpty())
                     tryToLoginWithAvailableToken(context, googleToken, email);
                 else PlacesLoginUtils.startLoginActivity(context, true);
             }
@@ -197,7 +197,7 @@ public class PlacesLoginUtils {
     }
 
     private void tryToLoginWithAvailableToken(final Activity context, final String token, String email) {
-        final HashMap<String, Object> params = new HashMap();
+        final HashMap<String, Object> params = new HashMap<>();
         params.put("code", token);
         params.put("email", email);
 
@@ -209,6 +209,8 @@ public class PlacesLoginUtils {
             public void done(final Object returnObj, ParseException e) {
                 if (e == null) {
                     ParseUser.becomeInBackground(returnObj.toString(), new LogInCallback() {
+
+                        @Override
                         public void done(ParseUser user, ParseException e) {
                             Log.d(TAG, "So that's the token: " + token);
 
@@ -264,20 +266,20 @@ public class PlacesLoginUtils {
     public void loadUsernameIntoTextView(final String userId, final TextView tv, String lt) {
         Log.d(TAG, "Account type in loadUsernameIntoTextView method: " + lt);
 
-        if (lt == null || lt.equals("fb") || lt.equals(""))
+        if (lt == null || lt.equals("fb") || lt.isEmpty())
             FacebookUtils.getInstance().loadUsernameIntoTextView(userId, tv);
         else GPlusUtils.getInstance().loadUsernameIntoTextView(userId, tv);
     }
 
     public void getProfilePictureURL(final String user_id, final String account_type, final PlacesLoginUtils.PicSize size, final PlacesUtilCallback cbk) {
-        if (account_type == null || account_type.equals("") || account_type.equals("fb"))
+        if (account_type == null || account_type.isEmpty() || account_type.equals("fb"))
             FacebookUtils.getInstance().getFbProfilePictureURL(user_id, size, cbk);
         else if (account_type.equals("g+"))
             GPlusUtils.getInstance().getGPlusProfilePictureURL(user_id, size, null, cbk);
     }
 
     public void loadProfilePicIntoImageView(final String user_id, final ImageView imageView, final PlacesLoginUtils.PicSize size, String lt) {
-        if (lt == null || lt.equals("fb") || lt.equals(""))
+        if (lt == null || lt.equals("fb") || lt.isEmpty())
             FacebookUtils.getInstance().loadProfilePicIntoImageView(user_id, imageView, size);
         else GPlusUtils.getInstance().loadProfilePicIntoImageView(user_id, imageView, size, null);
     }
