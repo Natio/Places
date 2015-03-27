@@ -30,7 +30,7 @@ dependencies {
     //Parse.com support files
     compile files('libs/bolts.jar')
     //compile fileTree(dir: 'libs', include: 'Parse-*.jar')
-    compile 'com.android.support:appcompat-v7:21.0.2'
+    compile 'com.android.support:appcompat-v7:21.0.3'
     //compile 'com.parse.bolts:bolts-android:1.1.2'
     //Google maps
     compile 'com.google.android.gms:play-services:6.5.+'
