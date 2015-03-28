@@ -69,7 +69,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
-/**
+/*
  * This class represents the fragment that contains informations regarding a flag like author,
  * meteo, text, comments, wow, and the interface overall behavior(ex.: media management)
  */
@@ -112,7 +112,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         this.mediaType = type;
         this.mediaFile = mediaFile;
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -205,7 +204,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         String temperature;
         String weather;
 
-        //temporary quiack solution to manage openweathermap when didn't work, and make app working all the same
+        //temporary quick solution to manage openweathermap when didn't work, and make app working all the same
         if (weatherInfo.isEmpty()) {
             temperature = "" + 20;
             weather = "Cloud";
@@ -214,7 +213,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             temperature = st.nextToken();
             weather = st.nextToken().substring(1);
         }
-
 
         temperatureView.setText(temperature);
 
@@ -283,20 +281,10 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 }
             });
             */
-        //Strings to show
-        //authorTextView.setText("Author: " + ((PlacesUser) ParseUser.getCurrentUser()).getName() + bottomLineText);
-        //final String weatherString = (weather == null || weather.isEmpty()) ? "" : "\nWeather: " + weather;
-        //final String inPlaceString = "In Place: " + (inPlace ? "✓" : "✗");
-        //final String bottomLineText = date + weatherString + "\nCategory: " + category + "\n" + inPlaceString;
 
         // authorTextView.setText(((PlacesUser) ParseUser.getCurrentUser()).getName());
         authorTextView.setText(this.flag.getFbName());
-
-        //changed to icons
-        //final String weatherString = (weather == null || weather.isEmpty()) ? "" : "\nWeather: " + weather;
-        //final String bottomLineText = "Category: " + category;
         final String inPlaceString = "In Place: " + (this.flag.getInPlace() ? "✓" : "✗");
-
         DateFormat df = new SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault());
         String sDate = df.format(this.flag.getDate());
         dateTextView.setText(sDate + '\n' + inPlaceString);
@@ -502,7 +490,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                 imm.hideSoftInputFromWindow(userInput.getWindowToken(), 0);
                                 dialog.dismiss();
                             }
-
                         }
                 );
 
@@ -570,7 +557,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                     audioHolder.setImageResource(R.drawable.play_button);
                 }
             });
-
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             FileInputStream inStream = new FileInputStream(temp);
             mediaPlayer.setDataSource(inStream.getFD());
