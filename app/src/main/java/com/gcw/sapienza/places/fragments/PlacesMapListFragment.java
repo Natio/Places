@@ -234,7 +234,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
         this.markers = new ArrayList<>();
 
-        List<Flag> flags = FlagsStorage.getSharedStorage().getOrderedFlags(getActivity(), FlagsStorage.Type.NEARBY);
+        List<Flag> flags = this.getData();
 
         Log.d(TAG, "Updating markers on map...flags size: " + flags.size());
 
@@ -273,7 +273,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                 index++;
             }
 
-            if (this.showDiscoverModeOnMap() && isDiscoverModeEnabled()) {
+            if (this.showDiscoverModeOnMap() && PlacesMapListFragment.isDiscoverModeEnabled()) {
 
                 List<Flag> hiddenFlags = FlagsStorage.getSharedStorage().fetchFlagsWithType(FlagsStorage.Type.HIDDEN);
 
@@ -357,13 +357,12 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
      *
      * @return true if discover mode is enabled, false otherwise
      */
-    private boolean isDiscoverModeEnabled() {
+    private static boolean isDiscoverModeEnabled() {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(PlacesApplication.getPlacesAppContext());
 
-        boolean discoverMode = preferences.getBoolean("discoverMode", true);
+        return preferences.getBoolean("discoverMode", true);
 
-        return discoverMode;
     }
 
 
