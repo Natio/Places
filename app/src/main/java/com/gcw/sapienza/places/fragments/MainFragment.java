@@ -26,13 +26,28 @@ import java.util.List;
 
 public class MainFragment extends PlacesMapListFragment{
     private static final String TAG = "MainFragment";
+
     /**
      * @param context The Context in which the receiver is running.
      * @param intent The Intent being received.
      */
     @Override
-    protected  void onBroadcastReceived(Context context, Intent intent) {
+    protected  void onFlagsReceived(Context context, Intent intent) {
         Log.d(TAG, "Broadcast intent received: " + intent.getAction());
+    }
+
+    /**
+     * @param context The Context in which the receiver is running.
+     * @param intent The Intent being received.
+     */
+    @Override
+    protected void onNoFlagsReceived(Context context, Intent intent) {
+        Log.d(TAG, "Broadcast intent received: " + intent.getAction());
+    }
+
+    @Override
+    protected String noFlagsReceivedText() {
+        return "No Flags nearby (yet!) :(";
     }
 
     /**
@@ -40,12 +55,18 @@ public class MainFragment extends PlacesMapListFragment{
      *
      */
     @Override
-    protected Collection<IntentFilter> getNotificationFilters() {
-        ArrayList<IntentFilter> list = new ArrayList<>(2);
+    protected Collection<IntentFilter> getFlagsFilters() {
+        ArrayList<IntentFilter> list = new ArrayList<>(3);
         list.add(new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
-        list.add(new IntentFilter(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
         list.add(new IntentFilter(LocationService.LOCATION_CHANGED_NOTIFICATION));
         list.add(new IntentFilter(MainActivity.PREFERENCES_CHANGED_NOTIFICATION));
+        return list;
+    }
+
+    @Override
+    protected Collection<IntentFilter> getNoFlagsFilters() {
+        ArrayList<IntentFilter> list = new ArrayList<>(1);
+        list.add(new IntentFilter(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
         return list;
     }
 

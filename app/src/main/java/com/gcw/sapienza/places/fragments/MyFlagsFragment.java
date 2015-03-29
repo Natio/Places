@@ -31,8 +31,22 @@ public class MyFlagsFragment extends PlacesMapListFragment{
      * @param intent The Intent being received.
      */
     @Override
-    protected  void onBroadcastReceived(Context context, Intent intent) {
+    protected  void onFlagsReceived(Context context, Intent intent) {
         Log.d(TAG, "Broadcast intent received: " + intent.getAction());
+    }
+
+    /**
+     * @param context The Context in which the receiver is running.
+     * @param intent The Intent being received.
+     */
+    @Override
+    protected void onNoFlagsReceived(Context context, Intent intent) {
+        Log.d(TAG, "Broadcast intent received: " + intent.getAction());
+    }
+
+    @Override
+    protected String noFlagsReceivedText() {
+        return "No Flags from you (yet!) :(";
     }
 
     /**
@@ -40,9 +54,19 @@ public class MyFlagsFragment extends PlacesMapListFragment{
      *
      */
     @Override
-    protected Collection<IntentFilter> getNotificationFilters() {
-        ArrayList<IntentFilter> list = new ArrayList<>(2);
+    protected Collection<IntentFilter> getFlagsFilters() {
+        ArrayList<IntentFilter> list = new ArrayList<>(1);
         list.add(new IntentFilter(LocationService.FOUND_MY_FLAGS_NOTIFICATION));
+        return list;
+    }
+
+    /**
+     * This method is automatically called when the class needs to register to the local notification system.
+     *
+     */
+    @Override
+    protected Collection<IntentFilter> getNoFlagsFilters() {
+        ArrayList<IntentFilter> list = new ArrayList<>(1);
         list.add(new IntentFilter(LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION));
         return list;
     }

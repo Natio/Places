@@ -22,6 +22,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gcw.sapienza.places.PlacesApplication;
@@ -67,30 +69,52 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
     private GoogleMap gMap;
     private List<Marker> markers;
-    private FlagsListFragment listFragment;
+    protected FlagsListFragment listFragment;
     private MSwipeRefreshLayout srl;
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
+    private BroadcastReceiver flagsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            PlacesMapListFragment.this.onBroadcastReceived(context, intent);
+            PlacesMapListFragment.this.onFlagsReceived(context, intent);
             PlacesMapListFragment.this.updateMarkersOnMap();
             List<Flag> data = PlacesMapListFragment.this.getData();
+            PlacesMapListFragment.this.listFragment.flagsToDisplay();
             PlacesMapListFragment.this.listFragment.updateRecycleViewWithNewContents(data);
         }
     };
+    private BroadcastReceiver noFlagsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            PlacesMapListFragment.this.onNoFlagsReceived(context, intent);
+            PlacesMapListFragment.this.listFragment.noFlagsToDisplay(noFlagsReceivedText());
+        }
+    };
 
+    protected abstract String noFlagsReceivedText();
 
     /**
-    * @param context The Context in which the receiver is running.
+    * @param context The Context in which the flagsReceiver is running.
     * @param intent The Intent being received.
     */
-    protected abstract void onBroadcastReceived(Context context, Intent intent);
+    protected abstract void onFlagsReceived(Context context, Intent intent);
+
+    /**
+     * @param context The Context in which the noFlagsReceiver is running.
+     * @param intent The Intent being received.
+     */
+    protected abstract void onNoFlagsReceived(Context context, Intent intent);
 
     /**
      * This method is automatically called when the class needs to register to the local notification system.
      *
      */
-    protected abstract Collection<IntentFilter> getNotificationFilters();
+    protected abstract Collection<IntentFilter> getFlagsFilters();
+
+
+    /**
+     * This method is automatically called when the class needs to register to the local notification system.
+     *
+     */
+    protected abstract Collection<IntentFilter> getNoFlagsFilters();
 
     /**
      * This method is called when new data is needed
@@ -119,19 +143,24 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
 
     /**
-     * Registers the receiver from local notifications
+     * Registers the flagsReceiver from local notifications
      */
     private void registerNotification(){
-        Collection<IntentFilter> filters = this.getNotificationFilters();
-        for(IntentFilter filter : filters){
-            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.receiver, filter);
+        Collection<IntentFilter> flagsFilters = this.getFlagsFilters();
+        for(IntentFilter filter : flagsFilters){
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.flagsReceiver, filter);
+        }
+        Collection<IntentFilter> noFlagsFilters = this.getNoFlagsFilters();
+        for(IntentFilter filter : noFlagsFilters){
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.noFlagsReceiver, filter);
         }
     }
     /**
-     * Unregisters the receiver from local notifications
+     * Unregisters the flagsReceiver from local notifications
      */
     private   void unregisterNotification(){
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(this.receiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(this.flagsReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(this.noFlagsReceiver);
     }
 
 
@@ -370,11 +399,22 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
     public static class FlagsListFragment extends Fragment{
 
         private RecyclerView recycleView;
+        private RelativeLayout noFlagLayout;
+        private TextView noFlagsText;
 
         //the following variable is used to fill the recycle view at cration time, after onCreateView it will be null. Do not use it
         private List<Flag> initialData;
 
+        protected void flagsToDisplay(){
+            noFlagLayout.setVisibility(View.GONE);
+            recycleView.setVisibility(View.VISIBLE);
+        }
 
+        protected void noFlagsToDisplay(String text){
+            noFlagsText.setText(text);
+            recycleView.setVisibility(View.GONE);
+            noFlagLayout.setVisibility(View.VISIBLE);
+        }
 
         public void setInitialData(List<Flag> initialData){
             this.initialData = initialData;
@@ -393,6 +433,9 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
             LinearLayoutManager llm = new LinearLayoutManager(this.getActivity());
             llm.setOrientation(LinearLayoutManager.VERTICAL);
             this.recycleView.setLayoutManager(llm);
+
+            noFlagLayout = (RelativeLayout)view.findViewById(R.id.no_flags_found_layout);
+            noFlagsText = (TextView)noFlagLayout.findViewById(R.id.no_flags_text);
 
 
             if(this.initialData != null){
