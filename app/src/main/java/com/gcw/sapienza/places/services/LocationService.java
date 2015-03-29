@@ -80,12 +80,12 @@ public class LocationService extends Service implements
 
     private HashMap<String, Long> cachedFlags;
 
-    private List<Flag> flagsNearby;
-    private List<Flag> hiddenFlags;
+    private ArrayList<Flag> flagsNearby;
+    private ArrayList<Flag> hiddenFlags;
 
-    private List<Flag> myFlags;
+    private ArrayList<Flag> myFlags;
 
-    private HashMap<String, Flag> bagFlags;
+    private ArrayList<Flag> bagFlags;
 
     //we store only one suspended request
     private Integer suspendedRequest;
@@ -210,7 +210,7 @@ public class LocationService extends Service implements
                 if (flags == null) {
                     flags = new ArrayList<>();
                 }
-                LocationService.this.myFlags = flags;
+                LocationService.this.myFlags = new ArrayList<Flag>(flags);
 
                 updateMyFlags();
 
@@ -230,7 +230,6 @@ public class LocationService extends Service implements
     public void queryParsewithBag() {
         Log.d(TAG, "Running queryParsewithBag...");
 
-        bagFlags = new HashMap<>();
 
         ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
         query.whereEqualTo("commenter", ParseUser.getCurrentUser());
@@ -262,30 +261,24 @@ public class LocationService extends Service implements
                         Log.e(TAG, npe.getMessage());
                         return;
                     }
-
+                    HashMap<String, Flag> filterDuplicates = new HashMap<>();
                     for (Comment c : comments) {
 
                         Flag currFlag = c.getFlag();
 
-                        String currentFlagOwner;
-
-                        //TODO Investigate why some owners are null.
-                        // Probably old users whose pointer is pointing to null objects
-                        try {
-
-                            currentFlagOwner = currFlag.getOwner().getObjectId();
-
-                        }catch (NullPointerException ex2){
-
-                            Log.e(TAG, "Error", ex2);
-
+                        //the following check is needed because some comments do not have a flag
+                        if(currFlag == null || currFlag.getOwner() == null || currFlag.getOwner().getObjectId() == null){
                             continue;
                         }
 
+                        String currentFlagOwner = currFlag.getOwner().getObjectId();
+
+
                         if (!currentFlagOwner.equals(currentUserId)) {
-                            bagFlags.put(currFlag.getObjectId(), currFlag);
+                            filterDuplicates.put(currFlag.getObjectId(), currFlag);
                         }
                     }
+                    LocationService.this.bagFlags = new ArrayList<>(filterDuplicates.values());
 
                     updateBagFlags();
 
@@ -598,7 +591,7 @@ public class LocationService extends Service implements
             listener.setFlagsNearby(flagsNearby);
             listener.setHiddenFlags(hiddenFlags);
             listener.setMyFlags(myFlags);
-            listener.setBagFlags(bagFlags.values());
+            listener.setBagFlags(bagFlags);
         }
     }
 
@@ -617,7 +610,7 @@ public class LocationService extends Service implements
 
     private void updateBagFlags(){
         if (listener != null) {
-            listener.setBagFlags(bagFlags.values());
+            listener.setBagFlags(bagFlags);
         }
     }
 
