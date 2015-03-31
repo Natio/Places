@@ -5,13 +5,26 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.gcw.sapienza.places.activities.MainActivity;
+import com.gcw.sapienza.places.utils.PlacesStorage;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.ParsePushBroadcastReceiver;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
+import java.io.StreamCorruptedException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by snowblack on 1/4/15.
@@ -30,12 +43,15 @@ public class Receiver extends ParsePushBroadcastReceiver {
             JSONObject root = new JSONObject(intent.getExtras().getString("com.parse.Data"));
             String type = root.getString("type");
             String flag_id = root.getString("commented_flag");
+            String alert_text = root.getString("alert");
             if (type != null && type.equals("comment") && flag_id != null) {
 
                 Intent i = new Intent(context, MainActivity.class);
                 Bundle extras = new Bundle();
                 extras.putString("type", Utils.RECEIVED_NOTIF_COMMENT_TYPE);
                 extras.putString(Utils.FLAG_ID, flag_id);
+
+                PlacesStorage.updateInboxWith(context, flag_id, alert_text);
 
                 i.putExtras(extras);
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -49,6 +65,19 @@ public class Receiver extends ParsePushBroadcastReceiver {
             }
         } catch (JSONException e) {
             Log.d(TAG, "Json error", e);
+            Utils.showToast(context, "Something went wrong while loading Places data", Toast.LENGTH_SHORT);
+        } catch (ClassNotFoundException e) {
+            Log.d(TAG, "Class not found", e);
+            Utils.showToast(context, "Something went wrong while loading Places data", Toast.LENGTH_SHORT);
+        } catch (OptionalDataException e) {
+            Log.d(TAG, "Optional data exception", e);
+            Utils.showToast(context, "Something went wrong while loading Places data", Toast.LENGTH_SHORT);
+        } catch (StreamCorruptedException e) {
+            Log.d(TAG, "Stream corrupted", e);
+            Utils.showToast(context, "Something went wrong while loading Places data", Toast.LENGTH_SHORT);
+        } catch (IOException e) {
+            Log.d(TAG, "I/O error", e);
+            Utils.showToast(context, "Something went wrong while loading Places data", Toast.LENGTH_SHORT);
         }
 
 

@@ -32,6 +32,7 @@ import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.fragments.BagFragment;
 import com.gcw.sapienza.places.fragments.CategoriesFragment;
 import com.gcw.sapienza.places.fragments.FlagFragment;
+import com.gcw.sapienza.places.fragments.InboxFragment;
 import com.gcw.sapienza.places.fragments.MainFragment;
 import com.gcw.sapienza.places.fragments.MyFlagsFragment;
 import com.gcw.sapienza.places.fragments.ProfileFragment;
@@ -64,16 +65,17 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
     public static final String TAG = MainActivity.class.getName();
 
-    private static final String[] section_titles = {"Home", "Profile", "My Flags", "Bag", "Settings", "Logout"};
+    private static final String[] section_titles = {"Home", "Profile", "Inbox", "My Flags", "Bag", "Settings", "Logout"};
 
     private static final int SHARE_ACTIVITY_REQUEST_CODE = 95;
 
     private static final int FLAGS_LIST_POSITION = 0;
     private static final int MY_PROFILE_POSITION = 1;
-    private static final int MY_FLAGS_POSITION = 2;
-    private static final int BAG_POSITION = 3;
-    private static final int SETTINGS_POSITION = 4;
-    private static final int LOGOUT_POSITION = 5;
+    private static final int INBOX_POSITION = 2;
+    private static final int MY_FLAGS_POSITION = 3;
+    private static final int BAG_POSITION = 4;
+    private static final int SETTINGS_POSITION = 5;
+    private static final int LOGOUT_POSITION = 6;
 
     private static final String FRAG_TAG = "FRAG_TAG";
 
@@ -370,6 +372,10 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
             case MY_PROFILE_POSITION:
                 myProfile();
+                break;
+
+            case INBOX_POSITION:
+                switchToOtherFrag(new InboxFragment());
                 break;
 
             case MY_FLAGS_POSITION:
