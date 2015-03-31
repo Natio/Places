@@ -1,14 +1,18 @@
 package com.gcw.sapienza.places.notifications;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.utils.PlacesStorage;
 import com.gcw.sapienza.places.utils.Utils;
@@ -23,6 +27,10 @@ import org.json.JSONObject;
 public class Receiver extends ParsePushBroadcastReceiver {
 
     private static final String TAG = "Receiver";
+    private static final String COLLAPSE_KEY = "places_push";
+    private static final int COMMENT_NOTIFICATION_ID = 80;
+    private static final String COMMENT_TYPE = "comment";
+    private String notificationText = "";
     private static final String UPDATES_REPO = "https://drive.google.com/folderview?id=0B1boWbY-47RQdHJnSlpScUNueTQ&usp=drive_web";
 
     @Override
@@ -61,6 +69,8 @@ public class Receiver extends ParsePushBroadcastReceiver {
                 }
                 */
 
+                clearNotificationText();
+
                 context.startActivity(i);
             } else {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW,
@@ -72,20 +82,7 @@ public class Receiver extends ParsePushBroadcastReceiver {
         } catch (JSONException e) {
             Log.d(TAG, "Json error", e);
             Utils.showToast(context, "Something went wrong while loading Places data", Toast.LENGTH_SHORT);
-        } /*catch (ClassNotFoundException e) {
-            Log.d(TAG, "Class not found", e);
-            Utils.showToast(context, "Something went wrong while loading Places data", Toast.LENGTH_SHORT);
-        } catch (OptionalDataException e) {
-            Log.d(TAG, "Optional data exception", e);
-            Utils.showToast(context, "Something went wrong while loading Places data", Toast.LENGTH_SHORT);
-        } catch (StreamCorruptedException e) {
-            Log.d(TAG, "Stream corrupted", e);
-            Utils.showToast(context, "Something went wrong while loading Places data", Toast.LENGTH_SHORT);
-        } catch (IOException e) {
-            Log.d(TAG, "I/O error", e);
-            Utils.showToast(context, "Something went wrong while loading Places data", Toast.LENGTH_SHORT);
-        }*/
-
+        }
 
 //        Default behavior: simply open up the Main Activity when clicking on the push notification
 //        Intent i = new Intent(context, MainActivity.class);
@@ -94,5 +91,74 @@ public class Receiver extends ParsePushBroadcastReceiver {
 //        context.startActivity(i);
 
 
+    }
+
+    private void clearNotificationText() {
+        notificationText = "";
+    }
+
+    @Override
+    protected void onPushReceive(Context context, Intent intent) {
+
+        try {
+
+            JSONObject data = new JSONObject(intent.getExtras().getString("com.parse.Data"));
+
+            String type = data.getString("type");
+
+            switch (type) {
+                case COMMENT_TYPE:
+                    String flag_id = data.getString("commented_flag");
+                    String alert_text = data.getString("alert");
+                    String alert_title = data.getString("title");
+
+                    notificationText = notificationText + "\n" + alert_text;
+
+                    //TODO uncomment when Inbox ready
+//                    PlacesStorage.updateInboxWith(context, flag_id, alert_text);
+
+                    NotificationManager notificationManager =
+                            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+                    Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+                    builder.setContentTitle(alert_title);
+                    builder.setContentText(notificationText);
+                    builder.setSmallIcon(R.drawable.app_logo_small);
+                    builder.setAutoCancel(true);
+
+                    // OPTIONAL create soundUri and set sound:
+                    builder.setSound(soundUri);
+
+                    notificationManager.notify(COMMENT_NOTIFICATION_ID, builder.build());
+                    break;
+                default:
+                    Log.d(TAG, "Triggering default onPushReceive behavior");
+            }
+        }catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private JSONObject getDataFromIntent(Context context, Intent intent) {
+        JSONObject data = null;
+        try {
+            data = new JSONObject(intent.getExtras().getString("com.parse.Data"));
+        } catch (JSONException e) {
+            Log.d(TAG, "Json error", e);
+            Utils.showToast(context, "Something went wrong while loading Places data", Toast.LENGTH_SHORT);
+            return null;
+        }
+        return data;
+    }
+
+    @Override
+    protected void onPushDismiss(Context context, Intent intent){
+        super.onPushDismiss(context, intent);
+
+//        clear notification text? maybe not advised
+//        clearNotificationText();
     }
 }

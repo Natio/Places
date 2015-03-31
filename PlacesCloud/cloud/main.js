@@ -96,6 +96,7 @@ Parse.Cloud.afterSave("Comments", function(request, response){
             collapse_key: "places_push",
             data: {
               alert: alertText,
+              title: "Somebody commented a Flag...",
               commented_flag: flagId,
               type: "comment"
             }
