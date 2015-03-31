@@ -16,7 +16,6 @@ public class Comment extends ParseObject {
     public static final String TEXT_KEY = "text";
     public static final String USERNAME_KEY = "username";
     public static final String FLAG_KEY = "flag";
-    public static final String FLAG_OWNER_KEY = "flagOwner";
     public static final String COMMENT_OWNER_KEY = "commenter";
     public static final String LOGIN_TYPE_KEY = "accountType";
 
@@ -60,6 +59,11 @@ public class Comment extends ParseObject {
         this.put(USERNAME_KEY, username);
     }
 
+    /**
+     * Use getCreatedAt {@link this.getCreatedAt()}
+     * @return the same value as {@link this.getCreatedAt()}
+     */
+    @Deprecated
     public Date getTimestamp() {
         return this.getCreatedAt();
     }
@@ -72,14 +76,4 @@ public class Comment extends ParseObject {
         this.put(LOGIN_TYPE_KEY, accountType);
     }
 
-    // TODO The following getter needs to be implemented
-    public String getFlagOwner()
-    {
-        return null;
-    }
-
-    public void setFlagOwner(PlacesUser owner)
-    {
-        this.put(FLAG_OWNER_KEY, owner);
-    }
 }

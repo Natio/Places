@@ -49,6 +49,10 @@ public class Flag extends ParseObject implements Serializable {
         return (PlacesUser) this.get(OWNER_KEY);
     }
 
+    @Deprecated
+    /**
+     * Deprecated. USE getObjectId()
+     */
     public String getFlagId() {
         return this.getObjectId();
     }

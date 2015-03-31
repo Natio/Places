@@ -26,6 +26,9 @@ import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.fragments.CategoriesFragment;
 import com.gcw.sapienza.places.models.Comment;
 import com.gcw.sapienza.places.models.Flag;
+import com.gcw.sapienza.places.models.manager.CommentsManager;
+import com.gcw.sapienza.places.models.manager.ErrorCallback;
+import com.gcw.sapienza.places.models.manager.ModelCallback;
 import com.gcw.sapienza.places.notifications.Notifications;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
@@ -231,6 +234,63 @@ public class LocationService extends Service implements
         Log.d(TAG, "Running queryParsewithBag...");
 
 
+        new CommentsManager().commentOfUser(ParseUser.getCurrentUser(), true)
+                .cache(ParseQuery.CachePolicy.CACHE_THEN_NETWORK)
+                .error(new ErrorCallback() {
+                    @Override
+                    public void error(ParseException e) {
+                        Toast.makeText(getBaseContext(), "Cannot fetch your bag Flags at the moment,\ntry again later", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .success(new ModelCallback<Comment>() {
+                    @Override
+                    public void result(List<Comment> comments) {
+                        if (comments == null)
+                        {
+                            comments = new ArrayList<>();
+                        }
+
+                        String currentUserId;
+
+                        try
+                        {
+                            currentUserId = ParseUser.getCurrentUser().getObjectId();
+                        }
+                        catch(NullPointerException npe)
+                        {
+                            Log.e(TAG, npe.getMessage());
+                            return;
+                        }
+                        HashMap<String, Flag> filterDuplicates = new HashMap<>();
+                        for (Comment c : comments) {
+
+                            Flag currFlag = c.getFlag();
+
+                            //the following check is needed because some comments do not have a flag
+                            if(currFlag == null || currFlag.getOwner() == null || currFlag.getOwner().getObjectId() == null){
+                                continue;
+                            }
+
+                            String currentFlagOwner = currFlag.getOwner().getObjectId();
+
+
+                            if (!currentFlagOwner.equals(currentUserId)) {
+                                filterDuplicates.put(currFlag.getObjectId(), currFlag);
+                            }
+                        }
+                        LocationService.this.bagFlags = new ArrayList<>(filterDuplicates.values());
+
+                        updateBagFlags();
+
+                        if (bagFlags.size() > 0) {
+                            LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_BAG_FLAGS_NOTIFICATION));
+                        } else {
+                            LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_BAG_FLAGS_NOTIFICATION));
+                        }
+                    }
+                }).start();
+
+/*
         ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
         query.whereEqualTo("commenter", ParseUser.getCurrentUser());
         query.include("flag");
@@ -290,6 +350,8 @@ public class LocationService extends Service implements
                 }
             }
         });
+
+        */
 
     }
 
