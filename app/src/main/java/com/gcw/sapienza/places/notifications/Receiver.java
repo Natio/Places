@@ -108,6 +108,7 @@ public class Receiver extends ParsePushBroadcastReceiver {
 
             switch (type) {
                 case COMMENT_TYPE:
+
                     String flag_id = data.getString("commented_flag");
                     String alert_text = data.getString("alert");
                     String alert_title = data.getString("title");
@@ -140,18 +141,6 @@ public class Receiver extends ParsePushBroadcastReceiver {
             e.printStackTrace();
         }
 
-    }
-
-    private JSONObject getDataFromIntent(Context context, Intent intent) {
-        JSONObject data = null;
-        try {
-            data = new JSONObject(intent.getExtras().getString("com.parse.Data"));
-        } catch (JSONException e) {
-            Log.d(TAG, "Json error", e);
-            Utils.showToast(context, "Something went wrong while loading Places data", Toast.LENGTH_SHORT);
-            return null;
-        }
-        return data;
     }
 
     @Override

@@ -223,7 +223,7 @@ Parse.Cloud.job("addFbId", function(request, status){
 // });
 
 
-function assignFlagsToComments(comments, index, status){
+function assignFlagsToTable(comments, index, status){
   if(index >= comments.length){
 		Parse.Object.saveAll(comments , {
 				success: function(list) {
@@ -244,7 +244,7 @@ function assignFlagsToComments(comments, index, status){
       success: function(first) {
         current.set("flag", first);
         console.log(first);
-        assignFlagsToComments(comments, index+1, status);
+        assignFlagsToTable(comments, index+1, status);
       },
       error: function(error) {
         status.error(error.message);
@@ -264,9 +264,25 @@ Parse.Cloud.job("addFlagsToComments", function(request, status) {
 			status.error(error.message);
 		},
 		success: function (results){
-      assignFlagsToComments(results, 0, status);
+      assignFlagsToTable(results, 0, status);
 		}
 	});
+
+});
+
+Parse.Cloud.job("addFlagsToWoWs", function(request, status) {
+  var WoWs = Parse.Object.extend("Wow_Lol_Boo");
+  var query = new Parse.Query(WoWs);
+  query.doesNotExist("flag");
+  query.limit(200);
+  query.find({
+    error: function(error){
+      status.error(error.message);
+    },
+    success: function (results){
+      assignFlagsToTable(results, 0, status);
+    }
+  });
 
 });
 
@@ -489,7 +505,22 @@ Parse.Cloud.afterDelete("Posts", function(request) {
   }).then(function(success) {
     console.log("Successfully deleted posts");
   }, function(error) {
-    console.error("Error deleting related comments " + error.code + ": " + error.message);
+    console.error("Error deleting related comments: " + error.code + ": " + error.message);
+  });
+
+  var wowQuery = new Parse.Query("Wow_Lol_Boo");
+  wowQuery.equalTo("flag", {
+        __type: "Pointer",
+        className: "Posts",
+        objectId: request.object.id
+    });
+  wowQuery.find().then(function(wows) {
+    console.log("WoWs being deleted: " + wows.length);
+    return Parse.Object.destroyAll(wows);
+  }).then(function(success) {
+    console.log("Successfully deleted wows");
+  }, function(error) {
+    console.error("Error deleting related wows: " + error.code + ": " + error.message);
   });
 });
 
@@ -512,6 +543,26 @@ Parse.Cloud.afterDelete("Comments", function(request) {
           // Execute any logic that should take place if the save fails.
           // error is a Parse.Error with an error code and message.
           alert('Failed to create new deleted comment entry, with error code: ' + error.message);
+      }
+  });
+});
+
+Parse.Cloud.afterDelete("Wow_Lol_Boo", function(request) {
+  var Deleted_WoWs = Parse.Object.extend("Deleted_WoW");
+  var delwows = new Deleted_WoWs();
+  var delwow_original = request.object;
+  delwows.set("previousObjectId", delwow_original.id);
+  delwows.set("user", delwow_original.get("user"));
+  delwows.set("flag", delwow_original.get("flag"));
+  delwows.save(null, {
+      success: function(post) {
+          // Execute any logic that should take place after the object is saved.
+          alert('New deleted wow entry created with objectId: ' + post.id);
+      },
+      error: function(post, error) {
+          // Execute any logic that should take place if the save fails.
+          // error is a Parse.Error with an error code and message.
+          alert('Failed to create new deleted wow entry, with error code: ' + error.message);
       }
   });
 });

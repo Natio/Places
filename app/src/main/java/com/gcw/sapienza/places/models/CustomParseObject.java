@@ -12,6 +12,7 @@ public class CustomParseObject extends ParseObject {
 
     public static final String FACEBOOK_ID_KEY = "fbId";
     public static final String FLAG_ID_KEY = "flagId";
+    public static final String FLAG_KEY = "flag";
     public static final String WOW_KEY = "boolWow";
     public static final String LOL_KEY = "boolLol";
     public static final String BOO_KEY = "boolBoo";
@@ -24,7 +25,6 @@ public class CustomParseObject extends ParseObject {
     public ParseUser getuser() {
         return (ParseUser) this.get(USER_KEY);
     }
-
 
     public String getFacebookId() {
         return (String) this.get(FACEBOOK_ID_KEY);
@@ -40,6 +40,14 @@ public class CustomParseObject extends ParseObject {
 
     public void setFlagId(String flagId) {
         this.put(FLAG_ID_KEY, flagId);
+    }
+
+    public Flag getFlag() {
+        return (Flag) this.get(FLAG_KEY);
+    }
+
+    public void setFlag(Flag flag) {
+        this.put(FLAG_KEY, flag);
     }
 
     public boolean getWowBoolean() {

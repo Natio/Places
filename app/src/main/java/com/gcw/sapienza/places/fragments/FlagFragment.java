@@ -121,7 +121,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         super.onCreate(savedInstanceState);
 
         Bundle bundle = getArguments();
-        this.scrollToLastComment = bundle.getBoolean("scrollToLastComment");
+        if(bundle != null) {
+            this.scrollToLastComment = bundle.getBoolean("scrollToLastComment");
+        }
 /*
         text = bundle.getString("text");
         id = bundle.getString("id");
@@ -628,6 +630,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                             obj = new CustomParseObject();
                             obj.setUser(PlacesUser.getCurrentUser());
                             obj.setFlagId(FlagFragment.this.flag.getObjectId());
+                            obj.setFlag(FlagFragment.this.flag);
                             obj.setFacebookId(PlacesLoginUtils.getInstance().getCurrentUserId());
                             obj.setWowBoolean(true);
                             obj.saveInBackground(new SaveCallback() {
