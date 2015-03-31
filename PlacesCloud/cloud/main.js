@@ -93,8 +93,8 @@ Parse.Cloud.afterSave("Comments", function(request, response){
           var alertText = request.object.get("username") + ": " + request.object.get("text").trunc(30);
           Parse.Push.send({
             where: query_push, // Set our Installation query
+            collapse_key: "places_push",
             data: {
-              collapse_key: "places_push",
               alert: alertText,
               commented_flag: flagId,
               type: "comment"
