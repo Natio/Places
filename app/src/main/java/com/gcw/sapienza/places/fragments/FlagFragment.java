@@ -120,9 +120,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //TODO do we need the commented part?
-//       Bundle bundle = getArguments();
-//        this.scrollToLastComment = bundle.getBoolean("scrollToLastComment");
+        Bundle bundle = getArguments();
+        this.scrollToLastComment = bundle.getBoolean("scrollToLastComment");
 /*
         text = bundle.getString("text");
         id = bundle.getString("id");
