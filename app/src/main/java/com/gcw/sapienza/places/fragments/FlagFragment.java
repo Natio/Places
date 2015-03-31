@@ -44,6 +44,8 @@ import com.gcw.sapienza.places.models.CommentReport;
 import com.gcw.sapienza.places.models.CustomParseObject;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.models.PlacesUser;
+import com.gcw.sapienza.places.models.manager.CommentsManager;
+import com.gcw.sapienza.places.models.manager.ModelCallback;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.DeleteCallback;
@@ -65,6 +67,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
@@ -408,7 +411,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     }
 
     private void retrieveComments() {
-        ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
+        /*ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
         query.whereEqualTo("flag", this.flag);
         query.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
         query.orderByAscending("createdAt");
@@ -430,7 +433,31 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
                 scrollToLastComment = false;
             }
-        });
+        });*/
+        new CommentsManager().commentsForFlag(this.flag)
+                .cache(ParseQuery.CachePolicy.CACHE_THEN_NETWORK)
+                .sort(new Comparator<Comment>() {
+                    @Override
+                    public int compare(Comment lhs, Comment rhs) {
+                        return lhs.getCreatedAt().compareTo(rhs.getCreatedAt());
+                    }
+                })
+                .success(new ModelCallback<Comment>() {
+                    @Override
+                    public void result(List<Comment> result) {
+                        if (result == null || result.size() == 0)
+                            result = new ArrayList<>();
+
+                        CommentsAdapter commentsAdapter = new CommentsAdapter(result, commentsRecyclerView, getActivity());
+
+                        commentsRecyclerView.setAdapter(commentsAdapter);
+                        if(scrollToLastComment && result.size() > 0)
+                            commentsRecyclerView.scrollToPosition(result.size() - 1);
+
+                        scrollToLastComment = false;
+                    }
+                })
+                .start();
     }
 
     private void insertComment() {
