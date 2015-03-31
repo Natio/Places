@@ -156,6 +156,11 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
                 this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
             }
+            else
+            {
+                String flagId = intent.getStringExtra(Utils.FLAG_ID);
+                openFlagFromHome(flagId);
+            }
         }
         else{
             Log.d(TAG, "Bundle is null. Triggering default Activity behavior.");
@@ -173,7 +178,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     {
         super.onNewIntent(intent);
 
-        //Log.d(TAG, "Is intent null? " + (intent==null));
+        Log.d(TAG, "onNewIntent called!");
 
         String bundleContentType = intent.getStringExtra("type");
         if(bundleContentType != null && bundleContentType.equals(Utils.RECEIVED_NOTIF_COMMENT_TYPE))
@@ -487,10 +492,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     public void switchToOtherFrag(Fragment frag) {
         Log.d(TAG, "Switching to other fragment: " + frag.getClass());
         Fragment f = this.getSupportFragmentManager().findFragmentById(R.id.home_container);
-        if (!isNonSupportFragmentVisible() && f != null && f.getClass() == frag.getClass()) {
-            Log.w(TAG, "Switching to the same fragment: " + f.getClass());
-            return;
-        }
 
         showSupportFrag();
 
