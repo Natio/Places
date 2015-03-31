@@ -94,7 +94,7 @@ Parse.Cloud.afterSave("Comments", function(request, response){
           Parse.Push.send({
             where: query_push, // Set our Installation query
             data: {
-              collapse_key: "places_push"
+              collapse_key: "places_push",
               alert: alertText,
               commented_flag: flagId,
               type: "comment"
