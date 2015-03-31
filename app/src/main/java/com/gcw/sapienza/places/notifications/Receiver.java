@@ -1,5 +1,6 @@
 package com.gcw.sapienza.places.notifications;
 
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -15,17 +16,6 @@ import com.parse.ParsePushBroadcastReceiver;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OptionalDataException;
-import java.io.StreamCorruptedException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by snowblack on 1/4/15.
@@ -52,7 +42,9 @@ public class Receiver extends ParsePushBroadcastReceiver {
                 extras.putString("type", Utils.RECEIVED_NOTIF_COMMENT_TYPE);
                 extras.putString(Utils.FLAG_ID, flag_id);
 
-                // PlacesStorage.updateInboxWith(context, flag_id, alert_text);
+//                Notification currNotification = getNotification(context, intent);
+
+//                PlacesStorage.updateInboxWith(context, flag_id, alert_text);
 
                 i.putExtras(extras);
                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -20,7 +20,7 @@ public class CommentsManager extends ModelManager<Comment> {
      * @return al the comments of a given user
      */
     public Promise<Comment> commentOfUser(@NonNull ParseUser user,boolean includeFlags){
-        ParseQuery<Comment> q = this.instanciateEmptyQuery();
+        ParseQuery<Comment> q = this.instantiateEmptyQuery();
         q.whereEqualTo(Comment.COMMENT_OWNER_KEY, user);
         if(includeFlags){
             q.include(Comment.FLAG_KEY);
@@ -34,7 +34,7 @@ public class CommentsManager extends ModelManager<Comment> {
      * @return all comments for a flag, comments are not sorted
      */
     public Promise<Comment> commentsForFlag(@NonNull Flag f){
-        ParseQuery<Comment> q = this.instanciateEmptyQuery();
+        ParseQuery<Comment> q = this.instantiateEmptyQuery();
         q.whereEqualTo(Comment.FLAG_KEY, f);
         return new Promise<>(q);
     }

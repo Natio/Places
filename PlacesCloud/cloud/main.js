@@ -93,6 +93,7 @@ Parse.Cloud.afterSave("Comments", function(request, response){
           var alertText = request.object.get("username") + ": " + request.object.get("text").trunc(30);
           Parse.Push.send({
             where: query_push, // Set our Installation query
+            collapse_key: "places_push",
             data: {
               alert: alertText,
               commented_flag: flagId,
@@ -100,7 +101,7 @@ Parse.Cloud.afterSave("Comments", function(request, response){
             }
           }, {
             success: function() {
-              console.log("Notifiche inviate!!!");
+              console.log("Notifications sent!");
             },
             error: function(error) {
               console.log(error.message);
