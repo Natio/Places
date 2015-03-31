@@ -16,7 +16,7 @@ public abstract class ModelManager<T extends ParseObject> {
      * @return the Promise associated with the query
      */
     public Promise<T> withIdentifier(String identifier){
-        ParseQuery<T> query  = this.instanciateEmptyQuery();
+        ParseQuery<T> query  = this.instantiateEmptyQuery();
         query.whereEqualTo("objectId", identifier);
        return new Promise<>(query);
     }
@@ -35,7 +35,7 @@ public abstract class ModelManager<T extends ParseObject> {
      *
      * @return a query instantiated with the correct class
      */
-    protected   ParseQuery<T> instanciateEmptyQuery(){
+    protected   ParseQuery<T> instantiateEmptyQuery(){
          String className = this.parseClass().getAnnotation(ParseClassName.class).value();
         return ParseQuery.getQuery(className);
 
