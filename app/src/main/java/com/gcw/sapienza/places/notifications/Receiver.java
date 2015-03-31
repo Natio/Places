@@ -1,5 +1,6 @@
 package com.gcw.sapienza.places.notifications;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -51,10 +52,23 @@ public class Receiver extends ParsePushBroadcastReceiver {
                 extras.putString("type", Utils.RECEIVED_NOTIF_COMMENT_TYPE);
                 extras.putString(Utils.FLAG_ID, flag_id);
 
-                PlacesStorage.updateInboxWith(context, flag_id, alert_text);
+                // PlacesStorage.updateInboxWith(context, flag_id, alert_text);
 
                 i.putExtras(extras);
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                /*
+                PendingIntent contentIntent = PendingIntent.getActivity(context, 0, i, 0);
+                try
+                {
+                    contentIntent.send();
+                }
+                catch(PendingIntent.CanceledException ce)
+                {
+                    ce.printStackTrace();
+                }
+                */
+
                 context.startActivity(i);
             } else {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW,
@@ -66,7 +80,7 @@ public class Receiver extends ParsePushBroadcastReceiver {
         } catch (JSONException e) {
             Log.d(TAG, "Json error", e);
             Utils.showToast(context, "Something went wrong while loading Places data", Toast.LENGTH_SHORT);
-        } catch (ClassNotFoundException e) {
+        } /*catch (ClassNotFoundException e) {
             Log.d(TAG, "Class not found", e);
             Utils.showToast(context, "Something went wrong while loading Places data", Toast.LENGTH_SHORT);
         } catch (OptionalDataException e) {
@@ -78,7 +92,7 @@ public class Receiver extends ParsePushBroadcastReceiver {
         } catch (IOException e) {
             Log.d(TAG, "I/O error", e);
             Utils.showToast(context, "Something went wrong while loading Places data", Toast.LENGTH_SHORT);
-        }
+        }*/
 
 
 //        Default behavior: simply open up the Main Activity when clicking on the push notification
