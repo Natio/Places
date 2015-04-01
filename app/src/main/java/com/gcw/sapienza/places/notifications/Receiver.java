@@ -5,9 +5,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -21,6 +23,10 @@ import com.parse.ParsePushBroadcastReceiver;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
+
 /**
  * Created by snowblack on 1/4/15.
  */
@@ -30,7 +36,6 @@ public class Receiver extends ParsePushBroadcastReceiver {
     private static final String COLLAPSE_KEY = "places_push";
     private static final int COMMENT_NOTIFICATION_ID = 80;
     private static final String COMMENT_TYPE = "comment";
-    private String notificationText = "";
     private static final String UPDATES_REPO = "https://drive.google.com/folderview?id=0B1boWbY-47RQdHJnSlpScUNueTQ&usp=drive_web";
 
     @Override
@@ -69,7 +74,10 @@ public class Receiver extends ParsePushBroadcastReceiver {
                 }
                 */
 
-                clearNotificationText();
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putStringSet("pushText", new HashSet<String>());
+                editor.commit();
 
                 context.startActivity(i);
             } else {
@@ -93,10 +101,6 @@ public class Receiver extends ParsePushBroadcastReceiver {
 
     }
 
-    private void clearNotificationText() {
-        notificationText = "";
-    }
-
     @Override
     protected void onPushReceive(Context context, Intent intent) {
 
@@ -113,7 +117,10 @@ public class Receiver extends ParsePushBroadcastReceiver {
                     String alert_text = data.getString("alert");
                     String alert_title = data.getString("title");
 
-                    notificationText = notificationText + "\n" + alert_text;
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                    Set<String> alerts = prefs.getStringSet("pushTextSet", new HashSet<String>());
+
+                    alerts.add(alert_text);
 
                     //TODO uncomment when Inbox ready
 //                    PlacesStorage.updateInboxWith(context, flag_id, alert_text);
@@ -124,15 +131,28 @@ public class Receiver extends ParsePushBroadcastReceiver {
                     Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-                    builder.setContentTitle(alert_title);
-                    builder.setContentText(notificationText);
+                    builder.setContentTitle(alerts.size() + ((alerts.size() > 1) ? " new notifications!" : " new notification!") );
+                    builder.setContentText(alert_title);
                     builder.setSmallIcon(R.drawable.app_logo_small);
                     builder.setAutoCancel(true);
+
+                    NotificationCompat.InboxStyle inboxStyle =
+                            new NotificationCompat.InboxStyle();
+                    inboxStyle.setBigContentTitle("Details: ");
+                    for(String s: alerts){
+                        inboxStyle.addLine(s);
+                    }
+                    builder.setStyle(inboxStyle);
 
                     // OPTIONAL create soundUri and set sound:
                     builder.setSound(soundUri);
 
                     notificationManager.notify(COMMENT_NOTIFICATION_ID, builder.build());
+
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putStringSet("pushTextSet", alerts);
+                    editor.commit();
+
                     break;
                 default:
                     Log.d(TAG, "Triggering default onPushReceive behavior");
