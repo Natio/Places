@@ -35,6 +35,7 @@ public class Receiver extends ParsePushBroadcastReceiver {
     private static final String TAG = "Receiver";
     private static final String COLLAPSE_KEY = "places_push";
     private static final int COMMENT_NOTIFICATION_ID = 80;
+    private static final int PUSH_OPEN_REQUEST = 90;
     private static final String COMMENT_TYPE = "comment";
     private static final String UPDATES_REPO = "https://drive.google.com/folderview?id=0B1boWbY-47RQdHJnSlpScUNueTQ&usp=drive_web";
 
@@ -76,7 +77,7 @@ public class Receiver extends ParsePushBroadcastReceiver {
 
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
                 SharedPreferences.Editor editor = prefs.edit();
-                editor.putStringSet("pushText", new HashSet<String>());
+                editor.putStringSet("pushTextSet", new HashSet<String>());
                 editor.commit();
 
                 context.startActivity(i);
@@ -103,6 +104,46 @@ public class Receiver extends ParsePushBroadcastReceiver {
 
     @Override
     protected void onPushReceive(Context context, Intent intent) {
+        Log.d(TAG, "onPushReceive called");
+        try {
+            JSONObject data = new JSONObject(intent.getExtras().getString("com.parse.Data"));
+
+            String type = data.getString("type");
+
+            switch (type) {
+                case COMMENT_TYPE:
+
+                    String flag_id = data.getString("commented_flag");
+                    String alert_text = data.getString("alert");
+                    String alert_title = data.getString("title");
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                    Set<String> alerts = prefs.getStringSet("pushTextSet", new HashSet<String>());
+
+                    alerts.add(alert_text);
+
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putStringSet("pushTextSet", alerts);
+                    editor.commit();
+
+                    break;
+                default:
+                    Log.d(TAG, "Triggering default onPushReceive behavior...");
+            }
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+        super.onPushReceive(context, intent);
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Log.d(TAG, "onReceive Called");
+        super.onReceive(context, intent);
+    }
+
+    @Override
+    protected Notification getNotification(Context context, Intent intent) {
+        Log.d(TAG, "getNotification called");
 
         try {
 
@@ -119,8 +160,6 @@ public class Receiver extends ParsePushBroadcastReceiver {
 
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
                     Set<String> alerts = prefs.getStringSet("pushTextSet", new HashSet<String>());
-
-                    alerts.add(alert_text);
 
                     //TODO uncomment when Inbox ready
 //                    PlacesStorage.updateInboxWith(context, flag_id, alert_text);
@@ -144,23 +183,23 @@ public class Receiver extends ParsePushBroadcastReceiver {
                     }
                     builder.setStyle(inboxStyle);
 
+                    Intent i = new Intent();
+                    i.setAction("com.parse.push.intent.OPEN");
+                    i.putExtras(intent.getExtras());
+                    PendingIntent pendingIntentNo = PendingIntent.getBroadcast(context, PUSH_OPEN_REQUEST, i, PendingIntent.FLAG_UPDATE_CURRENT);
+                    builder.setContentIntent(pendingIntentNo);
+
                     // OPTIONAL create soundUri and set sound:
                     builder.setSound(soundUri);
 
-                    notificationManager.notify(COMMENT_NOTIFICATION_ID, builder.build());
-
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putStringSet("pushTextSet", alerts);
-                    editor.commit();
-
-                    break;
+                    return builder.build();
                 default:
                     Log.d(TAG, "Triggering default onPushReceive behavior");
             }
         }catch (JSONException e) {
             e.printStackTrace();
         }
-
+        return null;
     }
 
     @Override
