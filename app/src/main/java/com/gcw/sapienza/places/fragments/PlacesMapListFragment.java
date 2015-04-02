@@ -60,6 +60,10 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ *
+ * Abstract class for showing Fragment with Map and list of flags.
+ * Subclasses must implement all abstract methods providing the right data
+ *
  * Created by paolo on 26/03/15.
  */
 public abstract class PlacesMapListFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener,
@@ -217,20 +221,28 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         super.onDestroyView();
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
 
-
+    /**
+     * Customizes GMap UI. Subclasses can implement this method to change the UiSettings of GMaps
+     * When implementing in subclasses remember to call super.customizeGmap()
+     * @param googleMap the Gmap
+     */
+    protected void customizeGmap(GoogleMap googleMap){
+        googleMap.getUiSettings().setScrollGesturesEnabled(true);
+        googleMap.getUiSettings().setZoomGesturesEnabled(true);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+        googleMap.setOnMarkerClickListener(this);
+        googleMap.setMyLocationEnabled(true);
     }
 
+    /**
+     * Called when GMap is ready
+     * @param googleMap GMap
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.gMap = googleMap;
-        this.gMap.getUiSettings().setScrollGesturesEnabled(true);
-        this.gMap.getUiSettings().setZoomGesturesEnabled(true);
-        this.gMap.setOnMarkerClickListener(this);
-        this.gMap.setMyLocationEnabled(true);
+        this.customizeGmap(googleMap);
 
         this.handleRefreshData();
     }
@@ -259,6 +271,9 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
     }
 
 
+    /**
+     * Puts markers on the map
+     */
     private void updateMarkersOnMap() {
 
         this.markers = new ArrayList<>();
@@ -395,13 +410,16 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
     }
 
 
+    /**
+     * Fragment that shows the list of flags in a cardview
+     */
     public static class FlagsListFragment extends Fragment{
 
         private RecyclerView recycleView;
         private RelativeLayout noFlagLayout;
         private TextView noFlagsText;
 
-        //the following variable is used to fill the recycle view at cration time, after onCreateView it will be null. Do not use it
+        //the following variable is used to fill the recycle view at creation time, after onCreateView it will be null. Do not use it
         private List<Flag> initialData;
 
         protected void flagsToDisplay(){
@@ -439,7 +457,6 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
             if(this.initialData != null){
                 this.updateRecycleViewWithNewContents(this.initialData);
-                Log.d(TAG, "Metto initial data");
                 this.initialData = null;
             }
 
