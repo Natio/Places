@@ -56,10 +56,6 @@ public class Receiver extends ParsePushBroadcastReceiver {
                 extras.putString("type", Utils.RECEIVED_NOTIF_COMMENT_TYPE);
                 extras.putString(Utils.FLAG_ID, flag_id);
 
-//                Notification currNotification = getNotification(context, intent);
-
-//                PlacesStorage.updateInboxWith(context, flag_id, alert_text);
-
                 i.putExtras(extras);
                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
@@ -116,6 +112,7 @@ public class Receiver extends ParsePushBroadcastReceiver {
                     String flag_id = data.getString("commented_flag");
                     String alert_text = data.getString("alert");
                     String alert_title = data.getString("title");
+                    String commenter_id = data.getString("commenter");
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
                     Set<String> alerts = prefs.getStringSet("pushTextSet", new HashSet<String>());
 
@@ -124,6 +121,9 @@ public class Receiver extends ParsePushBroadcastReceiver {
                     SharedPreferences.Editor editor = prefs.edit();
                     editor.putStringSet("pushTextSet", alerts);
                     editor.commit();
+                    
+//                    TODO uncomment when ready
+//                    PlacesStorage.updateInboxWith(context, commenter_id, flag_id, alert_text);
 
                     break;
                 default:
@@ -160,9 +160,6 @@ public class Receiver extends ParsePushBroadcastReceiver {
 
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
                     Set<String> alerts = prefs.getStringSet("pushTextSet", new HashSet<String>());
-
-                    //TODO uncomment when Inbox ready
-//                    PlacesStorage.updateInboxWith(context, flag_id, alert_text);
 
                     NotificationManager notificationManager =
                             (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

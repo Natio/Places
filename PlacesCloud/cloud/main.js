@@ -97,6 +97,7 @@ Parse.Cloud.afterSave("Comments", function(request, response){
             data: {
               alert: alertText,
               title: "Somebody commented a Flag...",
+              commenter: request.object.get("commenter").id,
               commented_flag: flagId,
               type: "comment"
             }

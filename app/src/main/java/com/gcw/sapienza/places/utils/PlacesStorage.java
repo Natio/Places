@@ -20,6 +20,10 @@ public class PlacesStorage {
     public static final String INBOX_FILE = "inbox";
     private static final String TAG = "PlacesStorage";
 
+    private static final int COMMENTER_POS = 0;
+    private static final int FLAG_POS = 1;
+    private static final int ALERT_TEXT_POS = 2;
+
     public static List<List<String>> fetchInbox(Context context)
             throws IOException, ClassNotFoundException{
         File storageFile = new File(context.getFilesDir(), PlacesStorage.INBOX_FILE);
@@ -40,7 +44,7 @@ public class PlacesStorage {
         return inbox;
     }
 
-    public static void updateInboxWith(Context context, String flag_id, String alert_text)
+    public static void updateInboxWith(Context context,String commenter, String flag_id, String alert_text)
             throws ClassNotFoundException, IOException {
 
 
@@ -52,6 +56,7 @@ public class PlacesStorage {
         }
 
         List<String> notificationEntry = new ArrayList<>();
+        notificationEntry.add(commenter);
         notificationEntry.add(flag_id);
         notificationEntry.add(alert_text);
         inbox.add(notificationEntry);
