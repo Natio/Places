@@ -23,6 +23,7 @@ import com.parse.ParsePushBroadcastReceiver;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -53,11 +54,6 @@ public class Receiver extends ParsePushBroadcastReceiver {
 
                 Intent i = new Intent(context, MainActivity.class);
                 Bundle extras = new Bundle();
-                extras.putString("type", Utils.RECEIVED_NOTIF_COMMENT_TYPE);
-                extras.putString(Utils.FLAG_ID, flag_id);
-
-                i.putExtras(extras);
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
                 /*
                 PendingIntent contentIntent = PendingIntent.getActivity(context, 0, i, 0);
@@ -72,9 +68,26 @@ public class Receiver extends ParsePushBroadcastReceiver {
                 */
 
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+                int notificationsSize = prefs.getStringSet("pushTextSet", new HashSet<String>()).size();
+
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putStringSet("pushTextSet", new HashSet<String>());
                 editor.commit();
+                if(notificationsSize == 1) {
+                    Log.d(TAG, "Just 1 notification. Showing the related Flag");
+                    extras.putString("type", Utils.RECEIVED_NOTIF_COMMENT_TYPE);
+                    extras.putString(Utils.FLAG_ID, flag_id);
+                }else if(notificationsSize > 1){
+                    Log.d(TAG, notificationsSize + " notifications. Showing the Inbox");
+                    extras.putString("type", Utils.RECEIVED_MULTI_NOTIF_COMMENT_TYPE);
+                }else{
+                    Log.w(TAG, "0 notifications. Nothing to show");
+                    return;
+                }
+
+                i.putExtras(extras);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
                 context.startActivity(i);
             } else {
@@ -121,9 +134,13 @@ public class Receiver extends ParsePushBroadcastReceiver {
                     SharedPreferences.Editor editor = prefs.edit();
                     editor.putStringSet("pushTextSet", alerts);
                     editor.commit();
-                    
-//                    TODO uncomment when ready
-//                    PlacesStorage.updateInboxWith(context, commenter_id, flag_id, alert_text);
+
+//                    TODO comment if problem arise with inbox
+                    PlacesStorage.updateInboxWith(context, commenter_id, flag_id, alert_text);
+
+                    Notification commentsNotification = getNotification(context, intent);
+                    NotificationManager nManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                    nManager.notify(COMMENT_NOTIFICATION_ID, commentsNotification);
 
                     break;
                 default:
@@ -131,8 +148,11 @@ public class Receiver extends ParsePushBroadcastReceiver {
             }
         }catch (JSONException e){
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        super.onPushReceive(context, intent);
     }
 
     @Override

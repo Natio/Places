@@ -60,6 +60,7 @@ public class Utils {
     public static final int COMMENT_LIST_GROUP = 6;
 
     public static final String RECEIVED_NOTIF_COMMENT_TYPE = "comment_notification";
+    public static final String RECEIVED_MULTI_NOTIF_COMMENT_TYPE = "multi_comment_notification";
     public static final String FLAG_ID = "flagId";
 
     @SuppressWarnings("unused")

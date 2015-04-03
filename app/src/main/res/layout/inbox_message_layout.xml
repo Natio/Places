@@ -14,7 +14,7 @@
         android:weightSum="1">
 
         <ImageView
-            android:id="@+id/friend_card_profile_pic"
+            android:id="@+id/placer_card_profile_pic"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_marginBottom="3dp"
@@ -24,7 +24,7 @@
             android:padding="2dp" />
 
         <TextView
-            android:id="@+id/friend_card_textView_username"
+            android:id="@+id/placer_card_textView_username"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"

@@ -147,23 +147,10 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         {
             Log.d(TAG, "Bundle is not null.");
 
-            String bundleContentType = intent.getStringExtra("type");
-            if(bundleContentType == null || !bundleContentType.equals(Utils.RECEIVED_NOTIF_COMMENT_TYPE))
-            {
-                Log.d(TAG, "String 'type' in bundle is null. Triggering default Activity behavior.");
-
-                PlacesApplication.getInstance().startLocationService();
-
-                this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
-            }
-            else
-            {
-                String flagId = intent.getStringExtra(Utils.FLAG_ID);
-                openFlagFromHome(flagId);
-            }
+            handleIntent(intent);
         }
         else{
-            Log.d(TAG, "Bundle is null. Triggering default Activity behavior.");
+            Log.d(TAG, "Bundle is null. Triggering default Activity behavior");
 
             PlacesApplication.getInstance().startLocationService();
 
@@ -173,22 +160,42 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         // setIntent(null);
     }
 
+    private void handleIntent(Intent intent) {
+        String bundleContentType = intent.getStringExtra("type");
+        if(bundleContentType == null)
+        {
+            Log.d(TAG, "String 'type' in bundle is null. Triggering default Activity behavior.");
+
+            PlacesApplication.getInstance().startLocationService();
+
+            this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
+        }
+        else
+        {
+            switch (bundleContentType){
+                case Utils.RECEIVED_NOTIF_COMMENT_TYPE:
+                    Log.d(TAG, Utils.RECEIVED_NOTIF_COMMENT_TYPE);
+                    String flagId = intent.getStringExtra(Utils.FLAG_ID);
+                    openFlagFromHome(flagId);
+                    break;
+
+                case Utils.RECEIVED_MULTI_NOTIF_COMMENT_TYPE:
+                    Log.d(TAG, Utils.RECEIVED_MULTI_NOTIF_COMMENT_TYPE);
+                    switchToOtherFrag(new InboxFragment());
+                    break;
+
+                default:
+                    Log.w(TAG, "Unrecognized bundleContentType");
+            }
+        }
+    }
+
     @Override
     protected void onNewIntent(Intent intent)
     {
         super.onNewIntent(intent);
 
-        Log.d(TAG, "onNewIntent called!");
-
-        String bundleContentType = intent.getStringExtra("type");
-        if(bundleContentType != null && bundleContentType.equals(Utils.RECEIVED_NOTIF_COMMENT_TYPE))
-        {
-            Log.d(TAG, "String 'type' in bundle is not null");
-
-            String flagId = intent.getStringExtra(Utils.FLAG_ID);
-            openFlagFromHome(flagId);
-        }
-        else Log.d(TAG, "String 'type' in bundle is null");
+        handleIntent(intent);
     }
 
     @Deprecated
