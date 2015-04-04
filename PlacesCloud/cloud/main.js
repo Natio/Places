@@ -95,9 +95,10 @@ Parse.Cloud.afterSave("Comments", function(request, response){
             where: query_push, // Set our Installation query
             collapse_key: "places_push",
             data: {
-              alert: alertText,
+              alert: request.object.get("text").trunc(30),
               title: "Somebody commented a Flag...",
               commenter: request.object.get("commenter").id,
+              commenter_name: request.object.get("username"),
               commented_flag: flagId,
               type: "comment"
             }
