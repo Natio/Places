@@ -124,12 +124,12 @@ public class Receiver extends ParsePushBroadcastReceiver {
 
                     String flag_id = data.getString("commented_flag");
                     String alert_text = data.getString("alert");
-                    String alert_title = data.getString("title");
                     String commenter_id = data.getString("commenter");
+                    String commenter_name = data.getString("commenter_name");
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
                     Set<String> alerts = prefs.getStringSet("pushTextSet", new HashSet<String>());
 
-                    alerts.add(alert_text);
+                    alerts.add(commenter_name + ": " + alert_text);
 
                     SharedPreferences.Editor editor = prefs.edit();
                     editor.putStringSet("pushTextSet", alerts);
@@ -174,8 +174,6 @@ public class Receiver extends ParsePushBroadcastReceiver {
             switch (type) {
                 case COMMENT_TYPE:
 
-                    String flag_id = data.getString("commented_flag");
-                    String alert_text = data.getString("alert");
                     String alert_title = data.getString("title");
 
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
