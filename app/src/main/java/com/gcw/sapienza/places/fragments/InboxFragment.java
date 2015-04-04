@@ -1,5 +1,6 @@
 package com.gcw.sapienza.places.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -16,6 +18,7 @@ import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.adapters.InboxAdapter;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
+import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.PlacesStorage;
 import com.gcw.sapienza.places.utils.Utils;
@@ -33,6 +36,7 @@ public class InboxFragment extends Fragment implements AdapterView.OnItemClickLi
 
     private ListView inboxListView;
     private MSwipeRefreshLayout inboxSwipe;
+    private Button clearInbox;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -67,15 +71,29 @@ public class InboxFragment extends Fragment implements AdapterView.OnItemClickLi
                     inbox = PlacesStorage.fetchInbox(getActivity());
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(getActivity(), "Something went wrong while refreshing Inbox data", Toast.LENGTH_SHORT);
+                    Utils.showToast(getActivity(), "Something went wrong while refreshing Inbox data", Toast.LENGTH_SHORT);
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
-                    Toast.makeText(getActivity(), "Something went wrong while refreshing Inbox data", Toast.LENGTH_SHORT);
+                    Utils.showToast(getActivity(), "Something went wrong while refreshing Inbox data", Toast.LENGTH_SHORT);
                 }
                 inboxListView.setAdapter(new InboxAdapter(getActivity(), R.layout.inbox_message_layout, inbox));
                 inboxSwipe.setRefreshing(false);
             }
         });
+
+        clearInbox = (Button)view.findViewById(R.id.clear_inbox);
+        clearInbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    PlacesStorage.clearInbox(getActivity());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Utils.showToast(getActivity(), "Something went wrong while clearing Inbox data", Toast.LENGTH_SHORT);
+                }
+            }
+        });
+
 
         return view;
     }
@@ -83,22 +101,20 @@ public class InboxFragment extends Fragment implements AdapterView.OnItemClickLi
     //TODO not properly implemented yet. At this stage clicking on a message causes the app to crash
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
         Log.d(TAG, "Click");
-        String fbid =(String) inboxListView.getAdapter().getItem(position);
+        String flagId = ((InboxAdapter)inboxListView.getAdapter()).getItem(position).get(PlacesStorage.FLAG_POS);
 
-        ParseQuery<PlacesUser> queryUsers = ParseQuery.getQuery("_User");
-        queryUsers.whereEqualTo(PlacesUser.FACEBOOK_ID_KEY, fbid);
-        queryUsers.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
-
-        try{
-            //the following query is not executed in background
-            //because the user is cached
-            PlacesUser user = queryUsers.getFirst();
-            ((MainActivity) this.getActivity()).switchToOtherFrag(ProfileFragment.newInstance(user));
-
+        try {
+            PlacesStorage.updateSeenInboxAt(getActivity(), position);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Utils.showToast(getActivity(), "Something went wrong while updating Inbox data", Toast.LENGTH_SHORT);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            Utils.showToast(getActivity(), "Something went wrong while updating Inbox data", Toast.LENGTH_SHORT);
         }
-        catch (ParseException ex){
-            Log.e(TAG, "error", ex);
-        }
+
+        ((MainActivity) this.getActivity()).openFlagFromId(flagId);
     }
 }

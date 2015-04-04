@@ -51,10 +51,11 @@ public class MyFriendsFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Log.d(TAG, "Click");
-        String fbid =(String) friendsListView.getAdapter().getItem(position);
+
+        String fbId =(String) friendsListView.getAdapter().getItem(position);
 
         ParseQuery<PlacesUser> queryUsers = ParseQuery.getQuery("_User");
-        queryUsers.whereEqualTo(PlacesUser.FACEBOOK_ID_KEY, fbid);
+        queryUsers.whereEqualTo(PlacesUser.FACEBOOK_ID_KEY, fbId);
         queryUsers.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
 
         try{

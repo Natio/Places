@@ -2,6 +2,7 @@ package com.gcw.sapienza.places.utils;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.EOFException;
 import java.io.File;
@@ -25,6 +26,7 @@ public class PlacesStorage {
     public static final int COMMENTER_POS = 0;
     public static final int FLAG_POS = 1;
     public static final int ALERT_TEXT_POS = 2;
+    public static final int SEEN_TEXT_POS = 3;
 
     public static List<List<String>> fetchInbox(Context context)
             throws IOException, ClassNotFoundException{
@@ -66,12 +68,27 @@ public class PlacesStorage {
         notificationEntry.add(commenter);
         notificationEntry.add(flag_id);
         notificationEntry.add(alert_text);
+        notificationEntry.add("");
         ((LinkedList<List<String>>)inbox).addFirst(notificationEntry);
 
-        FileOutputStream fos = context.openFileOutput(PlacesStorage.INBOX_FILE, Context.MODE_PRIVATE);
-        ObjectOutputStream os = new ObjectOutputStream(fos);
-        os.writeObject(inbox);
-        os.close();
-        fos.close();
+        updateInbox(context, inbox);
+    }
+
+    public static void updateInbox(Context context, List<List<String>> newInbox) throws IOException {
+            FileOutputStream fos = context.openFileOutput(PlacesStorage.INBOX_FILE, Context.MODE_PRIVATE);
+            ObjectOutputStream os = new ObjectOutputStream(fos);
+            os.writeObject(newInbox);
+            os.close();
+            fos.close();
+    }
+
+    public static void updateSeenInboxAt(Context context, int position) throws IOException, ClassNotFoundException {
+        List<List<String>> inbox = fetchInbox(context);
+        inbox.get(position).set(SEEN_TEXT_POS, "0");
+        updateInbox(context, inbox);
+    }
+
+    public static void clearInbox(Context context) throws IOException {
+        updateInbox(context, new LinkedList<List<String>>());
     }
 }

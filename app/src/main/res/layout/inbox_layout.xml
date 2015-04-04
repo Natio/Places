@@ -6,10 +6,20 @@
     android:orientation="vertical">
 
     <ListView
+        android:layout_weight="0.9"
+        android:layout_height="0dp"
         android:id="@+id/inbox_list_view"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
         android:choiceMode="singleChoice"
         android:scrollbars="none" />
+
+    <Button
+        android:id="@+id/clear_inbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textSize="14sp"
+        android:text="Clear Inbox"
+        android:textColor="@color/grey"/>
 
 </android.support.v4.widget.SwipeRefreshLayout>

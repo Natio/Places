@@ -176,7 +176,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
                 case Utils.RECEIVED_NOTIF_COMMENT_TYPE:
                     Log.d(TAG, Utils.RECEIVED_NOTIF_COMMENT_TYPE);
                     String flagId = intent.getStringExtra(Utils.FLAG_ID);
-                    openFlagFromHome(flagId);
+                    openFlagFromId(flagId);
                     break;
 
                 case Utils.RECEIVED_MULTI_NOTIF_COMMENT_TYPE:
@@ -278,7 +278,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             Log.d(TAG, "String 'type' in bundle is not null");
 
             String flagId = intent.getStringExtra(Utils.FLAG_ID);
-            openFlagFromHome(flagId);
+            openFlagFromId(flagId);
         }
         else Log.d(TAG, "String 'type' in bundle is null");
         */
@@ -654,7 +654,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         GPlusUtils.getInstance().getGoogleApiClient().connect();
     }
 
-    private void openFlagFromHome(String flagId)
+    public void openFlagFromId(String flagId)
     {
         ParseQuery<Flag> q = ParseQuery.getQuery("Posts");
         q.whereEqualTo("objectId", flagId);

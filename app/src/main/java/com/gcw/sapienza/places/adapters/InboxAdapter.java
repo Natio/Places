@@ -2,6 +2,7 @@ package com.gcw.sapienza.places.adapters;
 
 import android.content.Context;
 import android.database.DataSetObserver;
+import android.graphics.Color;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import com.gcw.sapienza.places.fragments.InboxFragment;
 import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.PlacesStorage;
+import com.gcw.sapienza.places.utils.Utils;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -52,10 +54,12 @@ public class InboxAdapter extends ArrayAdapter<List<String>> {
 
         final String friendId = getItem(position).get(PlacesStorage.COMMENTER_POS);
         final String alertText = getItem(position).get(PlacesStorage.ALERT_TEXT_POS);
+        final String isSeen = getItem(position).get(PlacesStorage.SEEN_TEXT_POS);
 
         final TextView placerMessageView = (TextView) v.findViewById(R.id.placer_card_textView_username);
         final ImageView placerImageView = (ImageView) v.findViewById(R.id.placer_card_profile_pic);
 
+        placerMessageView.setTextColor(isSeen.isEmpty() ? Color.BLACK : Color.GRAY);
         placerMessageView.setText(alertText);
 
         Log.d(TAG, "FriendID: " + friendId);
@@ -76,7 +80,7 @@ public class InboxAdapter extends ArrayAdapter<List<String>> {
                 } else {
 
                     Log.e(TAG, e.getMessage());
-                    Toast.makeText(getContext(), "An error occurred while retrieving Inbox data", Toast.LENGTH_SHORT).show();
+                    Utils.showToast(getContext(), "An error occurred while retrieving Inbox data", Toast.LENGTH_SHORT);
 
                 }
             }
