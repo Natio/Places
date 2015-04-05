@@ -1,24 +1,35 @@
 package com.gcw.sapienza.places.utils;
 
 import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Looper;
 import android.util.Log;
 
 import com.gcw.sapienza.places.BuildConfig;
+import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.models.Flag;
+import com.gcw.sapienza.places.services.WeatherHttpClient;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 import com.parse.ProgressCallback;
 import com.parse.SaveCallback;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -188,13 +199,7 @@ public class FlagUploader {
         this.callbacks = cbk;
         this.isUploading = true;
 
-        FacebookUtils.getInstance().getFacebookUsernameFromID(PlacesLoginUtils.getInstance().getCurrentUserId(), new PlacesUtilCallback() {
-            @Override
-            public void onResult(String result, Exception e) {
-                FlagUploader.this.flag.setFbName(result);
-                FlagUploader.this.loadFileLoop();
-            }
-        });
+        new WeatherTask().execute(PlacesApplication.getInstance().getLocation());
 
 
     }
@@ -313,6 +318,25 @@ public class FlagUploader {
                 } else {
                     FlagUploader.this.onFinish();
                 }
+            }
+        });
+
+    }
+
+    /**
+     *
+     * @param weather string representing the weather
+     */
+    private void onWeatherLoaded(String weather){
+        if(weather != null){
+            this.flag.setWeather(weather);
+        }
+
+        FacebookUtils.getInstance().getFacebookUsernameFromID(PlacesLoginUtils.getInstance().getCurrentUserId(), new PlacesUtilCallback() {
+            @Override
+            public void onResult(String result, Exception e) {
+                FlagUploader.this.flag.setFbName(result);
+                FlagUploader.this.loadFileLoop();
             }
         });
 
@@ -464,6 +488,64 @@ public class FlagUploader {
         @Override
         protected void onPostExecute(ParseFile file) {
             FlagUploader.this.onThumbInMemoryLoadDone(file);
+        }
+    }
+
+    private class WeatherTask extends AsyncTask<Location, Integer, String>{
+
+
+        private String getLocalityFromCoorinate(Location current){
+            Geocoder gcd = new Geocoder(PlacesApplication.getPlacesAppContext(), Locale.getDefault());
+            try {
+
+                List<Address> addresses = gcd.getFromLocation(current.getLatitude(), current.getLongitude(), 1);
+                if (addresses.size() > 0) {
+                    Log.d(TAG, "Locality: " + addresses.get(0).getLocality());
+                    String locality = addresses.get(0).getLocality();
+                    String cc = addresses.get(0).getCountryCode();
+                    return  locality + ',' + cc;
+                }
+            } catch (IOException | NullPointerException e) {
+                Log.e(TAG, "No locality found! Error: " + e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected String doInBackground(Location... params) {
+
+
+            String locality = this.getLocalityFromCoorinate(params[0]);
+            if (locality == null){
+                return null;
+            }
+
+            String data = ((new WeatherHttpClient()).getWeatherData(locality));
+            try {
+                Log.d("Weather", data);
+                JSONObject info = new JSONObject(data);
+                JSONObject mainObj = info.getJSONObject("main");
+
+                float temp = (float) mainObj.getDouble("temp") - 273.15f;
+                int round_temp = Math.round(temp);
+                Log.d("Weather", "Temperatura: " + round_temp);
+
+                JSONArray weatherObj = info.getJSONArray("weather");
+                String cond = weatherObj.getJSONObject(0).getString("main");
+                Log.d("Weather", "Condizioni: " + cond);
+                return round_temp + "°C, " + cond;
+
+            } catch (JSONException | NullPointerException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            FlagUploader.this.onWeatherLoaded(s);
+            super.onPostExecute(s);
         }
     }
 

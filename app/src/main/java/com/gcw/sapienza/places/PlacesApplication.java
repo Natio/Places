@@ -5,8 +5,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
@@ -22,7 +20,6 @@ import com.gcw.sapienza.places.models.FlagReport;
 import com.gcw.sapienza.places.services.ILocationServiceListener;
 import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.services.ILocationUpdater;
-import com.gcw.sapienza.places.services.JSONWeatherTask;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.services.LocationService.LocalBinder;
 import com.gcw.sapienza.places.utils.FlagsStorage;
@@ -37,12 +34,9 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
 
 
 public class PlacesApplication extends Application {
@@ -65,7 +59,7 @@ public class PlacesApplication extends Application {
         @Override
         public void setLocation(Location l) {
             PlacesApplication.this.currentLocation = l;
-            PlacesApplication.this.updateWeatherInfo();
+           // PlacesApplication.this.updateWeatherInfo();
         }
 
         @Override
@@ -118,8 +112,7 @@ public class PlacesApplication extends Application {
             PlacesApplication.this.mBound = false;
         }
     };
-    //shared variable for handling weather conditions
-    private String weather = "";
+
 
     /**
      * Call this method to access the UNIQUE PlacesApplication instance
@@ -162,21 +155,7 @@ public class PlacesApplication extends Application {
         return this.mService;
     }
 
-    /**
-     * @return string representing weather conditions
-     */
-    public String getWeather() {
-        return this.weather;
-    }
 
-    /**
-     * Sets the weather
-     *
-     * @param weather string representing the weather
-     */
-    public void setWeather(String weather) {
-        this.weather = weather;
-    }
 
     /**
      * Returns the current location if available. If running on emulator this method
@@ -305,26 +284,6 @@ public class PlacesApplication extends Application {
             startLocationService();
             return false;
         }
-    }
-
-    private void updateWeatherInfo() {
-        Geocoder gcd = new Geocoder(this, Locale.getDefault());
-        try {
-
-            Location current = this.currentLocation;
-
-            List<Address> addresses = gcd.getFromLocation(current.getLatitude(), current.getLongitude(), 1);
-            if (addresses.size() > 0) {
-                Log.d(TAG, "Locality: " + addresses.get(0).getLocality());
-                String locality = addresses.get(0).getLocality();
-                String cc = addresses.get(0).getCountryCode();
-                JSONWeatherTask task = new JSONWeatherTask();
-                task.execute(locality + ',' + cc);
-            }
-        } catch (IOException | NullPointerException e) {
-            Log.e(TAG, "No locality found! Error: " + e.getMessage());
-        }
-
     }
 
 /*
