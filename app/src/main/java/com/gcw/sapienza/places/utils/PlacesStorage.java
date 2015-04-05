@@ -20,7 +20,7 @@ import java.util.List;
  * Created by snowblack on 3/31/15.
  */
 public class PlacesStorage {
-    public static final String INBOX_FILE = "inbox_data";
+    public static final String INBOX_FILE = "inbox_data_file";
     private static final String TAG = "PlacesStorage";
 
     public static final int COMMENTER_POS = 0;
