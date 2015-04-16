@@ -350,8 +350,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         // else if(v.getId() == playVideoButton.getId()) playVideo();
         else if (v.getId() == R.id.audio) playRecording();
         else if (v.getId() == R.id.wow_button) wlbFlag(WOW_CODE);
-        // else if (v.getId() == R.id.lol_button) wlbFlag(LOL_CODE);
-        // else if (v.getId() == R.id.boo_button) wlbFlag(BOO_CODE);
+            // else if (v.getId() == R.id.lol_button) wlbFlag(LOL_CODE);
+            // else if (v.getId() == R.id.boo_button) wlbFlag(BOO_CODE);
         else if (v.getId() == R.id.add_comment) insertComment();
         else if (v.getId() == R.id.profile_pic) showProfilePage();
         else Log.d(TAG, "don't really know what's been clicked!");

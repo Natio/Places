@@ -58,7 +58,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 
-
 public class MainActivity extends ActionBarActivity implements Preference.OnPreferenceChangeListener, ResultCallback<People.LoadPeopleResult>,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ILocationServiceListener {
 

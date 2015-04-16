@@ -20,12 +20,12 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
@@ -54,10 +54,10 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 /**
  *
@@ -75,6 +75,8 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
     private List<Marker> markers;
     protected FlagsListFragment listFragment;
     private MSwipeRefreshLayout srl;
+    private SlidingUpPanelLayout supl;
+
     private BroadcastReceiver flagsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -178,34 +180,77 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
         this.srl = (MSwipeRefreshLayout) view.findViewById(R.id.my_swipe_refresh);
         this.srl.setOnRefreshListener(this);
-
-
         this.srl.setOnChildScrollUpListener(new MSwipeRefreshLayout.OnChildScrollUpListener() {
             @Override
-            public boolean canChildScrollUp() {
-
-
+            public boolean canChildScrollUp()
+            {
                 FlagsListFragment f = PlacesMapListFragment.this.listFragment;
-                if(f == null){
-                    return false;
-                }
-                RecyclerView rv = f.getRecyclerView();
+                if(f == null) return false;
 
+                RecyclerView rv = f.getRecyclerView();
                 if (rv == null) return false;
 
                 RecyclerView.LayoutManager layoutManager = rv.getLayoutManager();
 
                 int position = ((LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
-
-                // Log.d(TAG, "First completely visible item position: " + position);
+                /*if(position == 0 || supl.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED)
+                {
+                    // if(supl.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) supl.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+                    if(supl.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED) supl.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                    else if(supl.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED || supl.getPanelState() == SlidingUpPanelLayout.PanelState.HIDDEN)
+                        supl.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+                    return true;
+                }*/
 
                 return position != 0 && rv.getAdapter().getItemCount() != 0;
             }
         });
+        this.supl = (SlidingUpPanelLayout)view.findViewById(R.id.home_container);
+        this.supl.setAnchorPoint(0.1f);
+        // this.supl.setTouchEnabled(false);
+        this.supl.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+        this.supl.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View view, float v) {
+                // Log.d(TAG, "Panel sliding");
 
+            }
+
+            @Override
+            public void onPanelCollapsed(View view) {
+                Log.d(TAG, "Panel collapsed");
+                // supl.setTouchEnabled(true);
+                // srl.scrollTo(0, 0);
+            }
+
+            @Override
+            public void onPanelExpanded(View view) {
+                Log.d(TAG, "Panel expanded");
+
+                srl.scrollTo(0, 0);
+                // supl.setClickable(false);
+                // supl.setTouchEnabled(false);
+                // supl.setEnableDragViewTouchEvents(false);
+                // supl.setLongClickable(false);
+            }
+
+            @Override
+            public void onPanelAnchored(View view) {
+                Log.d(TAG, "Panel anchored");
+                srl.scrollTo(0, 0);
+            }
+
+            @Override
+            public void onPanelHidden(View view) {
+                Log.d(TAG, "Panel hidden");
+                srl.scrollTo(0, 0);
+            }
+        });
 
         this.listFragment = new FlagsListFragment();
         this.listFragment.setInitialData(this.getData());
+        this.listFragment.setSUPL(supl);
+        this.listFragment.setSRL(srl);
         this.getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.my_swipe_refresh, this.listFragment).commit();
 
         SupportMapFragment mapFragment = new SupportMapFragment();
@@ -228,7 +273,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
      * @param googleMap the Gmap
      */
     protected void customizeGmap(GoogleMap googleMap){
-        googleMap.getUiSettings().setScrollGesturesEnabled(true);
+        googleMap.getUiSettings().setScrollGesturesEnabled(false);
         googleMap.getUiSettings().setZoomGesturesEnabled(true);
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
         googleMap.setOnMarkerClickListener(this);
@@ -267,6 +312,9 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
         // by returning false we can show text on flag in the map
         // return false;
+
+        if(supl.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED)supl.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+
         return true;
     }
 
@@ -418,6 +466,18 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         private RecyclerView recycleView;
         private RelativeLayout noFlagLayout;
         private TextView noFlagsText;
+        private SlidingUpPanelLayout supl;
+        private MSwipeRefreshLayout srl;
+
+        public void setSUPL(SlidingUpPanelLayout supl)
+        {
+            this.supl = supl;
+        }
+
+        public void setSRL(MSwipeRefreshLayout srl)
+        {
+            this.srl = srl;
+        }
 
         //the following variable is used to fill the recycle view at creation time, after onCreateView it will be null. Do not use it
         private List<Flag> initialData;
@@ -447,6 +507,33 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
             View view = inflater.inflate(R.layout.flags_list_new_layout, container, false);
 
             this.recycleView = (RecyclerView) view.findViewById(R.id.cardList);
+            this.recycleView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+
+                    /*
+                    int firstVisibleItemPos = ((LinearLayoutManager)recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
+                    if(firstVisibleItemPos == 0)
+                    {
+                        FlagsListFragment.this.supl.setTouchEnabled(true);
+                        FlagsListFragment.this.srl.setClickable(false);
+                        FlagsListFragment.this.srl.setOnTouchListener(new View.OnTouchListener() {
+                            @Override
+                            public boolean onTouch(View v, MotionEvent event) {
+                                return false;
+                            }
+                        });
+                    }
+                    */
+                }
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                }
+            });
+
             LinearLayoutManager llm = new LinearLayoutManager(this.getActivity());
             llm.setOrientation(LinearLayoutManager.VERTICAL);
             this.recycleView.setLayoutManager(llm);
@@ -568,10 +655,5 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                 }
             });
         }
-
-
-
     }
-
-
 }
