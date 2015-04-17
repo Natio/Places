@@ -3,7 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-<!-- general layout changed from relative to linear to manage weights-->
+    <!-- general layout changed from relative to linear to manage weights-->
+
+    <ScrollView
+        android:id="@+id/FlagContent"
+        android:layout_below="@id/author_divider"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,117 +19,112 @@
         android:weightSum="1"
         android:id="@+id/whole_flag_container" >
 
-    <RelativeLayout
-        android:id="@+id/flag_container"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:background="@color/white">
-
-        <!--title bar-->
         <RelativeLayout
-            android:id="@+id/titleBar"
+            android:id="@+id/flag_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="300dp"
+            android:background="@color/white">
 
-            <LinearLayout
-                android:id="@+id/author_container"
-                android:layout_width="wrap_content"
+            <!--title bar-->
+            <RelativeLayout
+                android:id="@+id/titleBar"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:orientation="horizontal"
-                android:layout_marginLeft="6dp"
-                android:layout_marginTop="6dp"
-                android:layout_marginRight="6dp">
-
-                <ImageView
-                    android:id="@+id/profile_pic"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:cropToPadding="false"
-                    android:clickable="true" />
+                android:orientation="horizontal">
 
                 <LinearLayout
-                    android:orientation="vertical"
-                    android:id="@+id/flagInfo"
-                    android:layout_width="fill_parent"
+                    android:id="@+id/author_container"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="2dp"
-                    android:layout_toRightOf="@id/profile_pic"
-                    android:layout_marginTop="2dp">
+                    android:layout_alignParentTop="true"
+                    android:orientation="horizontal"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginRight="6dp">
 
-                    <TextView
-                        android:id="@+id/author"
-                        android:layout_width="wrap_content"
+                    <ImageView
+                        android:id="@+id/profile_pic"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:cropToPadding="false"
+                        android:clickable="true" />
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:id="@+id/flagInfo"
+                        android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_centerVertical="true"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"
-                        android:textSize="16sp" />
-                    <TextView
-                        android:id="@+id/dateInfo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_centerVertical="true"
-                        android:textColor="@color/grey"
-                        android:textSize="14sp" />
+                        android:layout_marginLeft="2dp"
+                        android:layout_toRightOf="@id/profile_pic"
+                        android:layout_marginTop="2dp">
+
+                        <TextView
+                            android:id="@+id/author"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_centerVertical="true"
+                            android:textColor="@color/black"
+                            android:textStyle="bold"
+                            android:textSize="16sp" />
+                        <TextView
+                            android:id="@+id/dateInfo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_centerVertical="true"
+                            android:textColor="@color/grey"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
-            </LinearLayout>
+                <TextView
+                    android:id="@+id/temperature"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_gravity="end"
+                    android:layout_marginRight="62dp"
+                    android:layout_marginEnd="62dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/black"
+                    android:layout_toLeftOf="@+id/meteo"
+                    android:layout_toStartOf="@+id/meteo"
+                    android:layout_centerVertical="true"/>
 
-            <TextView
-                android:id="@+id/temperature"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_gravity="end"
-                android:layout_marginRight="62dp"
-                android:layout_marginEnd="62dp"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:layout_width="wrap_content"
-                android:textColor="@color/black"
-                android:layout_toLeftOf="@+id/meteo"
-                android:layout_toStartOf="@+id/meteo"
-                android:layout_centerVertical="true"/>
-
-            <ImageView
-                android:id="@+id/meteo"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:cropToPadding="false"
-                android:layout_marginLeft="2dp"
-                android:layout_marginStart="2dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_gravity="end" />
+                <ImageView
+                    android:id="@+id/meteo"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:cropToPadding="false"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_gravity="end" />
 
             </RelativeLayout>
 
-        <!-- divider-->
-        <View
-            android:id="@+id/author_divider"
-            android:layout_width="fill_parent"
-            android:layout_height="1dp"
-            android:layout_below="@id/titleBar"
-            android:background="@color/grey"
-            android:layout_marginTop="4dp"
-            android:layout_marginLeft="6dp"
-            android:layout_marginRight="6dp"/>
+            <!-- divider-->
+            <View
+                android:id="@+id/author_divider"
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:layout_below="@id/titleBar"
+                android:background="@color/grey"
+                android:layout_marginTop="4dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"/>
 
-        <!--content -->
-        <ScrollView
-            android:id="@+id/FlagContent"
-            android:layout_below="@id/author_divider"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
+            <!--content -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_below="@+id/author_divider" >
 
                 <!--Flag's text-->
                 <TextView
@@ -156,15 +157,15 @@
                         android:gravity="center_horizontal"
                         android:background="@color/black"
                         android:visibility="gone">
-                            <ImageView
-                                android:id="@+id/pic"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:adjustViewBounds="true"
-                                android:background="@drawable/my_border"
-                                android:maxHeight="270dp"
-                                android:maxWidth="270dp"/>
-                        </LinearLayout>
+                        <ImageView
+                            android:id="@+id/pic"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:adjustViewBounds="true"
+                            android:background="@drawable/my_border"
+                            android:maxHeight="270dp"
+                            android:maxWidth="270dp"/>
+                    </LinearLayout>
 
                     <!-- linear layout for managing player -->
                     <LinearLayout
@@ -190,7 +191,7 @@
                         android:background="@color/black"
                         android:visibility="gone">
 
-                    <!-- hard-coded dimensions, must be changed -->
+                        <!-- hard-coded dimensions, must be changed -->
                         <VideoView
                             android:id="@+id/vid"
                             android:layout_width="wrap_content"
@@ -213,83 +214,81 @@
 
             </LinearLayout>
 
-        </ScrollView>
+        </RelativeLayout>
 
-    </RelativeLayout>
-
-    <!-- upper flag - buttons -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/light_grey"/>
-
-    <!--buttons-->
-    <LinearLayout
-        android:id="@+id/buttons"
-        android:layout_width="match_parent"
-        android:orientation="horizontal"
-        android:weightSum="1"
-        android:layout_height="35dp"
-        android:gravity="center_horizontal|center_vertical">
-
-        <LinearLayout
-            android:id="@+id/wow_container"
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
-            android:orientation="horizontal"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal|center_vertical">
-            <ToggleButton
-                android:id="@+id/wow_button"
-                android:layout_width="130dp"
-                android:layout_height="match_parent"
-                android:background="@drawable/button_wow_selector"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textOff="@string/wow_off"
-                android:textOn="@string/wow_on"
-                android:textColor="@drawable/button_wow_selector"
-                android:drawableRight="@drawable/wowico"
-                android:drawableEnd="@drawable/wowico"/>
-        </LinearLayout>
-
+        <!-- upper flag - buttons -->
         <View
-            android:id="@+id/divider1button"
-            android:layout_width="1dp"
-            android:layout_height="29dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
             android:background="@color/light_grey"/>
 
+        <!--buttons-->
         <LinearLayout
-            android:id="@+id/comment_container"
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
+            android:id="@+id/buttons"
+            android:layout_width="match_parent"
             android:orientation="horizontal"
-            android:layout_height="match_parent"
+            android:weightSum="1"
+            android:layout_height="35dp"
             android:gravity="center_horizontal|center_vertical">
 
-            <Button
-                android:id="@+id/add_comment"
-                android:layout_width="130dp"
+            <LinearLayout
+                android:id="@+id/wow_container"
+                android:layout_width="0dp"
+                android:layout_weight="0.5"
+                android:orientation="horizontal"
                 android:layout_height="match_parent"
-                android:background="@drawable/button_comment_selector"
-                android:text="@string/comment"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="@drawable/button_comment_selector"
-                android:drawableRight="@drawable/commentico"
-                android:drawableEnd="@drawable/commentico"/>
+                android:gravity="center_horizontal|center_vertical">
+                <ToggleButton
+                    android:id="@+id/wow_button"
+                    android:layout_width="130dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/button_wow_selector"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textOff="@string/wow_off"
+                    android:textOn="@string/wow_on"
+                    android:textColor="@drawable/button_wow_selector"
+                    android:drawableRight="@drawable/wowico"
+                    android:drawableEnd="@drawable/wowico"/>
+            </LinearLayout>
+
+            <View
+                android:id="@+id/divider1button"
+                android:layout_width="1dp"
+                android:layout_height="29dp"
+                android:background="@color/light_grey"/>
+
+            <LinearLayout
+                android:id="@+id/comment_container"
+                android:layout_width="0dp"
+                android:layout_weight="0.5"
+                android:orientation="horizontal"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal|center_vertical">
+
+                <Button
+                    android:id="@+id/add_comment"
+                    android:layout_width="130dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/button_comment_selector"
+                    android:text="@string/comment"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@drawable/button_comment_selector"
+                    android:drawableRight="@drawable/commentico"
+                    android:drawableEnd="@drawable/commentico"/>
+            </LinearLayout>
+
         </LinearLayout>
 
-    </LinearLayout>
+        <!-- divider buttons statistics -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/light_grey"/>
 
-    <!-- divider buttons statistics -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/light_grey"/>
-
-    <!--statistics-->
-    <RelativeLayout
+        <!--statistics-->
+        <RelativeLayout
 
             android:id="@+id/stats"
             android:layout_width="match_parent"
@@ -329,28 +328,28 @@
 
         </RelativeLayout>
 
-    <!--divider stats-comments-->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/light_grey"/>
-
-    <!-- comments -->
-    <android.support.v4.widget.SwipeRefreshLayout xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/comments"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/light_grey1">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/comments_holder"
+        <!--divider stats-comments-->
+        <View
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="1dp"
+            android:background="@color/light_grey"/>
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+        <!-- comments -->
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/comments" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:id="@+id/last_comment_pos"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
 
     </LinearLayout>
+
+    </ScrollView>
 
     <!--  Big preview of media  -->
     <RelativeLayout
@@ -376,34 +375,5 @@
         <requestFocus></requestFocus>
 
     </RelativeLayout>
-
-    <!-- unused buttons -->
-    <!-- <Button
-        android:id="@+id/lol_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:background="@drawable/my_border_3"
-        android:text="LOL"
-        android:textSize="14sp"
-        android:visibility="gone" />
-
-    <Button
-        android:id="@+id/boo_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_toRightOf="@+id/boo_button"
-        android:background="@drawable/my_border_3"
-        android:text="BOO"
-        android:textSize="14sp"
-        android:visibility="gone" /> -->
-    <!-- end Of unused -->
 
 </LinearLayout>

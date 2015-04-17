@@ -40,27 +40,31 @@
         android:layout_height="fill_parent"
         android:visibility="invisible" />
 
-    <LinearLayout
-        android:id="@+id/my_home_container"
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        xmlns:sothree="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/home_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <FrameLayout
-            android:id="@+id/my_map_holder"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.4"
-            />
+        android:gravity="top"
+        sothree:umanoPanelHeight="120dp"
+        sothree:umanoShadowHeight="4dp"
+        sothree:umanoParalaxOffset="100dp"
+        sothree:umanoDragView="@+id/dragView"
+        sothree:umanoFadeColor="@android:color/transparent">
 
         <com.gcw.sapienza.places.layouts.MSwipeRefreshLayout xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/my_swipe_refresh"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.6"
+            android:layout_height="match_parent"
             android:orientation="vertical"
             tools:context="com.gcw.sapienza.places.activities.MainActivity" />
 
-    </LinearLayout>
+        <FrameLayout
+            android:id="@+id/my_map_holder"
+            android:background="@color/transparent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
 </RelativeLayout>
