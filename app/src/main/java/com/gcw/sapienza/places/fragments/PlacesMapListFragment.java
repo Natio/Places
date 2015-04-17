@@ -213,21 +213,19 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
             @Override
             public void onPanelSlide(View view, float v) {
                 // Log.d(TAG, "Panel sliding");
-
             }
 
             @Override
             public void onPanelCollapsed(View view) {
                 Log.d(TAG, "Panel collapsed");
+
                 // supl.setTouchEnabled(true);
-                // srl.scrollTo(0, 0);
             }
 
             @Override
             public void onPanelExpanded(View view) {
                 Log.d(TAG, "Panel expanded");
 
-                srl.scrollTo(0, 0);
                 // supl.setClickable(false);
                 // supl.setTouchEnabled(false);
                 // supl.setEnableDragViewTouchEvents(false);
@@ -237,13 +235,11 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
             @Override
             public void onPanelAnchored(View view) {
                 Log.d(TAG, "Panel anchored");
-                srl.scrollTo(0, 0);
             }
 
             @Override
             public void onPanelHidden(View view) {
                 Log.d(TAG, "Panel hidden");
-                srl.scrollTo(0, 0);
             }
         });
 
