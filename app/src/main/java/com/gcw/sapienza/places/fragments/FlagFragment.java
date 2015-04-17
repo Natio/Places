@@ -376,11 +376,32 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             @Override
             public void done(Flag flag, ParseException e) {
                 if (e == null) {
-                    int wowCount = flag.getInt("wowCount");
-                    if (wowCount == 1) wowStatText.setText("You WoWed this.");
-                    else if (wowCount == 2) wowStatText.setText("You and another placer WoWed this.");
-                    else if (wowCount == 0) wowStatText.setText("");
-                    else wowStatText.setText("You and other " + wowCount + " WoWed this.");
+
+                    final int wowCount = flag.getInt("wowCount");
+
+                    ParseQuery<CustomParseObject> queryWoWs = ParseQuery.getQuery("WoW_Lol_Boo");
+                    queryWoWs.whereEqualTo("flag", flag);
+                    queryWoWs.whereEqualTo("user", ParseUser.getCurrentUser());
+                    queryWoWs.getFirstInBackground(new GetCallback<CustomParseObject>() {
+                        @Override
+                        public void done(CustomParseObject wow, ParseException e) {
+                            if(e == null) {
+                                if (wowCount == 1) wowStatText.setText("You WoWed this.");
+                                else if (wowCount == 2)
+                                    wowStatText.setText("You and another Placer WoWed this.");
+                                else if (wowCount == 0) wowStatText.setText("");
+                                else wowStatText.setText("You and other " + wowCount + " Placers WoWed this.");
+                            }else{
+                                Log.d(TAG, e.getMessage());
+                                if (wowCount > 0) wowStatText.setText((wowCount +
+                                        (wowCount == 1 ? " Placer WoWed this." : " Placers WoWed this.")));
+                                else wowStatText.setText("");
+                            }
+                        }
+                    });
+                }else{
+                    Log.e(TAG, e.getMessage());
+                    Utils.showToast(getActivity(), "An error occurred while retrieving Flag data", Toast.LENGTH_SHORT);
                 }
             }
         });
