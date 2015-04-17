@@ -5,6 +5,12 @@
     android:orientation="vertical" >
     <!-- general layout changed from relative to linear to manage weights-->
 
+    <ScrollView
+        android:id="@+id/FlagContent"
+        android:layout_below="@id/author_divider"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -114,106 +120,99 @@
                 android:layout_marginRight="6dp"/>
 
             <!--content -->
-            <ScrollView
-                android:id="@+id/FlagContent"
-                android:layout_below="@id/author_divider"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_below="@+id/author_divider" >
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
+                <!--Flag's text-->
+                <TextView
+                    android:id="@+id/text"
+                    android:layout_marginTop="2dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_width="match_parent"
+                    android:ems="@integer/max_text_size"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:textSize="16sp"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginRight="6dp"
+                    android:textColor="@color/black" />
 
-                    <!--Flag's text-->
-                    <TextView
-                        android:id="@+id/text"
-                        android:layout_marginTop="2dp"
-                        android:layout_height="wrap_content"
-                        android:layout_width="match_parent"
-                        android:ems="@integer/max_text_size"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false"
-                        android:textSize="16sp"
-                        android:layout_marginLeft="6dp"
-                        android:layout_marginRight="6dp"
-                        android:textColor="@color/black" />
+                <!-- Media Container-->
+                <LinearLayout
+                    android:id="@+id/media_container"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="3dp"
+                    android:gravity="center_vertical|center_horizontal">
 
-                    <!-- Media Container-->
+                    <!-- linear layout for picture border-->
                     <LinearLayout
-                        android:id="@+id/media_container"
-                        android:orientation="vertical"
+                        android:id="@+id/imageContainer"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginTop="3dp"
-                        android:gravity="center_vertical|center_horizontal">
-
-                        <!-- linear layout for picture border-->
-                        <LinearLayout
-                            android:id="@+id/imageContainer"
-                            android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:background="@color/black"
+                        android:visibility="gone">
+                        <ImageView
+                            android:id="@+id/pic"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="center_horizontal"
-                            android:background="@color/black"
-                            android:visibility="gone">
-                            <ImageView
-                                android:id="@+id/pic"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:adjustViewBounds="true"
-                                android:background="@drawable/my_border"
-                                android:maxHeight="270dp"
-                                android:maxWidth="270dp"/>
-                        </LinearLayout>
-
-                        <!-- linear layout for managing player -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="100dp"
-                            android:id="@+id/audioContainer"
-                            android:gravity="center_horizontal|center_vertical"
-                            android:visibility="gone">
-                            <ImageView
-                                android:id="@+id/audio"
-                                android:layout_width="50dp"
-                                android:layout_height="50dp"
-                                android:adjustViewBounds="true"
-                                android:src="@drawable/play_button"
-                                android:layout_gravity="center_horizontal|center_vertical"/>
-                        </LinearLayout>
-
-                        <!-- layout for managing player -->
-                        <FrameLayout
-                            android:id="@+id/video_holder"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@color/black"
-                            android:visibility="gone">
-
-                            <!-- hard-coded dimensions, must be changed -->
-                            <VideoView
-                                android:id="@+id/vid"
-                                android:layout_width="wrap_content"
-                                android:layout_height="230dp"
-                                android:layout_gravity="center_vertical|center_horizontal"
-                                />
-
-                            <ImageButton
-                                android:id="@+id/play_video_button"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical|center_horizontal"
-                                android:background="@android:color/transparent"
-                                android:clickable="false"
-                                android:src="@drawable/play_video_button"/>
-
-                        </FrameLayout>
-
+                            android:adjustViewBounds="true"
+                            android:background="@drawable/my_border"
+                            android:maxHeight="270dp"
+                            android:maxWidth="270dp"/>
                     </LinearLayout>
+
+                    <!-- linear layout for managing player -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:id="@+id/audioContainer"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:visibility="gone">
+                        <ImageView
+                            android:id="@+id/audio"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:adjustViewBounds="true"
+                            android:src="@drawable/play_button"
+                            android:layout_gravity="center_horizontal|center_vertical"/>
+                    </LinearLayout>
+
+                    <!-- layout for managing player -->
+                    <FrameLayout
+                        android:id="@+id/video_holder"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/black"
+                        android:visibility="gone">
+
+                        <!-- hard-coded dimensions, must be changed -->
+                        <VideoView
+                            android:id="@+id/vid"
+                            android:layout_width="wrap_content"
+                            android:layout_height="230dp"
+                            android:layout_gravity="center_vertical|center_horizontal"
+                            />
+
+                        <ImageButton
+                            android:id="@+id/play_video_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|center_horizontal"
+                            android:background="@android:color/transparent"
+                            android:clickable="false"
+                            android:src="@drawable/play_video_button"/>
+
+                    </FrameLayout>
 
                 </LinearLayout>
 
-            </ScrollView>
+            </LinearLayout>
 
         </RelativeLayout>
 
@@ -336,21 +335,21 @@
             android:background="@color/light_grey"/>
 
         <!-- comments -->
-        <android.support.v4.widget.SwipeRefreshLayout xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/comments"
+        <TableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@color/light_grey1">
+            android:id="@+id/comments" />
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/comments_holder"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-        </android.support.v4.widget.SwipeRefreshLayout>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:id="@+id/last_comment_pos"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
 
     </LinearLayout>
+
+    </ScrollView>
 
     <!--  Big preview of media  -->
     <RelativeLayout
@@ -376,34 +375,5 @@
         <requestFocus></requestFocus>
 
     </RelativeLayout>
-
-    <!-- unused buttons -->
-    <!-- <Button
-        android:id="@+id/lol_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:background="@drawable/my_border_3"
-        android:text="LOL"
-        android:textSize="14sp"
-        android:visibility="gone" />
-
-    <Button
-        android:id="@+id/boo_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_toRightOf="@+id/boo_button"
-        android:background="@drawable/my_border_3"
-        android:text="BOO"
-        android:textSize="14sp"
-        android:visibility="gone" /> -->
-    <!-- end Of unused -->
 
 </LinearLayout>

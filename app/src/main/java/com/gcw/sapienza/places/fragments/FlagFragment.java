@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.media.AudioManager;
+import android.media.Image;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,7 +15,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -30,6 +30,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -47,6 +49,7 @@ import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.models.manager.CommentsManager;
 import com.gcw.sapienza.places.models.manager.ModelCallback;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
+import com.gcw.sapienza.places.utils.PlacesUtilCallback;
 import com.gcw.sapienza.places.utils.Utils;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
@@ -68,6 +71,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
@@ -77,7 +81,7 @@ import java.util.StringTokenizer;
  * meteo, text, comments, wow, and the interface overall behavior(ex.: media management)
  */
 
-public class FlagFragment extends Fragment implements View.OnClickListener, View.OnTouchListener, SwipeRefreshLayout.OnRefreshListener {
+public class FlagFragment extends Fragment implements View.OnClickListener, View.OnTouchListener {
 
     private static final String TAG = "FlagFragment";
     private static final int WOW_CODE = 0;
@@ -90,15 +94,13 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private ImageView playVideoButton;
     private ImageView audioHolder;
     private TextView wowStatText;
-
     private RelativeLayout frameLayout;
     private LinearLayout wholeFlagContainer;
     private LinearLayout audioLayout;
     private LinearLayout imageHolder;
     private FrameLayout videoHolder;
-    private RecyclerView commentsRecyclerView;
-    private SwipeRefreshLayout commentsHolder;
-
+    private TableLayout commentsView;
+    private View lastCommentPos;
     private ToggleButton newWowButton;
 
     private MediaType mediaType;
@@ -124,34 +126,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         if(bundle != null) {
             this.scrollToLastComment = bundle.getBoolean("scrollToLastComment");
         }
-/*
-        text = bundle.getString("text");
-        id = bundle.getString("id");
-        date = bundle.getString("date");
-
-        weatherInfo = bundle.getString("weather");
-
-        //temporal bypass of a weather bug, "IF" to be deleted and keep only the else content
-        if (weatherInfo.equals("")) {
-            temperature = "" + 20;
-            weather = "Cloud";
-        } else {
-            st = new StringTokenizer(weatherInfo, ",");
-            temperature = st.nextToken();
-            weather = st.nextToken().substring(1);
-        }
-
-        //Log.d(TAG, "weather-" + weather + '-' + temperature);
-
-        category = bundle.getString("category");
-        inPlace = bundle.getBoolean("inPlace");
-        flagId = bundle.getString("flagId");
-        author = bundle.getString("author");
-        wowCount = bundle.getInt("wowCount");
-        accountType = bundle.getString("accountType");
-
-        userId = id;
-        */
     }
 
     /**
@@ -193,8 +167,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         LinearLayoutManager llm = new LinearLayoutManager(this.getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
-        commentsRecyclerView = (RecyclerView) view.findViewById(R.id.comments_holder);
-        commentsRecyclerView.setLayoutManager(llm);
+        // commentsRecyclerView = (RecyclerView) view.findViewById(R.id.comments_holder);
+        // commentsRecyclerView.setLayoutManager(llm);
 
         TextView flagText = (TextView) view.findViewById(R.id.text);
         TextView authorTextView = (TextView) view.findViewById(R.id.author);
@@ -203,6 +177,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         ImageView categoryIco = (ImageView) view.findViewById(R.id.categoryIcon);
         ImageView weatherIco = (ImageView) view.findViewById(R.id.meteo);
         ImageView profilePicImageView = (ImageView) view.findViewById(R.id.profile_pic);
+        lastCommentPos = view.findViewById(R.id.last_comment_pos);
 
         String weatherInfo = this.flag.getWeather();
         String temperature;
@@ -251,7 +226,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         wholeFlagContainer = (LinearLayout) view.findViewById(R.id.whole_flag_container);
         imageHolder = (LinearLayout) view.findViewById(R.id.imageContainer);
         imageView = (ImageView) view.findViewById(R.id.pic);
-        commentsHolder = (SwipeRefreshLayout)view.findViewById(R.id.comments);
+        commentsView = (TableLayout)view.findViewById(R.id.comments);
         playVideoButton = (ImageView) view.findViewById(R.id.play_video_button);
         videoHolder = (FrameLayout) view.findViewById(R.id.video_holder);
         videoView = (VideoView) view.findViewById(R.id.vid);
@@ -268,7 +243,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         newWowButton.setOnClickListener(this);
         setWowButton(); // to manage pressed effect when opening flag
         profilePicImageView.setOnClickListener(this);
-        commentsHolder.setOnRefreshListener(this);
         Button addCommentButton = (Button) view.findViewById(R.id.add_comment);
         addCommentButton.setOnClickListener(this);
         addCommentButton.setTransformationMethod(null);//to avoid capital letters in lollipop
@@ -325,13 +299,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     }
 
     @Override
-    public void onRefresh() {
-        commentsHolder.setRefreshing(true);
-        retrieveComments();
-        commentsHolder.setRefreshing(false);
-    }
-
-    @Override
     public void onClick(View v)
     {
         Log.d(TAG, "1) frame_layout visibility: " + ((frameLayout.getVisibility() == View.VISIBLE) ? "VISIBLE" : "NOT VISIBLE"));
@@ -378,63 +345,17 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 if (e == null) {
                     int wowCount = flag.getInt("wowCount");
                     if (wowCount == 1) wowStatText.setText("You WoWed this.");
-                    else if (wowCount == 2) wowStatText.setText("You and another placer WoWed this.");
+                    else if (wowCount == 2)
+                        wowStatText.setText("You and another placer WoWed this.");
                     else if (wowCount == 0) wowStatText.setText("");
                     else wowStatText.setText("You and other " + wowCount + " WoWed this.");
                 }
             }
         });
-
-        //TODO still useful?
-/*
-        ParseQuery<CustomParseObject> queryW = ParseQuery.getQuery("Wow_Lol_Boo");
-        queryW.whereEqualTo("fbId", userId);
-        queryW.whereEqualTo("flagId", flagId);
-        queryW.whereEqualTo("boolWow", true);
-
-        queryW.getFirstInBackground(new GetCallback<CustomParseObject>()
-        {
-            @Override
-            public void done(CustomParseObject obj, ParseException e)
-            {
-                if (e == null && obj != null)
-                {
-                    String emptyString = "";
-
-                    if (wowCount == 1) wowStatText.setText("You WoWed this.");
-                    else if (wowCount == 2) wowStatText.setText("You and another placer WoWed this.");
-                    else if (wowCount == 0) wowStatText.setText(emptyString);
-                    else wowStatText.setText("You and other " + wowCount + " WoWed this.");
-                }
-            }
-        });
-       */
     }
 
-    private void retrieveComments() {
-        /*ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
-        query.whereEqualTo("flag", this.flag);
-        query.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
-        query.orderByAscending("createdAt");
-
-        query.findInBackground(new FindCallback<Comment>()
-        {
-            @Override
-            public void done(List<Comment> result, ParseException e)
-            {
-
-                if (result == null || result.size() == 0)
-                    result = new ArrayList<>();
-
-                CommentsAdapter commentsAdapter = new CommentsAdapter(result, commentsRecyclerView, getActivity());
-
-                commentsRecyclerView.setAdapter(commentsAdapter);
-                if(scrollToLastComment && result.size() > 0)
-                    commentsRecyclerView.scrollToPosition(result.size() - 1);
-
-                scrollToLastComment = false;
-            }
-        });*/
+    private void retrieveComments()
+    {
         new CommentsManager().commentsForFlag(this.flag)
                 .cache(ParseQuery.CachePolicy.CACHE_THEN_NETWORK)
                 .sort(new Comparator<Comment>() {
@@ -446,14 +367,16 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 .success(new ModelCallback<Comment>() {
                     @Override
                     public void result(List<Comment> result) {
-                        if (result == null || result.size() == 0)
-                            result = new ArrayList<>();
+                        if (result == null || result.size() == 0) result = new ArrayList<>();
 
-                        CommentsAdapter commentsAdapter = new CommentsAdapter(result, commentsRecyclerView, getActivity());
+                        commentsView.removeAllViews();
 
-                        commentsRecyclerView.setAdapter(commentsAdapter);
-                        if(scrollToLastComment && result.size() > 0)
-                            commentsRecyclerView.scrollToPosition(result.size() - 1);
+                        for(Comment c : result)
+                        {
+                            commentsView.addView(getTableRowView(c));
+                        }
+
+                        if(scrollToLastComment && result.size() > 0) lastCommentPos.requestFocus();
 
                         scrollToLastComment = false;
                     }
@@ -468,8 +391,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         alertDialogBuilder.setView(passwordDialogLayout);
 
         final EditText userInput = (EditText) passwordDialogLayout.findViewById(R.id.new_comment);
-
-        // final InputMethodManager inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 
         alertDialogBuilder
                 .setCancelable(true)
@@ -529,6 +450,52 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+    }
+
+    private View getTableRowView(Comment c) {
+        TableRow tr = new TableRow(getActivity());
+        final View v = LayoutInflater.from(getActivity()).inflate(R.layout.comment_item_layout, tr, false);
+        // TODO Change views according to comment
+
+        String user_id = c.getUserId();
+        String account_type = c.getAccountType();
+        String fb_username = c.getUsername(); // checks if Flag has fb username. if there is one use it otherwise ask FB
+
+        TextView usernameTextView = (TextView)v.findViewById(R.id.author);
+        final ImageView profilePic = (ImageView) v.findViewById(R.id.comment_profile_pic);
+        TextView commentText = (TextView) v.findViewById(R.id.comment_text);
+        TextView commentDate = (TextView) v.findViewById(R.id.comment_date);
+
+        // If user is logged in with G+, FB Graph API cannot be used
+        if (fb_username == null)
+            PlacesLoginUtils.getInstance().loadUsernameIntoTextView(user_id, usernameTextView, account_type);
+        else
+        {
+            if(!PlacesLoginUtils.getInstance().getUserIdMap().containsKey(user_id)) PlacesLoginUtils.getInstance().addEntryToUserIdMap(user_id, fb_username);
+            usernameTextView.setText(fb_username);
+        }
+
+
+        PlacesLoginUtils.getInstance().getProfilePictureURL(user_id, account_type, PlacesLoginUtils.PicSize.SMALL, new PlacesUtilCallback()
+        {
+            @Override
+            public void onResult(String result, Exception e)
+            {
+                if (result != null && !result.isEmpty())
+                {
+                    Picasso.with(v.getContext()).load(result).into(profilePic);
+                }
+            }
+        });
+
+        Date date = c.getTimestamp();
+        DateFormat df = new SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault());
+        String sDate = df.format(date);
+        commentDate.setText(sDate);
+
+        commentText.setText(c.getCommentText());
+
+        return v;//have to return View child, so return made 'v'
     }
 
     private void playRecording() {
@@ -848,44 +815,12 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                         CustomParseObject obj = markers.get(0);
 
                         boolean boolWow = obj.getBoolean("boolWow");
-                        if (!boolWow) {
-                            newWowButton.setChecked(false);
-                                        /*
-                                        obj.setWowBoolean(true);
-                                        obj.saveInBackground(new SaveCallback() {
-                                            @Override
-                                            public void done(ParseException e) {
-                                                updateWLBCount(WOW_CODE, true);
-                                            }
-                                        });*/
-                        } else {
-                            newWowButton.setChecked(true);
-                                        /*
-                                        obj.setWowBoolean(false);
-                                        obj.saveInBackground(new SaveCallback() {
-                                            @Override
-                                            public void done(ParseException e) {
-                                                updateWLBCount(WOW_CODE, false);
-                                            }
-                                        });*/
-                        }
+                        if (!boolWow) newWowButton.setChecked(false);
+                        else newWowButton.setChecked(true);
                     }
                 }
-                                /*
-                        else if (markers.size() == 0) {
-                                    CustomParseObject obj = new CustomParseObject();
-                                    obj.setUser(ParseUser.getCurrentUser());
-                                    obj.setFlagId(flagId);
-                                    obj.setFacebookId(PlacesLoginUtils.getInstance().getCurrentUserId());
-                                    obj.setWowBoolean(true);
-                                    obj.saveInBackground(new SaveCallback() {
-                                        @Override
-                                        public void done(ParseException e) {
-                                            updateWLBCount(WOW_CODE, true);
-                                        }
-                                    });
-                                } */
-                else {
+                else
+                {
                     Toast.makeText(getActivity(), "Error encounterd while accessing database", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "Error encounterd while retrieving table entry on Parse.com");
                     newWowButton.setChecked(false);
@@ -896,7 +831,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
+    public boolean onContextItemSelected(MenuItem item)
+    {
+        /*
         CommentsAdapter fa = (CommentsAdapter) commentsRecyclerView.getAdapter();
         Comment sel_usr = fa.getSelectedComment();
 
@@ -924,6 +861,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 fa.setSelectedCommentIndex(-1);
                 return super.onContextItemSelected(item);
         }
+        */
+
+        return false;
     }
 
     private void deleteComment(Comment comment) {
@@ -931,10 +871,10 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             @Override
             public void done(com.parse.ParseException e) {
                 if (e == null) {
-                    Toast.makeText(commentsRecyclerView.getContext(), Utils.COMMENT_DELETED, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), Utils.COMMENT_DELETED, Toast.LENGTH_SHORT).show();
                     retrieveComments();
                 } else
-                    Toast.makeText(commentsRecyclerView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -945,9 +885,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-                    Toast.makeText(commentsRecyclerView.getContext(), Utils.COMMENT_REPORTED, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), Utils.COMMENT_REPORTED, Toast.LENGTH_SHORT).show();
                 } else
-                    Toast.makeText(commentsRecyclerView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -967,13 +907,13 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                         @Override
                         public void done(ParseException e) {
                             if (e == null) {
-                                Toast.makeText(commentsRecyclerView.getContext(), Utils.FLAG_REPORT_REVOKED, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), Utils.FLAG_REPORT_REVOKED, Toast.LENGTH_SHORT).show();
                             } else
-                                Toast.makeText(commentsRecyclerView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
                 } else {
-                    Toast.makeText(commentsRecyclerView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
