@@ -20,14 +20,15 @@
             android:scrollbars="none" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
-
-    <Button
-        android:id="@+id/clear_inbox"
-        android:layout_weight="0.1"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_centerInParent="true"
-        android:textSize="14sp"
-        android:text="Clear Inbox"
-        android:textColor="@color/grey"/>
+    <!--
+        <Button
+            android:id="@+id/clear_inbox"
+            android:layout_weight="0.1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_centerInParent="true"
+            android:textSize="14sp"
+            android:text="Clear Inbox"
+            android:textColor="@color/grey"/>
+    -->
 </LinearLayout>

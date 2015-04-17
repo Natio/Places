@@ -1,3 +1,7 @@
+/*
+ * Copyright 2015-present Places®.
+ */
+
 package com.gcw.sapienza.places.activities;
 
 import android.app.AlertDialog;
@@ -56,18 +60,23 @@ import com.parse.ParseFacebookUtils;
 import com.parse.ParseInstallation;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState;
+
+/*
+ * The following activity is the homepage of the app where the list of flags is contained
+ */
 
 public class MainActivity extends ActionBarActivity implements Preference.OnPreferenceChangeListener, ResultCallback<People.LoadPeopleResult>,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ILocationServiceListener {
 
-
     public static final String TAG = MainActivity.class.getName();
-
     private static final String[] section_titles = {"Home", "Profile", "Inbox", "My Flags", "Bag", "Settings", "Logout"};
+    private static final String FRAG_TAG = "FRAG_TAG";
 
     private static final int SHARE_ACTIVITY_REQUEST_CODE = 95;
-
     private static final int FLAGS_LIST_POSITION = 0;
     private static final int MY_PROFILE_POSITION = 1;
     private static final int INBOX_POSITION = 2;
@@ -75,8 +84,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     private static final int BAG_POSITION = 4;
     private static final int SETTINGS_POSITION = 5;
     private static final int LOGOUT_POSITION = 6;
-
-    private static final String FRAG_TAG = "FRAG_TAG";
 
     private static boolean isForeground = false;
     private boolean loggedIn;
@@ -92,7 +99,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
     public static final String PREFERENCES_CHANGED_NOTIFICATION = "Preferences Changed";
 
-
     public static boolean isForeground() {
         return isForeground;
     }
@@ -104,16 +110,14 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         PlacesLoginUtils.getInstance().checkForSessionValidityAndStartDownloadingInfo(this);
 
         setContentView(R.layout.activity_main_drawer_layout);
+
         this.current_title = this.getTitle();
         this.drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         this.drawerList = (ListView) findViewById(R.id.left_drawer);
-
         this.homeHolder = (LinearLayout) findViewById(R.id.home_container);
         this.fragHolder = (FrameLayout) findViewById(R.id.frag_container);
-
         // Set the adapter for the list view
         this.drawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, section_titles));
-
         this.drawerToggle = new ActionBarDrawerToggle(this, this.drawerLayout, R.drawable.ic_drawer, R.drawable.ic_drawer) {
             /** Called when a drawer has settled in a completely closed state. */
             @Override
@@ -137,40 +141,33 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.getSupportActionBar().setHomeButtonEnabled(true);
         this.getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
-
         this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.green)));
 
         // If app is opened by clicking of comment notification, go straight to the flag for which you've been notified
         Intent intent = getIntent();
-        if(intent != null)
-        {
+        if (intent != null) {
             Log.d(TAG, "Bundle is not null.");
-
             handleIntent(intent);
-        }
-        else{
+        } else {
             Log.d(TAG, "Bundle is null. Triggering default Activity behavior");
-
             PlacesApplication.getInstance().startLocationService();
-
+            //new interface
             this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
+            //this.getSupportFragmentManager().beginTransaction().replace(R.id.sliding_layout, new MainFragment()).commit();
         }
-
         // setIntent(null);
     }
 
     private void handleIntent(Intent intent) {
         String bundleContentType = intent.getStringExtra("type");
-        if(bundleContentType == null)
-        {
+        if (bundleContentType == null) {
             Log.d(TAG, "String 'type' in bundle is null. Triggering default Activity behavior.");
 
             PlacesApplication.getInstance().startLocationService();
-
+            //new interface
             this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
-        }
-        else
-        {
+            //this.getSupportFragmentManager().beginTransaction().replace(R.id.sliding_layout, new MainFragment()).commit();
+        } else {
             switch (bundleContentType){
                 case Utils.RECEIVED_NOTIF_COMMENT_TYPE:
                     Log.d(TAG, Utils.RECEIVED_NOTIF_COMMENT_TYPE);
@@ -190,10 +187,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     }
 
     @Override
-    protected void onNewIntent(Intent intent)
-    {
+    protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-
         handleIntent(intent);
     }
 
@@ -244,11 +239,9 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             Intent shareIntent = new Intent(this, ShareActivity.class);
             startActivityForResult(shareIntent, MainActivity.SHARE_ACTIVITY_REQUEST_CODE);
         } //attempt to add filters in homepage
-        else if (item.getItemId() == R.id.filters)
-        {
+        else if (item.getItemId() == R.id.filters) {
             switchToNonSupportFrag(new CategoriesFragment());
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -288,9 +281,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     @Override
     public void onPause() {
         super.onPause();
-
         isForeground = false;
-
     }
 
     private void promptForLocationServices() {
@@ -306,9 +297,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
                         (android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), Utils.GPS_ENABLE_REQUEST_CODE);
             }
         });
-        /**
-         * Allow users to use Places with no Location Services turned on
-         */
+
+        //Allow users to use Places with no Location Services turned on
         builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -325,9 +315,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main_drawer, menu);
-
         mMenu = menu;
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -474,11 +462,15 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     private void showSupportFrag() {
         fragHolder.setVisibility(View.INVISIBLE);
         homeHolder.setVisibility(View.VISIBLE);
+        //change for new layout
+        //mLayout.setVisibility(View.VISIBLE);
     }
 
     private void showNonSupportFrag() {
-        homeHolder.setVisibility(View.INVISIBLE);
         fragHolder.setVisibility(View.VISIBLE);
+        homeHolder.setVisibility(View.INVISIBLE);
+        //change for new layout
+        //mLayout.setVisibility(View.INVISIBLE);
     }
 
     private void switchToNonSupportFrag(android.app.Fragment frag) {
@@ -497,11 +489,14 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
     public void switchToOtherFrag(Fragment frag) {
         Log.d(TAG, "Switching to other fragment: " + frag.getClass());
+        //new interface
         Fragment f = this.getSupportFragmentManager().findFragmentById(R.id.home_container);
+        //Fragment f = this.getSupportFragmentManager().findFragmentById(R.id.sliding_layout);
 
         showSupportFrag();
-
+        //new interface
         this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, frag).addToBackStack(null).commit();
+        //this.getSupportFragmentManager().beginTransaction().replace(R.id.sliding_layout, frag).addToBackStack(null).commit();
     }
 
     private boolean isNonSupportFragmentVisible() {
@@ -510,7 +505,9 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
     @Override
     public void onBackPressed() {
+        //new interface
         Fragment f = this.getSupportFragmentManager().findFragmentById(R.id.home_container);
+        //Fragment f = this.getSupportFragmentManager().findFragmentById(R.id.sliding_layout);
         if (!isNonSupportFragmentVisible() && f != null && f.getClass() == MainFragment.class) {
             Log.d(TAG, "Pressed back button on MainFragment: finishing...");
             this.getSupportFragmentManager().popBackStack(null, android.support.v4.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);

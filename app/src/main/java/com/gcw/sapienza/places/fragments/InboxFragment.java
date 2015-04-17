@@ -1,3 +1,7 @@
+/*
+ * Copyright 2015-present Places®.
+ */
+
 package com.gcw.sapienza.places.fragments;
 
 import android.content.Intent;
@@ -29,7 +33,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Created by snowblack on 3/30/15.
+ * List of all the notification received after someone has commented a flag of mine
  */
 public class InboxFragment extends Fragment implements AdapterView.OnItemClickListener {
     private static final String TAG = "InboxFragment";
@@ -81,6 +85,8 @@ public class InboxFragment extends Fragment implements AdapterView.OnItemClickLi
             }
         });
 
+        //FIXME not working, the list is not cleared
+        /*
         clearInbox = (Button)view.findViewById(R.id.clear_inbox);
         clearInbox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,10 +99,12 @@ public class InboxFragment extends Fragment implements AdapterView.OnItemClickLi
                 }
             }
         });
+        */
 
 
         return view;
     }
+
 
     //TODO not properly implemented yet. At this stage clicking on a message causes the app to crash
     @Override

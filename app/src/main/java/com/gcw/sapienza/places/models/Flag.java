@@ -1,3 +1,6 @@
+/*
+ * Copyright 2015-present Places®.
+ */
 package com.gcw.sapienza.places.models;
 
 import com.parse.ParseClassName;
@@ -12,6 +15,7 @@ import java.util.Date;
 /**
  * Class that encapsulate the Post table on Parse.com
  */
+
 @ParseClassName("Posts")
 public class Flag extends ParseObject implements Serializable {
 
@@ -39,7 +43,6 @@ public class Flag extends ParseObject implements Serializable {
     public static final String PASSWORD_KEY = "password";
     public static final String ACCOUNT_TYPE_KEY = "accountType";
     public static final String COMMENTS_COUNT_KEY = "num_comments";
-
 
     public void setOwner(ParseUser owner) {
         this.put(OWNER_KEY, owner);

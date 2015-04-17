@@ -1,3 +1,7 @@
+/*
+ * Copyright 2015-present Places®.
+ */
+
 package com.gcw.sapienza.places.fragments;
 
 import android.content.Context;
@@ -16,7 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Created by snowblack on 3/20/15.
+ * the Bag will show all flags wowed and commented
  */
 
 public class BagFragment extends PlacesMapListFragment{
