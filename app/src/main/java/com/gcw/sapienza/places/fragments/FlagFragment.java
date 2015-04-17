@@ -308,12 +308,14 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             // getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             frameLayout.setVisibility(View.GONE);
             wholeFlagContainer.setVisibility(View.VISIBLE);
-        } else if (v.getId() == R.id.pic) {
+        }
+        // TODO Enlarged media frame disabled
+        /*else if (v.getId() == R.id.pic) {
             Log.d(TAG, "pic clicked!");
             // getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
             frameLayout.setVisibility(View.VISIBLE);
             wholeFlagContainer.setVisibility(View.GONE);
-        }
+        }*/
         // else if(v.getId() == playVideoButton.getId()) playVideo();
         else if (v.getId() == R.id.audio) playRecording();
         else if (v.getId() == R.id.wow_button) wlbFlag(WOW_CODE);
