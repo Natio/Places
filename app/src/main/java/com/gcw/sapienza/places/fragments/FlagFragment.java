@@ -345,7 +345,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             @Override
             public void done(Flag flag, ParseException e) {
                 if (e == null) {
-                    
+
                     final int wowCount = flag.getInt("wowCount");
 
                     ParseQuery<CustomParseObject> queryWoWs = ParseQuery.getQuery("WoW_Lol_Boo");
@@ -359,7 +359,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                 else if (wowCount == 2)
                                     wowStatText.setText("You and another Placer WoWed this.");
                                 else if (wowCount == 0) wowStatText.setText("");
-                                else wowStatText.setText("You and other " + wowCount + " Placers WoWed this.");
+                                else wowStatText.setText("You and " + (wowCount > 2 ? (("other " + (wowCount - 1) + " Placers WoWed this."))
+                                            : ("another Placer WoWed this.")));
                             }else{
                                 Log.d(TAG, e.getMessage());
                                 if (wowCount > 0) wowStatText.setText((wowCount +
@@ -584,6 +585,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     }
 
     private void wlbFlag(int code) {
+        newWowButton.setClickable(false);
+
         ParseQuery<CustomParseObject> queryWLB = ParseQuery.getQuery("Wow_Lol_Boo");
         queryWLB.whereEqualTo("user", PlacesUser.getCurrentUser());
         queryWLB.whereEqualTo("flagId", this.flag.getObjectId());
@@ -662,7 +665,13 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                 flag.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
-                                        updateWowStats(true, wowCount + 1);
+                                        if(e == null) {
+                                            updateWowStats(true, wowCount + 1);
+                                        }else{
+                                            Log.e(TAG, "Error", e);
+                                            Utils.showToast(getActivity(), "Something went wrong while updating WoW count", Toast.LENGTH_SHORT);
+                                        }
+                                        newWowButton.setClickable(true);
                                     }
                                 });
                             } else {
@@ -670,13 +679,21 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                 flag.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
-                                        updateWowStats(false, wowCount - 1);
+                                        if(e == null) {
+                                            updateWowStats(false, wowCount - 1);
+                                        }else{
+                                            Log.e(TAG, "Error", e);
+                                            Utils.showToast(getActivity(), "Something went wrong while updating WoW count", Toast.LENGTH_SHORT);
+                                        }
+                                        newWowButton.setClickable(true);
                                     }
                                 });
                             }
                         } else {
                             Toast.makeText(getActivity(), "Error encountered while accessing database", Toast.LENGTH_SHORT).show();
                             Log.d(TAG, "Error encountered while retrieving table entry on Parse.com");
+
+                            newWowButton.setClickable(true);
                         }
                     }
                 });

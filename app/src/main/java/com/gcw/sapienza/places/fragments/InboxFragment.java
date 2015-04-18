@@ -87,9 +87,14 @@ public class InboxFragment extends Fragment implements AdapterView.OnItemClickLi
             public void onClick(View v) {
                 try {
                     PlacesStorage.clearInbox(getActivity());
+                    List<List<String>> inbox = PlacesStorage.fetchInbox(getActivity());
+                    inboxListView.setAdapter(new InboxAdapter(getActivity(), R.layout.inbox_message_layout, inbox));
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "Error", e);
                     Utils.showToast(getActivity(), "Something went wrong while clearing Inbox data", Toast.LENGTH_SHORT);
+                } catch (ClassNotFoundException e) {
+                    Log.e(TAG, "Error", e);
+                    Utils.showToast(getActivity(), "Something went wrong while loading Inbox data", Toast.LENGTH_SHORT);
                 }
             }
         });
