@@ -34,6 +34,7 @@
         android:layout_centerInParent="true"
         android:textSize="14sp"
         android:clickable="true"
+        android:visibility="gone"
         android:text="Clear Inbox"
         android:textColor="@color/grey"/>
 </LinearLayout>
