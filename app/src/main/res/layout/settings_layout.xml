@@ -25,19 +25,12 @@
             android:defaultValue="false"
             android:key="timeFilter"
             android:summary="Show elder flags first" />
-        <!--<SeekBarPreference-->
-        <!--android:title="Range of action"-->
-        <!--android:max="4"-->
-        <!--android:defaultValue="1"-->
-        <!--android:progress="1"-->
-        <!--android:key="seekBar"-->
-        <!--/>-->
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Flags">
 
         <SeekBarPreference
-            android:defaultValue="1"
+            android:defaultValue="4"
             android:key="maxFetch"
             android:max="4"
             android:progress="1"
@@ -56,42 +49,6 @@
             android:summary="Notify me when new flags are around" />
 
     </PreferenceCategory>
-
-    <!--
-    <PreferenceCategory android:title="Visible Categories">
-
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="noneCheck"
-            android:summary="Not categorized" />
-
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="thoughtsCheck"
-            android:summary="Thoughts" />
-
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="funCheck"
-            android:summary="Fun" />
-
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="musicCheck"
-            android:summary="Music" />
-
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="landscapeCheck"
-            android:summary="Landscape" />
-
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="foodCheck"
-            android:summary="Food" />
-
-    </PreferenceCategory>
-    -->
 
     <PreferenceCategory android:title="About">
 

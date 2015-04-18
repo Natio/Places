@@ -1,3 +1,6 @@
+/*
+ * Copyright 2015-present Places®.
+ */
 package com.gcw.sapienza.places.adapters;
 
 import android.content.Context;
@@ -27,7 +30,8 @@ import com.parse.ParseQuery;
 import java.util.List;
 
 /**
- * Created by snowblack on 4/2/15.
+ * The Inbox Adapter manages the list of notification that a user receives for the comments made
+ * on his flags by other users.
  */
 public class InboxAdapter extends ArrayAdapter<List<String>> {
 
@@ -72,20 +76,20 @@ public class InboxAdapter extends ArrayAdapter<List<String>> {
             public void done(final PlacesUser placesUser, ParseException e) {
 
                 if (e == null) {
-                    Log.d(TAG, placesUser.getName());
+                    //commented because caused crash in some devices
+                    //Log.d(TAG, placesUser.getName());
 
                     PlacesLoginUtils.getInstance().addEntryToUserIdMap(placesUser.getFbId(), placesUser.getName());
                     PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(placesUser.getFbId(), placerImageView, PlacesLoginUtils.PicSize.LARGE, placesUser.getAccountType());
 
                 } else {
-
-                    Log.e(TAG, e.getMessage());
+                    //commented because caused crash in some devices
+                    //Log.e(TAG, e.getMessage());
                     Utils.showToast(getContext(), "An error occurred while retrieving Inbox data", Toast.LENGTH_SHORT);
 
                 }
             }
         });
-
 
         return v;
     }
