@@ -1,3 +1,6 @@
+/*
+ * Copyright 2015-present Places®.
+ */
 package com.gcw.sapienza.places.adapters;
 
 import android.app.Activity;
@@ -36,8 +39,9 @@ import com.squareup.picasso.Transformation;
 import java.util.List;
 
 /**
- * Created by paolo on 18/02/15.
+ * This file manages the preview of the Flag in the list of flags in homepage
  */
+
 public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHolder> {
 
     private static final String TAG = "FlagsAdapter";
@@ -95,9 +99,9 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
         // If user is logged in with G+, FB Graph API cannot be used
         if (fb_username == null)
             PlacesLoginUtils.getInstance().loadUsernameIntoTextView(user_id, flagViewHolder.username, f.getAccountType());
-        else
-        {
-            if(!PlacesLoginUtils.getInstance().getUserIdMap().containsKey(user_id)) PlacesLoginUtils.getInstance().addEntryToUserIdMap(user_id, fb_username);
+        else {
+            if (!PlacesLoginUtils.getInstance().getUserIdMap().containsKey(user_id))
+                PlacesLoginUtils.getInstance().addEntryToUserIdMap(user_id, fb_username);
             flagViewHolder.username.setText(fb_username);
         }
 
@@ -116,8 +120,10 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
         });
 
         int numberOfWows = f.getWowCount();
-        flagViewHolder.stats_wow.setText(numberOfWows + " WoW");
-
+        if (numberOfWows == 0 || numberOfWows == 1)
+            flagViewHolder.stats_wow.setText(numberOfWows + " WoW");
+        else
+            flagViewHolder.stats_wow.setText(numberOfWows + " WoWs");
 
         int numberOfComments = f.getNumberOfComments();
         if (numberOfComments == 1) {

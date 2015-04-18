@@ -1,3 +1,7 @@
+/*
+ * Copyright 2015-present Places®.
+ */
+
 package com.gcw.sapienza.places.fragments;
 
 import android.content.Intent;
@@ -29,13 +33,14 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Created by snowblack on 3/30/15.
+ * List of all the notification received after someone has commented a flag of mine
  */
 public class InboxFragment extends Fragment implements AdapterView.OnItemClickListener {
     private static final String TAG = "InboxFragment";
 
     private ListView inboxListView;
-    private MSwipeRefreshLayout inboxSwipe;
+    //Inbox refreshing currently disabled
+//    private MSwipeRefreshLayout inboxSwipe;
     private Button clearInbox;
 
     @Override
@@ -58,33 +63,35 @@ public class InboxFragment extends Fragment implements AdapterView.OnItemClickLi
             Utils.showToast(getActivity(), "Something went wrong while loading your Inbox", Toast.LENGTH_SHORT);
         }
 
-        inboxSwipe = (MSwipeRefreshLayout)view.findViewById(R.id.inbox_swipe_refresh);
+        //Inbox refreshing currently disabled
+//        inboxSwipe = (MSwipeRefreshLayout)view.findViewById(R.id.inbox_swipe_refresh);
 
         //FIXME not working, refreshing animation never halts
-        inboxSwipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                Log.d(TAG, "onRefresh called");
-
-                List<List<String>> inbox = null;
-                try {
-                    inbox = PlacesStorage.fetchInbox(getActivity());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Utils.showToast(getActivity(), "Something went wrong while refreshing Inbox data", Toast.LENGTH_SHORT);
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                    Utils.showToast(getActivity(), "Something went wrong while refreshing Inbox data", Toast.LENGTH_SHORT);
-                }
-                inboxListView.setAdapter(new InboxAdapter(getActivity(), R.layout.inbox_message_layout, inbox));
-                inboxSwipe.setRefreshing(false);
-            }
-        });
+//        inboxSwipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                Log.d(TAG, "onRefresh called");
+//
+//                List<List<String>> inbox = null;
+//                try {
+//                    inbox = PlacesStorage.fetchInbox(getActivity());
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    Utils.showToast(getActivity(), "Something went wrong while refreshing Inbox data", Toast.LENGTH_SHORT);
+//                } catch (ClassNotFoundException e) {
+//                    e.printStackTrace();
+//                    Utils.showToast(getActivity(), "Something went wrong while refreshing Inbox data", Toast.LENGTH_SHORT);
+//                }
+//                inboxListView.setAdapter(new InboxAdapter(getActivity(), R.layout.inbox_message_layout, inbox));
+//                inboxSwipe.setRefreshing(false);
+//            }
+//        });
 
         clearInbox = (Button)view.findViewById(R.id.clear_inbox);
         clearInbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "Clearing Inbox...");
                 try {
                     PlacesStorage.clearInbox(getActivity());
                     List<List<String>> inbox = PlacesStorage.fetchInbox(getActivity());
@@ -99,11 +106,10 @@ public class InboxFragment extends Fragment implements AdapterView.OnItemClickLi
             }
         });
 
-
         return view;
     }
 
-    //TODO not properly implemented yet. At this stage clicking on a message causes the app to crash
+
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 

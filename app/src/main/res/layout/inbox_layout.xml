@@ -5,9 +5,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
-    <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/inbox_swipe_refresh"
+    <!--Inbox refreshing currently disabled-->
+    <!--<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+        <!--android:id="@+id/inbox_swipe_refresh"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:layout_weight="0.9">-->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.9">
@@ -19,8 +23,9 @@
             android:choiceMode="singleChoice"
             android:scrollbars="none" />
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+    </LinearLayout>
 
+    <!--</android.support.v4.widget.SwipeRefreshLayout>-->
     <Button
         android:id="@+id/clear_inbox"
         android:layout_weight="0.1"
@@ -28,6 +33,7 @@
         android:layout_height="0dp"
         android:layout_centerInParent="true"
         android:textSize="14sp"
+        android:clickable="true"
         android:text="Clear Inbox"
         android:textColor="@color/grey"/>
 </LinearLayout>

@@ -1,3 +1,7 @@
+/*
+ * Copyright 2015-present Places®.
+ */
+
 package com.gcw.sapienza.places.fragments;
 
 import android.content.BroadcastReceiver;
@@ -60,11 +64,9 @@ import java.util.List;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 /**
- *
  * Abstract class for showing Fragment with Map and list of flags.
- * Subclasses must implement all abstract methods providing the right data
- *
- * Created by paolo on 26/03/15.
+ * Subclasses must implement all abstract methods providing the right data.
+ * Paolo++ ;)
  */
 public abstract class PlacesMapListFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener,
         GoogleMap.OnMarkerClickListener {
@@ -206,7 +208,9 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
             }
         });
         this.supl = (SlidingUpPanelLayout)view.findViewById(R.id.home_container);
-        this.supl.setAnchorPoint(0.1f);
+
+        //temporarily disabled anchorpoint
+        //this.supl.setAnchorPoint(0.1f);
         // this.supl.setTouchEnabled(false);
         this.supl.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
         this.supl.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
@@ -218,14 +222,16 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
             @Override
             public void onPanelCollapsed(View view) {
                 Log.d(TAG, "Panel collapsed");
-
+                //made temporarily scrollable
+                gMap.getUiSettings().setScrollGesturesEnabled(true);
                 // supl.setTouchEnabled(true);
             }
 
             @Override
             public void onPanelExpanded(View view) {
                 Log.d(TAG, "Panel expanded");
-
+                //made temporarily scrollable
+                gMap.getUiSettings().setScrollGesturesEnabled(true);
                 // supl.setClickable(false);
                 // supl.setTouchEnabled(false);
                 // supl.setEnableDragViewTouchEvents(false);
@@ -252,7 +258,6 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         SupportMapFragment mapFragment = new SupportMapFragment();
         this.getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.my_map_holder, mapFragment).commit();
         mapFragment.getMapAsync(this);
-
         return view;
     }
 
@@ -261,7 +266,6 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         this.unregisterNotification();
         super.onDestroyView();
     }
-
 
     /**
      * Customizes GMap UI. Subclasses can implement this method to change the UiSettings of GMaps
@@ -314,10 +318,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         return true;
     }
 
-
-    /**
-     * Puts markers on the map
-     */
+    // Puts markers on the map
     private void updateMarkersOnMap() {
 
         this.markers = new ArrayList<>();
@@ -452,7 +453,6 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         return preferences.getBoolean("discoverMode", true);
 
     }
-
 
     /**
      * Fragment that shows the list of flags in a cardview
