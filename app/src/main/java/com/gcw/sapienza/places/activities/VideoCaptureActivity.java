@@ -174,6 +174,7 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
+        Log.d(TAG, "onClick");
         if (v.equals(toggleButton)) {
             if (((ToggleButton) v).isChecked()) {
                 this.startRecordingVideo();

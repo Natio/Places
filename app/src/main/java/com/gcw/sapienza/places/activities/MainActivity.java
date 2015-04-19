@@ -33,6 +33,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
+import com.gcw.sapienza.places.adapters.InboxAdapter;
 import com.gcw.sapienza.places.fragments.BagFragment;
 import com.gcw.sapienza.places.fragments.CategoriesFragment;
 import com.gcw.sapienza.places.fragments.FlagFragment;
@@ -46,6 +47,7 @@ import com.gcw.sapienza.places.services.ILocationServiceListener;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.GPlusUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
+import com.gcw.sapienza.places.utils.PlacesStorage;
 import com.gcw.sapienza.places.utils.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -65,12 +67,15 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState;
 
+import java.io.IOException;
+import java.util.List;
+
 /*
  * The following activity is the homepage of the app where the list of flags is contained
  */
 
 public class MainActivity extends ActionBarActivity implements Preference.OnPreferenceChangeListener, ResultCallback<People.LoadPeopleResult>,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ILocationServiceListener {
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ILocationServiceListener{
 
     public static final String TAG = MainActivity.class.getName();
     private static final String[] section_titles = {"Home", "Profile", "Inbox", "My Flags", "Bag", "Settings", "Logout"};
@@ -411,6 +416,26 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     public void setTitle(CharSequence title) {
         this.current_title = title;
         this.getSupportActionBar().setTitle(this.current_title);
+    }
+
+    //for some reason, inbox clear button onClick
+    // callback listener setting doesn't work via Java code
+    // it has been set in inbox_layout.xml
+    public void onInboxClearButtonClick(View v){
+        Log.d(TAG, "Clearing Inbox...");
+        try {
+            PlacesStorage.clearInbox(this);
+            List<List<String>> inbox = PlacesStorage.fetchInbox(this);
+            LinearLayout llInbox = (LinearLayout)v.getParent();
+            ListView inboxListView = (ListView)llInbox.findViewById(R.id.inbox_list_view);
+            inboxListView.setAdapter(new InboxAdapter(this, R.layout.inbox_message_layout, inbox));
+        } catch (IOException e) {
+            Log.e(TAG, "Error", e);
+            Utils.showToast(this, "Something went wrong while clearing Inbox data", Toast.LENGTH_SHORT);
+        } catch (ClassNotFoundException e) {
+            Log.e(TAG, "Error", e);
+            Utils.showToast(this, "Something went wrong while loading Inbox data", Toast.LENGTH_SHORT);
+        }
     }
 
     @Override

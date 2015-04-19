@@ -11,10 +11,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -35,13 +37,12 @@ import java.util.List;
 /**
  * List of all the notification received after someone has commented a flag of mine
  */
-public class InboxFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class InboxFragment extends Fragment implements AdapterView.OnItemClickListener{
     private static final String TAG = "InboxFragment";
 
     private ListView inboxListView;
     //Inbox refreshing currently disabled
 //    private MSwipeRefreshLayout inboxSwipe;
-    private Button clearInbox;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -87,28 +88,8 @@ public class InboxFragment extends Fragment implements AdapterView.OnItemClickLi
 //            }
 //        });
 
-        clearInbox = (Button)view.findViewById(R.id.clear_inbox);
-        clearInbox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Clearing Inbox...");
-                try {
-                    PlacesStorage.clearInbox(getActivity());
-                    List<List<String>> inbox = PlacesStorage.fetchInbox(getActivity());
-                    inboxListView.setAdapter(new InboxAdapter(getActivity(), R.layout.inbox_message_layout, inbox));
-                } catch (IOException e) {
-                    Log.e(TAG, "Error", e);
-                    Utils.showToast(getActivity(), "Something went wrong while clearing Inbox data", Toast.LENGTH_SHORT);
-                } catch (ClassNotFoundException e) {
-                    Log.e(TAG, "Error", e);
-                    Utils.showToast(getActivity(), "Something went wrong while loading Inbox data", Toast.LENGTH_SHORT);
-                }
-            }
-        });
-
         return view;
     }
-
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
