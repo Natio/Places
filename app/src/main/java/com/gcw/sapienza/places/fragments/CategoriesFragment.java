@@ -1,3 +1,6 @@
+/*
+ * Copyright 2015-present Places®.
+ */
 package com.gcw.sapienza.places.fragments;
 
 import android.app.Fragment;
@@ -19,9 +22,9 @@ import android.widget.Button;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 
-
 /**
- * Created by snowblack on 3/8/15.
+ * the Categories Fragment manages the categories filter
+ * (show or not flags belonging to a certain category)
  */
 public class CategoriesFragment extends Fragment {
 
