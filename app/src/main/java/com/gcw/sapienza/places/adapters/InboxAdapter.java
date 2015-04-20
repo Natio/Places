@@ -77,14 +77,14 @@ public class InboxAdapter extends ArrayAdapter<List<String>> {
 
                 if (e == null) {
                     //commented because caused crash in some devices
-                    //Log.d(TAG, placesUser.getName());
+                    Log.d(TAG, "user name" + placesUser.getName());
 
                     PlacesLoginUtils.getInstance().addEntryToUserIdMap(placesUser.getFbId(), placesUser.getName());
                     PlacesLoginUtils.getInstance().loadProfilePicIntoImageView(placesUser.getFbId(), placerImageView, PlacesLoginUtils.PicSize.LARGE, placesUser.getAccountType());
 
                 } else {
                     //commented because caused crash in some devices
-                    //Log.e(TAG, e.getMessage());
+                    Log.e(TAG, e.getMessage());
                     Utils.showToast(getContext(), "An error occurred while retrieving Inbox data", Toast.LENGTH_SHORT);
 
                 }
