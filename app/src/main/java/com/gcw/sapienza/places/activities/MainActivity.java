@@ -247,13 +247,17 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         return super.onOptionsItemSelected(item);
     }
 
+    public boolean areLocationServicesEnabled(){
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
 
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-                && !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+        if (!areLocationServicesEnabled()) {
             promptForLocationServices();
         } else if(loggedIn){
             if(!PlacesApplication.getInstance().isLocationServiceRunning()){

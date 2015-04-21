@@ -257,6 +257,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         SupportMapFragment mapFragment = new SupportMapFragment();
         this.getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.my_map_holder, mapFragment).commit();
         mapFragment.getMapAsync(this);
+
         return view;
     }
 
@@ -289,6 +290,13 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         this.customizeGmap(googleMap);
 
         this.handleRefreshData();
+
+        if(((MainActivity)getActivity()).areLocationServicesEnabled()){
+            PlacesMapListFragment.this.listFragment.flagsToDisplay();
+        }else{
+            Log.w(TAG, "No Internet Connection Available");
+            PlacesMapListFragment.this.listFragment.noFlagsToDisplay("No location data available :(");
+        }
     }
 
     @Override
