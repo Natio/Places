@@ -704,7 +704,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 wowStatText.setText("You WoWed this.");
                 newWowButton.setChecked(true);
             } else {
-                wowStatText.setText("You and other " + (wowCount - 1) + " WoWed.");
+                wowStatText.setText("You and " + (wowCount > 2 ? (("other " + (wowCount - 1) + " Placers WoWed this."))
+                        : ("another Placer WoWed this.")));
                 newWowButton.setChecked(true);
             }
         } else {
@@ -714,10 +715,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 wowStatText.setText("");
                 wowStatText.setVisibility(View.INVISIBLE);
             } else {
-                if (wowCount == 1)
-                    wowStatText.setText("1 WoW");
-                else
-                    wowStatText.setText(wowCount + " WoWs");
+                wowStatText.setText((wowCount +
+                        (wowCount == 1 ? " Placer WoWed this." : " Placers WoWed this.")));
             }
         }
     }
