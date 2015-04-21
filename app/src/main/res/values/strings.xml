@@ -32,8 +32,8 @@
 
     <string name="topsecret">Make it a secret Flag</string>
     <string name="category">Category:</string>
-    <string name="wow_on">You WoWed.</string>
-    <string name="wow_off">WoW!</string>
+    <string name="wow_on">WoWed!</string>
+    <string name="wow_off">WoW</string>
 
     <string name="followers">Placers followed</string>
 

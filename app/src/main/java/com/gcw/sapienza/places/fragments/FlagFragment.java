@@ -52,6 +52,7 @@ import com.gcw.sapienza.places.models.manager.ModelCallback;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.PlacesUtilCallback;
 import com.gcw.sapienza.places.utils.Utils;
+import com.parse.CountCallback;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -336,43 +337,68 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     }
 
     private void updateWowInfo() {
-        ParseQuery<Flag> queryPosts = ParseQuery.getQuery("Posts");
-        queryPosts.whereEqualTo("objectId", this.flag.getObjectId());
-        queryPosts.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
-        queryPosts.getFirstInBackground(new GetCallback<Flag>() {
+//        ParseQuery<Flag> queryPosts = ParseQuery.getQuery("Posts");
+//        queryPosts.whereEqualTo("objectId", this.flag.getObjectId());
+//        queryPosts.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
+//        queryPosts.getFirstInBackground(new GetCallback<Flag>() {
+//            @Override
+//            public void done(Flag flag, ParseException e) {
+//                if (e == null) {
+
+        final int wowCount = flag.getInt("wowCount");
+
+        ParseQuery<CustomParseObject> queryWoWs = ParseQuery.getQuery("Wow_Lol_Boo");
+        queryWoWs.whereEqualTo("flag", flag);
+        queryWoWs.whereEqualTo("user", ParseUser.getCurrentUser());
+//        due to free parse api terms, better to use get over count
+//        queryWoWs.countInBackground(new CountCallback() {
+//            @Override
+//            public void done(int i, ParseException e) {
+//                if(e == null){
+//                    Log.d(TAG, "WoW count: " + i);
+//                    Log.d(TAG, "flagId: " + flag.getObjectId() + ", userId: " + ParseUser.getCurrentUser().getObjectId());
+//                    if (wowCount == 1) wowStatText.setText("You WoWed this.");
+//                    else if (wowCount == 2)
+//                        wowStatText.setText("You and another Placer WoWed this.");
+//                    else if (wowCount == 0) wowStatText.setText("");
+//                    else wowStatText.setText("You and " + (wowCount > 2 ? (("other " + (wowCount - 1) + " Placers WoWed this."))
+//                                : ("another Placer WoWed this.")));
+//                }else{
+//                    Log.e(TAG, e.getMessage());
+//                    Log.e(TAG, "Error on user: " + ParseUser.getCurrentUser().getUsername());
+//                    if (wowCount > 0) wowStatText.setText((wowCount +
+//                            (wowCount == 1 ? " Placer WoWed this." : " Placers WoWed this.")));
+//                    else wowStatText.setText("");
+//                }
+//            }
+//        });
+        queryWoWs.getFirstInBackground(new GetCallback<CustomParseObject>() {
             @Override
-            public void done(Flag flag, ParseException e) {
+            public void done(CustomParseObject wow, ParseException e) {
                 if (e == null) {
-
-                    final int wowCount = flag.getInt("wowCount");
-
-                    ParseQuery<CustomParseObject> queryWoWs = ParseQuery.getQuery("WoW_Lol_Boo");
-                    queryWoWs.whereEqualTo("flag", flag);
-                    queryWoWs.whereEqualTo("user", ParseUser.getCurrentUser());
-                    queryWoWs.getFirstInBackground(new GetCallback<CustomParseObject>() {
-                        @Override
-                        public void done(CustomParseObject wow, ParseException e) {
-                            if (e == null) {
-                                if (wowCount == 1) wowStatText.setText("You WoWed this.");
-                                else if (wowCount == 2)
-                                    wowStatText.setText("You and another Placer WoWed this.");
-                                else if (wowCount == 0) wowStatText.setText("");
-                                else wowStatText.setText("You and " + (wowCount > 2 ? (("other " + (wowCount - 1) + " Placers WoWed this."))
-                                            : ("another Placer WoWed this.")));
-                            }else{
-                                Log.d(TAG, e.getMessage());
-                                if (wowCount > 0) wowStatText.setText((wowCount +
-                                        (wowCount == 1 ? " Placer WoWed this." : " Placers WoWed this.")));
-                                else wowStatText.setText("");
-                            }
-                        }
-                    });
-                } else {
-                    Log.e(TAG, e.getMessage());
-                    Utils.showToast(getActivity(), "An error occurred while retrieving Flag data", Toast.LENGTH_SHORT);
+                    if (wowCount == 1) wowStatText.setText("You WoWed this.");
+                    else if (wowCount == 2)
+                        wowStatText.setText("You and another Placer WoWed this.");
+                    else if (wowCount == 0) wowStatText.setText("");
+                    else wowStatText.setText("You and " + (wowCount > 2 ? (("other " + (wowCount - 1) + " Placers WoWed this."))
+                                : ("another Placer WoWed this.")));
+                }else{
+                    Log.d(TAG, e.getMessage());
+                    Log.d(TAG, "Current user: " + ParseUser.getCurrentUser().getObjectId() +
+                            ", didn't WoW Flag: " + flag.getObjectId());
+                    if (wowCount > 0) wowStatText.setText((wowCount +
+                            (wowCount == 1 ? " Placer WoWed this." : " Placers WoWed this.")));
+                    else wowStatText.setText("");
                 }
             }
         });
+//                } else {
+//                    Log.e(TAG, e.getMessage());
+////                    Always triggers the toast on start
+////                    Utils.showToast(getActivity(), "An error occurred while retrieving Flag data", Toast.LENGTH_SHORT);
+//                }
+//            }
+//        });
     }
 
     private void retrieveComments() {
@@ -829,8 +855,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     //similar to wlbFlag but just to initialize the toggleButton of WOW in the correct way
     private void setWowButton() {
         ParseQuery<CustomParseObject> queryWLB = ParseQuery.getQuery("Wow_Lol_Boo");
-        queryWLB.whereEqualTo("fbId", this.flag.getFbId());
-        queryWLB.whereEqualTo("flagId", this.flag.getObjectId());
+        queryWLB.whereEqualTo("user", ParseUser.getCurrentUser());
+        queryWLB.whereEqualTo("flag", this.flag);
         queryWLB.findInBackground(new FindCallback<CustomParseObject>() {
             @Override
             public void done(List<CustomParseObject> markers, ParseException e) {
