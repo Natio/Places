@@ -13,7 +13,7 @@ import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.FlagsStorage;
-import com.gcw.sapienza.places.utils.Utils;
+import com.gcw.sapienza.places.utils.PlacesUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -72,7 +72,7 @@ public class BagFragment extends PlacesMapListFragment{
      */
     @Override
     protected  void handleRefreshData() {
-        ((MainActivity) getActivity()).refresh(Utils.BAG_FLAGS_CODE);
+        ((MainActivity) getActivity()).refresh(PlacesUtils.BAG_FLAGS_CODE);
     }
 
     /**

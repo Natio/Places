@@ -9,16 +9,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.models.Comment;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.PlacesUtilCallback;
-import com.gcw.sapienza.places.utils.Utils;
+import com.gcw.sapienza.places.utils.PlacesUtils;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -164,7 +166,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
             String fb_id = mComment.getUserId();
 
             if (PlacesLoginUtils.getInstance().getCurrentUserId().equals(fb_id)) {
-                menu.add(Utils.COMMENT_LIST_GROUP, Utils.DELETE_COMMENT, 0, "Delete Flag");
+                menu.add(PlacesUtils.COMMENT_LIST_GROUP, PlacesUtils.DELETE_COMMENT, 0, "Delete Flag");
             }
             else
             {
@@ -175,9 +177,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
                 try {
                     if (queryDelete.count() == 0) {
-                        menu.add(Utils.COMMENT_LIST_GROUP, Utils.REPORT_COMMENT, 0, "Report Flag as inappropriate");
+                        menu.add(PlacesUtils.COMMENT_LIST_GROUP, PlacesUtils.REPORT_COMMENT, 0, "Report Flag as inappropriate");
                     } else {
-                        menu.add(Utils.COMMENT_LIST_GROUP, Utils.DELETE_REPORT_COMMENT, 0, "Revoke Flag report");
+                        menu.add(PlacesUtils.COMMENT_LIST_GROUP, PlacesUtils.DELETE_REPORT_COMMENT, 0, "Revoke Flag report");
                     }
                 } catch (ParseException e) {
                     Log.e(TAG, e.getMessage());

@@ -7,13 +7,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.media.AudioManager;
-import android.media.Image;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -41,7 +39,6 @@ import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.activities.ShareActivity;
-import com.gcw.sapienza.places.adapters.CommentsAdapter;
 import com.gcw.sapienza.places.models.Comment;
 import com.gcw.sapienza.places.models.CommentReport;
 import com.gcw.sapienza.places.models.CustomParseObject;
@@ -51,8 +48,7 @@ import com.gcw.sapienza.places.models.manager.CommentsManager;
 import com.gcw.sapienza.places.models.manager.ModelCallback;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.PlacesUtilCallback;
-import com.gcw.sapienza.places.utils.Utils;
-import com.parse.CountCallback;
+import com.gcw.sapienza.places.utils.PlacesUtils;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -473,7 +469,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                     @Override
                                     public void done(ParseException e) {
                                         if (e != null) {
-                                            Utils.showToast(getActivity(), "Something went wrong while commenting", Toast.LENGTH_SHORT);
+                                            PlacesUtils.showToast(getActivity(), "Something went wrong while commenting", Toast.LENGTH_SHORT);
                                             Log.e(TAG, e.getMessage());
                                         }
                                         scrollToLastComment = true;
@@ -685,7 +681,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                             updateWowStats(true, wowCount + 1);
                                         }else{
                                             Log.e(TAG, "Error", e);
-                                            Utils.showToast(getActivity(), "Something went wrong while updating WoW count", Toast.LENGTH_SHORT);
+                                            PlacesUtils.showToast(getActivity(), "Something went wrong while updating WoW count", Toast.LENGTH_SHORT);
                                         }
                                         newWowButton.setClickable(true);
                                     }
@@ -699,7 +695,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                             updateWowStats(false, wowCount - 1);
                                         }else{
                                             Log.e(TAG, "Error", e);
-                                            Utils.showToast(getActivity(), "Something went wrong while updating WoW count", Toast.LENGTH_SHORT);
+                                            PlacesUtils.showToast(getActivity(), "Something went wrong while updating WoW count", Toast.LENGTH_SHORT);
                                         }
                                         newWowButton.setClickable(true);
                                     }
@@ -921,7 +917,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             @Override
             public void done(com.parse.ParseException e) {
                 if (e == null) {
-                    Toast.makeText(getActivity(), Utils.COMMENT_DELETED, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), PlacesUtils.COMMENT_DELETED, Toast.LENGTH_SHORT).show();
                     retrieveComments();
                 } else
                     Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -935,7 +931,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-                    Toast.makeText(getActivity(), Utils.COMMENT_REPORTED, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), PlacesUtils.COMMENT_REPORTED, Toast.LENGTH_SHORT).show();
                 } else
                     Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -957,7 +953,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                         @Override
                         public void done(ParseException e) {
                             if (e == null) {
-                                Toast.makeText(getActivity(), Utils.FLAG_REPORT_REVOKED, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), PlacesUtils.FLAG_REPORT_REVOKED, Toast.LENGTH_SHORT).show();
                             } else
                                 Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
                         }

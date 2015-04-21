@@ -4,25 +4,21 @@
 package com.gcw.sapienza.places.adapters;
 
 import android.content.Context;
-import android.database.DataSetObserver;
 import android.graphics.Color;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gcw.sapienza.places.R;
-import com.gcw.sapienza.places.fragments.InboxFragment;
 import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.PlacesStorage;
-import com.gcw.sapienza.places.utils.Utils;
+import com.gcw.sapienza.places.utils.PlacesUtils;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -85,7 +81,7 @@ public class InboxAdapter extends ArrayAdapter<List<String>> {
                 } else {
                     //commented because caused crash in some devices
                     Log.e(TAG, e.getMessage());
-                    Utils.showToast(getContext(), "An error occurred while retrieving Inbox data", Toast.LENGTH_SHORT);
+                    PlacesUtils.showToast(getContext(), "An error occurred while retrieving Inbox data", Toast.LENGTH_SHORT);
 
                 }
             }

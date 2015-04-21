@@ -13,8 +13,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.gcw.sapienza.places.R;
-import com.gcw.sapienza.places.utils.Utils;
+import com.gcw.sapienza.places.utils.PlacesUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -81,7 +83,7 @@ public class AudioRecordingActivity extends ActionBarActivity implements View.On
             bigMicButton.setImageResource(R.drawable.mic_darkgreen);
 
             try {
-                audio_filename = Utils.createAudioFile(ShareActivity.AUDIO_FORMAT, AudioRecordingActivity.this).getAbsolutePath();
+                audio_filename = PlacesUtils.createAudioFile(ShareActivity.AUDIO_FORMAT, AudioRecordingActivity.this).getAbsolutePath();
                 audioRec = new MediaRecorder();
                 audioRec.setAudioSource(MediaRecorder.AudioSource.MIC);
                 audioRec.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);

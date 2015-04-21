@@ -31,6 +31,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
+
 import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.adapters.InboxAdapter;
@@ -42,13 +43,13 @@ import com.gcw.sapienza.places.fragments.MainFragment;
 import com.gcw.sapienza.places.fragments.MyFlagsFragment;
 import com.gcw.sapienza.places.fragments.ProfileFragment;
 import com.gcw.sapienza.places.fragments.SettingsFragment;
+import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.services.ILocationServiceListener;
-import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.GPlusUtils;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.PlacesStorage;
-import com.gcw.sapienza.places.utils.Utils;
+import com.gcw.sapienza.places.utils.PlacesUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -62,10 +63,6 @@ import com.parse.ParseFacebookUtils;
 import com.parse.ParseInstallation;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
-
-import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState;
 
 import java.io.IOException;
 import java.util.List;
@@ -174,14 +171,14 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             //this.getSupportFragmentManager().beginTransaction().replace(R.id.sliding_layout, new MainFragment()).commit();
         } else {
             switch (bundleContentType){
-                case Utils.RECEIVED_NOTIF_COMMENT_TYPE:
-                    Log.d(TAG, Utils.RECEIVED_NOTIF_COMMENT_TYPE);
-                    String flagId = intent.getStringExtra(Utils.FLAG_ID);
+                case PlacesUtils.RECEIVED_NOTIF_COMMENT_TYPE:
+                    Log.d(TAG, PlacesUtils.RECEIVED_NOTIF_COMMENT_TYPE);
+                    String flagId = intent.getStringExtra(PlacesUtils.FLAG_ID);
                     openFlagFromId(flagId);
                     break;
 
-                case Utils.RECEIVED_MULTI_NOTIF_COMMENT_TYPE:
-                    Log.d(TAG, Utils.RECEIVED_MULTI_NOTIF_COMMENT_TYPE);
+                case PlacesUtils.RECEIVED_MULTI_NOTIF_COMMENT_TYPE:
+                    Log.d(TAG, PlacesUtils.RECEIVED_MULTI_NOTIF_COMMENT_TYPE);
                     switchToOtherFrag(new InboxFragment());
                     break;
 
@@ -299,7 +296,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 startActivityForResult(new Intent
-                        (android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), Utils.GPS_ENABLE_REQUEST_CODE);
+                        (android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), PlacesUtils.GPS_ENABLE_REQUEST_CODE);
             }
         });
 
@@ -431,10 +428,10 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             inboxListView.setAdapter(new InboxAdapter(this, R.layout.inbox_message_layout, inbox));
         } catch (IOException e) {
             Log.e(TAG, "Error", e);
-            Utils.showToast(this, "Something went wrong while clearing Inbox data", Toast.LENGTH_SHORT);
+            PlacesUtils.showToast(this, "Something went wrong while clearing Inbox data", Toast.LENGTH_SHORT);
         } catch (ClassNotFoundException e) {
             Log.e(TAG, "Error", e);
-            Utils.showToast(this, "Something went wrong while loading Inbox data", Toast.LENGTH_SHORT);
+            PlacesUtils.showToast(this, "Something went wrong while loading Inbox data", Toast.LENGTH_SHORT);
         }
     }
 
@@ -443,7 +440,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case Utils.LOGIN_REQUEST_CODE:
+            case PlacesUtils.LOGIN_REQUEST_CODE:
 
                 if (resultCode == RESULT_OK) {
                     //this.startDownloadingFacebookInfo();
@@ -468,7 +465,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
                 if (resultCode == RESULT_OK) {
                     Toast.makeText(this, data.getExtras().getString("result"), Toast.LENGTH_LONG).show();
-                    this.refresh(Utils.NEARBY_FLAGS_CODE);
+                    this.refresh(PlacesUtils.NEARBY_FLAGS_CODE);
                 }
                 break;
         }
@@ -572,7 +569,6 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
                 preference.getKey().equals("landscapeCheck") ||
                 preference.getKey().equals("foodCheck") ||
                 preference.getKey().equals("noneCheck") ||
-                preference.getKey().equals("discoverMode") ||
                 preference.getKey().equals("notificationsCheck")) {
             Log.d(TAG, "Called onPreferenceChange for: " + preference.getKey());
             editor.putBoolean(preference.getKey(), (boolean) newValue);
@@ -580,8 +576,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         }
         else if (preference.getKey().equals("maxFetch")) {
             preference.setDefaultValue(newValue);
-            int value = Utils.stepValues[(int) newValue];
-            Utils.MAX_FLAGS = value;
+            int value = PlacesUtils.stepValues[(int) newValue];
+            PlacesUtils.MAX_FLAGS = value;
             showToast("Max number of visible flags: " + value);
         }
 
@@ -602,19 +598,19 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     public void onServiceConnected(int updateCode) {
         Log.d(TAG, "LocationService is connected! Callback is called");
         switch (updateCode){
-            case Utils.NEARBY_FLAGS_CODE:
+            case PlacesUtils.NEARBY_FLAGS_CODE:
                 Log.d(TAG, "Service Connected. Updating Nearby Flags");
-                PlacesApplication.getInstance().updatePlacesData(this, Utils.NEARBY_FLAGS_CODE);
+                PlacesApplication.getInstance().updatePlacesData(this, PlacesUtils.NEARBY_FLAGS_CODE);
                 break;
-            case Utils.MY_FLAGS_CODE:
+            case PlacesUtils.MY_FLAGS_CODE:
                 Log.d(TAG, "Service Connected. Updating My Flags");
-                PlacesApplication.getInstance().updatePlacesData(this, Utils.MY_FLAGS_CODE);
+                PlacesApplication.getInstance().updatePlacesData(this, PlacesUtils.MY_FLAGS_CODE);
                 break;
-            case Utils.BAG_FLAGS_CODE:
+            case PlacesUtils.BAG_FLAGS_CODE:
                 Log.d(TAG, "Service Connected. Updating Bag Flags");
-                PlacesApplication.getInstance().updatePlacesData(this, Utils.BAG_FLAGS_CODE);
+                PlacesApplication.getInstance().updatePlacesData(this, PlacesUtils.BAG_FLAGS_CODE);
                 break;
-            case Utils.DEFAULT_FLAGS_CODE:
+            case PlacesUtils.DEFAULT_FLAGS_CODE:
                 Log.d(TAG, "Triggering default behavior: Updating whole Flag data");
                 PlacesApplication.getInstance().updatePlacesData(this);
                 break;

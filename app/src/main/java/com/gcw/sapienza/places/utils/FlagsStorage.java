@@ -94,7 +94,7 @@ public final class FlagsStorage {
             preferences = PreferenceManager.getDefaultSharedPreferences(context);
         }catch (NullPointerException e){
             Log.e(TAG, e.getMessage());
-            Utils.showToast(context, "There was a problem retrieving Flags data", Toast.LENGTH_SHORT);
+            PlacesUtils.showToast(context, "There was a problem retrieving Flags data", Toast.LENGTH_SHORT);
             return flags;
         }
 

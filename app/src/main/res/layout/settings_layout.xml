@@ -38,12 +38,6 @@
 
         <CheckBoxPreference
             android:defaultValue="true"
-            android:key="discoverMode"
-            android:title="Discover Mode"
-            android:summary="Show farther flags" />
-
-        <CheckBoxPreference
-            android:defaultValue="true"
             android:key="notificationsCheck"
             android:title="Flag Notifications"
             android:summary="Notify me when new flags are around" />

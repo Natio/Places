@@ -445,7 +445,7 @@ public class FlagUploader {
             FileInputStream is = new FileInputStream(f);
             ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
-            byte[] buff = new byte[Utils.CHUNK_SIZE];
+            byte[] buff = new byte[PlacesUtils.CHUNK_SIZE];
             int i;
             while ((i = is.read(buff, 0, buff.length)) > 0) {
                 outStream.write(buff, 0, i);
@@ -473,7 +473,7 @@ public class FlagUploader {
 
         @Override
         protected String getNameFromFile(File f) {
-            return "image." + Utils.getExtensionFromFile(f);
+            return "image." + PlacesUtils.getExtensionFromFile(f);
         }
 
     }
@@ -482,7 +482,7 @@ public class FlagUploader {
 
         @Override
         protected String getNameFromFile(File f) {
-            return "thumb." + Utils.getExtensionFromFile(f);
+            return "thumb." + PlacesUtils.getExtensionFromFile(f);
         }
 
         @Override

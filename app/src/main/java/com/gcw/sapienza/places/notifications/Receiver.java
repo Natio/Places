@@ -17,7 +17,7 @@ import android.widget.Toast;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.utils.PlacesStorage;
-import com.gcw.sapienza.places.utils.Utils;
+import com.gcw.sapienza.places.utils.PlacesUtils;
 import com.parse.ParsePushBroadcastReceiver;
 
 import org.json.JSONException;
@@ -26,7 +26,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Created by snowblack on 1/4/15.
@@ -76,11 +75,11 @@ public class Receiver extends ParsePushBroadcastReceiver {
                 editor.commit();
                 if(notificationsSize == 1) {
                     Log.d(TAG, "Just 1 notification. Showing the related Flag");
-                    extras.putString("type", Utils.RECEIVED_NOTIF_COMMENT_TYPE);
-                    extras.putString(Utils.FLAG_ID, flag_id);
+                    extras.putString("type", PlacesUtils.RECEIVED_NOTIF_COMMENT_TYPE);
+                    extras.putString(PlacesUtils.FLAG_ID, flag_id);
                 }else if(notificationsSize > 1){
                     Log.d(TAG, notificationsSize + " notifications. Showing the Inbox");
-                    extras.putString("type", Utils.RECEIVED_MULTI_NOTIF_COMMENT_TYPE);
+                    extras.putString("type", PlacesUtils.RECEIVED_MULTI_NOTIF_COMMENT_TYPE);
                 }else{
                     Log.w(TAG, "0 notifications. Nothing to show");
                     return;
@@ -99,7 +98,7 @@ public class Receiver extends ParsePushBroadcastReceiver {
             }
         } catch (JSONException e) {
             Log.d(TAG, "Json error", e);
-            Utils.showToast(context, "Something went wrong while loading Places data", Toast.LENGTH_SHORT);
+            PlacesUtils.showToast(context, "Something went wrong while loading Places data", Toast.LENGTH_SHORT);
         }
 
 //        Default behavior: simply open up the Main Activity when clicking on the push notification

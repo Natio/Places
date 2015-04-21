@@ -93,7 +93,7 @@ public class PlacesLoginUtils {
         loginIntent.putExtra("canChoose", canChoose);
         // loginIntent.setClass(activity, ParseLoginActivity.class);
 
-        activity.startActivityForResult(loginIntent, Utils.LOGIN_REQUEST_CODE);
+        activity.startActivityForResult(loginIntent, PlacesUtils.LOGIN_REQUEST_CODE);
     }
 
     public void addFriend(String friend) {

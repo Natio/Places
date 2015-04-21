@@ -31,7 +31,7 @@ import com.gcw.sapienza.places.models.manager.ErrorCallback;
 import com.gcw.sapienza.places.models.manager.ModelCallback;
 import com.gcw.sapienza.places.notifications.Notifications;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
-import com.gcw.sapienza.places.utils.Utils;
+import com.gcw.sapienza.places.utils.PlacesUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderApi;
@@ -135,7 +135,7 @@ public class LocationService extends Service implements
             queryParsewithCurrentUser();
             queryParsewithBag();
         }else{
-            suspendedRequest = Utils.DEFAULT_FLAGS_CODE;
+            suspendedRequest = PlacesUtils.DEFAULT_FLAGS_CODE;
             Log.d(TAG, "Last location is null!");
         }
     }
@@ -143,7 +143,7 @@ public class LocationService extends Service implements
     public void updateLocationData(int updateCode){
         switch (updateCode){
 
-            case Utils.NEARBY_FLAGS_CODE:
+            case PlacesUtils.NEARBY_FLAGS_CODE:
                 Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
                 if (currentLocation != null) {
                     this.location = currentLocation;
@@ -155,15 +155,15 @@ public class LocationService extends Service implements
                 }
                 break;
 
-            case Utils.MY_FLAGS_CODE:
+            case PlacesUtils.MY_FLAGS_CODE:
                 queryParsewithCurrentUser();
                 break;
 
-            case Utils.BAG_FLAGS_CODE:
+            case PlacesUtils.BAG_FLAGS_CODE:
                 queryParsewithBag();
                 break;
 
-            case Utils.DEFAULT_FLAGS_CODE:
+            case PlacesUtils.DEFAULT_FLAGS_CODE:
                 updateLocationData();
                 break;
 
@@ -384,7 +384,7 @@ public class LocationService extends Service implements
         final ParseGeoPoint gp = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
 
-        float radius = Utils.DISCOVER_MODE_RADIUS; // double it for discover mode
+        float radius = PlacesUtils.DISCOVER_MODE_RADIUS; // double it for discover mode
 
         if (PlacesApplication.isRunningOnEmulator) {
             radius = 10.0f;
@@ -412,7 +412,7 @@ public class LocationService extends Service implements
                 @Override
                 public void run() {
                     if (!PlacesLoginUtils.getInstance().hasCurrentUserId()) {
-                        handler.postDelayed(this, Utils.UPDATE_DELAY);
+                        handler.postDelayed(this, PlacesUtils.UPDATE_DELAY);
                     } else {
                         queryParsewithLocation(LocationService.this.location);
                     }
@@ -486,7 +486,7 @@ public class LocationService extends Service implements
         if (archaeologist) query.orderByAscending("createdAt");
         else query.orderByDescending("createdAt");
 
-        query.setLimit(Utils.MAX_FLAGS);
+        query.setLimit(PlacesUtils.MAX_FLAGS);
         if (PlacesApplication.isRunningOnEmulator) {
             query.setLimit(50);
         }
@@ -502,7 +502,8 @@ public class LocationService extends Service implements
                 Iterator<Flag> iterParseObjects = flags.iterator();
                 while (iterParseObjects.hasNext()) {
                     Flag currFlag = iterParseObjects.next();
-                    if (currFlag.getLocation().distanceInKilometersTo(gp) > Utils.MAP_RADIUS) {
+                    Log.d(TAG, "Distance from point to user: " + currFlag.getLocation().distanceInKilometersTo(gp));
+                    if (currFlag.getLocation().distanceInKilometersTo(gp) > PlacesUtils.MAP_RADIUS) {
                         hiddenFlags.add(currFlag);
                         iterParseObjects.remove();
                     }
@@ -513,9 +514,10 @@ public class LocationService extends Service implements
                 for (Flag f : hiddenFlags) {
                     LocationService.this.hiddenFlags.add(f);
                 }
+                Log.d(TAG, "Hidden Flags size: " + LocationService.this.hiddenFlags.size());
                 updateNearbyFlagsAndLocation();
 
-                if (flags.size() > 0) {
+                if (flags.size() > 0 || hiddenFlags.size() > 0) {
                     LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
                 } else {
                     LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
@@ -540,7 +542,7 @@ public class LocationService extends Service implements
     public void onLocationChanged(Location location) {
         Log.d(TAG, "Location changed");
 //        Log.d(TAG, "Location accuracy: " + location.getAccuracy());
-        if (notificationLocation != null && location.distanceTo(this.notificationLocation) > (Utils.MAP_RADIUS * KM_TO_M)) {
+        if (notificationLocation != null && location.distanceTo(this.notificationLocation) > (PlacesUtils.MAP_RADIUS * KM_TO_M)) {
             NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             nManager.cancel(NOTIFICATION_ID);
         }
@@ -661,6 +663,7 @@ public class LocationService extends Service implements
         if (listener != null) {
             listener.setLocation(location);
             listener.setFlagsNearby(flagsNearby);
+            listener.setHiddenFlags(hiddenFlags);
         }
     }
 
@@ -697,7 +700,7 @@ public class LocationService extends Service implements
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         locationRequest.setInterval(INTERVAL);
         locationRequest.setFastestInterval(FASTEST_INTERVAL);
-        locationRequest.setSmallestDisplacement(Utils.MAP_RADIUS * KM_TO_M / 2);
+        locationRequest.setSmallestDisplacement(PlacesUtils.MAP_RADIUS * KM_TO_M / 2);
 
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)

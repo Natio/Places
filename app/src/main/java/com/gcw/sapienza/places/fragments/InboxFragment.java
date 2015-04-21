@@ -4,32 +4,22 @@
 
 package com.gcw.sapienza.places.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.adapters.InboxAdapter;
-import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
-import com.gcw.sapienza.places.models.Flag;
-import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.PlacesStorage;
-import com.gcw.sapienza.places.utils.Utils;
-import com.parse.ParseException;
-import com.parse.ParseQuery;
+import com.gcw.sapienza.places.utils.PlacesUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -58,10 +48,10 @@ public class InboxFragment extends Fragment implements AdapterView.OnItemClickLi
             return view;
         } catch (IOException e) {
             e.printStackTrace();
-            Utils.showToast(getActivity(), "Something went wrong while loading your Inbox", Toast.LENGTH_SHORT);
+            PlacesUtils.showToast(getActivity(), "Something went wrong while loading your Inbox", Toast.LENGTH_SHORT);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            Utils.showToast(getActivity(), "Something went wrong while loading your Inbox", Toast.LENGTH_SHORT);
+            PlacesUtils.showToast(getActivity(), "Something went wrong while loading your Inbox", Toast.LENGTH_SHORT);
         }
 
         //Inbox refreshing currently disabled
@@ -101,10 +91,10 @@ public class InboxFragment extends Fragment implements AdapterView.OnItemClickLi
             PlacesStorage.updateSeenInboxAt(getActivity(), position);
         } catch (IOException e) {
             e.printStackTrace();
-            Utils.showToast(getActivity(), "Something went wrong while updating Inbox data", Toast.LENGTH_SHORT);
+            PlacesUtils.showToast(getActivity(), "Something went wrong while updating Inbox data", Toast.LENGTH_SHORT);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            Utils.showToast(getActivity(), "Something went wrong while updating Inbox data", Toast.LENGTH_SHORT);
+            PlacesUtils.showToast(getActivity(), "Something went wrong while updating Inbox data", Toast.LENGTH_SHORT);
         }
 
         ((MainActivity) this.getActivity()).openFlagFromId(flagId);

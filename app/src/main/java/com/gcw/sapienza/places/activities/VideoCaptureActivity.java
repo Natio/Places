@@ -22,11 +22,10 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.gcw.sapienza.places.R;
-import com.gcw.sapienza.places.utils.Utils;
+import com.gcw.sapienza.places.utils.PlacesUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -293,7 +292,7 @@ public class VideoCaptureActivity extends Activity implements View.OnClickListen
         this.mediaRecorder.setMaxDuration(MAX_VIDEO_LENGTH);
 
         try {
-            this.filePath = Utils.createRecordingVideoFile(".mp4");
+            this.filePath = PlacesUtils.createRecordingVideoFile(".mp4");
         } catch (IOException e) {
             Log.d(TAG, "Error creating file", e);
             return;

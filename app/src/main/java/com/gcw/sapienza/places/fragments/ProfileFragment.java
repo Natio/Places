@@ -18,7 +18,7 @@ import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.utils.Category;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
-import com.gcw.sapienza.places.utils.Utils;
+import com.gcw.sapienza.places.utils.PlacesUtils;
 import com.parse.CountCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -143,7 +143,7 @@ public class ProfileFragment extends Fragment {
 
                             } else {
                                 Log.e(TAG, e.getMessage());
-                                Utils.showToast(getActivity(), "An error occurred while retrieving your Flags data", Toast.LENGTH_SHORT);
+                                PlacesUtils.showToast(getActivity(), "An error occurred while retrieving your Flags data", Toast.LENGTH_SHORT);
                             }
                         }
                     });
@@ -208,7 +208,7 @@ public class ProfileFragment extends Fragment {
 
         String currUserId = PlacesLoginUtils.getInstance().getCurrentUserId();
         if(currUserId == null){
-            Utils.showToast(getActivity(), "User data not ready", Toast.LENGTH_SHORT);
+            PlacesUtils.showToast(getActivity(), "User data not ready", Toast.LENGTH_SHORT);
             return view;
         }
 

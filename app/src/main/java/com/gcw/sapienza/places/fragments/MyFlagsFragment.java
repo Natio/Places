@@ -4,16 +4,13 @@ package com.gcw.sapienza.places.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-
 import android.util.Log;
-
 
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.FlagsStorage;
-import com.gcw.sapienza.places.utils.Utils;
-
+import com.gcw.sapienza.places.utils.PlacesUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -76,7 +73,7 @@ public class MyFlagsFragment extends PlacesMapListFragment{
      */
     @Override
     protected  void handleRefreshData() {
-        ((MainActivity) getActivity()).refresh(Utils.MY_FLAGS_CODE);
+        ((MainActivity) getActivity()).refresh(PlacesUtils.MY_FLAGS_CODE);
     }
 
     /**

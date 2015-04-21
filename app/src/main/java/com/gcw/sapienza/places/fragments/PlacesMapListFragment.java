@@ -8,13 +8,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
@@ -24,13 +22,12 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.gcw.sapienza.places.PlacesApplication;
+
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.adapters.FlagsAdapter;
@@ -38,7 +35,7 @@ import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.models.FlagReport;
 import com.gcw.sapienza.places.utils.FlagsStorage;
-import com.gcw.sapienza.places.utils.Utils;
+import com.gcw.sapienza.places.utils.PlacesUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -58,10 +55,11 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 /**
  * Abstract class for showing Fragment with Map and list of flags.
@@ -294,20 +292,33 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
     @Override
     public boolean onMarkerClick(Marker selectedMarker) {
-        int index = Integer.parseInt(selectedMarker.getSnippet());
 
-        this.listFragment.getRecyclerView().smoothScrollToPosition(index);
+        String snippet = selectedMarker.getSnippet();
+        Log.d(TAG, "Marker Snippet: " + snippet);
 
+        if(snippet != null) {
 
-        if(selectedMarker.getAlpha() == Utils.FLAG_ALPHA_SELECTED){
-            for (Marker marker : this.markers) {
-                marker.setAlpha(Utils.FLAG_ALPHA_NORMAL);
+            int index = Integer.parseInt(selectedMarker.getSnippet());
+
+            this.listFragment.getRecyclerView().smoothScrollToPosition(index);
+
+            if (selectedMarker.getAlpha() == PlacesUtils.FLAG_ALPHA_SELECTED) {
+                for (Marker marker : this.markers) {
+                    marker.setAlpha(PlacesUtils.FLAG_ALPHA_NORMAL);
+                }
+            } else {
+                for (Marker marker : this.markers) {
+                    marker.setAlpha(PlacesUtils.FLAG_ALPHA_UNSELECTED);
+                }
+                selectedMarker.setAlpha(PlacesUtils.FLAG_ALPHA_SELECTED);
             }
-        }else {
-            for (Marker marker : this.markers) {
-                marker.setAlpha(Utils.FLAG_ALPHA_UNSELECTED);
+        }else{
+            //Doesn't work properly. Most likely Google Maps API Bug
+            if(selectedMarker.isInfoWindowShown()) {
+                selectedMarker.hideInfoWindow();
+            } else {
+                selectedMarker.showInfoWindow();
             }
-            selectedMarker.setAlpha(Utils.FLAG_ALPHA_SELECTED);
         }
 
         // by returning false we can show text on flag in the map
@@ -342,12 +353,12 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                 builder.include(latLng);
 
                 //25% size original icon
-                int marker_id = Utils.getIconForCategory(f.getCategory(), getActivity());
+                int marker_id = PlacesUtils.getIconForCategory(f.getCategory(), getActivity());
                 Bitmap marker = BitmapFactory.decodeResource(getResources(), marker_id);
                 Bitmap halfSizeMarker = Bitmap.createScaledBitmap
                         (marker,
-                                (int) (marker.getWidth() * Utils.FLAG_SCALE_NORMAL),
-                                (int) (marker.getHeight() * Utils.FLAG_SCALE_NORMAL),
+                                (int) (marker.getWidth() * PlacesUtils.FLAG_SCALE_NORMAL),
+                                (int) (marker.getHeight() * PlacesUtils.FLAG_SCALE_NORMAL),
                                 false);
 
                 Marker newMarker = this.gMap.addMarker(new MarkerOptions()
@@ -357,12 +368,12 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                         .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
                                 // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
                                 //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
-                        .alpha(Utils.FLAG_ALPHA_NORMAL));
+                        .alpha(PlacesUtils.FLAG_ALPHA_NORMAL));
                 this.markers.add(newMarker);
                 index++;
             }
 
-            if (this.showDiscoverModeOnMap() && PlacesMapListFragment.isDiscoverModeEnabled()) {
+            if (this.showDiscoverModeOnMap()){
 
                 List<Flag> hiddenFlags = FlagsStorage.getSharedStorage().fetchFlagsWithType(FlagsStorage.Type.HIDDEN);
 
@@ -375,17 +386,17 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                     builder.include(latLng);
 
                     //25% size original icon
-                    int marker_id = Utils.getIconForCategory(f.getCategory(), getActivity());
+                    int marker_id = PlacesUtils.getIconForCategory(f.getCategory(), getActivity());
                     Bitmap marker = BitmapFactory.decodeResource(getResources(), marker_id);
                     Bitmap halfSizeMarker = Bitmap.createScaledBitmap
                             (marker,
-                                    (int) (marker.getWidth() * Utils.FLAG_SCALE_NORMAL),
-                                    (int) (marker.getHeight() * Utils.FLAG_SCALE_NORMAL),
+                                    (int) (marker.getWidth() * PlacesUtils.FLAG_SCALE_NORMAL),
+                                    (int) (marker.getHeight() * PlacesUtils.FLAG_SCALE_NORMAL),
                                     false);
 
                     this.gMap.addMarker(new MarkerOptions()
                             .position(latLng)
-                            .title("**DiscoverMode**\nget closer to see the content")
+                            .title("Get closer to see the content!")
                             .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
                                     // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
                                     //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
@@ -400,7 +411,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                 builder.include(currentLocationLatLng);
                 this.gMap.addCircle(new CircleOptions()
                         .center(currentLocationLatLng)
-                        .radius(Utils.MAP_RADIUS * 1000)
+                        .radius(PlacesUtils.MAP_RADIUS * 1000)
                         .strokeColor(Color.GREEN)
                         .fillColor(Color.TRANSPARENT));
             }
@@ -419,12 +430,12 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                     });
                 else*/
                 try {
-                    gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
+                    gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, PlacesUtils.MAP_BOUNDS));
                 } catch (IllegalStateException ise) {
                     this.gMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
                         @Override
                         public void onCameraChange(CameraPosition cameraPosition) {
-                            gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
+                            gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, PlacesUtils.MAP_BOUNDS));
 //                            gMap.setOnCameraChangeListener(null);
                         }
                     });
@@ -434,24 +445,11 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                     LatLng currentLocationLatLng = new LatLng(currentLocation.getLatitude(),
                             currentLocation.getLongitude());
                     this.gMap.animateCamera(CameraUpdateFactory
-                            .newLatLngZoom(currentLocationLatLng, Utils.ZOOM_LVL));
+                            .newLatLngZoom(currentLocationLatLng, PlacesUtils.ZOOM_LVL));
                 }
             }
 
         }
-    }
-
-    /**
-     * check if discover mode is enabled
-     *
-     * @return true if discover mode is enabled, false otherwise
-     */
-    private static boolean isDiscoverModeEnabled() {
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(PlacesApplication.getPlacesAppContext());
-
-        return preferences.getBoolean("discoverMode", true);
-
     }
 
     /**
@@ -559,21 +557,21 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
             Flag sel_usr = fa.getSelectedFlag();
 
             if (sel_usr == null)
-                Toast.makeText(getActivity(), Utils.NO_VALID_FLAG_SELECTED, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), PlacesUtils.NO_VALID_FLAG_SELECTED, Toast.LENGTH_SHORT).show();
 
             switch (item.getItemId()) {
 
-                case Utils.DELETE_FLAG:
+                case PlacesUtils.DELETE_FLAG:
                     this.deleteFlag(sel_usr);
                     fa.setSelectedFlagIndex(-1);
                     return true;
 
-                case Utils.REPORT_FLAG:
+                case PlacesUtils.REPORT_FLAG:
                     this.reportFlag(sel_usr);
                     fa.setSelectedFlagIndex(-1);
                     return true;
 
-                case Utils.DELETE_REPORT_FLAG:
+                case PlacesUtils.DELETE_REPORT_FLAG:
                     this.deleteReportFlag(sel_usr);
                     fa.setSelectedFlagIndex(-1);
                     return true;
@@ -594,8 +592,8 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                 @Override
                 public void done(com.parse.ParseException e) {
                     if (e == null) {
-                        Toast.makeText(recycleView.getContext(), Utils.FLAG_DELETED, Toast.LENGTH_SHORT).show();
-                        ((MainActivity) getActivity()).refresh(Utils.NEARBY_FLAGS_CODE);
+                        Toast.makeText(recycleView.getContext(), PlacesUtils.FLAG_DELETED, Toast.LENGTH_SHORT).show();
+                        ((MainActivity) getActivity()).refresh(PlacesUtils.NEARBY_FLAGS_CODE);
                     } else
                         Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
@@ -614,7 +612,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                 @Override
                 public void done(ParseException e) {
                     if (e == null) {
-                        Toast.makeText(recycleView.getContext(), Utils.FLAG_REPORTED, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(recycleView.getContext(), PlacesUtils.FLAG_REPORTED, Toast.LENGTH_SHORT).show();
                     } else
                         Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
@@ -640,7 +638,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                             @Override
                             public void done(ParseException e) {
                                 if (e == null) {
-                                    Toast.makeText(recycleView.getContext(), Utils.FLAG_REPORT_REVOKED, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(recycleView.getContext(), PlacesUtils.FLAG_REPORT_REVOKED, Toast.LENGTH_SHORT).show();
                                 } else
                                     Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                             }

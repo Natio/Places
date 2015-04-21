@@ -26,7 +26,7 @@ import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.utils.CropCircleTransformation;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.PlacesUtilCallback;
-import com.gcw.sapienza.places.utils.Utils;
+import com.gcw.sapienza.places.utils.PlacesUtils;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -321,7 +321,7 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             //        String fb_id = sel_usr.getFbId();
             //
             if (PlacesLoginUtils.getInstance().getCurrentUserId().equals(fb_id)) {
-                menu.add(Utils.FLAG_LIST_GROUP, Utils.DELETE_FLAG, 0, "Delete Flag");
+                menu.add(PlacesUtils.FLAG_LIST_GROUP, PlacesUtils.DELETE_FLAG, 0, "Delete Flag");
             } else {
                 Log.d(TAG, "Username: " + ParseUser.getCurrentUser().getUsername());
                 Log.d(TAG, "objectId: " + mFlag.getObjectId());
@@ -333,9 +333,9 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
 
                 try {
                     if (queryDelete.count() == 0) {
-                        menu.add(Utils.FLAG_LIST_GROUP, Utils.REPORT_FLAG, 0, "Report Flag as inappropriate");
+                        menu.add(PlacesUtils.FLAG_LIST_GROUP, PlacesUtils.REPORT_FLAG, 0, "Report Flag as inappropriate");
                     } else {
-                        menu.add(Utils.FLAG_LIST_GROUP, Utils.DELETE_REPORT_FLAG, 0, "Revoke Flag report");
+                        menu.add(PlacesUtils.FLAG_LIST_GROUP, PlacesUtils.DELETE_REPORT_FLAG, 0, "Revoke Flag report");
                     }
                 } catch (ParseException e) {
                     Log.e(TAG, e.getMessage());

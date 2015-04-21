@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import com.gcw.sapienza.places.R;
 
-
 import java.io.File;
 import java.io.IOException;
 
@@ -18,7 +17,7 @@ import java.io.IOException;
 /**
  * Created by mic_head on 02/01/15.
  */
-public class Utils {
+public class PlacesUtils {
     public static final int UPDATE_DELAY = 200;
     public static final int ANIMATION_DURATION = 300;
     public static final int MAP_BOUNDS = 70;
@@ -70,6 +69,9 @@ public class Utils {
      * the static map radius is now set to 150 meters
      */
     public static final float MAP_RADIUS = 0.15f;
+    /**
+     * the discover mode radius is double as the map radius
+     */
     public static final float DISCOVER_MODE_RADIUS = MAP_RADIUS * 2;
     public static int MAX_FLAGS = 10;
     public static final int[] stepValues = {1, 5, 10, 15, 20};
@@ -118,7 +120,7 @@ public class Utils {
 
     public static File createAudioFile(String extension, Context ctx) throws IOException {
 
-        String imageFileName = 'a' + Utils.generateRandomName();
+        String imageFileName = 'a' + PlacesUtils.generateRandomName();
 
         File cache_dir = ctx.getExternalCacheDir();
         return File.createTempFile(
@@ -132,7 +134,7 @@ public class Utils {
 
     public static File createImageFile(String image_extension) throws IOException {
         // Create an image file name
-        String imageFileName = "img" + Utils.generateRandomName();
+        String imageFileName = "img" + PlacesUtils.generateRandomName();
         File storageDir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
         return File.createTempFile(
@@ -143,7 +145,7 @@ public class Utils {
     }
 
     public static File createRecordingVideoFile(String extension) throws IOException {
-        String imageFileName = "vid" + Utils.generateRandomName();
+        String imageFileName = "vid" + PlacesUtils.generateRandomName();
         File storageDir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_MOVIES);
         return File.createTempFile(

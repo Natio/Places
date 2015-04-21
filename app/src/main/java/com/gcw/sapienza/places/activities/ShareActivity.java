@@ -46,7 +46,7 @@ import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.FacebookUtils;
 import com.gcw.sapienza.places.utils.FlagUploader;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
-import com.gcw.sapienza.places.utils.Utils;
+import com.gcw.sapienza.places.utils.PlacesUtils;
 import com.parse.ParseAnalytics;
 import com.parse.ParseGeoPoint;
 
@@ -374,13 +374,13 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     private void handleShareImage(Intent intent) {
         Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (imageUri != null) {
-            File imageFile = new File(Utils.getImageRealPathFromURI(this, imageUri));
+            File imageFile = new File(PlacesUtils.getImageRealPathFromURI(this, imageUri));
             if (imageFile.length() >= Flag.MAX_FILE_SIZE_BYTES) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Cannot share this picture :(\nPlease, choose a smaller one").setNegativeButton("No", null).show();
             } else {
                 this.setPhoneMedia(imageFile.getAbsolutePath());
-                this.requestedPhoneMediaType = Utils.PHONE_IMAGE_REQUEST_CODE;
+                this.requestedPhoneMediaType = PlacesUtils.PHONE_IMAGE_REQUEST_CODE;
                 this.changeAlphaBasedOnSelection(PHONE_MEDIA_CODE);
             }
 
@@ -392,13 +392,13 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     private void handleShareAudio(Intent intent) {
         Uri audioUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (audioUri != null) {
-            File audioFile = new File(Utils.getImageRealPathFromURI(this, audioUri));
+            File audioFile = new File(PlacesUtils.getImageRealPathFromURI(this, audioUri));
             if (audioFile.length() >= Flag.MAX_FILE_SIZE_BYTES) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Cannot share this audio file :(\nPlease, choose a smaller one").setNegativeButton("No", null).show();
             } else {
                 this.setPhoneMedia(audioFile.getAbsolutePath());
-                this.requestedPhoneMediaType = Utils.PHONE_AUDIO_REQUEST_CODE;
+                this.requestedPhoneMediaType = PlacesUtils.PHONE_AUDIO_REQUEST_CODE;
                 this.changeAlphaBasedOnSelection(PHONE_MEDIA_CODE);
             }
 
@@ -410,13 +410,13 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     private void handleShareVideo(Intent intent) {
         Uri videoUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (videoUri != null) {
-            File videoFile = new File(Utils.getVideoRealPathFromURI(this, videoUri));
+            File videoFile = new File(PlacesUtils.getVideoRealPathFromURI(this, videoUri));
             if (videoFile.length() >= Flag.MAX_FILE_SIZE_BYTES) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Cannot share this video :(\nPlease, choose a smaller one").setNegativeButton("No", null).show();
             } else {
                 this.setPhoneMedia(videoFile.getAbsolutePath());
-                this.requestedPhoneMediaType = Utils.PHONE_VIDEO_REQUEST_CODE;
+                this.requestedPhoneMediaType = PlacesUtils.PHONE_VIDEO_REQUEST_CODE;
                 this.changeAlphaBasedOnSelection(PHONE_MEDIA_CODE);
             }
         } else {
@@ -535,7 +535,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     @Override
     public boolean onLongClick(final View v) {
         Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
-        vibrator.vibrate(Utils.VIBRATION_DURATION);
+        vibrator.vibrate(PlacesUtils.VIBRATION_DURATION);
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
@@ -615,9 +615,9 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
         menu.setHeaderTitle("File Type");
 
-        menu.add(Utils.PHONE_MEDIA_GROUP, Utils.PHONE_AUDIO, 0, "Audio");
-        menu.add(Utils.PHONE_MEDIA_GROUP, Utils.PHONE_IMAGE, 0, "Image");
-        menu.add(Utils.PHONE_MEDIA_GROUP, Utils.PHONE_VIDEO, 0, "Video");
+        menu.add(PlacesUtils.PHONE_MEDIA_GROUP, PlacesUtils.PHONE_AUDIO, 0, "Audio");
+        menu.add(PlacesUtils.PHONE_MEDIA_GROUP, PlacesUtils.PHONE_IMAGE, 0, "Image");
+        menu.add(PlacesUtils.PHONE_MEDIA_GROUP, PlacesUtils.PHONE_VIDEO, 0, "Video");
     }
 
     @Override
@@ -732,7 +732,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         ParseGeoPoint p = new ParseGeoPoint(current_location.getLatitude(), current_location.getLongitude());
 
         Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
-        vibrator.vibrate(Utils.VIBRATION_DURATION);
+        vibrator.vibrate(PlacesUtils.VIBRATION_DURATION);
 
         String accountType = "";
         if (PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.FACEBOOK) accountType = "fb";
@@ -785,13 +785,13 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 Log.v(TAG, "Successfully retrieved media.");
                 // uploader.setPhoneMediaFile(this.phoneMedia);
                 switch (this.requestedPhoneMediaType) {
-                    case Utils.PHONE_AUDIO_REQUEST_CODE:
+                    case PlacesUtils.PHONE_AUDIO_REQUEST_CODE:
                         uploader.setAudioFile(this.phoneMedia);
                         break;
-                    case Utils.PHONE_IMAGE_REQUEST_CODE:
+                    case PlacesUtils.PHONE_IMAGE_REQUEST_CODE:
                         uploader.setPictureFile(this.phoneMedia, true);
                         break;
-                    case Utils.PHONE_VIDEO_REQUEST_CODE:
+                    case PlacesUtils.PHONE_VIDEO_REQUEST_CODE:
                         uploader.setVideoFile(this.phoneMedia, true);
                         break;
                     default:
@@ -807,7 +807,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         }
 
         AlphaAnimation inAnim = new AlphaAnimation(0, 1);
-        inAnim.setDuration(Utils.ANIMATION_DURATION);
+        inAnim.setDuration(PlacesUtils.ANIMATION_DURATION);
         progressBarHolder.setAnimation(inAnim);
         progressBarHolder.setVisibility(View.VISIBLE);
 
@@ -856,7 +856,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
             void dismissProgressBar() {
                 AlphaAnimation outAnim = new AlphaAnimation(1, 0);
-                outAnim.setDuration(Utils.ANIMATION_DURATION);
+                outAnim.setDuration(PlacesUtils.ANIMATION_DURATION);
                 progressBarHolder.setAnimation(outAnim);
                 progressBarHolder.setVisibility(View.GONE);
             }
@@ -997,7 +997,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, "I've just left my mark in history!! Check it out on Places (" + flag_marker_url + ')');
         sendIntent.setType("text/plain");
-        startActivityForResult(sendIntent, Utils.SHARE_SOCIAL_REQUEST_CODE);
+        startActivityForResult(sendIntent, PlacesUtils.SHARE_SOCIAL_REQUEST_CODE);
     }
 
 
@@ -1005,7 +1005,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
     public void takePic() {
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        vibrator.vibrate(Utils.VIBRATION_DURATION);
+        vibrator.vibrate(PlacesUtils.VIBRATION_DURATION);
 
         restoreAlpha(PIC_CODE);
 
@@ -1013,39 +1013,39 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
         if (takePicture.resolveActivity(this.getPackageManager()) != null) {
             this.imageFile = null;
             try {
-                this.imageFile = Utils.createImageFile(ShareActivity.PICTURE_FORMAT);
+                this.imageFile = PlacesUtils.createImageFile(ShareActivity.PICTURE_FORMAT);
             } catch (IOException e) {
                 Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
             }
 
             if (this.imageFile != null) {
                 takePicture.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(this.imageFile));
-                this.startActivityForResult(takePicture, Utils.PIC_CAPTURE_REQUEST_CODE);
+                this.startActivityForResult(takePicture, PlacesUtils.PIC_CAPTURE_REQUEST_CODE);
             }
         }
     }
 
     private void recordAudio() {
         Intent recordAudio = new Intent(this, AudioRecordingActivity.class);
-        this.startActivityForResult(recordAudio, Utils.RECORD_AUDIO_REQUEST_CODE);
+        this.startActivityForResult(recordAudio, PlacesUtils.RECORD_AUDIO_REQUEST_CODE);
     }
 
     public void shootVid() {
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        vibrator.vibrate(Utils.VIBRATION_DURATION);
+        vibrator.vibrate(PlacesUtils.VIBRATION_DURATION);
 
         restoreAlpha(VIDEO_CODE);
 
         Intent videoIntent = new Intent(this, VideoCaptureActivity.class);
 
         if (videoIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(videoIntent, Utils.VID_SHOOT_REQUEST_CODE);
+            startActivityForResult(videoIntent, PlacesUtils.VID_SHOOT_REQUEST_CODE);
         }
     }
 
     private void getMedia(int mediaType) {
         Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
-        vibrator.vibrate(Utils.VIBRATION_DURATION);
+        vibrator.vibrate(PlacesUtils.VIBRATION_DURATION);
 
         restoreAlpha(PHONE_MEDIA_CODE);
 
@@ -1054,23 +1054,23 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
         try {
             switch (mediaType) {
-                case Utils.PHONE_AUDIO:
+                case PlacesUtils.PHONE_AUDIO:
                     intent.setType("audio/*");
                     startActivityForResult(
                             Intent.createChooser(intent, "Select a File to Upload"),
-                            Utils.PHONE_AUDIO_REQUEST_CODE);
+                            PlacesUtils.PHONE_AUDIO_REQUEST_CODE);
                     break;
-                case Utils.PHONE_IMAGE:
+                case PlacesUtils.PHONE_IMAGE:
                     intent.setType("image/*");
                     startActivityForResult(
                             Intent.createChooser(intent, "Select a File to Upload"),
-                            Utils.PHONE_IMAGE_REQUEST_CODE);
+                            PlacesUtils.PHONE_IMAGE_REQUEST_CODE);
                     break;
-                case Utils.PHONE_VIDEO:
+                case PlacesUtils.PHONE_VIDEO:
                     intent.setType("video/*");
                     startActivityForResult(
                             Intent.createChooser(intent, "Select a File to Upload"),
-                            Utils.PHONE_VIDEO_REQUEST_CODE);
+                            PlacesUtils.PHONE_VIDEO_REQUEST_CODE);
             }
         } catch (android.content.ActivityNotFoundException ex) {
             // no file manager installed
@@ -1083,14 +1083,14 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == Utils.SHARE_SOCIAL_REQUEST_CODE) {
+        if (requestCode == PlacesUtils.SHARE_SOCIAL_REQUEST_CODE) {
             Intent returnIntent = new Intent();
             returnIntent.putExtra("result", "Flag placed!");
             setResult(RESULT_OK, returnIntent);
             ShareActivity.this.finish();
-        } else if (requestCode == Utils.LOGIN_REQUEST_CODE && resultCode == RESULT_OK) {
+        } else if (requestCode == PlacesUtils.LOGIN_REQUEST_CODE && resultCode == RESULT_OK) {
             FacebookUtils.getInstance().downloadFacebookInfo(this);
-        } else if (requestCode == Utils.PIC_CAPTURE_REQUEST_CODE && resultCode == RESULT_OK) {
+        } else if (requestCode == PlacesUtils.PIC_CAPTURE_REQUEST_CODE && resultCode == RESULT_OK) {
 
             if (this.imageFile == null || !this.imageFile.canRead()) {
                 Toast.makeText(getApplicationContext(), "Error encountered while taking picture", Toast.LENGTH_LONG).show();
@@ -1103,18 +1103,18 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             this.imageFile = null;
 
             changeAlphaBasedOnSelection(PIC_CODE);
-        } else if (requestCode == Utils.PIC_CAPTURE_REQUEST_CODE && resultCode == RESULT_CANCELED) {
+        } else if (requestCode == PlacesUtils.PIC_CAPTURE_REQUEST_CODE && resultCode == RESULT_CANCELED) {
             Log.v(TAG, "Camera Intent canceled");
-        } else if (requestCode == Utils.VID_SHOOT_REQUEST_CODE && resultCode == RESULT_OK) {
+        } else if (requestCode == PlacesUtils.VID_SHOOT_REQUEST_CODE && resultCode == RESULT_OK) {
             String videoPath = data.getExtras().getString("result");
             this.setVideo(videoPath);
 
             changeAlphaBasedOnSelection(VIDEO_CODE);
-        } else if (requestCode == Utils.VID_SHOOT_REQUEST_CODE && resultCode == RESULT_CANCELED) {
+        } else if (requestCode == PlacesUtils.VID_SHOOT_REQUEST_CODE && resultCode == RESULT_CANCELED) {
             Log.v(TAG, "Video Intent canceled");
-        } else if ((requestCode == Utils.PHONE_AUDIO_REQUEST_CODE ||
-                requestCode == Utils.PHONE_IMAGE_REQUEST_CODE ||
-                requestCode == Utils.PHONE_VIDEO_REQUEST_CODE)
+        } else if ((requestCode == PlacesUtils.PHONE_AUDIO_REQUEST_CODE ||
+                requestCode == PlacesUtils.PHONE_IMAGE_REQUEST_CODE ||
+                requestCode == PlacesUtils.PHONE_VIDEO_REQUEST_CODE)
                 && resultCode == Activity.RESULT_OK) {
 
             Uri mediaUri = data.getData();
@@ -1133,12 +1133,12 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
                 Toast.makeText(this, "Invalid Media Selected", Toast.LENGTH_SHORT).show();
             }
 
-        } else if ((requestCode == Utils.PHONE_AUDIO_REQUEST_CODE ||
-                requestCode == Utils.PHONE_IMAGE_REQUEST_CODE ||
-                requestCode == Utils.PHONE_VIDEO_REQUEST_CODE)
+        } else if ((requestCode == PlacesUtils.PHONE_AUDIO_REQUEST_CODE ||
+                requestCode == PlacesUtils.PHONE_IMAGE_REQUEST_CODE ||
+                requestCode == PlacesUtils.PHONE_VIDEO_REQUEST_CODE)
                 && resultCode == Activity.RESULT_CANCELED) {
             Log.v(TAG, "Phone Media Intent canceled");
-        } else if (requestCode == Utils.RECORD_AUDIO_REQUEST_CODE) {
+        } else if (requestCode == PlacesUtils.RECORD_AUDIO_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 String audioPath = data.getExtras().getString("result");
 

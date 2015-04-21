@@ -17,13 +17,13 @@ import com.gcw.sapienza.places.models.CommentReport;
 import com.gcw.sapienza.places.models.CustomParseObject;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.models.FlagReport;
-import com.gcw.sapienza.places.services.ILocationServiceListener;
 import com.gcw.sapienza.places.models.PlacesUser;
+import com.gcw.sapienza.places.services.ILocationServiceListener;
 import com.gcw.sapienza.places.services.ILocationUpdater;
 import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.services.LocationService.LocalBinder;
 import com.gcw.sapienza.places.utils.FlagsStorage;
-import com.gcw.sapienza.places.utils.Utils;
+import com.gcw.sapienza.places.utils.PlacesUtils;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
@@ -269,7 +269,7 @@ public class PlacesApplication extends Application {
             mService.updateLocationData();
             return true;
         } else {
-            serviceListeners.put(serviceListener, Utils.DEFAULT_FLAGS_CODE);
+            serviceListeners.put(serviceListener, PlacesUtils.DEFAULT_FLAGS_CODE);
             startLocationService();
             return false;
         }
