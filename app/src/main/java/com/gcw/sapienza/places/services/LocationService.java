@@ -429,7 +429,7 @@ public class LocationService extends Service implements
                 this.noFlagsWarning = true;
             }
 
-            updateNearbyFlagsAndLocation();
+            updateNearbyFlags();
             LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
 
             return;
@@ -470,7 +470,7 @@ public class LocationService extends Service implements
                     hiddenFlags.clear();
                 }
 
-                updateNearbyFlagsAndLocation();
+                updateNearbyFlags();
 
                 LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
 
@@ -514,8 +514,7 @@ public class LocationService extends Service implements
                 for (Flag f : hiddenFlags) {
                     LocationService.this.hiddenFlags.add(f);
                 }
-                Log.d(TAG, "Hidden Flags size: " + LocationService.this.hiddenFlags.size());
-                updateNearbyFlagsAndLocation();
+                updateNearbyFlags();
 
                 if (flags.size() > 0 || hiddenFlags.size() > 0) {
                     LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
@@ -551,6 +550,7 @@ public class LocationService extends Service implements
             float distance = location.distanceTo(this.location) / KM_TO_M;
         }*/
         this.location = location;
+        updateLocation();
         queryParsewithLocation(location);
         if (this.flagsNearby != null && PlacesLoginUtils.getInstance().hasCurrentUserId()) {
 
@@ -659,12 +659,15 @@ public class LocationService extends Service implements
         }
     }
 
-    private void updateNearbyFlagsAndLocation(){
+    private void updateNearbyFlags(){
         if (listener != null) {
-            listener.setLocation(location);
             listener.setFlagsNearby(flagsNearby);
             listener.setHiddenFlags(hiddenFlags);
         }
+    }
+
+    private void updateLocation(){
+        listener.setLocation(location);
     }
 
     private void updateMyFlags(){

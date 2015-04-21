@@ -28,6 +28,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gcw.sapienza.places.PlacesApplication;
 import com.gcw.sapienza.places.R;
 import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.adapters.FlagsAdapter;
@@ -377,8 +378,6 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
                 List<Flag> hiddenFlags = FlagsStorage.getSharedStorage().fetchFlagsWithType(FlagsStorage.Type.HIDDEN);
 
-                Log.d(TAG, "Hidden Flags size: " + hiddenFlags.size());
-
                 for (ParseObject hf : hiddenFlags) {
                     Flag f = (Flag) hf;
                     ParseGeoPoint location = f.getLocation();
@@ -404,7 +403,8 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                 }
             }
 
-            Location currentLocation = gMap.getMyLocation();
+            Location currentLocation = gMap.getMyLocation() != null ?
+                    gMap.getMyLocation() : PlacesApplication.getInstance().getLocation();
 
             if (currentLocation != null) {
                 LatLng currentLocationLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
