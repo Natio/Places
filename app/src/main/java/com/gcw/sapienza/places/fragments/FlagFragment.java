@@ -84,7 +84,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
     private static final String TAG = "FlagFragment";
     private static final int WOW_CODE = 0;
-
     private String newComment;
     private boolean scrollToLastComment = false;
     private MediaPlayer mediaPlayer;
@@ -385,9 +384,10 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                     else if (wowCount == 2)
                         wowStatText.setText("You and another Placer WoWed this.");
                     else if (wowCount == 0) wowStatText.setText("");
-                    else wowStatText.setText("You and " + (wowCount > 2 ? (("other " + (wowCount - 1) + " Placers WoWed this."))
+                    else
+                        wowStatText.setText("You and " + (wowCount > 2 ? (("other " + (wowCount - 1) + " Placers WoWed this."))
                                 : ("another Placer WoWed this.")));
-                }else{
+                } else {
                     Log.d(TAG, e.getMessage());
                     Log.d(TAG, "Current user: " + ParseUser.getCurrentUser().getObjectId() +
                             ", didn't WoW Flag: " + flag.getObjectId());
@@ -686,9 +686,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                 flag.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
-                                        if(e == null) {
+                                        if (e == null) {
                                             updateWowStats(true, wowCount + 1);
-                                        }else{
+                                        } else {
                                             Log.e(TAG, "Error", e);
                                             PlacesUtils.showToast(getActivity(), "Something went wrong while updating WoW count", Toast.LENGTH_SHORT);
                                         }
@@ -700,9 +700,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                 flag.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
-                                        if(e == null) {
+                                        if (e == null) {
                                             updateWowStats(false, wowCount - 1);
-                                        }else{
+                                        } else {
                                             Log.e(TAG, "Error", e);
                                             PlacesUtils.showToast(getActivity(), "Something went wrong while updating WoW count", Toast.LENGTH_SHORT);
                                         }
@@ -767,6 +767,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                     public void onSuccess() {
                         Picasso.with(FlagFragment.this.getActivity()).load(picture.getUrl()).into(FlagFragment.this.imageView);
                     }
+
                     @Override
                     public void onError() {
                     }

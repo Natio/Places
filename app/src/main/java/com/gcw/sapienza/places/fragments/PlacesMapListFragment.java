@@ -75,9 +75,13 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
     public static PlacesMapListFragment currentFragmentInstance;
 
-    public static PlacesMapListFragment getInstance() {return PlacesMapListFragment.currentFragmentInstance; }
+    public static PlacesMapListFragment getInstance() {
+        return PlacesMapListFragment.currentFragmentInstance;
+    }
 
-    public enum Requirements {NONE, NETWORK, LOCATION, ALL};
+    public enum Requirements {NONE, NETWORK, LOCATION, ALL}
+
+    ;
 
     private GoogleMap gMap;
     private List<Marker> markers;
@@ -115,33 +119,31 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
     protected abstract String noFlagsReceivedText();
 
     /**
-    * @param context The Context in which the flagsReceiver is running.
-    * @param intent The Intent being received.
-    */
+     * @param context The Context in which the flagsReceiver is running.
+     * @param intent  The Intent being received.
+     */
     protected abstract void onFlagsReceived(Context context, Intent intent);
 
     /**
      * @param context The Context in which the noFlagsReceiver is running.
-     * @param intent The Intent being received.
+     * @param intent  The Intent being received.
      */
     protected abstract void onNoFlagsReceived(Context context, Intent intent);
 
     /**
      * @param context The Context in which the parseErrorReceiver is running.
-     * @param intent The Intent being received.
+     * @param intent  The Intent being received.
      */
     protected abstract void onParseError(Context context, Intent intent);
 
     /**
      * This method is automatically called when the class needs to register to the local notification system.
-     *
      */
     protected abstract Collection<IntentFilter> getFlagsFilters();
 
 
     /**
      * This method is automatically called when the class needs to register to the local notification system.
-     *
      */
     protected abstract Collection<IntentFilter> getNoFlagsFilters();
 
@@ -152,13 +154,13 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
     /**
      * Returns the list of flags for current subclass
+     *
      * @return list of flags
      */
     protected abstract List<Flag> getData();
 
 
     /**
-     *
      * @return true if you want to enable discover mode on map
      */
     protected abstract boolean showDiscoverModeOnMap();
@@ -168,24 +170,22 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
      */
     protected abstract Requirements fragmentRequirements();
 
-
     @Override
-    public void onRefresh(){
+    public void onRefresh() {
         this.handleRefreshData();
         srl.setRefreshing(false);
     }
 
-
     /**
      * Registers the flagsReceiver from local notifications
      */
-    private void registerNotification(){
+    private void registerNotification() {
         Collection<IntentFilter> flagsFilters = this.getFlagsFilters();
-        for(IntentFilter filter : flagsFilters){
+        for (IntentFilter filter : flagsFilters) {
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.flagsReceiver, filter);
         }
         Collection<IntentFilter> noFlagsFilters = this.getNoFlagsFilters();
-        for(IntentFilter filter : noFlagsFilters){
+        for (IntentFilter filter : noFlagsFilters) {
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.noFlagsReceiver, filter);
         }
         registerParseErrorNotifications();
@@ -199,11 +199,10 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
     /**
      * Unregisters the flagsReceiver from local notifications
      */
-    private   void unregisterNotification(){
+    private void unregisterNotification() {
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(this.flagsReceiver);
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(this.noFlagsReceiver);
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -211,21 +210,17 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         super.onCreateView(inflater, container, savedInstanceState);
 
         View view = inflater.inflate(R.layout.my_flags_layout, container, false);
-
         currentFragmentInstance = this;
 
         this.srl = (MSwipeRefreshLayout) view.findViewById(R.id.my_swipe_refresh);
         this.srl.setOnRefreshListener(this);
         this.srl.setOnChildScrollUpListener(new MSwipeRefreshLayout.OnChildScrollUpListener() {
             @Override
-            public boolean canChildScrollUp()
-            {
+            public boolean canChildScrollUp() {
                 FlagsListFragment f = PlacesMapListFragment.this.listFragment;
-                if(f == null) return false;
-
+                if (f == null) return false;
                 RecyclerView rv = f.getRecyclerView();
                 if (rv == null) return false;
-
                 RecyclerView.LayoutManager layoutManager = rv.getLayoutManager();
 
                 int position = ((LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
@@ -241,7 +236,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                 return position != 0 && rv.getAdapter().getItemCount() != 0;
             }
         });
-        this.supl = (SlidingUpPanelLayout)view.findViewById(R.id.home_container);
+        this.supl = (SlidingUpPanelLayout) view.findViewById(R.id.home_container);
 
         //temporarily disabled anchorpoint
         //this.supl.setAnchorPoint(0.5f);
@@ -309,9 +304,10 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
     /**
      * Customizes GMap UI. Subclasses can implement this method to change the UiSettings of GMaps
      * When implementing in subclasses remember to call super.customizeGmap()
+     *
      * @param googleMap the Gmap
      */
-    protected void customizeGmap(GoogleMap googleMap){
+    protected void customizeGmap(GoogleMap googleMap) {
         googleMap.getUiSettings().setScrollGesturesEnabled(true);
         googleMap.getUiSettings().setZoomGesturesEnabled(true);
         googleMap.getUiSettings().setMyLocationButtonEnabled(true);
@@ -321,6 +317,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
     /**
      * Called when GMap is ready
+     *
      * @param googleMap GMap
      */
     @Override
@@ -335,33 +332,32 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         hintMissingRequirements(requirements);
     }
 
-    private void hintMissingRequirements(Requirements requirements){
-        MainActivity mainActivity = (MainActivity)getActivity();
+    private void hintMissingRequirements(Requirements requirements) {
+        MainActivity mainActivity = (MainActivity) getActivity();
 
         boolean networkReady = mainActivity.isNetworkAvailable();
         boolean locationReady = mainActivity.areLocationServicesEnabled();
 
-        if(requirements == Requirements.NONE){
+        if (requirements == Requirements.NONE) {
             PlacesMapListFragment.this.listFragment.flagsToDisplay();
-        }else{
-            switch(requirements){
+        } else {
+            switch (requirements) {
                 case NETWORK:
-                    if(!networkReady) {
+                    if (!networkReady) {
                         PlacesMapListFragment.this.listFragment.noFlagsToDisplay("No Internet connection available :(");
                     }
                     break;
                 case LOCATION:
-                    if(!locationReady) {
+                    if (!locationReady) {
                         PlacesMapListFragment.this.listFragment.noFlagsToDisplay("No location data available :(");
                     }
                     break;
                 case ALL:
-                    if(!networkReady && locationReady){
+                    if (!networkReady && locationReady) {
                         PlacesMapListFragment.this.listFragment.noFlagsToDisplay("No Internet connection and location data available :(");
-                    }
-                    else if(networkReady && !locationReady){
+                    } else if (networkReady && !locationReady) {
                         PlacesMapListFragment.this.listFragment.noFlagsToDisplay("No location data available :(");
-                    }else if(!networkReady && !locationReady) {
+                    } else if (!networkReady && !locationReady) {
                         PlacesMapListFragment.this.listFragment.noFlagsToDisplay("No Internet connection and location data available :(");
                     }
                     break;
@@ -377,7 +373,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         String snippet = selectedMarker.getSnippet();
         Log.d(TAG, "Marker Snippet: " + snippet);
 
-        if(snippet != null) {
+        if (snippet != null) {
 
             int index = Integer.parseInt(selectedMarker.getSnippet());
 
@@ -393,9 +389,9 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                 }
                 selectedMarker.setAlpha(PlacesUtils.FLAG_ALPHA_SELECTED);
             }
-        }else{
+        } else {
             //Doesn't work properly. Most likely Google Maps API Bug
-            if(selectedMarker.isInfoWindowShown()) {
+            if (selectedMarker.isInfoWindowShown()) {
                 selectedMarker.hideInfoWindow();
             } else {
                 selectedMarker.showInfoWindow();
@@ -405,7 +401,8 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         // by returning false we can show text on flag in the map
         // return false;
 
-        if(supl.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED)supl.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+        if (supl.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED)
+            supl.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
 
         return true;
     }
@@ -419,7 +416,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
         Log.d(TAG, "Updating markers on map...flags size: " + flags.size());
 
-        if ( this.gMap != null) {
+        if (this.gMap != null) {
             this.gMap.clear();
 
             //zooms around all the Flags
@@ -445,7 +442,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                 Marker newMarker = this.gMap.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title(text)
-                        .snippet( String.valueOf(index))
+                        .snippet(String.valueOf(index))
                         .icon(BitmapDescriptorFactory.fromBitmap(halfSizeMarker))
                                 // .icon(BitmapDescriptorFactory.fromResource(getIconForCategory(f.getCategory())))
                                 //.icon(BitmapDescriptorFactory.defaultMarker(getCategoryColor(f.getCategory())))
@@ -454,7 +451,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                 index++;
             }
 
-            if (this.showDiscoverModeOnMap()){
+            if (this.showDiscoverModeOnMap()) {
 
                 List<Flag> hiddenFlags = FlagsStorage.getSharedStorage().fetchFlagsWithType(FlagsStorage.Type.HIDDEN);
 
@@ -535,7 +532,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
     /**
      * Fragment that shows the list of flags in a cardview
      */
-    public static class FlagsListFragment extends Fragment{
+    public static class FlagsListFragment extends Fragment {
 
         private RecyclerView recycleView;
         private RelativeLayout noFlagLayout;
@@ -543,31 +540,29 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         private SlidingUpPanelLayout supl;
         private MSwipeRefreshLayout srl;
 
-        public void setSUPL(SlidingUpPanelLayout supl)
-        {
+        public void setSUPL(SlidingUpPanelLayout supl) {
             this.supl = supl;
         }
 
-        public void setSRL(MSwipeRefreshLayout srl)
-        {
+        public void setSRL(MSwipeRefreshLayout srl) {
             this.srl = srl;
         }
 
         //the following variable is used to fill the recycle view at creation time, after onCreateView it will be null. Do not use it
         private List<Flag> initialData;
 
-        protected void flagsToDisplay(){
+        protected void flagsToDisplay() {
             noFlagLayout.setVisibility(View.GONE);
             recycleView.setVisibility(View.VISIBLE);
         }
 
-        protected void noFlagsToDisplay(String text){
+        protected void noFlagsToDisplay(String text) {
             noFlagsText.setText(text);
             recycleView.setVisibility(View.GONE);
             noFlagLayout.setVisibility(View.VISIBLE);
         }
 
-        public void setInitialData(List<Flag> initialData){
+        public void setInitialData(List<Flag> initialData) {
             this.initialData = initialData;
         }
 
@@ -612,11 +607,11 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
             llm.setOrientation(LinearLayoutManager.VERTICAL);
             this.recycleView.setLayoutManager(llm);
 
-            noFlagLayout = (RelativeLayout)view.findViewById(R.id.no_flags_found_layout);
-            noFlagsText = (TextView)noFlagLayout.findViewById(R.id.no_flags_text);
+            noFlagLayout = (RelativeLayout) view.findViewById(R.id.no_flags_found_layout);
+            noFlagsText = (TextView) noFlagLayout.findViewById(R.id.no_flags_text);
 
 
-            if(this.initialData != null){
+            if (this.initialData != null) {
                 this.updateRecycleViewWithNewContents(this.initialData);
                 this.initialData = null;
             }

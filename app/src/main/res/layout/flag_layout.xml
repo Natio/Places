@@ -353,7 +353,6 @@
                 android:focusableInTouchMode="true" />
 
         </LinearLayout>
-
     </ScrollView>
 
     <!--  Big preview of media  -->
