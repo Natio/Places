@@ -61,7 +61,8 @@ public final class FacebookUtils {
         progress.setTitle("Loading");
         progress.setMessage("Wait while loading...");
         progress.setCancelable(false);
-        progress.show();
+//        not showing progress dialog
+//        progress.show();
         FacebookUtils.getInstance().makeMeRequest(new PlacesUtilCallback() {
             @Override
             public void onResult(String result, Exception e) {

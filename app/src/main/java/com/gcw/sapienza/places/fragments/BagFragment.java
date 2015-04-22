@@ -40,6 +40,15 @@ public class BagFragment extends PlacesMapListFragment{
         Log.d(TAG, "Broadcast intent received: " + intent.getAction());
     }
 
+    /**
+     * @param context The Context in which the receiver is running.
+     * @param intent The Intent being received.
+     */
+    @Override
+    protected void onParseError(Context context, Intent intent) {
+        Log.d(TAG, "Broadcast intent received: " + intent.getAction());
+    }
+
     @Override
     protected String noFlagsReceivedText() {
         return "No Flags in your Bag (yet!) :(";

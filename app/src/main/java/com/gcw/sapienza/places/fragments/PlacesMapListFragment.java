@@ -35,6 +35,7 @@ import com.gcw.sapienza.places.adapters.FlagsAdapter;
 import com.gcw.sapienza.places.layouts.MSwipeRefreshLayout;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.models.FlagReport;
+import com.gcw.sapienza.places.services.LocationService;
 import com.gcw.sapienza.places.utils.FlagsStorage;
 import com.gcw.sapienza.places.utils.PlacesUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -90,11 +91,20 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
             PlacesMapListFragment.this.listFragment.updateRecycleViewWithNewContents(data);
         }
     };
+
     private BroadcastReceiver noFlagsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             PlacesMapListFragment.this.onNoFlagsReceived(context, intent);
             PlacesMapListFragment.this.listFragment.noFlagsToDisplay(noFlagsReceivedText());
+        }
+    };
+
+    private BroadcastReceiver parseErrorReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            PlacesMapListFragment.this.onNoFlagsReceived(context, intent);
+            hintMissingRequirements(Requirements.NETWORK);
         }
     };
 
@@ -111,6 +121,12 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
      * @param intent The Intent being received.
      */
     protected abstract void onNoFlagsReceived(Context context, Intent intent);
+
+    /**
+     * @param context The Context in which the parseErrorReceiver is running.
+     * @param intent The Intent being received.
+     */
+    protected abstract void onParseError(Context context, Intent intent);
 
     /**
      * This method is automatically called when the class needs to register to the local notification system.
@@ -168,7 +184,14 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         for(IntentFilter filter : noFlagsFilters){
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.noFlagsReceiver, filter);
         }
+        registerParseErrorNotifications();
     }
+
+    private void registerParseErrorNotifications() {
+        IntentFilter parseErrorFilter = new IntentFilter(LocationService.PARSE_ERROR_NOTIFICATION);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.parseErrorReceiver, parseErrorFilter);
+    }
+
     /**
      * Unregisters the flagsReceiver from local notifications
      */
@@ -242,8 +265,6 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                 // supl.setTouchEnabled(false);
                 // supl.setEnableDragViewTouchEvents(false);
                 // supl.setLongClickable(false);
-                //enable my location button
-                gMap.setMyLocationEnabled(true);
             }
 
             @Override
@@ -282,9 +303,9 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
      * @param googleMap the Gmap
      */
     protected void customizeGmap(GoogleMap googleMap){
-        googleMap.getUiSettings().setScrollGesturesEnabled(false);
+        googleMap.getUiSettings().setScrollGesturesEnabled(true);
         googleMap.getUiSettings().setZoomGesturesEnabled(true);
-        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(true);
         googleMap.setOnMarkerClickListener(this);
         googleMap.setMyLocationEnabled(true);
     }
@@ -300,8 +321,13 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
         this.handleRefreshData();
 
-        MainActivity mainActivity = (MainActivity)getActivity();
         Requirements requirements = fragmentRequirements();
+
+        hintMissingRequirements(requirements);
+    }
+
+    private void hintMissingRequirements(Requirements requirements){
+        MainActivity mainActivity = (MainActivity)getActivity();
 
         boolean networkReady = mainActivity.isNetworkAvailable();
         boolean locationReady = mainActivity.areLocationServicesEnabled();

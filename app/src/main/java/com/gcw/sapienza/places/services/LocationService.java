@@ -63,6 +63,7 @@ public class LocationService extends Service implements
     public static final String LOCATION_CHANGED_NOTIFICATION = "LOCATION_CHANGED_NOTIFICATION";
     public static final String FOUND_BAG_FLAGS_NOTIFICATION = "FOUND_BAG_FLAGS_NOTIFICATION";
     public static final String FOUND_NO_BAG_FLAGS_NOTIFICATION = "FOUND_NO_BAG_FLAGS_NOTIFICATION";
+    public static final String PARSE_ERROR_NOTIFICATION = "PARSE_ERROR_NOTIFICATION";
     public static final String NO_FLAGS_VISIBLE = "you won't be able to see any flags with these settings";
     public static final String SERVICE_CONNECTED = "SERVICE_CONNECTED";
     private static final String TAG = "LocationService";
@@ -207,20 +208,22 @@ public class LocationService extends Service implements
         query.findInBackground(new FindCallback<Flag>() {
             @Override
             public void done(List<Flag> flags, ParseException e) {
-                if (e != null) {
-                    Toast.makeText(getBaseContext(), "Cannot fetch your Flags at the moment,\ntry again later", Toast.LENGTH_SHORT);
-                }
-                if (flags == null) {
-                    flags = new ArrayList<>();
-                }
-                LocationService.this.myFlags = new ArrayList<Flag>(flags);
+                if (e == null) {
 
-                updateMyFlags();
+                    if (flags == null) {
+                        flags = new ArrayList<>();
+                    }
+                    LocationService.this.myFlags = new ArrayList<Flag>(flags);
 
-                if (flags.size() > 0) {
-                    LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_MY_FLAGS_NOTIFICATION));
-                } else {
-                    LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION));
+                    updateMyFlags();
+
+                    if (flags.size() > 0) {
+                        LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_MY_FLAGS_NOTIFICATION));
+                    } else {
+                        LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_MY_FLAGS_NOTIFICATION));
+                    }
+                }else{
+                    LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.PARSE_ERROR_NOTIFICATION));
                 }
             }
         });
@@ -239,7 +242,7 @@ public class LocationService extends Service implements
                 .error(new ErrorCallback() {
                     @Override
                     public void error(ParseException e) {
-                        Toast.makeText(getBaseContext(), "Cannot fetch your bag Flags at the moment,\ntry again later", Toast.LENGTH_SHORT).show();
+                        LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.PARSE_ERROR_NOTIFICATION));
                     }
                 })
                 .success(new ModelCallback<Comment>() {
@@ -495,31 +498,35 @@ public class LocationService extends Service implements
         query.findInBackground(new FindCallback<Flag>() {
             @Override
             public void done(List<Flag> flags, ParseException e) {
-                if (flags == null) {
-                    flags = new ArrayList<>();
-                }
-                List<Flag> hiddenFlags = new ArrayList<>();
-                Iterator<Flag> iterParseObjects = flags.iterator();
-                while (iterParseObjects.hasNext()) {
-                    Flag currFlag = iterParseObjects.next();
-                    Log.d(TAG, "Distance from point to user: " + currFlag.getLocation().distanceInKilometersTo(gp));
-                    if (currFlag.getLocation().distanceInKilometersTo(gp) > PlacesUtils.MAP_RADIUS) {
-                        hiddenFlags.add(currFlag);
-                        iterParseObjects.remove();
+                if(e == null) {
+                    if (flags == null) {
+                        flags = new ArrayList<>();
                     }
-                }
-                for (Flag f : flags) {
-                    LocationService.this.flagsNearby.add(f);
-                }
-                for (Flag f : hiddenFlags) {
-                    LocationService.this.hiddenFlags.add(f);
-                }
-                updateNearbyFlags();
+                    List<Flag> hiddenFlags = new ArrayList<>();
+                    Iterator<Flag> iterParseObjects = flags.iterator();
+                    while (iterParseObjects.hasNext()) {
+                        Flag currFlag = iterParseObjects.next();
+                        Log.d(TAG, "Distance from point to user: " + currFlag.getLocation().distanceInKilometersTo(gp));
+                        if (currFlag.getLocation().distanceInKilometersTo(gp) > PlacesUtils.MAP_RADIUS) {
+                            hiddenFlags.add(currFlag);
+                            iterParseObjects.remove();
+                        }
+                    }
+                    for (Flag f : flags) {
+                        LocationService.this.flagsNearby.add(f);
+                    }
+                    for (Flag f : hiddenFlags) {
+                        LocationService.this.hiddenFlags.add(f);
+                    }
+                    updateNearbyFlags();
 
-                if (flags.size() > 0 || hiddenFlags.size() > 0) {
-                    LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
-                } else {
-                    LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
+                    if (flags.size() > 0 || hiddenFlags.size() > 0) {
+                        LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
+                    } else {
+                        LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
+                    }
+                }else{
+                    LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.PARSE_ERROR_NOTIFICATION));
                 }
 
             }
