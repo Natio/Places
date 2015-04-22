@@ -593,7 +593,7 @@ public class LocationService extends Service implements
             NotificationCompat.Builder builder =
                     new NotificationCompat.Builder(this)
                             .setAutoCancel(true)
-                            .setSmallIcon(R.drawable.app_logo_small)
+                            .setSmallIcon(R.drawable.app_ico_small)
                             .setContentTitle(Notifications.notifications[(int) (Math.random() * Notifications.notifications.length)])
                             .setContentText(numFlags > 1 ? textMoreThanOne : textIfOne)
                             .setSound(soundUri)
