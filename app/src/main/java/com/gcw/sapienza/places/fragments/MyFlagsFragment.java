@@ -89,4 +89,9 @@ public class MyFlagsFragment extends PlacesMapListFragment{
     protected boolean showDiscoverModeOnMap(){
         return false;
     }
+
+    @Override
+    protected Requirements fragmentRequirements() {
+        return Requirements.NETWORK;
+    }
 }

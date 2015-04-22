@@ -667,7 +667,9 @@ public class LocationService extends Service implements
     }
 
     private void updateLocation(){
-        listener.setLocation(location);
+        if (listener != null) {
+            listener.setLocation(location);
+        }
     }
 
     private void updateMyFlags(){

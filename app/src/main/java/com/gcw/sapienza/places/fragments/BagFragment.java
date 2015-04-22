@@ -89,4 +89,9 @@ public class BagFragment extends PlacesMapListFragment{
         return false;
     }
 
+    @Override
+    protected Requirements fragmentRequirements() {
+        return Requirements.NETWORK;
+    }
+
 }

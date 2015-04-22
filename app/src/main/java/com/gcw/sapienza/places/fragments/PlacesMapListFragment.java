@@ -72,6 +72,8 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
     private static final String TAG = "PlacesMapListFragment";
 
+    public enum Requirements {NONE, NETWORK, LOCATION, ALL};
+
     private GoogleMap gMap;
     private List<Marker> markers;
     protected FlagsListFragment listFragment;
@@ -140,6 +142,11 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
      * @return true if you want to enable discover mode on map
      */
     protected abstract boolean showDiscoverModeOnMap();
+
+    /**
+     * @return code indicating the network/location requirements of the fragment
+     */
+    protected abstract Requirements fragmentRequirements();
 
 
     @Override
@@ -235,6 +242,8 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                 // supl.setTouchEnabled(false);
                 // supl.setEnableDragViewTouchEvents(false);
                 // supl.setLongClickable(false);
+                //enable my location button
+                gMap.setMyLocationEnabled(true);
             }
 
             @Override
@@ -291,11 +300,39 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
         this.handleRefreshData();
 
-        if(((MainActivity)getActivity()).areLocationServicesEnabled()){
+        MainActivity mainActivity = (MainActivity)getActivity();
+        Requirements requirements = fragmentRequirements();
+
+        boolean networkReady = mainActivity.isNetworkAvailable();
+        boolean locationReady = mainActivity.areLocationServicesEnabled();
+
+        if(requirements == Requirements.NONE){
             PlacesMapListFragment.this.listFragment.flagsToDisplay();
         }else{
-            Log.w(TAG, "No Internet Connection Available");
-            PlacesMapListFragment.this.listFragment.noFlagsToDisplay("No location data available :(");
+            switch(requirements){
+                case NETWORK:
+                    if(!networkReady) {
+                        PlacesMapListFragment.this.listFragment.noFlagsToDisplay("No Internet connection available :(");
+                    }
+                    break;
+                case LOCATION:
+                    if(!locationReady) {
+                        PlacesMapListFragment.this.listFragment.noFlagsToDisplay("No location data available :(");
+                    }
+                    break;
+                case ALL:
+                    if(!networkReady && locationReady){
+                        PlacesMapListFragment.this.listFragment.noFlagsToDisplay("No Internet connection and location data available :(");
+                    }
+                    else if(networkReady && !locationReady){
+                        PlacesMapListFragment.this.listFragment.noFlagsToDisplay("No location data available :(");
+                    }else if(!networkReady && !locationReady) {
+                        PlacesMapListFragment.this.listFragment.noFlagsToDisplay("No Internet connection and location data available :(");
+                    }
+                    break;
+                default:
+                    Log.w(TAG, "Unknown missing requirement: " + requirements);
+            }
         }
     }
 

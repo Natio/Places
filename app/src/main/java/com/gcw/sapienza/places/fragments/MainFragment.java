@@ -88,4 +88,9 @@ public class MainFragment extends PlacesMapListFragment{
     protected boolean showDiscoverModeOnMap(){
         return true;
     }
+
+    @Override
+    protected Requirements fragmentRequirements() {
+        return Requirements.ALL;
+    }
 }
