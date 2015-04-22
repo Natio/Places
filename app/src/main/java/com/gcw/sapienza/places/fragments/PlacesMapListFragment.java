@@ -73,6 +73,10 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
     private static final String TAG = "PlacesMapListFragment";
 
+    public static PlacesMapListFragment currentFragmentInstance;
+
+    public static PlacesMapListFragment getInstance() {return PlacesMapListFragment.currentFragmentInstance; }
+
     public enum Requirements {NONE, NETWORK, LOCATION, ALL};
 
     private GoogleMap gMap;
@@ -208,6 +212,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
         View view = inflater.inflate(R.layout.my_flags_layout, container, false);
 
+        currentFragmentInstance = this;
 
         this.srl = (MSwipeRefreshLayout) view.findViewById(R.id.my_swipe_refresh);
         this.srl.setOnRefreshListener(this);
@@ -242,6 +247,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         //this.supl.setAnchorPoint(0.1f);
         // this.supl.setTouchEnabled(false);
         this.supl.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+        this.supl.setDragView(R.id.drag_handler);
         this.supl.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(View view, float v) {
@@ -664,7 +670,8 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                 public void done(com.parse.ParseException e) {
                     if (e == null) {
                         Toast.makeText(recycleView.getContext(), PlacesUtils.FLAG_DELETED, Toast.LENGTH_SHORT).show();
-                        ((MainActivity) getActivity()).refresh(PlacesUtils.NEARBY_FLAGS_CODE);
+//                        ((MainActivity) getActivity()).refresh(PlacesUtils.NEARBY_FLAGS_CODE);
+                        PlacesMapListFragment.getInstance().handleRefreshData();
                     } else
                         Toast.makeText(recycleView.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }

@@ -221,7 +221,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
 
     public void refresh(int updateCode) {
-        Log.d(TAG, "Refreshing application");
+        Log.d(TAG, "Refreshing application with code: " + updateCode);
         PlacesApplication.getInstance().updatePlacesData(this, updateCode);
     }
 
