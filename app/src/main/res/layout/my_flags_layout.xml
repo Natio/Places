@@ -59,7 +59,7 @@
             android:orientation="vertical"
             tools:context="com.gcw.sapienza.places.activities.MainActivity" />
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -68,16 +68,19 @@
                 android:id="@+id/my_map_holder"
                 android:background="@color/transparent"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.95"/>
+                android:layout_height="match_parent" />
+            <!-- android:layout_weight="0.95"
+             android:layout_height="0dp"-->
 
             <View
                 android:id="@+id/drag_handler"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.05"
-                android:background="@color/transparent_green"/>
-        </LinearLayout>
+                android:layout_gravity="bottom|right"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@color/transparent_green"></View>
+            <!-- android:layout_weight="0.05"
+             android:layout_height="0dp"-->
+        </FrameLayout>
 
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
