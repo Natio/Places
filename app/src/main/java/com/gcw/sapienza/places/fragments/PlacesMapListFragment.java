@@ -244,8 +244,11 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         this.supl = (SlidingUpPanelLayout)view.findViewById(R.id.home_container);
 
         //temporarily disabled anchorpoint
-        //this.supl.setAnchorPoint(0.1f);
+        //this.supl.setAnchorPoint(0.5f);
+
+        //to disable drag function
         // this.supl.setTouchEnabled(false);
+
         this.supl.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
         this.supl.setDragView(R.id.drag_handler);
         this.supl.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
@@ -258,7 +261,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
             public void onPanelCollapsed(View view) {
                 Log.d(TAG, "Panel collapsed");
                 //made temporarily scrollable
-                gMap.getUiSettings().setScrollGesturesEnabled(true);
+                //gMap.getUiSettings().setScrollGesturesEnabled(true);
                 // supl.setTouchEnabled(true);
             }
 
@@ -266,7 +269,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
             public void onPanelExpanded(View view) {
                 Log.d(TAG, "Panel expanded");
                 //made temporarily scrollable
-                gMap.getUiSettings().setScrollGesturesEnabled(true);
+                //gMap.getUiSettings().setScrollGesturesEnabled(true);
                 // supl.setClickable(false);
                 // supl.setTouchEnabled(false);
                 // supl.setEnableDragViewTouchEvents(false);

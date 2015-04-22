@@ -367,7 +367,7 @@
         android:visibility="gone">
 
         <ImageView
-            android:id="@+id/focused_pic"
+            android:id="@+id/pic_big_preview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"

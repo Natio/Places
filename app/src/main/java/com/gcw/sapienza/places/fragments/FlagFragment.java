@@ -90,6 +90,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private MediaPlayer mediaPlayer;
     private VideoView videoView;
     private ImageView imageView;
+    private ImageView bigView;
     private ImageView playVideoButton;
     private ImageView audioHolder;
     private TextView wowStatText;
@@ -182,8 +183,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         String weather;
 
         //temporary quick solution to manage openweathermap when didn't work, and make app working all the same
-        if (weatherInfo.isEmpty()) {
-            temperature = "" + 20;
+        if (weatherInfo.isEmpty() || weatherInfo.equals(null)) {
+            temperature = "" + 20 + "°C";
             weather = "Cloud";
         } else {
             StringTokenizer st = new StringTokenizer(weatherInfo, ",");
@@ -221,6 +222,10 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         }
 
         frameLayout = (RelativeLayout) view.findViewById(R.id.frame_layout);
+
+        //to show big preview
+        bigView = (ImageView) view.findViewById(R.id.pic_big_preview);
+
         wholeFlagContainer = (LinearLayout) view.findViewById(R.id.whole_flag_container);
         imageHolder = (LinearLayout) view.findViewById(R.id.imageContainer);
         imageView = (ImageView) view.findViewById(R.id.pic);
@@ -305,12 +310,16 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             wholeFlagContainer.setVisibility(View.VISIBLE);
         }
         // TODO Enlarged media frame disabled
-        /*else if (v.getId() == R.id.pic) {
+        /*
+        else if (v.getId() == R.id.pic) {
             Log.d(TAG, "pic clicked!");
             // getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
             frameLayout.setVisibility(View.VISIBLE);
+            //TODO image bigView
+
             wholeFlagContainer.setVisibility(View.GONE);
-        }*/
+        }
+        */
         // else if(v.getId() == playVideoButton.getId()) playVideo();
         else if (v.getId() == R.id.audio) playRecording();
         else if (v.getId() == R.id.wow_button) wlbFlag(WOW_CODE);
@@ -745,13 +754,10 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
     private void changeLayoutAccordingToMediaType() {
         if (mediaType == MediaType.NONE) {
-            // TODO managing resizing of flags with very short text
-            //maybe i'll do a swipe up and down...as googleMap effect
         } else if (mediaType == MediaType.AUDIO) {
             audioLayout.setVisibility(View.VISIBLE);
         } else if (mediaType == MediaType.PIC) {
             imageHolder.setVisibility(View.VISIBLE);
-
 
             ParseFile thumbnail = this.flag.getThumbnail();
             final ParseFile picture = this.flag.getPic();
@@ -761,7 +767,6 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                     public void onSuccess() {
                         Picasso.with(FlagFragment.this.getActivity()).load(picture.getUrl()).into(FlagFragment.this.imageView);
                     }
-
                     @Override
                     public void onError() {
                     }
@@ -770,7 +775,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 Picasso.with(this.getActivity()).load(picture.getUrl()).into(this.imageView);
             }
             if (this.getView() != null) {
-                ImageView focused_imageView = (ImageView) this.getView().findViewById(R.id.focused_pic);
+                ImageView focused_imageView = (ImageView) this.getView().findViewById(R.id.pic_big_preview);
                 Picasso.with(this.getActivity()).load(picture.getUrl()).into(focused_imageView);
             }
 
