@@ -6,9 +6,11 @@ package com.gcw.sapienza.places.activities;
 
 import android.app.AlertDialog;
 import android.app.FragmentManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.location.LocationManager;
@@ -43,6 +45,7 @@ import com.gcw.sapienza.places.fragments.FlagFragment;
 import com.gcw.sapienza.places.fragments.InboxFragment;
 import com.gcw.sapienza.places.fragments.MainFragment;
 import com.gcw.sapienza.places.fragments.MyFlagsFragment;
+import com.gcw.sapienza.places.fragments.PlacesMapListFragment;
 import com.gcw.sapienza.places.fragments.ProfileFragment;
 import com.gcw.sapienza.places.fragments.SettingsFragment;
 import com.gcw.sapienza.places.models.Flag;
@@ -100,6 +103,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     private LinearLayout homeHolder;
     private FrameLayout fragHolder;
     private Toast radiusToast;
+
+    private boolean preferencesChangedFlag = false;
 
     public static final String PREFERENCES_CHANGED_NOTIFICATION = "Preferences Changed";
 
@@ -160,7 +165,28 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             //this.getSupportFragmentManager().beginTransaction().replace(R.id.sliding_layout, new MainFragment()).commit();
         }
         // setIntent(null);
+        registerReceivers();
     }
+
+    private void registerReceivers() {
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(this.receiver, new IntentFilter(MainActivity.PREFERENCES_CHANGED_NOTIFICATION));
+    }
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+
+                case MainActivity.PREFERENCES_CHANGED_NOTIFICATION:
+                    //set the preferences changed
+                    preferencesChangedFlag = true;
+                    //no automatic refresh of application data on preference change
+                    break;
+                default:
+                    Log.w(MainActivity.class.getName(), intent.getAction() + ": cannot identify the received notification");
+            }
+        }
+    };
 
     private void handleIntent(Intent intent) {
         String bundleContentType = intent.getStringExtra("type");
@@ -448,6 +474,14 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         }
     }
 
+    public boolean arePreferencesChanged(){
+        return this.preferencesChangedFlag;
+    }
+
+    public void resetPreferencesFlag(){
+        this.preferencesChangedFlag = false;
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -542,19 +576,34 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     public void onBackPressed() {
         //new interface
         Fragment f = this.getSupportFragmentManager().findFragmentById(R.id.home_container);
-        //Fragment f = this.getSupportFragmentManager().findFragmentById(R.id.sliding_layout);
+
         if (!isNonSupportFragmentVisible() && f != null && f.getClass() == MainFragment.class) {
+
+            int first_backstack_id = this.getSupportFragmentManager().getBackStackEntryAt(0).getId();
+            String first_backstack_name = this.getSupportFragmentManager().getBackStackEntryAt(0).getName();
+
             Log.d(TAG, "Pressed back button on MainFragment: finishing...");
             this.getSupportFragmentManager().popBackStack(null, android.support.v4.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+            Fragment onBack = this.getSupportFragmentManager().findFragmentById(first_backstack_id);
+            Log.d(TAG, "First fragment on backstack to be popped and refreshed: " + first_backstack_name);
+
+            PlacesMapListFragment toBeRefreshedFragment = (PlacesMapListFragment)onBack;
+            toBeRefreshedFragment.refresh();
+
             finish();
-            return;
-        }
 
-        FragmentManager fm = getFragmentManager();
-
-        if (isNonSupportFragmentVisible()) {
+        } else if (isNonSupportFragmentVisible()) {
+            //if here, settings are visible
+            if(arePreferencesChanged()) {
+                PlacesMapListFragment toBeRefreshedFragment = (PlacesMapListFragment) f;
+                toBeRefreshedFragment.refresh();
+                resetPreferencesFlag();
+            }
             showSupportFrag();
         } else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            FragmentManager fm = getFragmentManager();
+
             Log.i("MainActivity", "popping support: " +
                     getSupportFragmentManager().getBackStackEntryCount() + ", while backstack: " +
                     fm.getBackStackEntryCount());
@@ -589,8 +638,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         }
         else if (preference.getKey().equals("maxFetch")) {
             preference.setDefaultValue(newValue);
-            int value = PlacesUtils.stepValues[(int) newValue];
-            PlacesUtils.MAX_FLAGS = value;
+            int value = PlacesUtils.STEP_VALUES[(int) newValue];
             showToast("Max number of visible flags: " + value);
         }
 
@@ -709,5 +757,15 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         frag.setFlag(f);
 
         switchToOtherFrag(frag);
+    }
+
+    private void unregisterReceivers() {
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(this.receiver);
+    }
+
+    @Override
+    public void onDestroy(){
+        unregisterReceivers();
+        super.onDestroy();
     }
 }

@@ -73,8 +73,9 @@ public class PlacesUtils {
      * the discover mode radius is double as the map radius
      */
     public static final float DISCOVER_MODE_RADIUS = MAP_RADIUS * 2;
-    public static int MAX_FLAGS = 10;
-    public static final int[] stepValues = {1, 5, 10, 15, 20};
+
+    public static final int MAX_FLAGS_DEFAULT_INDEX = 1;
+    public static final int[] STEP_VALUES = {10, 20, 30, 40, 50};
 
     public static final float FLAG_ALPHA_NORMAL = 0.75f;
     public static final float FLAG_ALPHA_UNSELECTED = 0.4f;

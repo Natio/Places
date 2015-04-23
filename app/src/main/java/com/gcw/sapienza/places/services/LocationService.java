@@ -31,6 +31,7 @@ import com.gcw.sapienza.places.models.manager.ErrorCallback;
 import com.gcw.sapienza.places.models.manager.ModelCallback;
 import com.gcw.sapienza.places.notifications.Notifications;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
+import com.gcw.sapienza.places.utils.PlacesStorage;
 import com.gcw.sapienza.places.utils.PlacesUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -409,6 +410,10 @@ public class LocationService extends Service implements
         boolean none_check = preferences.getBoolean("noneCheck", true);
         boolean music_check = preferences.getBoolean("musicCheck", true);
 
+        int maxFlags_index = preferences.getInt("maxFetch", PlacesUtils.MAX_FLAGS_DEFAULT_INDEX);
+
+        int maxFlags = PlacesUtils.STEP_VALUES[maxFlags_index];
+
         if (!PlacesLoginUtils.getInstance().hasCurrentUserId()) {
             final android.os.Handler handler = new android.os.Handler();
             handler.post(new Runnable() {
@@ -489,7 +494,9 @@ public class LocationService extends Service implements
         if (archaeologist) query.orderByAscending("createdAt");
         else query.orderByDescending("createdAt");
 
-        query.setLimit(PlacesUtils.MAX_FLAGS);
+        Log.d(TAG, "Max flags: " + maxFlags);
+        query.setLimit(maxFlags);
+
         if (PlacesApplication.isRunningOnEmulator) {
             query.setLimit(50);
         }
@@ -750,8 +757,9 @@ public class LocationService extends Service implements
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
 
-                //they behave in the same way
                 case MainActivity.PREFERENCES_CHANGED_NOTIFICATION:
+                    //no automatic refresh of application data on preference change
+                    break;
                 case CategoriesFragment.ENABLE_ALL_CLICKED:
                     LocationService.this.resetNoFlagsWarning();
                     updateLocationData();

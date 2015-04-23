@@ -176,6 +176,10 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         srl.setRefreshing(false);
     }
 
+    public void refresh(){
+        this.handleRefreshData();
+    }
+
     /**
      * Registers the flagsReceiver from local notifications
      */
@@ -202,6 +206,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
     private void unregisterNotification() {
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(this.flagsReceiver);
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(this.noFlagsReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(this.parseErrorReceiver);
     }
 
     @Override

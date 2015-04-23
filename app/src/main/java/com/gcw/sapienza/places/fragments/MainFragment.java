@@ -65,7 +65,6 @@ public class MainFragment extends PlacesMapListFragment{
         ArrayList<IntentFilter> list = new ArrayList<>(3);
         list.add(new IntentFilter(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
         list.add(new IntentFilter(LocationService.LOCATION_CHANGED_NOTIFICATION));
-        list.add(new IntentFilter(MainActivity.PREFERENCES_CHANGED_NOTIFICATION));
         return list;
     }
 
