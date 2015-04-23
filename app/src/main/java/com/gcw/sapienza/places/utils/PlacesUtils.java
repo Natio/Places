@@ -202,7 +202,9 @@ public class PlacesUtils {
     }
 
     public static void showToast(Context context, String text, int duration) {
-        Toast.makeText(context, text, duration).show();
+        if(context != null) {
+            Toast.makeText(context, text, duration).show();
+        }
     }
 
 }
