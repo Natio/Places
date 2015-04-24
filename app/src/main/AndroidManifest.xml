@@ -28,6 +28,7 @@
     <permission
         android:name="com.gcw.sapienza.places.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
+
     <uses-permission android:name="com.gcw.sapienza.places.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -79,7 +80,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.VideoCaptureActivity"/>
+        <activity android:name=".activities.VideoCaptureActivity" />
 
         <activity
             android:name=".activities.ShareActivity"
@@ -112,7 +113,7 @@
 
         <activity
             android:name=".activities.AudioRecordingActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
 
         <!-- <activity
             android:name="com.parse.ui.ParseLoginActivity"
@@ -177,7 +178,7 @@
         <!-- replace @drawable/push_icon with your push icon identifier -->
         <meta-data
             android:name="com.parse.push.notification_icon"
-            android:resource="@drawable/app_logo_small" />
+            android:resource="@drawable/app_ico_small" />
 
     </application>
 

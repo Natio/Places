@@ -1,3 +1,6 @@
+/*
+ * Copyright 2015-present Places®.
+ */
 package com.gcw.sapienza.places.notifications;
 
 import android.app.Notification;
@@ -27,9 +30,10 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by snowblack on 1/4/15.
+/*
+ * Notification management, from Parse cloud service
  */
+
 public class Receiver extends ParsePushBroadcastReceiver {
 
     private static final String TAG = "Receiver";
@@ -73,14 +77,14 @@ public class Receiver extends ParsePushBroadcastReceiver {
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putStringSet("pushTextSet", new HashSet<String>());
                 editor.commit();
-                if(notificationsSize == 1) {
+                if (notificationsSize == 1) {
                     Log.d(TAG, "Just 1 notification. Showing the related Flag");
                     extras.putString("type", PlacesUtils.RECEIVED_NOTIF_COMMENT_TYPE);
                     extras.putString(PlacesUtils.FLAG_ID, flag_id);
-                }else if(notificationsSize > 1){
+                } else if (notificationsSize > 1) {
                     Log.d(TAG, notificationsSize + " notifications. Showing the Inbox");
                     extras.putString("type", PlacesUtils.RECEIVED_MULTI_NOTIF_COMMENT_TYPE);
-                }else{
+                } else {
                     Log.w(TAG, "0 notifications. Nothing to show");
                     return;
                 }
@@ -145,7 +149,7 @@ public class Receiver extends ParsePushBroadcastReceiver {
                 default:
                     Log.d(TAG, "Triggering default onPushReceive behavior...");
             }
-        }catch (JSONException e){
+        } catch (JSONException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -184,15 +188,15 @@ public class Receiver extends ParsePushBroadcastReceiver {
                     Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-                    builder.setContentTitle(alerts.size() + ((alerts.size() > 1) ? " new notifications!" : " new notification!") );
+                    builder.setContentTitle(alerts.size() + ((alerts.size() > 1) ? " new notifications!" : " new notification!"));
                     builder.setContentText(alert_title);
-                    builder.setSmallIcon(R.drawable.app_logo_small);
+                    builder.setSmallIcon(R.drawable.app_ico_small);
                     builder.setAutoCancel(true);
 
                     NotificationCompat.InboxStyle inboxStyle =
                             new NotificationCompat.InboxStyle();
                     inboxStyle.setBigContentTitle("Details: ");
-                    for(String s: alerts){
+                    for (String s : alerts) {
                         inboxStyle.addLine(s);
                     }
                     builder.setStyle(inboxStyle);
@@ -210,14 +214,14 @@ public class Receiver extends ParsePushBroadcastReceiver {
                 default:
                     Log.d(TAG, "Triggering default onPushReceive behavior");
             }
-        }catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         return null;
     }
 
     @Override
-    protected void onPushDismiss(Context context, Intent intent){
+    protected void onPushDismiss(Context context, Intent intent) {
         super.onPushDismiss(context, intent);
 
 //        clear notification text? maybe not advised

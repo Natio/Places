@@ -24,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -68,6 +69,7 @@ import java.util.List;
  * Subclasses must implement all abstract methods providing the right data.
  * Paolo++ ;)
  */
+
 public abstract class PlacesMapListFragment extends Fragment implements OnMapReadyCallback, SwipeRefreshLayout.OnRefreshListener,
         GoogleMap.OnMarkerClickListener {
 
@@ -88,6 +90,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
     protected FlagsListFragment listFragment;
     private MSwipeRefreshLayout srl;
     private SlidingUpPanelLayout supl;
+
 
     private BroadcastReceiver flagsReceiver = new BroadcastReceiver() {
         @Override
@@ -260,9 +263,11 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
             @Override
             public void onPanelCollapsed(View view) {
                 Log.d(TAG, "Panel collapsed");
+
                 //made temporarily scrollable
                 //gMap.getUiSettings().setScrollGesturesEnabled(true);
                 // supl.setTouchEnabled(true);
+                ((ImageView) view.findViewById(R.id.arrowView)).setImageResource(R.drawable.arrow_down);
             }
 
             @Override
@@ -274,6 +279,10 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                 // supl.setTouchEnabled(false);
                 // supl.setEnableDragViewTouchEvents(false);
                 // supl.setLongClickable(false);
+
+                ((ImageView) view.findViewById(R.id.arrowView)).setImageResource(R.drawable.arrow_up);
+
+
             }
 
             @Override

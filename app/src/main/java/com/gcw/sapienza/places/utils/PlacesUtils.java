@@ -1,3 +1,6 @@
+/*
+ * Copyright 2015-present Places®.
+ */
 package com.gcw.sapienza.places.utils;
 
 import android.content.Context;
@@ -12,10 +15,9 @@ import com.gcw.sapienza.places.R;
 import java.io.File;
 import java.io.IOException;
 
-
-
 /**
- * Created by mic_head on 02/01/15.
+ * PlacesUtils is a list of functions that are used in the Places platform. The aim of PlacesUtils
+ * is to modularize the software.
  */
 public class PlacesUtils {
     public static final int UPDATE_DELAY = 200;
@@ -53,14 +55,13 @@ public class PlacesUtils {
     public static final String COMMENT_DELETED = "Comment deleted";
     public static final String COMMENT_REPORTED = "Comment reported";
     public static final String COMMENT_REPORT_REVOKED = "Comment report revoked";
+    public static final String RECEIVED_NOTIF_COMMENT_TYPE = "comment_notification";
+    public static final String RECEIVED_MULTI_NOTIF_COMMENT_TYPE = "multi_comment_notification";
+    public static final String FLAG_ID = "flagId";
     public static final int DELETE_COMMENT = 3;
     public static final int REPORT_COMMENT = 4;
     public static final int DELETE_REPORT_COMMENT = 5;
     public static final int COMMENT_LIST_GROUP = 6;
-
-    public static final String RECEIVED_NOTIF_COMMENT_TYPE = "comment_notification";
-    public static final String RECEIVED_MULTI_NOTIF_COMMENT_TYPE = "multi_comment_notification";
-    public static final String FLAG_ID = "flagId";
 
     @SuppressWarnings("unused")
     private static final String TAG = "Utils";
@@ -129,8 +130,6 @@ public class PlacesUtils {
                 extension,
                 cache_dir
         );
-
-
     }
 
     public static File createImageFile(String image_extension) throws IOException {
@@ -202,9 +201,7 @@ public class PlacesUtils {
     }
 
     public static void showToast(Context context, String text, int duration) {
-        if(context != null) {
-            Toast.makeText(context, text, duration).show();
-        }
+        Toast.makeText(context, text, duration).show();
     }
 
 }
