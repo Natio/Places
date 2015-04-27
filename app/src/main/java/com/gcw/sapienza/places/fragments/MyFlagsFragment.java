@@ -1,5 +1,7 @@
+/*
+ * Copyright 2015-present Places®.
+ */
 package com.gcw.sapienza.places.fragments;
-
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,25 +18,26 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Created by snowblack on 2/19/15.
+/*
+ * My FlagsFragment, looks like the homepage but it's possible to see all flags we own around the
+ * world
  */
 
-public class MyFlagsFragment extends PlacesMapListFragment{
+public class MyFlagsFragment extends PlacesMapListFragment {
     private static final String TAG = "MyFlagsFragment";
 
     /**
      * @param context The Context in which the receiver is running.
-     * @param intent The Intent being received.
+     * @param intent  The Intent being received.
      */
     @Override
-    protected  void onFlagsReceived(Context context, Intent intent) {
+    protected void onFlagsReceived(Context context, Intent intent) {
         Log.d(TAG, "Broadcast intent received: " + intent.getAction());
     }
 
     /**
      * @param context The Context in which the receiver is running.
-     * @param intent The Intent being received.
+     * @param intent  The Intent being received.
      */
     @Override
     protected void onNoFlagsReceived(Context context, Intent intent) {
@@ -43,7 +46,7 @@ public class MyFlagsFragment extends PlacesMapListFragment{
 
     /**
      * @param context The Context in which the receiver is running.
-     * @param intent The Intent being received.
+     * @param intent  The Intent being received.
      */
     @Override
     protected void onParseError(Context context, Intent intent) {
@@ -57,7 +60,6 @@ public class MyFlagsFragment extends PlacesMapListFragment{
 
     /**
      * This method is automatically called when the class needs to register to the local notification system.
-     *
      */
     @Override
     protected Collection<IntentFilter> getFlagsFilters() {
@@ -68,7 +70,6 @@ public class MyFlagsFragment extends PlacesMapListFragment{
 
     /**
      * This method is automatically called when the class needs to register to the local notification system.
-     *
      */
     @Override
     protected Collection<IntentFilter> getNoFlagsFilters() {
@@ -81,21 +82,22 @@ public class MyFlagsFragment extends PlacesMapListFragment{
      * This method is called when new data is needed
      */
     @Override
-    protected  void handleRefreshData() {
+    protected void handleRefreshData() {
         ((MainActivity) getActivity()).refresh(PlacesUtils.MY_FLAGS_CODE);
     }
 
     /**
      * Returns the list of flags for current subclass
+     *
      * @return list of flags
      */
     @Override
-    protected  List<Flag> getData(){
-       return FlagsStorage.getSharedStorage().fetchFlagsWithType(FlagsStorage.Type.MY);
+    protected List<Flag> getData() {
+        return FlagsStorage.getSharedStorage().fetchFlagsWithType(FlagsStorage.Type.MY);
     }
 
     @Override
-    protected boolean showDiscoverModeOnMap(){
+    protected boolean showDiscoverModeOnMap() {
         return false;
     }
 

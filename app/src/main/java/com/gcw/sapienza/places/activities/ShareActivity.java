@@ -1,3 +1,6 @@
+/*
+ * Copyright 2015-present Places®.
+ */
 package com.gcw.sapienza.places.activities;
 
 import android.annotation.TargetApi;
@@ -56,7 +59,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/*
+ * The following activity is for managing the flags sharing and its media
+ */
 public class ShareActivity extends ActionBarActivity implements View.OnLongClickListener,
         View.OnClickListener, View.OnCreateContextMenuListener, CompoundButton.OnCheckedChangeListener {
 
@@ -596,7 +601,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        switch (buttonView.getId()){
+        switch (buttonView.getId()) {
 
             case R.id.private_checkbox:
                 isPrivate = isChecked;
@@ -685,7 +690,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
             this.onShareFailed(EMPTY_FLAG_TEXT);
             return false;
         } else if (current_location == null) {
-
+            Log.d(TAG, "loc: " + current_location);
             Log.d(TAG, "No GPS data");
             Map<String, String> dimensions = new HashMap<>(1);
             dimensions.put("reason", "Share with No GPS");
@@ -983,7 +988,7 @@ public class ShareActivity extends ActionBarActivity implements View.OnLongClick
 //
 //        dialog.show();
 
-        if(onSocial){
+        if (onSocial) {
             shareOnSocial();
         }
 
