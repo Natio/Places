@@ -246,7 +246,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         this.supl = (SlidingUpPanelLayout) view.findViewById(R.id.home_container);
 
         //temporarily disabled anchorpoint
-        this.supl.setAnchorPoint(0.5f);
+        //this.supl.setAnchorPoint(0.5f);
 
         //to disable drag function
         // this.supl.setTouchEnabled(false);
