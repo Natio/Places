@@ -182,7 +182,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         String weather;
 
         //temporary quick solution to manage openweathermap when didn't work, and make app working all the same
-        if (weatherInfo.isEmpty() || weatherInfo.equals(null)) {
+        if (weatherInfo == null || weatherInfo.isEmpty()) {
             temperature = "" + 20 + "°C";
             weather = "Cloud";
         } else {
