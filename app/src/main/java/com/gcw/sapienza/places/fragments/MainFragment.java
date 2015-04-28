@@ -80,7 +80,10 @@ public class MainFragment extends PlacesMapListFragment{
      */
     @Override
     protected  void handleRefreshData() {
-        ((MainActivity) getActivity()).refresh(PlacesUtils.NEARBY_FLAGS_CODE);
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if(mainActivity != null) {
+            mainActivity.refresh(PlacesUtils.NEARBY_FLAGS_CODE);
+        }
     }
 
     /**
