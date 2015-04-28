@@ -578,7 +578,10 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         //new interface
         Fragment f = this.getSupportFragmentManager().findFragmentById(R.id.home_container);
 
-        if (!isNonSupportFragmentVisible() && f != null && f.getClass() == MainFragment.class) {
+        if(this.getSupportFragmentManager().getBackStackEntryCount() == 0){
+            Log.d(TAG, "Backstack is empty!");
+            super.onBackPressed();
+        }else if (!isNonSupportFragmentVisible() && f != null && f.getClass() == MainFragment.class) {
 
             int first_backstack_id = this.getSupportFragmentManager().getBackStackEntryAt(0).getId();
             String first_backstack_name = this.getSupportFragmentManager().getBackStackEntryAt(0).getName();
