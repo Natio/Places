@@ -641,32 +641,37 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
         @Override
         public boolean onContextItemSelected(MenuItem item) {
-            FlagsAdapter fa = (FlagsAdapter) recycleView.getAdapter();
-            Flag sel_usr = fa.getSelectedFlag();
+            if(item.getGroupId() == PlacesUtils.FLAG_LIST_GROUP) {
+                FlagsAdapter fa = (FlagsAdapter) recycleView.getAdapter();
+                Flag sel_usr = fa.getSelectedFlag();
 
-            if (sel_usr == null)
-                Toast.makeText(getActivity(), PlacesUtils.NO_VALID_FLAG_SELECTED, Toast.LENGTH_SHORT).show();
+                if (sel_usr == null)
+                    Toast.makeText(getActivity(), PlacesUtils.NO_VALID_FLAG_SELECTED, Toast.LENGTH_SHORT).show();
 
-            switch (item.getItemId()) {
+                switch (item.getItemId()) {
 
-                case PlacesUtils.DELETE_FLAG:
-                    this.deleteFlag(sel_usr);
-                    fa.setSelectedFlagIndex(-1);
-                    return true;
+                    case PlacesUtils.DELETE_FLAG:
+                        this.deleteFlag(sel_usr);
+                        fa.setSelectedFlagIndex(-1);
+                        return true;
 
-                case PlacesUtils.REPORT_FLAG:
-                    this.reportFlag(sel_usr);
-                    fa.setSelectedFlagIndex(-1);
-                    return true;
+                    case PlacesUtils.REPORT_FLAG:
+                        this.reportFlag(sel_usr);
+                        fa.setSelectedFlagIndex(-1);
+                        return true;
 
-                case PlacesUtils.DELETE_REPORT_FLAG:
-                    this.deleteReportFlag(sel_usr);
-                    fa.setSelectedFlagIndex(-1);
-                    return true;
+                    case PlacesUtils.DELETE_REPORT_FLAG:
+                        this.deleteReportFlag(sel_usr);
+                        fa.setSelectedFlagIndex(-1);
+                        return true;
 
-                default:
-                    fa.setSelectedFlagIndex(-1);
-                    return super.onContextItemSelected(item);
+                    default:
+                        fa.setSelectedFlagIndex(-1);
+                        return super.onContextItemSelected(item);
+                }
+            }else{
+                Log.w(TAG, "Not handling the context item selection in " + TAG);
+                return false;
             }
         }
 

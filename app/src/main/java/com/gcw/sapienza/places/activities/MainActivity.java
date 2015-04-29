@@ -578,7 +578,15 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         //new interface
         Fragment f = this.getSupportFragmentManager().findFragmentById(R.id.home_container);
 
-        if(this.getSupportFragmentManager().getBackStackEntryCount() == 0){
+        if (isNonSupportFragmentVisible()) {
+            //if here, settings are visible
+            if(arePreferencesChanged()) {
+                PlacesMapListFragment toBeRefreshedFragment = (PlacesMapListFragment) f;
+                toBeRefreshedFragment.refresh();
+                resetPreferencesFlag();
+            }
+            showSupportFrag();
+        }else if(this.getSupportFragmentManager().getBackStackEntryCount() == 0){
             Log.d(TAG, "Backstack is empty!");
             super.onBackPressed();
         }else if (!isNonSupportFragmentVisible() && f != null && f.getClass() == MainFragment.class) {
@@ -597,15 +605,7 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
             finish();
 
-        } else if (isNonSupportFragmentVisible()) {
-            //if here, settings are visible
-            if(arePreferencesChanged()) {
-                PlacesMapListFragment toBeRefreshedFragment = (PlacesMapListFragment) f;
-                toBeRefreshedFragment.refresh();
-                resetPreferencesFlag();
-            }
-            showSupportFrag();
-        } else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+        }else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             FragmentManager fm = getFragmentManager();
 
             Log.i("MainActivity", "popping support: " +

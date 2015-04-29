@@ -14,6 +14,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -105,6 +106,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private MediaType mediaType;
     private ParseFile mediaFile;
     private Flag flag;
+
+    private Comment selectedComment;
 
     /*
      * Must be called BEFORE adding the fragment to the
@@ -503,10 +506,48 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
 
-    private View getTableRowView(Comment c) {
+    private View getTableRowView(final Comment c) {
+        //FIXME ===START OF CRASH=== investigate why it crashes here with a NullPointerException
         TableRow tr = new TableRow(getActivity());
         final View v = LayoutInflater.from(getActivity()).inflate(R.layout.comment_item_layout, tr, false);
         // TODO Change views according to comment
+
+        v.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                getActivity().openContextMenu(v);
+                return true;
+            }
+        });
+
+        registerForContextMenu(v);
+        v.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+            @Override
+            public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+                selectedComment = c;
+                menu.setHeaderTitle("Edit");
+                if (ParseUser.getCurrentUser().getObjectId().equals(c.getOwner().getObjectId())) {
+                    menu.add(PlacesUtils.COMMENT_LIST_GROUP, PlacesUtils.DELETE_COMMENT, 0, "Delete Comment");
+                } else {
+                    Log.d(TAG, "Username: " + ParseUser.getCurrentUser().getUsername());
+
+                    ParseQuery<ParseObject> queryDelete = ParseQuery.getQuery("Reported_Comments");
+
+                    queryDelete.whereEqualTo("reported_by", ParseUser.getCurrentUser());
+                    queryDelete.whereEqualTo("reported_comment", c);
+
+                    try {
+                        if (queryDelete.count() == 0) {
+                            menu.add(PlacesUtils.COMMENT_LIST_GROUP, PlacesUtils.REPORT_COMMENT, 0, "Report Comment as inappropriate");
+                        } else {
+                            menu.add(PlacesUtils.COMMENT_LIST_GROUP, PlacesUtils.DELETE_REPORT_COMMENT, 0, "Revoke Comment report");
+                        }
+                    } catch (ParseException e) {
+                        Log.e(TAG, e.getMessage());
+                    }
+                }
+            }
+        });
 
         String user_id = c.getUserId();
         String account_type = c.getAccountType();
@@ -514,6 +555,13 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         TextView usernameTextView = (TextView) v.findViewById(R.id.author);
         final ImageView profilePic = (ImageView) v.findViewById(R.id.comment_profile_pic);
+        profilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity) getActivity()).switchToOtherFrag(ProfileFragment.newInstance(c.getOwner()));
+            }
+        });
+
         TextView commentText = (TextView) v.findViewById(R.id.comment_text);
         TextView commentDate = (TextView) v.findViewById(R.id.comment_date);
 
@@ -885,37 +933,36 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        /*
-        CommentsAdapter fa = (CommentsAdapter) commentsRecyclerView.getAdapter();
-        Comment sel_usr = fa.getSelectedComment();
 
-        if (sel_usr == null)
-            Toast.makeText(getActivity(), Utils.NO_VALID_COMMENT_SELECTED, Toast.LENGTH_SHORT).show();
+        if(item.getGroupId() == PlacesUtils.COMMENT_LIST_GROUP) {
 
-        switch (item.getItemId()) {
+            Comment sel_usr = selectedComment;
 
-            case Utils.DELETE_COMMENT:
-                deleteComment(sel_usr);
-                fa.setSelectedCommentIndex(-1);
-                return true;
+            if (sel_usr == null)
+                Toast.makeText(getActivity(), PlacesUtils.NO_VALID_COMMENT_SELECTED, Toast.LENGTH_SHORT).show();
 
-            case Utils.REPORT_COMMENT:
-                this.reportComment(sel_usr);
-                fa.setSelectedCommentIndex(-1);
-                return true;
+            switch (item.getItemId()) {
 
-            case Utils.DELETE_REPORT_COMMENT:
-                this.deleteReportComment(sel_usr);
-                fa.setSelectedCommentIndex(-1);
-                return true;
+                case PlacesUtils.DELETE_COMMENT:
+                    deleteComment(sel_usr);
+                    return true;
 
-            default:
-                fa.setSelectedCommentIndex(-1);
-                return super.onContextItemSelected(item);
+                case PlacesUtils.REPORT_COMMENT:
+                    this.reportComment(sel_usr);
+                    return true;
+
+                case PlacesUtils.DELETE_REPORT_COMMENT:
+                    this.deleteReportComment(sel_usr);
+                    return true;
+
+                default:
+                    Log.w(TAG, "Unknown item selected for Comments' Context Menu");
+                    return super.onContextItemSelected(item);
+            }
+        }else{
+            Log.w(TAG, "Not handling the context item selection in " + TAG);
+            return false;
         }
-        */
-
-        return false;
     }
 
     private void deleteComment(Comment comment) {
@@ -932,14 +979,16 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     }
 
     private void reportComment(final Comment comment) {
-        CommentReport report = CommentReport.createFlagReportFromFlag(comment);
+        CommentReport report = CommentReport.createCommentReportFromComment(comment);
         report.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
                     Toast.makeText(getActivity(), PlacesUtils.COMMENT_REPORTED, Toast.LENGTH_SHORT).show();
-                } else
-                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.e(TAG, "error", e);
+                    PlacesUtils.showToast(getActivity(), "Something went wrong while reporting the Comment", Toast.LENGTH_SHORT);
+                }
             }
         });
     }
@@ -949,7 +998,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         ParseQuery<ParseObject> queryDelete = ParseQuery.getQuery("Reported_Comments");
 
         queryDelete.whereEqualTo("reported_by", ParseUser.getCurrentUser());
-        queryDelete.whereEqualTo("reported_flag", comment);
+        queryDelete.whereEqualTo("reported_comment", comment);
 
         queryDelete.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
@@ -959,13 +1008,16 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                         @Override
                         public void done(ParseException e) {
                             if (e == null) {
-                                Toast.makeText(getActivity(), PlacesUtils.FLAG_REPORT_REVOKED, Toast.LENGTH_SHORT).show();
-                            } else
-                                Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), PlacesUtils.COMMENT_REPORT_REVOKED, Toast.LENGTH_SHORT).show();
+                            } else {
+                                Log.e(TAG, "error", e);
+                                Toast.makeText(getActivity(), "Something went wrong while revoking the Comment report", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     });
                 } else {
-                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "error", e);
+                    PlacesUtils.showToast(getActivity(), "Something went wrong while revoking the Comment report", Toast.LENGTH_SHORT);
                 }
             }
         });

@@ -2,6 +2,7 @@ package com.gcw.sapienza.places.models;
 
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 import java.util.Date;
 
@@ -57,6 +58,14 @@ public class Comment extends ParseObject {
 
     public void setUsername(String username) {
         this.put(USERNAME_KEY, username);
+    }
+
+    public void setOwner(ParseUser owner) {
+        this.put(COMMENT_OWNER_KEY, owner);
+    }
+
+    public PlacesUser getOwner() {
+        return (PlacesUser) this.get(COMMENT_OWNER_KEY);
     }
 
     /**

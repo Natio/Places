@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -80,6 +82,8 @@ public class ProfileFragment extends Fragment {
         wowedView = (TextView) view.findViewById(R.id.wowedView);
         final TextView numFollowersView = (TextView) view.findViewById(R.id.numFollowersView);
         final Button friendsView = (Button) view.findViewById(R.id.friendsView);
+
+        final LinearLayout followersLayout = (LinearLayout)view.findViewById(R.id.followers_layout);
 
         //new split views for categories
         nonCat = (TextView) view.findViewById(R.id.cntNone);
@@ -173,16 +177,21 @@ public class ProfileFragment extends Fragment {
                 });
 
 
-                if (PlacesLoginUtils.getInstance().getCurrentUserId().equals(user.getFbId())) {
+//                if (PlacesLoginUtils.getInstance().getCurrentUserId().equals(user.getFbId())) {
+//                    int numFollowers = PlacesLoginUtils.getInstance().getFriends().size();
+//                    numFollowersView.setText(numFollowers + (numFollowers != 1 ? " Placers followed" : " Placer followed"));
+//                } else {
+//                    numFollowersView.setHeight(0);
+//                    numFollowersView.setVisibility(View.INVISIBLE);
+//                }
+
+                if (!ParseUser.getCurrentUser().getObjectId().equals(user.getObjectId())) {
+                    numFollowersView.setVisibility(View.GONE);
+                    followersLayout.setVisibility(View.GONE);
+                }else{
                     int numFollowers = PlacesLoginUtils.getInstance().getFriends().size();
                     numFollowersView.setText(numFollowers + (numFollowers != 1 ? " Placers followed" : " Placer followed"));
-                } else {
-                    numFollowersView.setHeight(0);
-                    numFollowersView.setVisibility(View.INVISIBLE);
-                }
-
-                if (!PlacesLoginUtils.getInstance().getCurrentUserId().equals(user.getFbId())) {
-                    friendsView.setVisibility(View.INVISIBLE);
+                    followersLayout.setVisibility(View.VISIBLE);
                 }
 
 

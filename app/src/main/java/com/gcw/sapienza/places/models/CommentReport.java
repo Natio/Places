@@ -23,7 +23,7 @@ public class CommentReport extends ParseObject{
      * @param f the comment to report
      * @return the configured instance
      */
-    public static CommentReport createFlagReportFromFlag(Comment f) {
+    public static CommentReport createCommentReportFromComment(Comment f) {
         assert ParseUser.getCurrentUser() != null : "Current user MUST not be null";
         CommentReport report = ParseObject.create(CommentReport.class);
         report.setReportedComment(f);
