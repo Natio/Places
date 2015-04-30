@@ -252,9 +252,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         // this.supl.setTouchEnabled(false);
         this.supl.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
         this.supl.setDragView(R.id.drag_handler);
-
-        // FIXME This brings some problems
-        this.supl.setAnchorPoint(0.75f);
+        // this.supl.setAnchorPoint(0.75f);
 
         this.supl.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
@@ -386,13 +384,12 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
     }
 
     @Override
-    public boolean onMarkerClick(Marker selectedMarker) {
-
+    public boolean onMarkerClick(Marker selectedMarker)
+    {
         String snippet = selectedMarker.getSnippet();
         Log.d(TAG, "Marker Snippet: " + snippet);
 
         if (snippet != null) {
-
             int index = Integer.parseInt(selectedMarker.getSnippet());
 
             this.listFragment.getRecyclerView().smoothScrollToPosition(index);
@@ -419,8 +416,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         // by returning false we can show text on flag in the map
         // return false;
 
-        if (supl.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED)
-            supl.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+        this.supl.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
 
         return true;
     }
