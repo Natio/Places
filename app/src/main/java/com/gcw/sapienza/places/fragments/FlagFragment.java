@@ -29,6 +29,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -94,7 +95,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private ImageView playVideoButton;
     private ImageView audioHolder;
     private TextView wowStatText;
-    private RelativeLayout frameLayout;
+    private FrameLayout frameLayout;
     private LinearLayout wholeFlagContainer;
     private LinearLayout audioLayout;
     private LinearLayout imageHolder;
@@ -102,6 +103,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private TableLayout commentsView;
     private View lastCommentPos;
     private ToggleButton newWowButton;
+    private ScrollView scrollView;
+    private ImageView focusedImageView;
 
     private MediaType mediaType;
     private ParseFile mediaFile;
@@ -223,7 +226,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             categoryIco.setImageResource(R.drawable.food);
         }
 
-        frameLayout = (RelativeLayout) view.findViewById(R.id.frame_layout);
+        frameLayout = (FrameLayout) view.findViewById(R.id.frame_layout);
 
         //to show big preview
         bigView = (ImageView) view.findViewById(R.id.pic_big_preview);
@@ -240,6 +243,8 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         wowStatText = (TextView) view.findViewById(R.id.wow_stats);
         newWowButton = (ToggleButton) view.findViewById(R.id.wow_button);
         newWowButton.setTransformationMethod(null); //to avoid capital letters in lollipop
+        scrollView = (ScrollView) view.findViewById(R.id.FlagContent);
+        focusedImageView = (ImageView) view.findViewById(R.id.pic_big_preview);
 
         imageView.setOnClickListener(this);
         videoView.setOnTouchListener(this);
@@ -278,12 +283,18 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         view.requestFocus();
 
         view.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_BACK) {
-                    if (frameLayout.getVisibility() == View.VISIBLE) {
+                @Override
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_BACK)
+                {
+                    Log.d(TAG, "Back button pressed!");
+
+                    if (frameLayout.getVisibility() == View.VISIBLE)
+                    {
+                        Log.d(TAG, "Larger pic was visible!");
+
                         frameLayout.setVisibility(View.GONE);
-                        wholeFlagContainer.setVisibility(View.VISIBLE);
+                        // scrollView.setVisibility(View.VISIBLE);
                         // getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                         return true;
                     }
@@ -291,8 +302,10 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 return false;
             }
         });
+
         updateWowInfo();
         retrieveComments();
+
         return view;
     }
 
@@ -309,19 +322,14 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             Log.d(TAG, "frame_layout clicked!");
             // getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             frameLayout.setVisibility(View.GONE);
-            wholeFlagContainer.setVisibility(View.VISIBLE);
+            // scrollView.setVisibility(View.VISIBLE);
         }
-        // TODO Enlarged media frame disabled
-        /*
         else if (v.getId() == R.id.pic) {
             Log.d(TAG, "pic clicked!");
             // getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
             frameLayout.setVisibility(View.VISIBLE);
-            //TODO image bigView
-
-            wholeFlagContainer.setVisibility(View.GONE);
+            // scrollView.setVisibility(View.GONE);
         }
-        */
         // else if(v.getId() == playVideoButton.getId()) playVideo();
         else if (v.getId() == R.id.audio) playRecording();
         else if (v.getId() == R.id.wow_button) wlbFlag(WOW_CODE);
@@ -805,27 +813,30 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
             ParseFile thumbnail = this.flag.getThumbnail();
             final ParseFile picture = this.flag.getPic();
-            if (thumbnail != null) {
-                Picasso.with(this.getActivity()).load(thumbnail.getUrl()).into(this.imageView, new Callback() {
+            if (thumbnail != null)
+            {
+                Picasso.with(this.getActivity()).load(thumbnail.getUrl()).into(this.imageView, new Callback()
+                {
                     @Override
-                    public void onSuccess() {
+                    public void onSuccess()
+                    {
                         Picasso.with(FlagFragment.this.getActivity()).load(picture.getUrl()).into(FlagFragment.this.imageView);
+                        Picasso.with(FlagFragment.this.getActivity()).load(picture.getUrl()).into(FlagFragment.this.focusedImageView);
                     }
 
                     @Override
                     public void onError() {
                     }
                 });
-            } else {
+            }
+            else
+            {
                 Picasso.with(this.getActivity()).load(picture.getUrl()).into(this.imageView);
+                Picasso.with(this.getActivity()).load(picture.getUrl()).into(focusedImageView);
             }
-            if (this.getView() != null) {
-                ImageView focused_imageView = (ImageView) this.getView().findViewById(R.id.pic_big_preview);
-                Picasso.with(this.getActivity()).load(picture.getUrl()).into(focused_imageView);
-            }
-
-
-        } else {
+        }
+        else
+        {
             videoHolder.setVisibility(View.VISIBLE);
         }
         if (this.mediaType != MediaType.NONE && this.mediaType != MediaType.PIC && this.mediaFile != null) {
