@@ -8,7 +8,7 @@ import com.parse.ParseUser;
  * Created by mic_head on 22/02/15.
  */
 @ParseClassName("Wow_Lol_Boo")
-public class CustomParseObject extends ParseObject {
+public class WoWObject extends ParseObject {
 
     public static final String FACEBOOK_ID_KEY = "fbId";
     public static final String FLAG_ID_KEY = "flagId";

@@ -28,7 +28,6 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -43,7 +42,7 @@ import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.activities.ShareActivity;
 import com.gcw.sapienza.places.models.Comment;
 import com.gcw.sapienza.places.models.CommentReport;
-import com.gcw.sapienza.places.models.CustomParseObject;
+import com.gcw.sapienza.places.models.WoWObject;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.models.PlacesUser;
 import com.gcw.sapienza.places.models.manager.CommentsManager;
@@ -283,14 +282,12 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         view.requestFocus();
 
         view.setOnKeyListener(new View.OnKeyListener() {
-                @Override
-                public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_BACK)
-                {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
                     Log.d(TAG, "Back button pressed!");
 
-                    if (frameLayout.getVisibility() == View.VISIBLE)
-                    {
+                    if (frameLayout.getVisibility() == View.VISIBLE) {
                         Log.d(TAG, "Larger pic was visible!");
 
                         frameLayout.setVisibility(View.GONE);
@@ -358,7 +355,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
         final int wowCount = flag.getInt("wowCount");
 
-        ParseQuery<CustomParseObject> queryWoWs = ParseQuery.getQuery("Wow_Lol_Boo");
+        ParseQuery<WoWObject> queryWoWs = ParseQuery.getQuery("Wow_Lol_Boo");
         queryWoWs.whereEqualTo("flag", flag);
         queryWoWs.whereEqualTo("user", ParseUser.getCurrentUser());
 //        due to free parse api terms, better to use get over count
@@ -383,9 +380,9 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 //                }
 //            }
 //        });
-        queryWoWs.getFirstInBackground(new GetCallback<CustomParseObject>() {
+        queryWoWs.getFirstInBackground(new GetCallback<WoWObject>() {
             @Override
-            public void done(CustomParseObject wow, ParseException e) {
+            public void done(WoWObject wow, ParseException e) {
                 if (e == null) {
                     if (wowCount == 1) wowStatText.setText("You WoWed this.");
                     else if (wowCount == 2)
@@ -664,15 +661,15 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     private void wlbFlag(int code) {
         newWowButton.setClickable(false);
 
-        ParseQuery<CustomParseObject> queryWLB = ParseQuery.getQuery("Wow_Lol_Boo");
+        ParseQuery<WoWObject> queryWLB = ParseQuery.getQuery("Wow_Lol_Boo");
         queryWLB.whereEqualTo("user", PlacesUser.getCurrentUser());
         queryWLB.whereEqualTo("flagId", this.flag.getObjectId());
 
         switch (code) {
             case WOW_CODE:
-                queryWLB.getFirstInBackground(new GetCallback<CustomParseObject>() {
+                queryWLB.getFirstInBackground(new GetCallback<WoWObject>() {
                     @Override
-                    public void done(CustomParseObject obj, ParseException e) {
+                    public void done(WoWObject obj, ParseException e) {
                         if (e == null) {
                             boolean boolWow = obj.getBoolean("boolWow");
 
@@ -694,7 +691,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                                 });
                             }
                         } else if (obj == null) {
-                            obj = new CustomParseObject();
+                            obj = new WoWObject();
                             obj.setUser(PlacesUser.getCurrentUser());
                             obj.setFlagId(FlagFragment.this.flag.getObjectId());
                             obj.setFlag(FlagFragment.this.flag);
@@ -911,18 +908,18 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
 
     //similar to wlbFlag but just to initialize the toggleButton of WOW in the correct way
     private void setWowButton() {
-        ParseQuery<CustomParseObject> queryWLB = ParseQuery.getQuery("Wow_Lol_Boo");
+        ParseQuery<WoWObject> queryWLB = ParseQuery.getQuery("Wow_Lol_Boo");
         queryWLB.whereEqualTo("user", ParseUser.getCurrentUser());
         queryWLB.whereEqualTo("flag", this.flag);
-        queryWLB.findInBackground(new FindCallback<CustomParseObject>() {
+        queryWLB.findInBackground(new FindCallback<WoWObject>() {
             @Override
-            public void done(List<CustomParseObject> markers, ParseException e) {
+            public void done(List<WoWObject> markers, ParseException e) {
                 if (e == null /*  && markers.size() != 0   */) {
                     //with old flags, when markers size is 0
                     if (markers.size() == 0)
                         newWowButton.setChecked(false);
                     else {
-                        CustomParseObject obj = markers.get(0);
+                        WoWObject obj = markers.get(0);
 
                         boolean boolWow = obj.getBoolean("boolWow");
                         if (!boolWow) newWowButton.setChecked(false);
