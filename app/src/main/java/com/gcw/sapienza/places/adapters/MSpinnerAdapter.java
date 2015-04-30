@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
@@ -36,10 +37,12 @@ public class MSpinnerAdapter extends ArrayAdapter<String> implements SpinnerAdap
 
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = vi.inflate(android.R.layout.simple_spinner_dropdown_item, null);
+            v = vi.inflate(R.layout.custom_spinner_item, null);
         }
 
-        TextView tv = (TextView) v.findViewById(android.R.id.text1);
+        TextView tv = (TextView) v.findViewById(R.id.text);
+        ImageView iv = (ImageView) v.findViewById(R.id.category_color);
+        ImageView iv2 = (ImageView) v.findViewById(R.id.category_icon);
 
         /*
         switch (position) {
@@ -63,18 +66,41 @@ public class MSpinnerAdapter extends ArrayAdapter<String> implements SpinnerAdap
         switch (position) {
             case 0:
                 tv.setTextColor(mContext.getResources().getColor(R.color.grey));
+                // iv.setBackgroundColor(mContext.getResources().getColor(R.color.red));
+                iv.setImageResource(R.drawable.flag_red);
+                iv2.setImageResource(R.drawable.none);
                 break;
             case 1:
+                // iv.setBackgroundColor(mContext.getResources().getColor(R.color.green));
+                iv.setImageResource(R.drawable.flag_green);
+                iv2.setImageResource(R.drawable.thoughts);
+                break;
             case 2:
+                // iv.setBackgroundColor(mContext.getResources().getColor(R.color.yellow));
+                iv.setImageResource(R.drawable.flag_yellow);
+                iv2.setImageResource(R.drawable.smile);
+                break;
             case 3:
+                // iv.setBackgroundColor(mContext.getResources().getColor(R.color.blue));
+                iv.setImageResource(R.drawable.flag_blue);
+                iv2.setImageResource(R.drawable.music);
+                break;
             case 4:
-                tv.setTextColor(mContext.getResources().getColor(R.color.black));
+                // iv.setBackgroundColor(mContext.getResources().getColor(R.color.grey));
+                iv.setImageResource(R.drawable.flag_grey);
+                iv2.setImageResource(R.drawable.eyes);
+                break;
+            case 5:
+                // iv.setBackgroundColor(mContext.getResources().getColor(R.color.purple));
+                iv.setImageResource(R.drawable.flag_purple);
+                iv2.setImageResource(R.drawable.food);
+                // tv.setTextColor(mContext.getResources().getColor(R.color.black));
         }
 
         tv.setBackgroundResource(R.drawable.spinner_selector);
         tv.setPadding(0, 15, 0, 15);
         tv.setGravity(Gravity.CENTER);
-        tv.setTextSize(22);
+        tv.setTextSize(24);
         tv.setText(values.get(position));
 
         return v;
