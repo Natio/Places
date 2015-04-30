@@ -253,6 +253,9 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         this.supl.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
         this.supl.setDragView(R.id.drag_handler);
 
+        // FIXME This brings some problems
+        this.supl.setAnchorPoint(0.75f);
+
         this.supl.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(View view, float v) {
@@ -287,6 +290,8 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
             @Override
             public void onPanelAnchored(View view) {
                 Log.d(TAG, "Panel anchored");
+
+                ((ImageView) view.findViewById(R.id.arrowView)).setImageResource(R.drawable.arrow_up);
             }
 
             @Override
