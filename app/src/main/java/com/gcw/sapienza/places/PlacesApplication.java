@@ -14,7 +14,7 @@ import android.util.Log;
 
 import com.gcw.sapienza.places.models.Comment;
 import com.gcw.sapienza.places.models.CommentReport;
-import com.gcw.sapienza.places.models.CustomParseObject;
+import com.gcw.sapienza.places.models.WoWObject;
 import com.gcw.sapienza.places.models.Flag;
 import com.gcw.sapienza.places.models.FlagReport;
 import com.gcw.sapienza.places.models.PlacesUser;
@@ -209,7 +209,7 @@ public class PlacesApplication extends Application {
         //register subclasses of Parse objects
         ParseObject.registerSubclass(Flag.class);
         ParseObject.registerSubclass(FlagReport.class);
-        ParseObject.registerSubclass(CustomParseObject.class);
+        ParseObject.registerSubclass(WoWObject.class);
         ParseObject.registerSubclass(Comment.class);
         ParseUser.registerSubclass(PlacesUser.class);
         ParseUser.registerSubclass(CommentReport.class);

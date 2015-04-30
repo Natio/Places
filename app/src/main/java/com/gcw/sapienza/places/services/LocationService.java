@@ -26,9 +26,11 @@ import com.gcw.sapienza.places.activities.MainActivity;
 import com.gcw.sapienza.places.fragments.CategoriesFragment;
 import com.gcw.sapienza.places.models.Comment;
 import com.gcw.sapienza.places.models.Flag;
+import com.gcw.sapienza.places.models.WoWObject;
 import com.gcw.sapienza.places.models.manager.CommentsManager;
 import com.gcw.sapienza.places.models.manager.ErrorCallback;
 import com.gcw.sapienza.places.models.manager.ModelCallback;
+import com.gcw.sapienza.places.models.manager.WoWsManager;
 import com.gcw.sapienza.places.notifications.Notifications;
 import com.gcw.sapienza.places.utils.PlacesLoginUtils;
 import com.gcw.sapienza.places.utils.PlacesStorage;
@@ -157,7 +159,6 @@ public class LocationService extends Service implements
                 Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
                 if (currentLocation != null) {
                     this.location = currentLocation;
-                    Log.d(TAG, "Called from HERE");
                     queryParsewithLocation(currentLocation);
                 }
                 else{
@@ -246,6 +247,66 @@ public class LocationService extends Service implements
     public void queryParsewithBag() {
         Log.d(TAG, "Running queryParsewithBag...");
 
+        final HashMap<String, Flag> filterDuplicates = new HashMap<>();
+
+        new WoWsManager().wowsOfUser(ParseUser.getCurrentUser(), true)
+                .cache(ParseQuery.CachePolicy.CACHE_THEN_NETWORK)
+                .error(new ErrorCallback() {
+                    @Override
+                    public void error(ParseException e) {
+                        LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.PARSE_ERROR_NOTIFICATION));
+                    }
+                })
+                .success(new ModelCallback<WoWObject>() {
+                    @Override
+                    public void result(List<WoWObject> wows) {
+                        if (wows == null)
+                        {
+                            wows = new ArrayList<>();
+                        }
+                        Log.d(TAG, "Size of wows: " + wows.size());
+
+                        String currentUserId;
+
+                        try
+                        {
+                            currentUserId = ParseUser.getCurrentUser().getObjectId();
+                        }
+                        catch(NullPointerException npe)
+                        {
+                            Log.e(TAG, npe.getMessage());
+                            return;
+                        }
+                        for (WoWObject w : wows) {
+
+                            Flag currFlag = w.getFlag();
+
+                            //the following check is needed because some comments do not have a flag
+                            if(currFlag == null || currFlag.getOwner() == null || currFlag.getOwner().getObjectId() == null){
+                                continue;
+                            }
+
+                            String currentFlagOwner = currFlag.getOwner().getObjectId();
+
+
+                            if (!currentFlagOwner.equals(currentUserId)) {
+                                filterDuplicates.put(currFlag.getObjectId(), currFlag);
+                            }
+                        }
+
+                        LocationService.this.bagFlags = new ArrayList<>(filterDuplicates.values());
+
+                        Log.d(TAG, "Size of Bag: " + LocationService.this.bagFlags.size());
+
+                        updateBagFlags();
+
+                        if (bagFlags.size() > 0) {
+                            LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_BAG_FLAGS_NOTIFICATION));
+                        } else {
+                            LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_BAG_FLAGS_NOTIFICATION));
+                        }
+                    }
+                }).start();
 
         new CommentsManager().commentOfUser(ParseUser.getCurrentUser(), true)
                 .cache(ParseQuery.CachePolicy.CACHE_THEN_NETWORK)
@@ -262,6 +323,7 @@ public class LocationService extends Service implements
                         {
                             comments = new ArrayList<>();
                         }
+                        Log.d(TAG, "Size of comments: " + comments.size());
 
                         String currentUserId;
 
@@ -274,7 +336,6 @@ public class LocationService extends Service implements
                             Log.e(TAG, npe.getMessage());
                             return;
                         }
-                        HashMap<String, Flag> filterDuplicates = new HashMap<>();
                         for (Comment c : comments) {
 
                             Flag currFlag = c.getFlag();
@@ -291,7 +352,10 @@ public class LocationService extends Service implements
                                 filterDuplicates.put(currFlag.getObjectId(), currFlag);
                             }
                         }
+
                         LocationService.this.bagFlags = new ArrayList<>(filterDuplicates.values());
+
+                        Log.d(TAG, "Size of Bag: " + LocationService.this.bagFlags.size());
 
                         updateBagFlags();
 
@@ -302,7 +366,6 @@ public class LocationService extends Service implements
                         }
                     }
                 }).start();
-
 /*
         ParseQuery<Comment> query = ParseQuery.getQuery("Comments");
         query.whereEqualTo("commenter", ParseUser.getCurrentUser());
