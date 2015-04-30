@@ -1,6 +1,6 @@
 # Places
 
-First Geo time social network where people are "flagged together".
+First Geo Time Social Network where people are "flagged together" because they have been at least once in their life in the same place.
 
 You can download the .apk and see the Places video on our  [website]
 
