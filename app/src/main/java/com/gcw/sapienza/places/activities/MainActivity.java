@@ -159,8 +159,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
             Log.d(TAG, "Bundle is not null.");
             handleIntent(intent);
         } else {
-            Log.d(TAG, "Bundle is null. Triggering default Activity behavior");
-            PlacesApplication.getInstance().startLocationService();
+//            Log.d(TAG, "Bundle is null. Triggering default Activity behavior");
+//            PlacesApplication.getInstance().startLocationService();
             //new interface
             this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
             //this.getSupportFragmentManager().beginTransaction().replace(R.id.sliding_layout, new MainFragment()).commit();
@@ -192,9 +192,9 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
     private void handleIntent(Intent intent) {
         String bundleContentType = intent.getStringExtra("type");
         if (bundleContentType == null) {
-            Log.d(TAG, "String 'type' in bundle is null. Triggering default Activity behavior.");
-
-            PlacesApplication.getInstance().startLocationService();
+//            Log.d(TAG, "String 'type' in bundle is null. Triggering default Activity behavior.");
+//
+//            PlacesApplication.getInstance().startLocationService();
             //new interface
             this.getSupportFragmentManager().beginTransaction().replace(R.id.home_container, new MainFragment()).commit();
             //this.getSupportFragmentManager().beginTransaction().replace(R.id.sliding_layout, new MainFragment()).commit();

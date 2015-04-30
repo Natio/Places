@@ -250,6 +250,11 @@ public class PlacesApplication extends Application {
 
     }
 
+    /**
+     * start the location service that provides updates on the location-sensitive
+     * data in Places. Upon connection, it automatically fetches location-sensitive
+     * data related to the Home page
+     */
     public void startLocationService() {
         LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
@@ -264,6 +269,12 @@ public class PlacesApplication extends Application {
         }
     }
 
+    /**
+     * update location-sensitive data in Places. If the LocationService is not
+     * yet started, start it instead.
+     * @param serviceListener the listener of location-sensitive data updates
+     * @return true if the location service was started already, false otherwise
+     */
     public boolean updatePlacesData(ILocationServiceListener serviceListener){
         if(mService != null){
             mService.updateLocationData();
@@ -275,6 +286,13 @@ public class PlacesApplication extends Application {
         }
     }
 
+    /**
+     * update location-sensistive data in Places related to a particular context
+     * If the LocationService is not yet started, start it instead.
+     * @param serviceListener the listener of location-sensitive data updates
+     * @param updateCode the update context we are interested in
+     * @return true if the location service was started already, false otherwise
+     */
     public boolean updatePlacesData(ILocationServiceListener serviceListener, int updateCode){
         if(mService != null) {
             mService.updateLocationData(updateCode);

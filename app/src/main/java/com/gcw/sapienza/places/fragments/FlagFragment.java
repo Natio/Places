@@ -339,18 +339,14 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         return v.getId() == videoView.getId() && event.getAction() == MotionEvent.ACTION_DOWN && playVideo();
     }
 
+    /**
+     * Show the profile page of the user the User has clicked on
+     */
     private void showProfilePage() {
         ((MainActivity) getActivity()).switchToOtherFrag(ProfileFragment.newInstance(this.flag.getOwner()));
     }
 
     private void updateWowInfo() {
-//        ParseQuery<Flag> queryPosts = ParseQuery.getQuery("Posts");
-//        queryPosts.whereEqualTo("objectId", this.flag.getObjectId());
-//        queryPosts.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
-//        queryPosts.getFirstInBackground(new GetCallback<Flag>() {
-//            @Override
-//            public void done(Flag flag, ParseException e) {
-//                if (e == null) {
 
         final int wowCount = flag.getInt("wowCount");
 
@@ -400,15 +396,11 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 }
             }
         });
-//                } else {
-//                    Log.e(TAG, e.getMessage());
-////                    Always triggers the toast on start
-////                    Utils.showToast(getActivity(), "An error occurred while retrieving Flag data", Toast.LENGTH_SHORT);
-//                }
-//            }
-//        });
     }
 
+    /**
+     * download all the comments for this Flag and update the view with new content
+     */
     private void retrieveComments() {
         new CommentsManager().commentsForFlag(this.flag)
                 .cache(ParseQuery.CachePolicy.CACHE_THEN_NETWORK)
@@ -437,6 +429,10 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
                 .start();
     }
 
+    /**
+     * the comment is uploaded and comments list is updated. In case something goes wrong,
+     * a Toast shows the related problem
+     */
     private void insertComment() {
         LayoutInflater li = LayoutInflater.from(getActivity());
         View passwordDialogLayout = li.inflate(R.layout.comment_insertion_layout, null);
