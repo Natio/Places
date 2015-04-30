@@ -129,6 +129,9 @@ public class LocationService extends Service implements
         return random_loc;
     }
 
+    /**
+     * update all the location-sensitive data in the application
+     */
     public void updateLocationData(){
         Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
         if (currentLocation != null) {
@@ -142,6 +145,11 @@ public class LocationService extends Service implements
         }
     }
 
+    /**
+     * update the location-sensitive data related to updateCode
+     * @param updateCode the code that identifies the location-sensitive
+     *                   context we are interested in
+     */
     public void updateLocationData(int updateCode){
         switch (updateCode){
 
@@ -149,6 +157,7 @@ public class LocationService extends Service implements
                 Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
                 if (currentLocation != null) {
                     this.location = currentLocation;
+                    Log.d(TAG, "Called from HERE");
                     queryParsewithLocation(currentLocation);
                 }
                 else{
@@ -529,6 +538,9 @@ public class LocationService extends Service implements
 
                     if (flags.size() > 0 || hiddenFlags.size() > 0) {
                         LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NEW_FLAGS_NOTIFICATION));
+                        if(flags.size() > 0){
+                            checkNotificationRequirements();
+                        }
                     } else {
                         LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(new Intent(LocationService.FOUND_NO_FLAGS_NOTIFICATION));
                     }
@@ -559,16 +571,20 @@ public class LocationService extends Service implements
             NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             nManager.cancel(NOTIFICATION_ID);
         }
-        /*long elapsed_time = location.getTime() - (this.location == null ? 0L : this.location.getTime());
-        if (this.location != null) {
-            float distance = location.distanceTo(this.location) / KM_TO_M;
-        }*/
         this.location = location;
         updateLocation();
         queryParsewithLocation(location);
+    }
+
+    /**
+     * check if we can notify the user about Flags around. the reason why we could not,
+     * for example, could be that Places is not in background, that the user has already
+     * checked out the Flags around, notifications are disabled, no Flags are around, etc...
+     */
+    private void checkNotificationRequirements() {
         if (this.flagsNearby != null && PlacesLoginUtils.getInstance().hasCurrentUserId()) {
 
-
+            //if Places is in foreground, we don't notify the user
             if (!MainActivity.isForeground()) {
 
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -590,7 +606,9 @@ public class LocationService extends Service implements
      * Called when new Flags are found
      */
     private void notifyUser() {
+        //flags that we have never seen or haven't seen in a long time...
         int newFlags = updateCachedPostsAndRet();
+        //...and we notify the user only if there are such flags
         if (newFlags > 0) {
             Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             int numFlags = this.flagsNearby.size();
