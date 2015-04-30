@@ -109,6 +109,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
 
     public static final String PREFERENCES_CHANGED_NOTIFICATION = "Preferences Changed";
 
+    public int flagClicked;
+
     public static boolean isForeground() {
         return isForeground;
     }
@@ -120,6 +122,8 @@ public class MainActivity extends ActionBarActivity implements Preference.OnPref
         PlacesLoginUtils.getInstance().checkForSessionValidityAndStartDownloadingInfo(this);
 
         setContentView(R.layout.activity_main_drawer_layout);
+
+        flagClicked = 0;
 
         this.current_title = this.getTitle();
         this.drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);

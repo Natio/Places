@@ -202,6 +202,12 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(this.parseErrorReceiver, parseErrorFilter);
     }
 
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+    }
+
     /**
      * Unregisters the flagsReceiver from local notifications
      */
@@ -637,6 +643,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
 
         public void updateRecycleViewWithNewContents(List<Flag> l) {
             this.recycleView.setAdapter(new FlagsAdapter(l, recycleView, getActivity()));
+            this.recycleView.scrollToPosition(((MainActivity)getActivity()).flagClicked);
         }
 
 

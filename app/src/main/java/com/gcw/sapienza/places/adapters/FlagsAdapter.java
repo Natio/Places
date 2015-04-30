@@ -251,12 +251,15 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
         }
 
         @Override
-        public void onClick(View v) {
+        public void onClick(View v)
+        {
             if (mFlag.getPassword() != null) askForPassword(mFlag.getPassword());
             else openFlag();
         }
 
-        private void openFlag() {
+        private void openFlag()
+        {
+            ((MainActivity)mainActivity).flagClicked = this.getPosition();
 
             FlagFragment frag = new FlagFragment();
             frag.setFlag(this.mFlag);
@@ -361,53 +364,6 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
             });
 
             stats_wow.setText(numberOfWows + " WoW");
-
-
-            // TODO I totally have to go over this mess
-            //for now only number of wows is shown, we could like it also from cardView with a button
-            /*
-            ParseQuery<CustomParseObject> queryW = ParseQuery.getQuery("Wow_Lol_Boo");
-            queryW.whereEqualTo("fbId", userId);
-            queryW.whereEqualTo("flagId", flagId);
-            queryW.whereEqualTo("boolWow", true);
-
-            queryW.findInBackground(new FindCallback<CustomParseObject>() {
-                public void done(List<CustomParseObject> markers, ParseException e) {
-                    if (e == null && markers.size() != 0) {
-                        numberOfWows--; //me and all the others but me
-                        stats_wow.setText("You and other "+ numberOfWows+ " WoWed this");
-                    }
-                }
-            });
-            */
-
-    /*
-            ParseQuery<CustomParseObject> queryL = ParseQuery.getQuery("Wow_Lol_Boo");
-            queryL.whereEqualTo("fbId", userId);
-            queryL.whereEqualTo("flagId", flagId);
-            queryL.whereEqualTo("boolLol", true);
-
-            queryL.findInBackground(new FindCallback<CustomParseObject>() {
-                public void done(List<CustomParseObject> markers, ParseException e) {
-                    if (e == null && markers.size() != 0) {
-                        lolButton.setText("You lol this." + " (" + lolCount + ")");
-                    }
-                }
-            });
-
-            ParseQuery<CustomParseObject> queryB = ParseQuery.getQuery("Wow_Lol_Boo");
-            queryB.whereEqualTo("fbId", userId);
-            queryB.whereEqualTo("flagId", flagId);
-            queryB.whereEqualTo("boolBoo", true);
-
-            queryB.findInBackground(new FindCallback<CustomParseObject>() {
-                public void done(List<CustomParseObject> markers, ParseException e) {
-                    if (e == null && markers.size() != 0) {
-                        booButton.setText("You boo this." + " (" + booCount + ")");
-                    }
-                }
-            });
-            */
         }
 
 
