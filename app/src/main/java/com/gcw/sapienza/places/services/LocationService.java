@@ -521,7 +521,8 @@ public class LocationService extends Service implements
         if (fun_check) selectedCategories.add("Fun");
         if (landscape_check) selectedCategories.add("Landscape");
         if (food_check) selectedCategories.add("Food");
-        if (none_check) selectedCategories.add("None");
+        // if (none_check) selectedCategories.add("None");
+        if (none_check) selectedCategories.add("#www2015");
         if (music_check) selectedCategories.add("Music");
         query.whereContainedIn("category", selectedCategories);
 

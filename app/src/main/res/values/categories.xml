@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="categories">
-        <item name="None">None</item>
+        <!-- <item name="None">None</item> -->
+        <item name="None">#www2015</item>
         <item name="Thoughts">Thoughts</item>
         <item name="Fun">Fun</item>
         <item name="Music">Music</item>
