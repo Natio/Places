@@ -154,7 +154,8 @@ public class FlagsAdapter extends RecyclerView.Adapter<FlagsAdapter.FlagsViewHol
         if (flagViewHolder.mFlag.getCategory().equals(category_array[0])) { //None
             flagViewHolder.categoryIcon.setImageResource(R.drawable.thoughts);
         } else if (flagViewHolder.mFlag.getCategory().equals(category_array[1])) { //Thoughts
-            flagViewHolder.categoryIcon.setImageResource(R.drawable.none);
+            // flagViewHolder.categoryIcon.setImageResource(R.drawable.none);
+            flagViewHolder.categoryIcon.setImageResource(R.mipmap.www15);
         } else if (flagViewHolder.mFlag.getCategory().equals(category_array[2])) { //Fun
             flagViewHolder.categoryIcon.setImageResource(R.drawable.smile);
         } else if (flagViewHolder.mFlag.getCategory().equals(category_array[3])) { //Music

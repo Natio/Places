@@ -73,7 +73,8 @@ public class MSpinnerAdapter extends ArrayAdapter<String> implements SpinnerAdap
             case 1:
                 // iv.setBackgroundColor(mContext.getResources().getColor(R.color.green));
                 iv.setImageResource(R.drawable.flag_green);
-                iv2.setImageResource(R.drawable.none);
+                // iv2.setImageResource(R.drawable.none);
+                iv2.setImageResource(R.mipmap.www15);
                 break;
             case 2:
                 // iv.setBackgroundColor(mContext.getResources().getColor(R.color.yellow));
