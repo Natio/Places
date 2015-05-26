@@ -33,7 +33,7 @@
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="noneCheck"
-            android:summary="Not categorized" />
+            android:summary="#www2015" />
 
     </PreferenceCategory>
 
