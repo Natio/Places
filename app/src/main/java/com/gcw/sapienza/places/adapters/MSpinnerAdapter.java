@@ -65,16 +65,16 @@ public class MSpinnerAdapter extends ArrayAdapter<String> implements SpinnerAdap
 
         switch (position) {
             case 0:
-                tv.setTextColor(mContext.getResources().getColor(R.color.grey));
+                // tv.setTextColor(mContext.getResources().getColor(R.color.grey));
                 // iv.setBackgroundColor(mContext.getResources().getColor(R.color.red));
                 iv.setImageResource(R.drawable.flag_red);
-                iv2.setImageResource(R.drawable.thoughts);
+                iv2.setImageResource(R.mipmap.www15);
                 break;
             case 1:
                 // iv.setBackgroundColor(mContext.getResources().getColor(R.color.green));
                 iv.setImageResource(R.drawable.flag_green);
                 // iv2.setImageResource(R.drawable.none);
-                iv2.setImageResource(R.mipmap.www15);
+                iv2.setImageResource(R.drawable.thoughts);
                 break;
             case 2:
                 // iv.setBackgroundColor(mContext.getResources().getColor(R.color.yellow));
