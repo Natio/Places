@@ -300,15 +300,15 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
             }
         });
 
-        updateWowInfo();
-        retrieveComments();
-
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
+        updateWowInfo();
+        retrieveComments();
     }
 
     @Override
@@ -508,8 +508,10 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
     }
 
     private View getTableRowView(final Comment c) {
+        if(getActivity() == null) return null;
+
         //FIXME ===START OF CRASH=== investigate why it crashes here with a NullPointerException
-        TableRow tr = new TableRow(getActivity());
+        TableRow tr = new TableRow(getActivity().getApplicationContext());
         final View v = LayoutInflater.from(getActivity()).inflate(R.layout.comment_item_layout, tr, false);
         // TODO Change views according to comment
 
