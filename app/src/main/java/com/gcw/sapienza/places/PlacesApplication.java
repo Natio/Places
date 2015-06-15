@@ -52,15 +52,10 @@ public class PlacesApplication extends Application {
     private static Context PLACES_CONTEXT = null;
     private static PlacesApplication placesApplication;
     //current location
-    private Location currentLocation = null;
+    private Location cachedLocation;
 
     private HashMap<ILocationServiceListener, Integer> serviceListeners = new HashMap<>();
     private ILocationUpdater listener = new ILocationUpdater() {
-        @Override
-        public void setLocation(Location l) {
-            PlacesApplication.this.currentLocation = l;
-           // PlacesApplication.this.updateWeatherInfo();
-        }
 
         @Override
         public void setFlagsNearby(Collection<Flag> l) {
@@ -165,18 +160,18 @@ public class PlacesApplication extends Application {
      */
     public Location getLocation() {
         //if (/*PlacesApplication.isRunningOnEmulator &&*/ this.currentLocation == null) {
-        if (PlacesApplication.isRunningOnEmulator && this.currentLocation == null) {
+        if (PlacesApplication.isRunningOnEmulator && this.cachedLocation == null) {
 
             Location loc = new Location("rome_center");
             loc.setLatitude(41.900193);
             loc.setLongitude(12.472916);
-            this.currentLocation = LocationService.getRandomLocation(loc, 1000);
+            this.cachedLocation = LocationService.getRandomLocation(loc, 1000);
         }
-        return this.currentLocation;
-    }
-
-    public void setLocation(Location l){
-        this.currentLocation = l;
+        Location currentLocation = mService.getCurrentLocation();
+        if(currentLocation != null){
+            this.cachedLocation = currentLocation;
+        }
+        return this.cachedLocation;
     }
 
     /*

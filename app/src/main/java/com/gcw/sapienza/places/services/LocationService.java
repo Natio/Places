@@ -190,8 +190,7 @@ public class LocationService extends Service implements
 
         Log.d(TAG, "Connected to Google Api");
 
-        Location currentLocation = fusedLocationProviderApi.getLastLocation(googleApiClient);
-        if(currentLocation != null && suspendedRequest != null){
+        if(suspendedRequest != null){
             updateLocationData(suspendedRequest);
         }
         fusedLocationProviderApi.requestLocationUpdates(googleApiClient, locationRequest, this);
@@ -628,8 +627,6 @@ public class LocationService extends Service implements
             nManager.cancel(NOTIFICATION_ID);
         }
         this.location = location;
-        PlacesApplication.getInstance().setLocation(this.location);
-        updateLocation();
         queryParsewithLocation(location);
     }
 
@@ -740,7 +737,6 @@ public class LocationService extends Service implements
      */
     private void updateApplication() {
         if (listener != null) {
-            listener.setLocation(location);
             listener.setFlagsNearby(flagsNearby);
             listener.setHiddenFlags(hiddenFlags);
             listener.setMyFlags(myFlags);
@@ -752,12 +748,6 @@ public class LocationService extends Service implements
         if (listener != null) {
             listener.setFlagsNearby(flagsNearby);
             listener.setHiddenFlags(hiddenFlags);
-        }
-    }
-
-    private void updateLocation(){
-        if (listener != null) {
-            listener.setLocation(location);
         }
     }
 
@@ -818,6 +808,13 @@ public class LocationService extends Service implements
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
+    }
+
+    public Location getCurrentLocation() {
+        if(this.location == null){
+            this.location = fusedLocationProviderApi.getLastLocation(googleApiClient);
+        }
+        return this.location;
     }
 
     public class LocalBinder extends Binder {

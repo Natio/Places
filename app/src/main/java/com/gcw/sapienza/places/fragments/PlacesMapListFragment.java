@@ -433,7 +433,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         return true;
     }
 
-    private LatLng addDiscanceToLocation(Location center, double dLat, double dLon){
+    private LatLng addDistanceToLocation(Location center, double dLat, double dLon){
         double lat = center.getLatitude() + (180/Math.PI)*(dLat/6378137);
         double lon = center.getLongitude() + (180/Math.PI)*(dLon/6378137)/Math.cos(center.getLatitude());
         return new LatLng(lat, lon);
@@ -524,10 +524,10 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                         .strokeColor(Color.GREEN)
                         .fillColor(Color.TRANSPARENT));
                 if (this.mapZoomsAroundSearchRadius()){
-                    builder.include(this.addDiscanceToLocation(currentLocation, PlacesUtils.MAP_RADIUS * 1000,0.0));
-                    builder.include(this.addDiscanceToLocation(currentLocation, -PlacesUtils.MAP_RADIUS * 1000,0.0));
-                    builder.include(this.addDiscanceToLocation(currentLocation, 0.0, -PlacesUtils.MAP_RADIUS * 1000));
-                    builder.include(this.addDiscanceToLocation(currentLocation, 0.0, PlacesUtils.MAP_RADIUS * 1000));
+                    builder.include(this.addDistanceToLocation(currentLocation, PlacesUtils.MAP_RADIUS * 1000, 0.0));
+                    builder.include(this.addDistanceToLocation(currentLocation, -PlacesUtils.MAP_RADIUS * 1000, 0.0));
+                    builder.include(this.addDistanceToLocation(currentLocation, 0.0, -PlacesUtils.MAP_RADIUS * 1000));
+                    builder.include(this.addDistanceToLocation(currentLocation, 0.0, PlacesUtils.MAP_RADIUS * 1000));
                 }
             }
 
@@ -547,7 +547,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                     se.setLongitude(tmpBounds.northeast.longitude);
                     float dist = ne.distanceTo(se);
                     float tot = dist / 0.15f;
-                    builder.include(this.addDiscanceToLocation(se, tot, 0.0));
+                    builder.include(this.addDistanceToLocation(se, tot, 0.0));
                     tmpBounds = builder.build();
                 }
                 final LatLngBounds bounds = tmpBounds;
