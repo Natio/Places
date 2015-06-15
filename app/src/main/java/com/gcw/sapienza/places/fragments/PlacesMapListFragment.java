@@ -80,9 +80,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         return PlacesMapListFragment.currentFragmentInstance;
     }
 
-    public enum Requirements {NONE, NETWORK, LOCATION, ALL}
-
-    ;
+    public enum Requirements {NONE, NETWORK, LOCATION, ALL};
 
     private GoogleMap gMap;
     private List<Marker> markers;
@@ -166,6 +164,13 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
      * @return true if you want to enable discover mode on map
      */
     protected abstract boolean showDiscoverModeOnMap();
+
+    /**
+     * @return true if the map has to zoom around the raiud
+     */
+    protected boolean mapZoomsAroundSearchRadius(){
+        return false;
+    }
 
     /**
      * @return code indicating the network/location requirements of the fragment
@@ -273,6 +278,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                 //made temporarily scrollable
                 //gMap.getUiSettings().setScrollGesturesEnabled(true);
                 // supl.setTouchEnabled(true);
+                updateMarkersOnMap();
                 ((ImageView) view.findViewById(R.id.arrowView)).setImageResource(R.drawable.arrow_down);
             }
 
@@ -285,7 +291,7 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                 // supl.setTouchEnabled(false);
                 // supl.setEnableDragViewTouchEvents(false);
                 // supl.setLongClickable(false);
-
+                updateMarkersOnMap();
                 ((ImageView) view.findViewById(R.id.arrowView)).setImageResource(R.drawable.arrow_up);
 
 
@@ -427,6 +433,12 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
         return true;
     }
 
+    private LatLng addDiscanceToLocation(Location center, double dLat, double dLon){
+        double lat = center.getLatitude() + (180/Math.PI)*(dLat/6378137);
+        double lon = center.getLongitude() + (180/Math.PI)*(dLon/6378137)/Math.cos(center.getLatitude());
+        return new LatLng(lat, lon);
+    }
+
     // Puts markers on the map
     private void updateMarkersOnMap() {
 
@@ -511,21 +523,37 @@ public abstract class PlacesMapListFragment extends Fragment implements OnMapRea
                         .radius(PlacesUtils.MAP_RADIUS * 1000)
                         .strokeColor(Color.GREEN)
                         .fillColor(Color.TRANSPARENT));
+                if (this.mapZoomsAroundSearchRadius()){
+                    builder.include(this.addDiscanceToLocation(currentLocation, PlacesUtils.MAP_RADIUS * 1000,0.0));
+                    builder.include(this.addDiscanceToLocation(currentLocation, -PlacesUtils.MAP_RADIUS * 1000,0.0));
+                    builder.include(this.addDiscanceToLocation(currentLocation, 0.0, -PlacesUtils.MAP_RADIUS * 1000));
+                    builder.include(this.addDiscanceToLocation(currentLocation, 0.0, PlacesUtils.MAP_RADIUS * 1000));
+                }
             }
 
             if (flags.size() > 0) {
-                final LatLngBounds bounds = builder.build();
-//                this.gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
-                // FIXME That's a mess, Paolo forgive me
-                /*if (PlacesLoginUtils.loginType == PlacesLoginUtils.LoginType.GPLUS)
-                    this.gMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-                        @Override
-                        public void onCameraChange(CameraPosition cameraPosition) {
-                            gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.MAP_BOUNDS));
-                            gMap.setOnCameraChangeListener(null);
-                        }
-                    });
-                else*/
+
+                LatLngBounds tmpBounds = builder.build();
+
+                if (this.supl.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED){
+                    LatLngBounds.Builder b = new LatLngBounds.Builder();
+                    b.include(tmpBounds.northeast);
+                    b.include(tmpBounds.southwest);
+                    Location ne = new Location("NE");
+                    ne.setLatitude(tmpBounds.northeast.latitude);
+                    ne.setLongitude(tmpBounds.northeast.longitude);
+                    Location se = new Location("SE");
+                    se.setLatitude(tmpBounds.southwest.latitude);
+                    se.setLongitude(tmpBounds.northeast.longitude);
+                    float dist = ne.distanceTo(se);
+                    float tot = dist / 0.15f;
+                    builder.include(this.addDiscanceToLocation(se, tot, 0.0));
+                    tmpBounds = builder.build();
+                }
+                final LatLngBounds bounds = tmpBounds;
+
+
+
                 try {
                     gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, PlacesUtils.MAP_BOUNDS));
                 } catch (IllegalStateException ise) {
