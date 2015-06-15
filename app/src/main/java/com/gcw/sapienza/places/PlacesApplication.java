@@ -175,7 +175,9 @@ public class PlacesApplication extends Application {
         return this.currentLocation;
     }
 
-
+    public void setLocation(Location l){
+        this.currentLocation = l;
+    }
 
     /*
     public Flag getFlagWithId(String id) {

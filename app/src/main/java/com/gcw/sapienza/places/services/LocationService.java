@@ -636,6 +636,7 @@ public class LocationService extends Service implements
             nManager.cancel(NOTIFICATION_ID);
         }
         this.location = location;
+        PlacesApplication.getInstance().setLocation(this.location);
         updateLocation();
         queryParsewithLocation(location);
     }
