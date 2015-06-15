@@ -438,10 +438,7 @@ public class LocationService extends Service implements
      */
     public void queryParsewithLocation(Location location) {
         Log.d(TAG, "Running queryParsewithLocation...");
-        //creates a fake location for testing if it is running on simulator
-        if (PlacesApplication.isRunningOnEmulator) {
-            location = PlacesApplication.getInstance().getLocation();
-        }
+
 
         //this is for avoiding a crash if location is null
         //the crash happens if there is no GPS data and the action range is changed
@@ -461,10 +458,6 @@ public class LocationService extends Service implements
         ParseQuery<Flag> query = ParseQuery.getQuery("Posts");
 
         float radius = PlacesUtils.DISCOVER_MODE_RADIUS; // double it for discover mode
-
-        if (PlacesApplication.isRunningOnEmulator) {
-            radius = 10.0f;
-        }
 
         query.whereWithinKilometers("location", gp, radius);
 
@@ -522,7 +515,7 @@ public class LocationService extends Service implements
         if (landscape_check) selectedCategories.add("Landscape");
         if (food_check) selectedCategories.add("Food");
         // if (none_check) selectedCategories.add("None");
-        if (none_check) selectedCategories.add("#www2015");
+        if (none_check) selectedCategories.add("None");
         if (music_check) selectedCategories.add("Music");
         query.whereContainedIn("category", selectedCategories);
 
@@ -573,7 +566,6 @@ public class LocationService extends Service implements
         if (PlacesApplication.isRunningOnEmulator) {
             query.setLimit(50);
         }
-
 
         query.findInBackground(new FindCallback<Flag>() {
             @Override

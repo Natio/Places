@@ -92,7 +92,8 @@ public class MainFragment extends PlacesMapListFragment{
      */
     @Override
     protected  List<Flag> getData(){
-        return FlagsStorage.getSharedStorage().fetchFlagsWithType(Type.NEARBY);
+        List<Flag> list = FlagsStorage.getSharedStorage().fetchFlagsWithType(Type.NEARBY);
+        return list;
     }
 
     @Override
