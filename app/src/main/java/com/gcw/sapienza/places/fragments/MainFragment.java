@@ -92,8 +92,7 @@ public class MainFragment extends PlacesMapListFragment{
      */
     @Override
     protected  List<Flag> getData(){
-        List<Flag> list = FlagsStorage.getSharedStorage().fetchFlagsWithType(Type.NEARBY);
-        return list;
+        return FlagsStorage.getSharedStorage().fetchFlagsWithType(Type.NEARBY);
     }
 
     @Override
@@ -104,5 +103,9 @@ public class MainFragment extends PlacesMapListFragment{
     @Override
     protected Requirements fragmentRequirements() {
         return Requirements.ALL;
+    }
+
+    protected boolean mapZoomsAroundSearchRadius(){
+        return true;
     }
 }
