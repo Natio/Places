@@ -11,8 +11,6 @@ import java.util.Collection;
  */
 public interface ILocationUpdater {
 
-    public void setLocation(Location l);
-
     public void setFlagsNearby(Collection<Flag> c);
 
     public void setMyFlags(Collection<Flag> c);
