@@ -100,7 +100,7 @@ public class ProfileFragment extends Fragment {
         ImageView foodCatIco = (ImageView) view.findViewById(R.id.icoFood);
         ImageView musicCatIco = (ImageView) view.findViewById(R.id.icoMusic);
 
-        nonCatIco.setImageResource(R.drawable.none);
+        nonCatIco.setImageResource(R.drawable.uncategorized);
         thoughtsCatIco.setImageResource(R.drawable.thoughts);
         funCatIco.setImageResource(R.drawable.smile);
         landscapeCatIco.setImageResource(R.drawable.eyes);

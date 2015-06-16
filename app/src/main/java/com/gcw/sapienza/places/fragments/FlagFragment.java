@@ -212,7 +212,7 @@ public class FlagFragment extends Fragment implements View.OnClickListener, View
         String[] category_array = PlacesApplication.getInstance().getResources().getStringArray(R.array.categories);
         String category = this.flag.getCategory();
         if (category.equals(category_array[0])) { //None
-            categoryIco.setImageResource(R.drawable.none);
+            categoryIco.setImageResource(R.drawable.uncategorized);
         } else if (category.equals(category_array[1])) { //Thoughts
             categoryIco.setImageResource(R.drawable.thoughts);
         } else if (category.equals(category_array[2])) { //Fun
